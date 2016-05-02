@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.inova8.odata2sparql</groupId>
+  <artifactId>odata2sparql.v4</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1</version>
+  <name>odata2sparql.v4</name>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.olingo</groupId>
+    	<artifactId>odata-server-core</artifactId>
+    	<version>${olingo.version}</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.olingo</groupId>
+    	<artifactId>odata-commons-api</artifactId>
+    	<version>${olingo.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>odata2sparql.v4</finalName>
+  </build>
+  <organization>
+  	<name>inova8 llc</name>
+  	<url>http://www.inova8.com</url>
+  </organization>
+  <scm>
+  	<developerConnection>Peter Lawrence</developerConnection>
+  	<url>https://github.com/peterjohnlawrence/com.inova8.odata2sparql.v4</url>
+  </scm>
+  <properties>
+  	<olingo.version>4.2.0</olingo.version>
+  </properties>
+  <url>http://www.inova8.com</url>
+</project>
