@@ -327,8 +327,8 @@ odata4sparql:OUEXT
   odata4sparql:namespace <http://northwind.com/model/> ;
   odata4sparql:prefix "northwind"^^xsd:string ;
   odata4sparql:vocabularyRepository odata4sparql:ODATA2SPARQL ;
-  odata4sparql:withRdfAnnotations "true"^^xsd:boolean ;
-  odata4sparql:withSapAnnotations "true"^^xsd:boolean ;
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
   rdfs:label "NorthwindVocabulary"^^xsd:string ;
 .
 :NW_Data

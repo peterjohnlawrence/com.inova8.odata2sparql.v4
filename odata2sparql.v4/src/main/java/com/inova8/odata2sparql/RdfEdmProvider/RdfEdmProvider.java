@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -13,9 +14,12 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
+import org.apache.olingo.commons.api.edm.provider.CsdlFunction;
 import org.apache.olingo.commons.api.edm.provider.CsdlFunctionImport;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
+import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.apache.olingo.commons.api.ex.ODataException;
+
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
@@ -28,9 +32,11 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	private final Log log = LogFactory.getLog(RdfEdmProvider.class);
 	private final RdfEdmModelProvider rdfEdmModelProvider;
+	
 
 	RdfEdmProvider(String odataVersion, RdfRepository rdfRepository) throws OData2SparqlException {
 		this.rdfEdmModelProvider = new RdfEdmModelProvider(rdfRepository, odataVersion);
+		
 	}
 
 	public RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
@@ -127,27 +133,6 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
-/*	@Override
-	public Association getAssociation(final FullQualifiedName edmFQName) throws ODataException {
-		String nameSpace = edmFQName.getNamespace();
-		try {
-			for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
-				if (nameSpace.equals(schema.getNamespace())) {
-					String associationName = edmFQName.getName();
-					for (Association association : schema.getAssociations()) {
-						if (associationName.equals(association.getName())) {
-							return association;
-						}
-					}
-				}
-			}
-		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getAssociation " + edmFQName);
-			throw new ODataException("NullPointerException getAssociation " + edmFQName);
-		}
-		return null;
-	}*/
-
 	@Override
 	public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, final String name) throws ODataException {
 
@@ -169,30 +154,6 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		}
 		return null;
 	}
-
-/*	@Override
-	public AssociationSet getAssociationSet(FullQualifiedName entityContainer, final FullQualifiedName association,
-			final String sourceEntitySetName, final String sourceEntitySetRole) throws ODataException {
-
-		try {
-			for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
-				CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
-				if (entityContainer.equals(schemaEntityContainer.getName())) {
-
-					for (AssociationSet associationSet : schemaEntityContainer.getAssociationSets()) {
-						if (association.equals(associationSet.getAssociation())) {
-							return associationSet;
-						}
-					}
-
-				}
-			}
-		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getAssociationSet " + entityContainer + " " + association);
-			throw new ODataException("NullPointerException getAssociationSet " + entityContainer + " " + association);
-		}
-		return null;
-	}*/
 
 	@Override
 	public CsdlFunctionImport getFunctionImport(FullQualifiedName entityContainer, final String name)
@@ -222,11 +183,10 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName name) throws ODataException {
 		if (name == null) {
 			// Assume request for null container means default container
-			return new CsdlEntityContainerInfo().setContainerName(new FullQualifiedName(RdfConstants.ENTITYCONTAINER));
+			return new CsdlEntityContainerInfo().setContainerName(new FullQualifiedName(RdfConstants.ENTITYCONTAINERNAMESPACE,RdfConstants.ENTITYCONTAINER));
 		} else {
 			try {
 				for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
-
 					CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
 					if (name.equals(schemaEntityContainer.getName())) {
 						return new CsdlEntityContainerInfo().setContainerName(name);
@@ -239,4 +199,28 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		}
 		return null;
 	}
+
+	@Override
+	public List<CsdlFunction> getFunctions(FullQualifiedName functionName) throws ODataException {
+		// TODO Auto-generated method stub
+		return super.getFunctions(functionName);
+	}
+
+	@Override
+	public CsdlTerm getTerm(FullQualifiedName termName) throws ODataException {
+		return RdfConstants.TERMS.get(termName.getName());
+	}
+
+	@Override
+	public CsdlEntityContainer getEntityContainer() throws ODataException {
+		for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+			CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
+			//First one found will be the container, as only one allowed in V4
+			if (schemaEntityContainer!=null) {
+				return schemaEntityContainer;
+			}
+		}	
+		return null;
+	}
+	
 }
