@@ -15,14 +15,12 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 class RdfEdmModelProvider {
 
-	private final String odataVersion;
 	private final RdfRepository rdfRepository;
 	private RdfModelToMetadata edmMetadata;
 	private final RdfModel rdfModel;
 		
-	RdfEdmModelProvider(RdfRepository rdfRepository ,String odataVersion) throws OData2SparqlException{
+	RdfEdmModelProvider(RdfRepository rdfRepository ) throws OData2SparqlException{
 		this.rdfRepository = rdfRepository;
-		this.odataVersion = odataVersion;
 
 		RdfModelProvider rdfModelProvider = new RdfModelProvider(rdfRepository);
 		try {
@@ -30,7 +28,7 @@ class RdfEdmModelProvider {
 		} catch (Exception e) {
 			throw new OData2SparqlException(e.getMessage()); 
 		}
-		this.setEdmMetadata(new RdfModelToMetadata(rdfModel, this.odataVersion,this.rdfRepository.getWithRdfAnnotations() ,this.rdfRepository.getWithSapAnnotations()));
+		this.setEdmMetadata(new RdfModelToMetadata(rdfModel,this.rdfRepository.getWithRdfAnnotations() ,this.rdfRepository.getWithSapAnnotations()));
 		
 	}
 	
@@ -42,12 +40,6 @@ class RdfEdmModelProvider {
 	}
 	public RdfRepository getRdfRepository() {
 		return rdfRepository;
-	}
-	/**
-	 * @return the odataVersion
-	 */
-	public String getOdataVersion() {
-		return odataVersion;
 	}
 	/**
 	 * @return the rdfModel

@@ -15,12 +15,17 @@
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
-			<version>1.1.2</version>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.core4j</groupId>
 			<artifactId>core4j</artifactId>
 			<version>0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
@@ -72,6 +77,18 @@
 			<version>${rdf4j.version}</version>
 			<type>pom</type>
 			<scope>import</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+			<version>4.11</version>
+		</dependency>
+		<dependency>
+			<groupId>com.restfuse</groupId>
+			<artifactId>com.eclipsesource.restfuse</artifactId>
+			<version>1.2.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

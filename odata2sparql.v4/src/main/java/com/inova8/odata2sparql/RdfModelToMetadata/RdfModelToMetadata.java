@@ -71,7 +71,7 @@ public class RdfModelToMetadata {
 				new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.String, text));
 	}
 
-	public RdfModelToMetadata(RdfModel rdfModel, String oDataVersion, boolean withRdfAnnotations,
+	public RdfModelToMetadata(RdfModel rdfModel,  boolean withRdfAnnotations,
 			boolean withSapAnnotations) {
 		Map<String, CsdlEntityType> globalEntityTypes = new HashMap<String, CsdlEntityType>();
 
@@ -201,11 +201,7 @@ public class RdfModelToMetadata {
 							property.setNullable(false);
 						} else if (rdfProperty.getCardinality() == RdfConstants.Cardinality.ZERO_TO_ONE
 								|| rdfProperty.getCardinality() == RdfConstants.Cardinality.MANY) {
-							if (ODataServiceVersion.isBiggerThan(oDataVersion, ODataServiceVersion.V20)) {
 								property.setNullable(true);
-							} else {
-								property.setNullable(true);
-							}
 						} else {
 							//TODO need to handle case when data violates nullablility, in the meantime allow all to be nullable
 							property.setNullable(true);

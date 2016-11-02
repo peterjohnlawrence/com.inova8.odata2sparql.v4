@@ -34,8 +34,8 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	private final RdfEdmModelProvider rdfEdmModelProvider;
 	
 
-	RdfEdmProvider(String odataVersion, RdfRepository rdfRepository) throws OData2SparqlException {
-		this.rdfEdmModelProvider = new RdfEdmModelProvider(rdfRepository, odataVersion);
+	RdfEdmProvider( RdfRepository rdfRepository) throws OData2SparqlException {
+		this.rdfEdmModelProvider = new RdfEdmModelProvider(rdfRepository);
 		
 	}
 
@@ -137,17 +137,17 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, final String name) throws ODataException {
 
 		try {
-			for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
-				CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
-				if (entityContainer.equals(schemaEntityContainer.getName())) {
+			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+				CsdlEntityContainer schemaEntityContainer = this.rdfEdmModelProvider.getEdmMetadata().getSchema(entityContainer.getNamespace()).getEntityContainer();
+				//if (entityContainer.equals(schemaEntityContainer.getName())) {
 					for (CsdlEntitySet entitySet : schemaEntityContainer.getEntitySets()) {
 						if (name.equals(entitySet.getName())) {
 							return entitySet;
 						}
 					}
 
-				}
-			}
+				//}
+		//	}
 		} catch (NullPointerException e) {
 			log.fatal("NullPointerException getEntitySet " + entityContainer + " " + name);
 			throw new ODataException("NullPointerException getEntitySet " + entityContainer + " " + name);
@@ -160,17 +160,18 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 			throws ODataException {
 
 		try {
-			for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
-				CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
-				if (entityContainer.equals(schemaEntityContainer.getName())) {
+			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+				CsdlEntityContainer schemaEntityContainer = this.rdfEdmModelProvider.getEdmMetadata().getSchema(entityContainer.getNamespace()).getEntityContainer();
+				
+				//if (entityContainer.equals(schemaEntityContainer.getName())) {
 					for (CsdlFunctionImport functionImport : schemaEntityContainer.getFunctionImports()) {
 						if (name.equals(functionImport.getName())) {
 							return functionImport;
 						}
 					}
 
-				}
-			}
+				//}
+			//}
 		} catch (NullPointerException e) {
 			log.fatal("NullPointerException getFunctionImport " + entityContainer + " " + name);
 			throw new ODataException("NullPointerException getFunctionImport " + entityContainer + " " + name);
@@ -180,21 +181,21 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	}
 
 	@Override
-	public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName name) throws ODataException {
-		if (name == null) {
+	public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName entityContainer) throws ODataException {
+		if (entityContainer == null) {
 			// Assume request for null container means default container
 			return new CsdlEntityContainerInfo().setContainerName(new FullQualifiedName(RdfConstants.ENTITYCONTAINERNAMESPACE,RdfConstants.ENTITYCONTAINER));
 		} else {
 			try {
 				for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
 					CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
-					if (name.equals(schemaEntityContainer.getName())) {
-						return new CsdlEntityContainerInfo().setContainerName(name);
+					if (entityContainer.equals(schemaEntityContainer.getName())) {
+						return new CsdlEntityContainerInfo().setContainerName(entityContainer);
 					}
 				}
 			} catch (NullPointerException e) {
-				log.fatal("NullPointerException getEntityContainerInfo " + name);
-				throw new ODataException("NullPointerException getEntityContainerInfo " + name);
+				log.fatal("NullPointerException getEntityContainerInfo " + entityContainer);
+				throw new ODataException("NullPointerException getEntityContainerInfo " + entityContainer);
 			}
 		}
 		return null;
