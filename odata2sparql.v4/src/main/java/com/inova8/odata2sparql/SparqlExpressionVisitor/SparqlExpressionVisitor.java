@@ -26,17 +26,16 @@ import org.apache.olingo.server.api.uri.queryoption.expression.MethodKind;
 import org.apache.olingo.server.api.uri.queryoption.expression.UnaryOperatorKind;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
-import com.inova8.odata2sparql.RdfModel.RdfEntity;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
+import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
 public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private final String SUBJECT_POSTFIX = "_s";
-	private String sPath = "";
-//TODO V2	private EdmNavigationProperty currentNavigationProperty;
+	//TODO V2	private EdmNavigationProperty currentNavigationProperty;
 	//Container of properties expressed in filter that need to be explicit selected in SPARQL where clause
 	//List<RdfProperty> properties = new ArrayList<RdfProperty>();
 	private final HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
@@ -49,7 +48,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private final RdfModel rdfModel;
 	private final RdfModelToMetadata rdfModelToMetadata;
 	private final RdfEntityType entityType;
-	private String conditionString = "";
+	private final String conditionString = "";
 	private final Boolean allStatus = false;
 	public SparqlExpressionVisitor(RdfModel rdfModel,RdfModelToMetadata rdfModelToMetadata, RdfEntityType entityType) {
 		super();
@@ -400,7 +399,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	}
 	@Override
 	public Object visitLiteral(Literal literal) throws ExpressionVisitException, ODataApplicationException {
-		String expandedKey = this.rdfModel.getRdfPrefixes().expandPrefix(RdfEntity.URLDecodeEntityKey(literal.toString()));
+		String expandedKey = this.rdfModel.getRdfPrefixes().expandPrefix(SparqlEntity.URLDecodeEntityKey(literal.toString()));
 
 		if (urlValidator.isValid(expandedKey)) {
 			return "<" + expandedKey + ">";

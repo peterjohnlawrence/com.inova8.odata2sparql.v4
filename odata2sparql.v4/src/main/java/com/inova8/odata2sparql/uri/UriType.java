@@ -97,7 +97,7 @@ public enum UriType {
 	 */
 	URI50B(SystemQueryOption.$filter, SystemQueryOption.$orderby, SystemQueryOption.$skip, SystemQueryOption.$top);
 
-	private ArrayList<SystemQueryOption> whiteList = new ArrayList<SystemQueryOption>();
+	private final ArrayList<SystemQueryOption> whiteList = new ArrayList<SystemQueryOption>();
 
 	private UriType(final SystemQueryOption... compatibleQueryOptions) {
 		for (SystemQueryOption queryOption : compatibleQueryOptions) {
@@ -105,7 +105,8 @@ public enum UriType {
 		}
 	}
 
-	public boolean isCompatible(final SystemQueryOption queryOption) {
-		return whiteList.contains(queryOption);
-	}
+// TODO Remove unused code found by UCDetector
+// 	public boolean isCompatible(final SystemQueryOption queryOption) {
+// 		return whiteList.contains(queryOption);
+// 	}
 }

@@ -2,7 +2,7 @@ package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
@@ -10,7 +10,6 @@ import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.ex.ODataException;
-import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
@@ -25,26 +24,21 @@ import org.apache.olingo.server.api.serializer.EntitySerializerOptions;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
-import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
-import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 import com.inova8.odata2sparql.uri.UriType;
-
+import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlEntityProcessor implements EntityProcessor {
 	public SparqlEntityProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-	private RdfEdmProvider rdfEdmProvider;
+	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	private SparqlQueryBuilder sparqlBuilder;
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -61,21 +55,12 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	    EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
 	    // 2. retrieve the data from backend
-	    List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 	    Entity entity = null;
 		try {
-			entity = readEntity(uriInfo);
-		} catch (EdmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OData2SparqlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ODataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}//storage.readEntityData(edmEntitySet, keyPredicates);
-
+			entity = SparqlBaseCommand.readEntity( rdfEdmProvider,uriInfo,(uriInfo.getUriResourceParts().size() > 1)?UriType.URI6A:UriType.URI2);
+		} catch (EdmException | OData2SparqlException | ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+		}
 	    // 3. serialize
 	    EdmEntityType entityType = edmEntitySet.getEntityType();
 
@@ -111,50 +96,5 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			ODataLibraryException {
 		// TODO Auto-generated method stub
 
-	}
-
-	public Entity readEntity(final UriInfo uriInfo) throws EdmException, OData2SparqlException, ODataException {
-		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		RdfEntityType rdfEntityType = null;
-		EdmEntitySet edmEntitySet = null;
-		UriType uriType;
-		if (uriInfo.getUriResourceParts().size() > 1) {
-			uriType = UriType.URI6A;
-		} else {
-			uriType = UriType.URI2;
-		}		
-		
-		this.sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),rdfEdmProvider.getEdmMetadata(),uriInfo, uriType);
-		
-		//prepareQuery
-		SparqlStatement sparqlStatement = null;
-		if (resourcePaths.size() == 1) {
-			UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-			edmEntitySet = uriResourceEntitySet.getEntitySet();
-			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-		} else if (resourcePaths.size() == 2) {
-			//TODO surely not limited to just 2?
-			UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(1);
-			edmEntitySet = uriResourceEntitySet.getEntitySet();
-			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-		}
-		try {
-			sparqlStatement = this.sparqlBuilder.prepareConstructSparql();
-		} catch (OData2SparqlException e) {
-			throw new ODataRuntimeException( e.getMessage());
-		}
-		SparqlResults rdfResults = null;
-		rdfResults = SparqlBaseCommand.executeQuery(rdfEdmProvider,rdfEntityType, sparqlStatement,uriInfo.getExpandOption(), uriInfo.getSelectOption());
-		return rdfResults.getEntity();
-		
-//		Map<String, Object> data = rdfResults.getEntityResults();
-//		if (data == null) {
-//			throw new ODataNotFoundException(ODataNotFoundException.ENTITY);
-//		} else {
-//			ExpandSelectTreeNode expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelect(), uriInfo.getExpand());
-//			Map<String, ODataCallback> callbacks = locateCallbacks(expandSelectTreeNode, rdfResults);
-//			return EntityProvider.writeEntry(contentType, edmEntitySet, data, buildEntityProperties(expandSelectTreeNode, callbacks)
-//					.build());
-//		}
 	}
 }

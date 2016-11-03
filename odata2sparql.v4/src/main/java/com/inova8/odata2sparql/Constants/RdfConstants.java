@@ -62,10 +62,10 @@ public class RdfConstants {
 	public static final String PROPERTY_POSTFIX = "_value";
 
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";
-	public static final String SAP_ANNOTATION_NS = "sap";
-	public static final String SAP_LABEL = "label";
-	public static final String SAP_HEADING = "heading";
-	public static final String SAP_QUICKINFO = "quickinfo";
+	private static final String SAP_ANNOTATION_NS = "sap";
+	private static final String SAP_LABEL = "label";
+	private static final String SAP_HEADING = "heading";
+	private static final String SAP_QUICKINFO = "quickinfo";
 
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -129,13 +129,13 @@ public class RdfConstants {
 	public static final String RDFS_RANGE_LABEL = "range";
 	@Deprecated
 	public static final String OWL_EQUIVALENTPROPERTY = "http://www.w3.org/2002/07/owl#equivalentProperty";
-	public static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
+	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
 
-	public static final String ONTOLOGY = "Ontology";
-	public static final String DATATYPE = "Datatype";
-	public static final String PROPERTY = "Property";
+	private static final String ONTOLOGY = "Ontology";
+	private static final String DATATYPE = "Datatype";
+	private static final String PROPERTY = "Property";
 
 	public static final String LANGSTRING = "langString";
 	public static final String LANG = "lang";
@@ -153,7 +153,7 @@ public class RdfConstants {
 	@Deprecated
 	public static final String DATA = "data";
 
-	public static final String INVERSEOF = "inverseOf ";
+	private static final String INVERSEOF = "inverseOf ";
 	public static final String SPARQL_MODEL = "SparqlModel";
 	@Deprecated
 	public static final String ENTITY = "_Entity";
@@ -215,25 +215,25 @@ public class RdfConstants {
 	public static final String NULLABLE = "Nullable";
 	public static final String FALSE = "false";
 
-	public static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
-	public static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
-	public static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
-	public static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
-	public static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
-	public static String DATATYPE_FQN =RdfConstants.RDF + "." + RdfConstants.DATATYPE;
-	public static String INVERSEOF_FQN =RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
-	public static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "." +RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
-	public static String ONTOLOGY_FQN = RdfConstants.OWL + "." +RdfConstants.ONTOLOGY;
+	public final static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
+	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
+	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
+	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
+	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
+	public final static String DATATYPE_FQN =RdfConstants.RDF + "." + RdfConstants.DATATYPE;
+	public final static String INVERSEOF_FQN =RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
+	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "." +RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
+	public final static String ONTOLOGY_FQN = RdfConstants.OWL + "." +RdfConstants.ONTOLOGY;
 
-	static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL);
-	static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING);
-	static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO);
-	static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL);
-	static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY);
-	static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE);
-	static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF);
-	static CsdlTerm owlEquivalentPropertyTerm = new CsdlTerm().setName(RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL);
-	static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY);
+	private final static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL);
+	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING);
+	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO);
+	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL);
+	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY);
+	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE);
+	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF);
+	private final static CsdlTerm owlEquivalentPropertyTerm = new CsdlTerm().setName(RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL);
+	private final static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY);
 
 	public final static List<String> RDF_DATATYPES = new ArrayList<String>();
 

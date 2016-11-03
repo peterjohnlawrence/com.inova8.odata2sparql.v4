@@ -1,8 +1,19 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
+import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 
+import org.apache.olingo.commons.api.data.ContextURL;
+import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.Property;
+import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
+import org.apache.olingo.commons.api.edm.EdmProperty;
+import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
+import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataApplicationException;
@@ -11,17 +22,26 @@ import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
 import org.apache.olingo.server.api.processor.PrimitiveProcessor;
+import org.apache.olingo.server.api.serializer.ODataSerializer;
+import org.apache.olingo.server.api.serializer.PrimitiveSerializerOptions;
+import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriParameter;
+import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceProperty;
 
+import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
-
+import com.inova8.odata2sparql.uri.UriType;
+import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 	public SparqlPrimitiveProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-	private RdfEdmProvider rdfEdmProvider;
+	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
 	private SparqlQueryBuilder sparqlBuilder;
@@ -34,10 +54,57 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 	@Override
 	public void readPrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		// TODO Auto-generated method stub
-		throw new ODataApplicationException(new Object(){}.getClass().getEnclosingMethod().getName() + " not yet implemented",
-                HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
+        // 1. Retrieve info from URI
+        // 1.1. retrieve the info about the requested entity set
+        List<UriResource> resourceParts = uriInfo.getUriResourceParts();
+        // Note: only in our example we can rely that the first segment is the EntitySet
+        UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
+        EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
 
+        // 1.2. retrieve the requested (Edm) property
+        // the last segment is the Property
+        UriResourceProperty uriProperty = (UriResourceProperty) resourceParts.get(resourceParts.size() -1);
+        EdmProperty edmProperty = uriProperty.getProperty();
+        String edmPropertyName = edmProperty.getName();
+        // in our example, we know we have only primitive types in our model
+        EdmPrimitiveType edmPropertyType = (EdmPrimitiveType) edmProperty.getType();
+
+        // 2. retrieve data from backend
+        // 2.1. retrieve the entity data, for which the property has to be read
+	    Entity entity = null;
+		try {
+			entity = SparqlBaseCommand.readEntity(rdfEdmProvider,uriInfo,UriType.URI5);
+		} catch (EdmException | OData2SparqlException | ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+		}
+
+        // 2.2. retrieve the property data from the entity
+        Property property = entity.getProperty(edmPropertyName);
+        if (property == null) {
+             throw new ODataApplicationException("Property not found",
+                        HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
+        }
+
+        // 3. serialize
+        Object value = property.getValue();
+        if (value != null) {
+             // 3.1. configure the serializer
+             ODataSerializer serializer = odata.createSerializer(responseFormat);
+
+             ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).navOrPropertyPath(edmPropertyName).build();
+             PrimitiveSerializerOptions options = PrimitiveSerializerOptions.with().contextURL(contextUrl).build();
+             // 3.2. serialize
+             SerializerResult serializerResult = serializer.primitive(serviceMetadata, edmPropertyType, property, options);
+             InputStream propertyStream = serializerResult.getContent();
+
+             //4. configure the response object
+             response.setContent(propertyStream);
+             response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+             response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
+          }else{
+              // in case there's no value for the property, we can skip the serialization
+              response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+          }
 	}
 
 	@Override

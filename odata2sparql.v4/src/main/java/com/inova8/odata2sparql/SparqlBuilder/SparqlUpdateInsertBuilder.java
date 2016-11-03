@@ -12,11 +12,11 @@ import org.apache.olingo.odata2.api.exception.ODataApplicationException;
 import org.apache.olingo.odata2.api.uri.NavigationSegment;
 import org.apache.olingo.odata2.api.uri.expression.ExceptionVisitExpression;
 
-import com.inova8.odata2sparql.RdfModel.RdfEntity;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
+import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 
 public class SparqlUpdateInsertBuilder {
@@ -107,7 +107,7 @@ public class SparqlUpdateInsertBuilder {
 
 		sparql.append("WHERE { ?" + key + "_s ?" + key + "_p ?" + key + "_o .");
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		if (urlValidator.isValid(expandedKey)) {
 			sparql.append("VALUES(?" + key + "_s ){(<" + expandedKey + ">)}");
 			sparql.append("}");
@@ -122,7 +122,7 @@ public class SparqlUpdateInsertBuilder {
 		UrlValidator urlValidator = new UrlValidator();
 		StringBuilder sparql = new StringBuilder("SELECT ?VALUE WHERE {");
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		if (urlValidator.isValid(expandedKey)) {
 			sparql.append("<" + expandedKey + "> ");
 			String expandedProperty = entityType.findProperty(property).propertyNode.getIRI().toString();
@@ -144,7 +144,7 @@ public class SparqlUpdateInsertBuilder {
 		StringBuilder sparql = new StringBuilder("DELETE {?" + key + "_s ?" + key + "_p ?" + key + "_o .}WHERE { ?"
 				+ key + "_s ?" + key + "_p ?" + key + "_o . VALUES(?" + key + "_s ?" + key + "_p){(");
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		if (urlValidator.isValid(expandedKey)) {
 			sparql.append("<" + expandedKey + "> ");
 			String expandedProperty = entityType.findProperty(property).propertyNode.getIRI().toString();
@@ -164,7 +164,7 @@ public class SparqlUpdateInsertBuilder {
 		UrlValidator urlValidator = new UrlValidator();
 		String key = entityType.entityTypeName;
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		String expandedProperty = entityType.findProperty(property).propertyNode.getIRI().toString();
 		String value = entry.toString();
 		if (urlValidator.isValid(expandedKey)) {
@@ -195,7 +195,7 @@ public class SparqlUpdateInsertBuilder {
 		String key = entityType.entityTypeName;
 
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		if (urlValidator.isValid(expandedKey)) {
 		} else {
 			throw new ODataApplicationException("Invalid key: " + entityKey, null);
@@ -227,7 +227,7 @@ public class SparqlUpdateInsertBuilder {
 		UrlValidator urlValidator = new UrlValidator();
 		String key = entityType.entityTypeName;
 		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPrefix(RdfEntity.URLDecodeEntityKey(entityKey));
+				.expandPrefix(SparqlEntity.URLDecodeEntityKey(entityKey));
 		if (urlValidator.isValid(expandedKey)) {
 		} else {
 			throw new ODataApplicationException("Invalid key: " + entityKey, null);

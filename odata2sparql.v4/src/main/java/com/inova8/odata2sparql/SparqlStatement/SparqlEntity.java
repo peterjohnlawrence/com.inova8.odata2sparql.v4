@@ -1,29 +1,33 @@
-package com.inova8.odata2sparql.RdfModel;
-
+package com.inova8.odata2sparql.SparqlStatement;
 
 import java.util.HashMap;
+
+import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.Property;
+import org.apache.olingo.commons.api.data.ValueType;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrefixes;
 
-public class RdfEntity extends HashMap<String, Object>{
-	private static final long serialVersionUID = 1L;
+public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	private final HashMap<RdfNode, Object> datatypeProperties = new HashMap<RdfNode, Object>();
 	private final String subject;
 	private final RdfPrefixes rdfPrefixes;
 	private RdfEntityType rdfEntityType;
-	private boolean isExpandedEntity =false;
-	private boolean isTargetEntity =false;
+	private boolean isExpandedEntity = false;
+	private boolean isTargetEntity = false;
 
-	public RdfEntity(RdfNode subjectNode, RdfPrefixes rdfPrefixes) {
+	SparqlEntity(RdfNode subjectNode, RdfPrefixes rdfPrefixes) {
 		super();
-		this.rdfPrefixes=rdfPrefixes;
-		this.subject =  this.rdfPrefixes.toQName(subjectNode); //subjectNode.toQName(this.rdfPrefixes);
-		this.put(RdfConstants.SUBJECT, RdfEntity.URLEncodeEntityKey(this.subject));	
+		this.rdfPrefixes = rdfPrefixes;
+		this.subject = this.rdfPrefixes.toQName(subjectNode); //subjectNode.toQName(this.rdfPrefixes);
+		//this.put(RdfConstants.SUBJECT, RdfEntity.URLEncodeEntityKey(this.subject));	
+		this.addProperty(new Property(null, RdfConstants.SUBJECT, ValueType.PRIMITIVE, SparqlEntity
+				.URLEncodeEntityKey(this.subject)));
 	}
-    
+
 	public static String URLDecodeEntityKey(String encodedEntityKey) {
 
 		String decodedEntityKey = encodedEntityKey;
@@ -31,7 +35,8 @@ public class RdfEntity extends HashMap<String, Object>{
 		decodedEntityKey = encodedEntityKey.replace("%3A", ":");
 		return decodedEntityKey;
 	}
-	public static String URLEncodeEntityKey(String entityKey) {
+
+	static String URLEncodeEntityKey(String entityKey) {
 		String encodedEntityKey = entityKey;
 		encodedEntityKey = encodedEntityKey.replace("/", "@");
 		//Required by Batch otherwise URIs fail
@@ -69,5 +74,16 @@ public class RdfEntity extends HashMap<String, Object>{
 
 	public void setTargetEntity(boolean isTargetEntity) {
 		this.isTargetEntity = isTargetEntity;
-	}	
+	}
+
+	Boolean containsProperty(final String name) {
+		Boolean result = null;
+		for (Property property : this.getProperties()) {
+			if (name.equals(property.getName())) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
 }
