@@ -14,6 +14,7 @@ import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
@@ -21,6 +22,7 @@ import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
@@ -839,25 +841,29 @@ public class SparqlQueryBuilder {
 		int segmentSize = navigationSegments.size();
 		if((uriType==UriType.URI5)||(uriType==UriType.URI4))segmentSize--;
 		Integer lastIndex = segmentSize;
-
-		
-		//for (UriResource navigationSegment : navigationSegments) {
 		for (index = 1; index < segmentSize; index++) {
+			UriResource priorNavigationSegment = navigationSegments.get(index-1);
+			String namespace="";
+			if(priorNavigationSegment.getKind().equals(UriResourceKind.entitySet)){
+				namespace= ((UriResourceEntitySet) priorNavigationSegment).getEntitySet().getEntityType().getNamespace();
+			}else if(priorNavigationSegment.getKind().equals(UriResourceKind.navigationProperty)){
+				namespace=((UriResourceNavigation) priorNavigationSegment).getProperty().getType().getNamespace();
+			};
 			//index++;
 			UriResource navigationSegment = navigationSegments.get(index);
 			EdmNavigationProperty predicate = ((UriResourceNavigation) navigationSegment).getProperty();
-			RdfAssociation navProperty = null;//TODO V2 rdfModelToMetadata.getMappedNavigationProperty(predicate.getName());
+			RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(new FullQualifiedName(namespace,predicate.getName()));
 			if (isFirstSegment) {
 				// Not possible to have more than one key field is it?
 				for (UriParameter entityKey : entityKeys) {
 					String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
-					String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(decodedEntityKey);
+					String expandedKey = rdfModel.getRdfPrefixes().expandPrefix( decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 					pathVariable = "<" + expandedKey + ">";
 				}
 			} else {
 				pathVariable = "?" + path + "_s";
 			}
-			if (index.equals(lastIndex)) {
+			if (index.equals(lastIndex-1)) {
 				targetVariable = "?" + edmTargetEntitySet.getEntityType().getName() + "_s";
 			} else {
 				targetVariable = "?" + path + navProperty.getAssociationName() + "_s";

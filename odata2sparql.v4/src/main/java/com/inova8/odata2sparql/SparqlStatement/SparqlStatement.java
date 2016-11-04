@@ -24,14 +24,13 @@ public class SparqlStatement {
 	private static String sparql;
 
 	public SparqlStatement(String sparql) {
-		this.sparql = sparql;
+		SparqlStatement.sparql = sparql;
 	}
 
 	public String getSparql() {
 		return sparql;
 	}
-	public SparqlEntityCollection executeQuery(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
-			//TODO V2			List<ArrayList<NavigationPropertySegment>> expand, List<SelectItem> select) throws OData2SparqlException {
+	SparqlEntityCollection executeQuery(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
 			ExpandOption expand, SelectOption select) throws OData2SparqlException {
 		RdfConstructQuery rdfQuery = new RdfConstructQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
 				sparql);

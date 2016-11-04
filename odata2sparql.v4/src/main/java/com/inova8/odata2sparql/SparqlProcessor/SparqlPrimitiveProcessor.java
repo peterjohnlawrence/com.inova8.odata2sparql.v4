@@ -26,14 +26,12 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.PrimitiveSerializerOptions;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
-import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
@@ -44,7 +42,7 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	private SparqlQueryBuilder sparqlBuilder;
+
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;

@@ -38,7 +38,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
 
-public class SparqlEntityCollection extends EntityCollection{
+class SparqlEntityCollection extends EntityCollection{
 	private final Log log = LogFactory.getLog(SparqlEntityCollection.class);
 	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
@@ -51,7 +51,7 @@ public class SparqlEntityCollection extends EntityCollection{
 	// Expanded to second level: List<Map<Subject, Map<navProp, Map<Object, Map<navProp, Map<Object, Map<Property,Value>>>>>>>
 
 
-	public SparqlEntityCollection(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType, RdfTripleSet results,
+	SparqlEntityCollection(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) {
 		super();
 		

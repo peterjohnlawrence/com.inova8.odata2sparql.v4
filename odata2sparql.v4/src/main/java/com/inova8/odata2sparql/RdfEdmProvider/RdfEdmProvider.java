@@ -39,7 +39,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		
 	}
 
-	private RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
+	public RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedEntityType(fullQualifiedName);
 	}
 

@@ -12,6 +12,7 @@ import org.core4j.Predicate1;
 import org.openrdf.model.BNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.xerces.util.XMLChar;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
@@ -610,10 +611,10 @@ public class RdfModel {
 			return associationNode.getIRI().toString();
 		}
 
-//		public FullQualifiedName getFullQualifiedName() {
-//			return new FullQualifiedName(domainClass.schema.schemaPrefix, this.getEDMAssociationName());//associationName);
-//
-//		}
+		public FullQualifiedName getFullQualifiedName() {
+			return new FullQualifiedName(domainClass.schema.schemaPrefix, this.getEDMAssociationName());//associationName);
+
+		}
 
 		public String getEDMAssociationName() {
 			if (this.domainClass.schema.isDefault) {

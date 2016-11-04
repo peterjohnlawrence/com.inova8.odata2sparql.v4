@@ -3,6 +3,7 @@ package com.inova8.odata2sparql.SparqlStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -12,13 +13,19 @@ import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.data.Link;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
+import org.apache.olingo.commons.api.edm.EdmBindingTarget;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.apache.olingo.commons.api.http.HttpStatusCode;
+import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
@@ -76,13 +83,13 @@ public class SparqlBaseCommand {
 			edmEntitySet = uriResourceEntitySet.getEntitySet();
 			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 			break;
-		case URI6A:
-			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(1);
-			edmEntitySet = uriResourceEntitySet.getEntitySet();
-			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+		case URI6B:
+			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1); 
+			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+			rdfEntityType=rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
 			break;
 		default:
-			break;
+			throw new ODataApplicationException("Unhandled URIType "+uriType, HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
 		try {
 			sparqlStatement = sparqlBuilder.prepareConstructSparql();
@@ -129,12 +136,12 @@ public class SparqlBaseCommand {
 			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 			break;
 		case URI6A:
-			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(1);
-			edmEntitySet = uriResourceEntitySet.getEntitySet();
-			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1); 
+			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+			rdfEntityType=rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
 			break;
 		default:
-			break;
+			throw new ODataApplicationException("Unhandled URIType "+uriType, HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
 		try {
 			sparqlStatement = sparqlBuilder.prepareConstructSparql();
@@ -145,5 +152,33 @@ public class SparqlBaseCommand {
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
 		return rdfResults.getFirstEntity();
 	}
+	public static EdmEntitySet getNavigationTargetEntitySet(final UriInfoResource uriInfo) throws ODataApplicationException {
 
+	    EdmEntitySet entitySet;
+	    final List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+
+	    // First must be entity set (hence function imports are not supported here).
+	    if (resourcePaths.get(0) instanceof UriResourceEntitySet) {
+	        entitySet = ((UriResourceEntitySet) resourcePaths.get(0)).getEntitySet();
+	    } else {
+	        throw new ODataApplicationException("Invalid resource type.",
+	                HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ROOT);
+	    }
+
+	    int navigationCount = 0;
+	    while (entitySet != null
+	        && ++navigationCount < resourcePaths.size()
+	        && resourcePaths.get(navigationCount) instanceof UriResourceNavigation) {
+	        final UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(navigationCount);
+	        final EdmBindingTarget target = entitySet.getRelatedBindingTarget(uriResourceNavigation.getProperty().getName());
+	        if (target instanceof EdmEntitySet) {
+	            entitySet = (EdmEntitySet) target;
+	        } else {
+	            throw new ODataApplicationException("Singletons not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+	                                                 Locale.ROOT);
+	        }
+	    }
+
+	    return entitySet;
+	}
 }

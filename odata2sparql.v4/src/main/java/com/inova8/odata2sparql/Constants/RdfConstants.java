@@ -51,11 +51,6 @@ public class RdfConstants {
 	public static String spFile; // NO_UCD (use final)
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
-	@Deprecated
-	public final static Value repositoryQuery = valueFactoryImpl
-			.createIRI("http://inova8.com/odata4sparql#repositoryQuery");
-	@Deprecated
-	public final static Value prefixQuery = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#prefixQuery");
 
 	public static final String TARGETENTITY = "http://targetEntity";
 	public static final String PREFIX = "j";
@@ -79,7 +74,7 @@ public class RdfConstants {
 	public static final String XSD_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 	public static final String XSD_NS = "http://www.w3.org/2001/XMLSchema#";
 	public static final String XSD = "xsd";
-	public static final String DC_SCHEMA = "http://purl.org/dc/elements/1.1/";
+
 	public static final String DC_NS = "http://purl.org/dc/elements/1.1/";
 	public static final String DC = "dc";
 
@@ -112,23 +107,14 @@ public class RdfConstants {
 	public static final String RDF_TYPE_LABEL = "has Type";
 	public static final String RDF_INVERSE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#hasInstance";
 	public static final String RDF_INVERSE_TYPE_LABEL = "has Instance";
-	//TODO we should rely on the metadata queries to determine which properties even of Resource that should be included
-	@Deprecated
-	public static final String RDFS_COMMENT = "http://www.w3.org/2000/01/rdf-schema#comment";
-	@Deprecated
-	public static final String RDFS_COMMENT_LABEL = "comment";
-	@Deprecated
-	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
-	@Deprecated
-	public static final String RDFS_LABEL_LABEL = "label";
+
 	public static final String RDFS_DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain";
 	public static final String RDFS_DOMAIN_LABEL = "domain";
 	public static final String RDFS_SUBCLASSOF = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 	public static final String RDFS_SUBCLASSOF_LABEL = "subClassOf";
 	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
 	public static final String RDFS_RANGE_LABEL = "range";
-	@Deprecated
-	public static final String OWL_EQUIVALENTPROPERTY = "http://www.w3.org/2002/07/owl#equivalentProperty";
+
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
@@ -140,53 +126,29 @@ public class RdfConstants {
 	public static final String LANGSTRING = "langString";
 	public static final String LANG = "lang";
 	public static final String VALUE = "value";
-	@Deprecated
-	public static final String OBJECTSTATEMENT = "objectStatement";
-	@Deprecated
-	public static final String OBJECTPREDICATE = "objectPredicate";
-	@Deprecated
-	public static final String OBJECT = "object";
-	@Deprecated
-	public static final String DATASTATEMENT = "dataStatement";
-	@Deprecated
-	public static final String DATAPREDICATE = "dataPredicate";
-	@Deprecated
-	public static final String DATA = "data";
+
 
 	private static final String INVERSEOF = "inverseOf ";
 	public static final String SPARQL_MODEL = "SparqlModel";
-	@Deprecated
-	public static final String ENTITY = "_Entity";
-	@Deprecated
-	public static final String ENTITYTYPE = "_Class";
+
+
 	public static final String ENTITYCONTAINER = "Container";
 	public static final String ENTITYCONTAINERNAMESPACE = "Instances";
-	@Deprecated
-	public static final String NAVIGATIONPROPERTY = "_ObjectProperty";
-	public static final String PLURAL = "";
-	public static final String FROMROLE = "";
-	public static final String TOROLE = "";
-	@Deprecated
-	public static final String HASH = "#";
+
 	public static final String PREDICATE_SEPARATOR = "_";;
 	public static final String CLASS_SEPARATOR = "_";;
-
-	public static final String DUPLICATEROLE = "1";
 
 	public static final String CLASS_LABEL_PREFIX = "";
 	public static final String PROPERTY_LABEL_PREFIX = "";
 	public static final String NAVIGATIONPROPERTY_LABEL_PREFIX = "";
-	@Deprecated
-	public static final String INVERSENAVIGATIONPROPERTY_LABEL_PREFIX = "has ";
-	@Deprecated
+
+
 	public static final Object RDF_LANG_STRING = RDF + "." + LANGSTRING;
 
 	public static final Value URI_ASSOCIATIONQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#associationQuery");
 	public static final Value URI_CLASSQUERY = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#classQuery");
-	@Deprecated
-	public static final Value URI_DATASETQUERY = valueFactoryImpl
-			.createIRI("http://inova8.com/odata4sparql#datasetQuery");
+
 	public static final Value URI_DATATYPEQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#datatypeQuery");
 	public static final Value URI_GRAPHQUERY = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#graphQuery");
@@ -212,8 +174,6 @@ public class RdfConstants {
 			.createIRI("http://inova8.com/odata4sparql#propertyQuery_Cardinality");
 	public static final Value URI_REPOSITORYQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#repositoryQuery");
-	public static final String NULLABLE = "Nullable";
-	public static final String FALSE = "false";
 
 	public final static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
@@ -232,7 +192,7 @@ public class RdfConstants {
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY);
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE);
 	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF);
-	private final static CsdlTerm owlEquivalentPropertyTerm = new CsdlTerm().setName(RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL);
+
 	private final static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY);
 
 	public final static List<String> RDF_DATATYPES = new ArrayList<String>();

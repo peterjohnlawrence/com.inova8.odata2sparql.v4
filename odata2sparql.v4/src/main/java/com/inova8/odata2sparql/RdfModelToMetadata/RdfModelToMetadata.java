@@ -301,7 +301,9 @@ public class RdfModelToMetadata {
 							.add(navigationProperty);
 
 					navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
-					//navigationPropertyMapping.put(navigationProperty.getRelationship(), rdfAssociation);
+					
+					//navigationPropertyMapping.put(new FullQualifiedName( rdfAssociation.getDomainClass().getSchema().getSchemaPrefix(), navigationProperty.getName()), rdfAssociation);
+					navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(),rdfAssociation);
 
 				}
 			}
