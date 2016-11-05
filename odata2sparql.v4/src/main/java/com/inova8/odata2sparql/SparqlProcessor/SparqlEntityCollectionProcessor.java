@@ -7,10 +7,10 @@ import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.data.ContextURL;
-import org.apache.olingo.commons.api.data.ContextURL.Suffix;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
@@ -22,8 +22,10 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.processor.CountEntityCollectionProcessor;
 import org.apache.olingo.server.api.processor.EntityCollectionProcessor;
 import org.apache.olingo.server.api.serializer.EntityCollectionSerializerOptions;
+import org.apache.olingo.server.api.serializer.FixedFormatSerializer;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
@@ -32,10 +34,11 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
-public class SparqlEntityCollectionProcessor implements EntityCollectionProcessor {
+public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
 	private final Log log = LogFactory.getLog(SparqlEntityCollectionProcessor.class);
 	public SparqlEntityCollectionProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
@@ -108,4 +111,36 @@ public class SparqlEntityCollectionProcessor implements EntityCollectionProcesso
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 
 	}
+
+	@Override
+	public void countEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+			throws ODataApplicationException, ODataLibraryException {
+	
+		// 2. retrieve data from backend
+		// 2.1. retrieve the entity data, for which the property has to be read
+		RdfLiteral count = null;
+		try {
+			count = SparqlBaseCommand.countEntitySet(rdfEdmProvider, uriInfo, UriType.URI15);
+		} catch (EdmException | OData2SparqlException | ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		// 3. serialize
+		if (count != null) {
+			// 3.1. configure the serializer
+			FixedFormatSerializer serializer = odata.createFixedFormatSerializer();
+			// 3.2. serialize
+			InputStream countStream = serializer.count(Integer.parseInt(count.getLexicalForm().toString()));
+	
+			//4. configure the response object
+			response.setContent(countStream);
+			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+			response.setHeader(HttpHeader.CONTENT_TYPE, ContentType.TEXT_PLAIN.toContentTypeString());
+		} else {
+			// in case there's no value for the property, we can skip the serialization
+			response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+		}
+	
+	}
+
 }

@@ -19,7 +19,6 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlCountEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveProcessor;
@@ -46,12 +45,11 @@ public class RdfODataServlet extends HttpServlet {
 				ServiceMetadata edm = odata.createServiceMetadata(rdfEdmProvider,
 						new ArrayList<EdmxReference>());
 				ODataHttpHandler handler = odata.createHandler(edm);
-				//Reserve first paramter for either the service name or a$RESET. $RELOAD
+				//Reserve first parameter for either the service name or a$RESET. $RELOAD
 				handler.setSplit(1);
 				handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
 				handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 				handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
-				handler.register(new SparqlCountEntityCollectionProcessor(rdfEdmProvider));
 				// let the handler do the work
 				handler.process(req, resp);
 					}
