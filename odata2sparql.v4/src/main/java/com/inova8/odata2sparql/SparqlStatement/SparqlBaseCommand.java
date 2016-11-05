@@ -33,7 +33,10 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfConstructQuery;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfQuerySolution;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTriple;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTripleSet;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
@@ -151,6 +154,47 @@ public class SparqlBaseCommand {
 		SparqlEntityCollection rdfResults = sparqlStatement.executeQuery(rdfEdmProvider, rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
 		return rdfResults.getFirstEntity();
+	}
+	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
+			throws ODataException, OData2SparqlException {
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		RdfEntityType rdfEntityType = null;
+		EdmEntitySet edmEntitySet = null;
+		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
+				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType);
+
+		//prepareQuery
+		SparqlStatement sparqlStatement = null;
+		UriResourceEntitySet uriResourceEntitySet;
+//		switch (uriType) {
+//		case URI1:
+//			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+//			edmEntitySet = uriResourceEntitySet.getEntitySet();
+//			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+//			break;
+//		case URI6B:
+//			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1); 
+//			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+//			rdfEntityType=rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+//			break;
+//		default:
+//			throw new ODataApplicationException("Unhandled URIType "+uriType, HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+//		}
+		sparqlStatement = sparqlBuilder.prepareCountEntitySetSparql();
+		RdfResultSet rdfResults = sparqlStatement.executeSelectQuery(rdfEdmProvider);
+		
+		RdfLiteral countLiteral = null;
+		while (rdfResults.hasNext()) {
+			RdfQuerySolution solution = rdfResults.next();
+			countLiteral = solution.getRdfLiteral("COUNT");
+			break; 
+		}
+		if (countLiteral == null) {
+			throw new ODataApplicationException("No results", HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+		} else {
+			return countLiteral;
+		}
+
 	}
 	public static EdmEntitySet getNavigationTargetEntitySet(final UriInfoResource uriInfo) throws ODataApplicationException {
 

@@ -411,7 +411,15 @@ public class SparqlQueryBuilder {
 			//selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
 		}
 			break;
+		case URI15: {
+			//To be tested
 
+			//expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelectOption(), uriInfo.getExpandOption());
+			//expandSelectNavPropertyMap = createExpandSelectNavPropertyMap(uriInfo.getSelectOption(), uriInfo.getExpandOption());
+			//filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType);
+			//selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
+		}
+			break;
 		case URI16: {
 			//To be tested
 
@@ -444,7 +452,7 @@ public class SparqlQueryBuilder {
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
 		prepareCountEntitySet.append("\t").append("SELECT ");
 		prepareCountEntitySet.append("(COUNT(DISTINCT ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
-				.append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName, this.expandSelectTreeNode))
+			//	.append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName, this.expandOption))
 				.append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));
 		return new SparqlStatement(prepareCountEntitySet.toString());
@@ -713,11 +721,11 @@ public class SparqlQueryBuilder {
 			break;
 		}
 		case URI15: {
-			clausesPath.append(clausesPath_URI1(indent));
+			clausesPath.append(clausesPath_URI15(indent));
 			break;
 		}
 		case URI16: {
-			clausesPath.append(clausesPath_URI2(indent));
+			clausesPath.append(clausesPath_URI16(indent));
 			clausesPath.append(exists(indent));
 			break;
 		}
@@ -761,6 +769,35 @@ public class SparqlQueryBuilder {
 	private StringBuilder clausesPath_URI5(String indent) throws EdmException {
 		StringBuilder clausesPath = new StringBuilder();
 		clausesPath.append(clausesPath_KeyPredicateValues(indent));
+		return clausesPath;
+	}
+	private StringBuilder clausesPath_URI15(String indent) throws EdmException {
+		StringBuilder clausesPath = new StringBuilder();
+		if (uriInfo.getUriResourceParts().size() > 2) {
+			clausesPath.append(clausesPathNavigation(indent, uriInfo.getUriResourceParts(),
+					((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()));
+		} else {
+			clausesPath.append(indent).append(
+					"?" + rdfEntityType.entityTypeName
+							+ "_s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class .\n");
+			clausesPath.append(indent).append(
+					"?class (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)* <" + rdfEntityType.getIRI() + "> .\n");
+
+			// Workaround for Virtuoso that sometimes misinterprets subClassOf*
+			//			clausesPath.append(indent).append(
+			//					"?" + rdfEntityType.entityTypeName + "_s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"
+			//							+ rdfEntityType.getURI() + "> .\n");
+		}
+		return clausesPath;
+	}
+	private StringBuilder clausesPath_URI16(String indent) throws EdmException {
+		StringBuilder clausesPath = new StringBuilder();
+		if (uriInfo.getUriResourceParts().size() > 2) {
+			clausesPath.append(clausesPathNavigation(indent, uriInfo.getUriResourceParts(),
+					((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()));
+		} else {
+			clausesPath.append(clausesPath_KeyPredicateValues(indent));
+		}
 		return clausesPath;
 	}
 	private StringBuilder clausesPath_KeyPredicateValues(String indent) throws EdmException {

@@ -19,6 +19,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlCountEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveProcessor;
@@ -50,6 +51,7 @@ public class RdfODataServlet extends HttpServlet {
 				handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
 				handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 				handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
+				handler.register(new SparqlCountEntityCollectionProcessor(rdfEdmProvider));
 				// let the handler do the work
 				handler.process(req, resp);
 					}

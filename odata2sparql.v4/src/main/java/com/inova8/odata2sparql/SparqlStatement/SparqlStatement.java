@@ -15,6 +15,8 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfConstructQuery;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfSelectQuery;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTripleSet;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -42,5 +44,25 @@ public class SparqlStatement {
 			throw new ODataRuntimeException(e.getMessage(), null);
 		}
 		return new SparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
+	}
+	RdfResultSet executeSelectQuery(RdfEdmProvider sparqlEdmProvider)
+			throws  OData2SparqlException {
+		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
+				sparql);
+		RdfResultSet results = null;
+		try {
+			results = rdfQuery.execSelect();
+		} catch (OData2SparqlException e) {
+			log.error(e.getMessage());
+			throw new ODataRuntimeException(e.getMessage(), null);
+		}
+//
+//		RdfLiteral countLiteral = null;
+//		while (results.hasNext()) {
+//			RdfQuerySolution solution = results.next();
+//			countLiteral = solution.getRdfLiteral("COUNT");
+//			break; // Only one record, but no reason for more anyway
+//		}
+		return results;
 	}
 }
