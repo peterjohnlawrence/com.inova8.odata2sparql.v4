@@ -32,6 +32,7 @@ import org.eclipse.rdf4j.repository.manager.RemoteRepositoryManager;
 import org.eclipse.rdf4j.repository.manager.RepositoryManager;
 import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
 import org.eclipse.rdf4j.repository.sparql.config.SPARQLRepositoryConfig;
+import org.eclipse.rdf4j.rio.RDFFormat;
 //import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
 //import org.eclipse.rdf4j.repository.manager.RemoteRepositoryManager;
 //import org.eclipse.rdf4j.repository.manager.RepositoryManager;
@@ -421,7 +422,7 @@ public class RdfRepositories {
 
 			}
 			try {
-				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), null, null);
+				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), null, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.odata4sparqlFile, e);
 				throw new OData2SparqlException();
