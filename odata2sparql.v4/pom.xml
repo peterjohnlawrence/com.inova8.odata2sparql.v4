@@ -8,9 +8,9 @@
 	<name>odata2sparql.v4</name>
 	<dependencies>
 		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-runtime</artifactId>
-			<version>${sesame.version}</version>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-repository-api</artifactId>
+			<version>${rdf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -90,6 +90,21 @@
 			<version>1.2.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-repository-sail</artifactId>
+			<version>${rdf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-sail-memory</artifactId>
+			<version>${rdf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.rdf4j</groupId>
+			<artifactId>rdf4j-repository-manager</artifactId>
+			<version>${rdf4j.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>odata2sparql.v4</finalName>
@@ -106,8 +121,7 @@
 		<olingo.version>4.3.0</olingo.version>
 		<javax.version>2.5</javax.version>
 		<slf4j.version>1.7.11</slf4j.version>
-		<sesame.version>4.1.2</sesame.version>
-		<rdf4j.version>2.0.1</rdf4j.version>
+		<rdf4j.version>2.1.2</rdf4j.version>
 	</properties>
 	<url>http://www.inova8.com</url>
 </project>

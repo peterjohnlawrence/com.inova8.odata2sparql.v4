@@ -1,6 +1,6 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.openrdf.model.Statement;
+import org.eclipse.rdf4j.model.Statement;
 
 public class RdfTriple {
 

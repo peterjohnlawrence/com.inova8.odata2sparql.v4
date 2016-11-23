@@ -1,6 +1,6 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.openrdf.model.Literal;
+import org.eclipse.rdf4j.model.Literal;
 
 public class RdfLiteral {
 	private final Literal node_literal;

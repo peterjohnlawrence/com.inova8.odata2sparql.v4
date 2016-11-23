@@ -8,7 +8,7 @@
 package com.inova8.odata2sparql.RdfRepository;
 
 import java.util.Hashtable;
-import org.openrdf.model.Namespace;
+import org.eclipse.rdf4j.model.Namespace;
 
 public class RdfRepository  {
 

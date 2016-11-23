@@ -1,6 +1,6 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.openrdf.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;
 

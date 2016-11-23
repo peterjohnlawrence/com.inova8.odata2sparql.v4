@@ -1,6 +1,6 @@
 package com.inova8.odata2sparql.RdfRepository;
 
-import org.openrdf.repository.Repository;
+import org.eclipse.rdf4j.repository.Repository;
 
 import com.inova8.odata2sparql.Constants.SPARQLProfile;
 

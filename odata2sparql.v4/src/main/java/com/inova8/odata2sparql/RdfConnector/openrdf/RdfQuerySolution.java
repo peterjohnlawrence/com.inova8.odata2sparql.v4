@@ -1,7 +1,7 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.openrdf.model.Literal;
-import org.openrdf.query.BindingSet;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.query.BindingSet;
 
 public class RdfQuerySolution {
 	private final BindingSet querySolution;

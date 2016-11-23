@@ -2,8 +2,8 @@ package com.inova8.odata2sparql.RdfConnector.openrdf;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.QueryLanguage;
+import org.eclipse.rdf4j.query.GraphQuery;
+import org.eclipse.rdf4j.query.QueryLanguage;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;

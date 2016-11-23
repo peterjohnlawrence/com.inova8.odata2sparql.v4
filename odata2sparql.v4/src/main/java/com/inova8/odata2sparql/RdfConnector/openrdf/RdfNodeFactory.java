@@ -1,7 +1,7 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 
 public class RdfNodeFactory {
