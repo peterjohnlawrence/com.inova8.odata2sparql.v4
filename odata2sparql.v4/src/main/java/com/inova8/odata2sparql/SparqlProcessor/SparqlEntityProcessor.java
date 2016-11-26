@@ -1,6 +1,8 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,6 +31,8 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
+import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
+import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
@@ -53,13 +57,13 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			throws ODataApplicationException, ODataLibraryException {
 	    // 1. retrieve the Entity Type
 	    List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-	    // Note: only in our example we can assume that the first segment is the EntitySet
 	    UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
 	    EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-	    EdmEntityType responseEdmEntityType = null; // we'll need this to build the ContextURL
-	    EdmEntitySet responseEdmEntitySet = null; // we need this for building the contextUrl
-	    
+	    EdmEntityType responseEdmEntityType = null; 
+	    EdmEntitySet responseEdmEntitySet = null; 
+	    SelectOption selectOption = uriInfo.getSelectOption();
+	    ExpandOption expandOption = uriInfo.getExpandOption();	    
 	    // 2. retrieve the data from backend
 	    Entity entity = null;
 		try {
@@ -68,7 +72,6 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
 		}
 	    // 3. serialize
-	    EdmEntityType entityType = edmEntitySet.getEntityType();
 
 		// Analyze the URI segments
 		int segmentCount = resourceParts.size();
@@ -88,11 +91,17 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	        throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ROOT);
 	    }
 	    
-	    
-	    
-	    ContextURL contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).suffix(Suffix.ENTITY).build();
-	    // expand and select currently not supported
-	    EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
+		ContextURL contextUrl = null;
+		try {
+			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
+			 String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType,
+					 expandOption, selectOption);
+			 contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList).serviceRoot(new URI(request.getRawBaseUri()+"/")).build();
+		} catch (URISyntaxException e) {
+			throw new ODataApplicationException("Inavlid RawBaseURI "+ request.getRawBaseUri(), HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+		}	    
+
+	    EntitySerializerOptions options = EntitySerializerOptions.with().select(selectOption).expand(expandOption).contextURL(contextUrl).build();
 
 	    ODataSerializer serializer = odata.createSerializer(responseFormat);
 	    SerializerResult serializerResult = serializer.entity(serviceMetadata, responseEdmEntityType, entity, options);

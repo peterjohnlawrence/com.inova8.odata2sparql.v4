@@ -408,31 +408,28 @@ public class SparqlQueryBuilder {
 			//expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelectOption(), uriInfo.getExpandOption());
 			//expandSelectNavPropertyMap = createExpandSelectNavPropertyMap(uriInfo.getSelectOption(), uriInfo.getExpandOption());
 			//filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType);//rdfEntityType);
-			//selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
+
 		}
 			break;
 		case URI15: {
-			//To be tested
-
-			//expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelectOption(), uriInfo.getExpandOption());
-			//expandSelectNavPropertyMap = createExpandSelectNavPropertyMap(uriInfo.getSelectOption(), uriInfo.getExpandOption());
-			//filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType);
-			//selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
+			lastSegment = resourceParts.get(resourceParts.size() - 2);
+			if (lastSegment instanceof UriResourceNavigation) {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+				rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
+			}
 		}
 			break;
 		case URI16: {
-			//To be tested
-
-			//expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelectOption(), uriInfo.getExpandOption());
-			//expandSelectNavPropertyMap = createExpandSelectNavPropertyMap(uriInfo.getSelectOption(), uriInfo.getExpandOption());
-			//filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType);
-			//selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
+			throw new ODataApplicationException("Invalid request type " + this.uriType.toString(),
+					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
-			break;
 		default:
 			throw new ODataApplicationException("Unhandled request type " + this.uriType.toString(),
 					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
+		selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
 	}
 
 	public SparqlStatement prepareConstructSparql() throws EdmException, ODataApplicationException,
@@ -452,7 +449,7 @@ public class SparqlQueryBuilder {
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
 		prepareCountEntitySet.append("\t").append("SELECT ");
 		prepareCountEntitySet.append("(COUNT(DISTINCT ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
-			//	.append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName, this.expandOption))
+		//	.append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName, this.expandOption))
 				.append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));
 		return new SparqlStatement(prepareCountEntitySet.toString());
@@ -659,19 +656,21 @@ public class SparqlQueryBuilder {
 		switch (uriType) {
 		case URI1:
 			selectExpandWhere.append(selectPath());
+			selectExpandWhere.append(indent).append("}\n");
 			break;
 		case URI2:
 		case URI5:
-			case URI6A:
-		case URI6B:
+		case URI6A:
 		case URI15:
 		case URI16:
-			//nothing required for any entity query
+			selectExpandWhere.append(indent).append("}\n");
+			break;
+		case URI6B:
+			selectExpandWhere.append(indent).append("} ").append(limitClause()).append("\n");
 			break;
 		default:
 			selectExpandWhere.append("#Unhandled URIType: " + this.uriType + "\n");
 		}
-		selectExpandWhere.append(indent).append("}\n");
 
 		return selectExpandWhere;
 	}
@@ -766,11 +765,18 @@ public class SparqlQueryBuilder {
 		}
 		return clausesPath;
 	}
+
 	private StringBuilder clausesPath_URI5(String indent) throws EdmException {
 		StringBuilder clausesPath = new StringBuilder();
-		clausesPath.append(clausesPath_KeyPredicateValues(indent));
+		if (uriInfo.getUriResourceParts().size() > 2) {
+			clausesPath.append(clausesPathNavigation(indent, uriInfo.getUriResourceParts(),
+					((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()));
+		} else {
+			clausesPath.append(clausesPath_KeyPredicateValues(indent));
+		}
 		return clausesPath;
 	}
+
 	private StringBuilder clausesPath_URI15(String indent) throws EdmException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (uriInfo.getUriResourceParts().size() > 2) {
@@ -790,6 +796,7 @@ public class SparqlQueryBuilder {
 		}
 		return clausesPath;
 	}
+
 	private StringBuilder clausesPath_URI16(String indent) throws EdmException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (uriInfo.getUriResourceParts().size() > 2) {
@@ -800,6 +807,7 @@ public class SparqlQueryBuilder {
 		}
 		return clausesPath;
 	}
+
 	private StringBuilder clausesPath_KeyPredicateValues(String indent) throws EdmException {
 		StringBuilder clausesPath_KeyPredicateValues = new StringBuilder();
 		String key = "";
@@ -876,31 +884,36 @@ public class SparqlQueryBuilder {
 		String pathVariable = "";
 		String targetVariable = "";
 		int segmentSize = navigationSegments.size();
-		if((uriType==UriType.URI5)||(uriType==UriType.URI4))segmentSize--;
+		if ((uriType == UriType.URI5) || (uriType == UriType.URI4) || (uriType == UriType.URI15))
+			segmentSize--;
 		Integer lastIndex = segmentSize;
 		for (index = 1; index < segmentSize; index++) {
-			UriResource priorNavigationSegment = navigationSegments.get(index-1);
-			String namespace="";
-			if(priorNavigationSegment.getKind().equals(UriResourceKind.entitySet)){
-				namespace= ((UriResourceEntitySet) priorNavigationSegment).getEntitySet().getEntityType().getNamespace();
-			}else if(priorNavigationSegment.getKind().equals(UriResourceKind.navigationProperty)){
-				namespace=((UriResourceNavigation) priorNavigationSegment).getProperty().getType().getNamespace();
-			};
+			UriResource priorNavigationSegment = navigationSegments.get(index - 1);
+			String namespace = "";
+			if (priorNavigationSegment.getKind().equals(UriResourceKind.entitySet)) {
+				namespace = ((UriResourceEntitySet) priorNavigationSegment).getEntitySet().getEntityType()
+						.getNamespace();
+			} else if (priorNavigationSegment.getKind().equals(UriResourceKind.navigationProperty)) {
+				namespace = ((UriResourceNavigation) priorNavigationSegment).getProperty().getType().getNamespace();
+			}
+			;
 			//index++;
 			UriResource navigationSegment = navigationSegments.get(index);
 			EdmNavigationProperty predicate = ((UriResourceNavigation) navigationSegment).getProperty();
-			RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(new FullQualifiedName(namespace,predicate.getName()));
+			RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(new FullQualifiedName(
+					namespace, predicate.getName()));
 			if (isFirstSegment) {
 				// Not possible to have more than one key field is it?
 				for (UriParameter entityKey : entityKeys) {
 					String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
-					String expandedKey = rdfModel.getRdfPrefixes().expandPrefix( decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
+					String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(
+							decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 					pathVariable = "<" + expandedKey + ">";
 				}
 			} else {
 				pathVariable = "?" + path + "_s";
 			}
-			if (index.equals(lastIndex-1)) {
+			if (index.equals(lastIndex - 1)) {
 				targetVariable = "?" + edmTargetEntitySet.getEntityType().getName() + "_s";
 			} else {
 				targetVariable = "?" + path + navProperty.getAssociationName() + "_s";
@@ -1083,20 +1096,10 @@ public class SparqlQueryBuilder {
 		clausesSelect.append("{\n");
 		clausesSelect.append(indent).append("\t")
 				.append("?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
-		//      If specific properties from filters, but we should assume that if not specified otherwise *ALL* properties should be returned, not just those in the filter
-		//		if ((navPropertyPropertyFilter != null && !navPropertyPropertyFilter.getPropertyFilters().isEmpty())
-		//				|| 
+
 		if ((this.selectPropertyMap != null && this.selectPropertyMap.containsKey(navPath) && !this.selectPropertyMap
 				.get(navPath).isEmpty())) {
 			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
-			//	      If specific properties from filters, but we should assume that if not specified otherwise *ALL* properties should be returned, not just those in the filter
-			//			if (navPropertyPropertyFilter != null && !navPropertyPropertyFilter.getPropertyFilters().isEmpty()) {
-			//				for (Entry<String, PropertyFilter> propertyFilterEntry : navPropertyPropertyFilter.getPropertyFilters()
-			//						.entrySet()) {
-			//					PropertyFilter propertyFilter = propertyFilterEntry.getValue();
-			//					clausesSelect.append("(<" + propertyFilter.getProperty().getPropertyURI() + ">)");
-			//				}
-			//			}
 			if (this.selectPropertyMap != null && this.selectPropertyMap.containsKey(navPath)) {
 				for (String selectProperty : this.selectPropertyMap.get(navPath)) {
 					clausesSelect.append("(<" + selectProperty + ">)");
@@ -1189,34 +1192,34 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder limitClause() {
 		StringBuilder limitClause = new StringBuilder();
-		if (this.uriType.equals(UriType.URI1)) {
-			int top;
-			int skip;
-			int defaultLimit = rdfModel.getRdfRepository().getModelRepository().getDefaultQueryLimit();
-			if (uriInfo.getTopOption() == null) {
+		//if (this.uriType.equals(UriType.URI1)||this.uriType.equals(UriType.URI6B)) {
+		int top;
+		int skip;
+		int defaultLimit = rdfModel.getRdfRepository().getModelRepository().getDefaultQueryLimit();
+		if (uriInfo.getTopOption() == null) {
+			top = defaultLimit;
+			skip = 0;
+		} else {
+			top = uriInfo.getTopOption().getValue();
+
+			if ((top > defaultLimit) && (defaultLimit != 0))
 				top = defaultLimit;
+			if (uriInfo.getSkipOption() == null) {
 				skip = 0;
 			} else {
-				top = uriInfo.getTopOption().getValue();
-
-				if ((top > defaultLimit) && (defaultLimit != 0))
-					top = defaultLimit;
-				if (uriInfo.getSkipOption() == null) {
-					skip = 0;
-				} else {
-					skip = uriInfo.getSkipOption().getValue();
-				}
-			}
-			if (top > 0 || skip > 0) {
-
-				if (top > 0) {
-					limitClause.append(" LIMIT ").append(top);
-				}
-				if (skip > 0) {
-					limitClause.append(" OFFSET ").append(skip);
-				}
+				skip = uriInfo.getSkipOption().getValue();
 			}
 		}
+		if (top > 0 || skip > 0) {
+
+			if (top > 0) {
+				limitClause.append(" LIMIT ").append(top);
+			}
+			if (skip > 0) {
+				limitClause.append(" OFFSET ").append(skip);
+			}
+		}
+		//}
 		return limitClause;
 	}
 
@@ -1227,79 +1230,81 @@ public class SparqlQueryBuilder {
 		return defaultLimitClause;
 	}
 
-	private HashMap<String, HashSet<String>> createSelectPropertyMap(List<SelectItem> selectProperties)
-			throws EdmException {
+	private HashMap<String, HashSet<String>> createSelectPropertyMap(SelectOption selectOption) throws EdmException {
 		//Align variables
-		RdfEntityType entityType = rdfTargetEntityType;//rdfEntityType;
+		RdfEntityType entityType = rdfTargetEntityType;
 		String key = entityType.entityTypeName;
 		HashMap<String, HashSet<String>> values = new HashMap<String, HashSet<String>>();
 		//Boolean emptyClause = true;
-
-		for (SelectItem property : selectProperties) {
-			HashSet<String> valueProperties;
-			RdfEntityType segmentEntityType = entityType;
-			RdfEntityType priorSegmentEntityType = null;
-			key = entityType.entityTypeName;
-			//check property.getNavigationPropertySegments() 
-			// if so then 
-			for (NavigationPropertySegment navigationPropertySegment : property.getNavigationPropertySegments()) {
-				priorSegmentEntityType = segmentEntityType;
-				segmentEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(navigationPropertySegment
-						.getTargetEntitySet());
-				key = key + navigationPropertySegment.getNavigationProperty().getName();
-			}
-			if (!values.containsKey(key)) {
-				valueProperties = new HashSet<String>();
-				values.put(key, valueProperties);
-			} else {
-				valueProperties = values.get(key);
-			}
-
-			if (property.isStar()) {
-				//TODO Does/should segmentEntityType.getProperties get inhererited properties as well? 
-				//TODO Why not get all
-				for (RdfProperty rdfProperty : segmentEntityType.getProperties()) {
-					if (rdfProperty.propertyNode != null) {
-						valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
-						//emptyClause = false;
-					}
+		if (selectOption != null) {
+			for (SelectItem property : selectOption.getSelectItems()) {
+				HashSet<String> valueProperties;
+				RdfEntityType segmentEntityType = entityType;
+				RdfEntityType priorSegmentEntityType = null;
+				key = entityType.entityTypeName;
+				//check property.getNavigationPropertySegments() 
+				// if so then 
+				//V4			for (NavigationPropertySegment navigationPropertySegment : property.getNavigationPropertySegments()) {
+				//				priorSegmentEntityType = segmentEntityType;
+				//				segmentEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(navigationPropertySegment
+				//						.getTargetEntitySet());
+				//				key = key + navigationPropertySegment.getNavigationProperty().getName();
+				//			}
+				if (!values.containsKey(key)) {
+					valueProperties = new HashSet<String>();
+					values.put(key, valueProperties);
+				} else {
+					valueProperties = values.get(key);
 				}
 
-			} else if (property.getProperty() != null) {
-				if (!property.getProperty().getName().equals(RdfConstants.SUBJECT)) {
-					RdfProperty rdfProperty = null;
-					try {
-						rdfProperty = segmentEntityType.findProperty(property.getProperty().getName());
-					} catch (EdmException e) {
-						log.error("Failed to locate property:" + property.getProperty().getName());
+				if (property.isStar()) {
+					//TODO Does/should segmentEntityType.getProperties get inhererited properties as well? 
+					//TODO Why not get all
+					for (RdfProperty rdfProperty : segmentEntityType.getProperties()) {
+						if (rdfProperty.propertyNode != null) {
+							valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
+							//emptyClause = false;
+						}
 					}
 
-					if (rdfProperty.getIsKey()) {
-						//TODO specifically asked for key so should be added to VALUES
-						valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-						//emptyClause = false;
+				} else if (property.getResourcePath() != null) {
+					if (!property.getResourcePath().equals(RdfConstants.SUBJECT)) {
+						RdfProperty rdfProperty = null;
+						try {
+							rdfProperty = segmentEntityType.findProperty(property.getResourcePath()
+									.getUriResourceParts().get(0).getSegmentValue());
+						} catch (EdmException e) {
+							log.error("Failed to locate property:" + property.getResourcePath());
+						}
 
-					} else {
-						valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
-						//emptyClause = false;
+						if (rdfProperty.getIsKey()) {
+							//TODO specifically asked for key so should be added to VALUES
+							valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+							//emptyClause = false;
+
+						} else {
+							valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
+							//emptyClause = false;
+						}
 					}
+				} else {
+					//Must be a navigation property
+					//				@SuppressWarnings("unused")
+					//				RdfAssociation rdfAssociation = null;
+					//				try {
+					//					//TODO which of the navigation properties???
+					//					rdfAssociation = priorSegmentEntityType.findNavigationProperty(property
+					//							.getNavigationPropertySegments().get(0).getNavigationProperty().getName());
+					//				} catch (EdmException e) {
+					//					log.error("Failed to locate navigation property:"
+					//							+ property.getNavigationPropertySegments().get(0).getNavigationProperty().getName());
+					//				}
 				}
-			} else {
-				//Must be a navigation property
-				@SuppressWarnings("unused")
-				RdfAssociation rdfAssociation = null;
-				try {
-					//TODO which of the navigation properties???
-					rdfAssociation = priorSegmentEntityType.findNavigationProperty(property
-							.getNavigationPropertySegments().get(0).getNavigationProperty().getName());
-				} catch (EdmException e) {
-					log.error("Failed to locate navigation property:"
-							+ property.getNavigationPropertySegments().get(0).getNavigationProperty().getName());
-				}
+
 			}
-
+			return values;
 		}
-		return values;
+		return null;
 	}
 
 }

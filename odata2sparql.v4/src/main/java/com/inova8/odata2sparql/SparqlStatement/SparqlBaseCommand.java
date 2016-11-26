@@ -66,9 +66,6 @@ public class SparqlBaseCommand {
 		return navPropertiesMap;
 	}
 
-	//TODO V2
-	//	public EntityCollection readEntitySet(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-	//			ContentType responseFormat) throws OData2SparqlException, ODataException {
 	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -129,9 +126,15 @@ public class SparqlBaseCommand {
 		UriResourceEntitySet uriResourceEntitySet = null;
 		switch (uriType) {
 		case URI5:
-			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-			edmEntitySet = uriResourceEntitySet.getEntitySet();
-			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+			if(uriInfo.getUriResourceParts().size() > 2){
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1); 
+				FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+				rdfEntityType=rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+			}else{
+				uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+				edmEntitySet = uriResourceEntitySet.getEntitySet();
+				rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);	
+			}
 			break;
 		case URI2:
 			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
@@ -151,9 +154,12 @@ public class SparqlBaseCommand {
 		} catch (OData2SparqlException e) {
 			throw new ODataRuntimeException(e.getMessage());
 		}
+
 		SparqlEntityCollection rdfResults = sparqlStatement.executeQuery(rdfEdmProvider, rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
+		
 		return rdfResults.getFirstEntity();
+
 	}
 	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {
@@ -166,20 +172,7 @@ public class SparqlBaseCommand {
 		//prepareQuery
 		SparqlStatement sparqlStatement = null;
 		UriResourceEntitySet uriResourceEntitySet;
-//		switch (uriType) {
-//		case URI1:
-//			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-//			edmEntitySet = uriResourceEntitySet.getEntitySet();
-//			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-//			break;
-//		case URI6B:
-//			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1); 
-//			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
-//			rdfEntityType=rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
-//			break;
-//		default:
-//			throw new ODataApplicationException("Unhandled URIType "+uriType, HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
-//		}
+
 		sparqlStatement = sparqlBuilder.prepareCountEntitySetSparql();
 		RdfResultSet rdfResults = sparqlStatement.executeSelectQuery(rdfEdmProvider);
 		

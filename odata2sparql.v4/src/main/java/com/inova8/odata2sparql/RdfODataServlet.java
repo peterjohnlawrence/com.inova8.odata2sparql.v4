@@ -22,6 +22,7 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlServiceDocumentProcessor;
 
 public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -33,28 +34,28 @@ public class RdfODataServlet extends HttpServlet {
 		try {
 			String service = req.getPathInfo().split("/")[1];
 			if (service.equals(RdfConstants.RESET)) {
-				RdfEdmProviders.getRdfRepositories().reset( req.getPathInfo().split("/")[2]);	
+				RdfEdmProviders.getRdfRepositories().reset(req.getPathInfo().split("/")[2]);
 			} else if (service.equals(RdfConstants.RELOAD)) {
-				RdfEdmProviders.getRdfRepositories().reload( req.getPathInfo().split("/")[2]);
+				RdfEdmProviders.getRdfRepositories().reload(req.getPathInfo().split("/")[2]);
 			} else {
 				//Find provider matching service name			
-				RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider( service);
+				RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider(service);
 				// create odata handler and configure it with CsdlEdmProvider and Processor
-				if(rdfEdmProvider!=null)
-					{OData odata = OData.newInstance();
-				ServiceMetadata edm = odata.createServiceMetadata(rdfEdmProvider,
-						new ArrayList<EdmxReference>());
-				ODataHttpHandler handler = odata.createHandler(edm);
-				//Reserve first parameter for either the service name or a$RESET. $RELOAD
-				handler.setSplit(1);
-				handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
-				handler.register(new SparqlEntityProcessor(rdfEdmProvider));
-				handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
-				// let the handler do the work
-				handler.process(req, resp);
-					}
-				else{
-					throw new OData2SparqlException("No service matching "+service+" found");
+				if (rdfEdmProvider != null) {
+					OData odata = OData.newInstance();
+					ServiceMetadata edm = odata.createServiceMetadata(rdfEdmProvider, new ArrayList<EdmxReference>());
+					ODataHttpHandler handler = odata.createHandler(edm);
+					//Reserve first parameter for either the service name or a$RESET. $RELOAD
+					handler.setSplit(1);
+					handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
+					handler.register(new SparqlEntityProcessor(rdfEdmProvider));
+					handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
+					handler.register(new SparqlServiceDocumentProcessor());
+					log.info("Path: "+ req.getPathInfo()+" Query: "+req.getQueryString());
+					// let the handler do the work
+					handler.process(req, resp);
+				} else {
+					throw new OData2SparqlException("No service matching " + service + " found");
 				}
 			}
 		} catch (RuntimeException | OData2SparqlException e) {

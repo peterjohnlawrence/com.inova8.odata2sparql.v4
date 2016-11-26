@@ -38,23 +38,23 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
 
-class SparqlEntityCollection extends EntityCollection{
+class SparqlEntityCollection extends EntityCollection {
 	private final Log log = LogFactory.getLog(SparqlEntityCollection.class);
 	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
-//	private final ArrayList<Map<String, Object>> entitySetResults;
-//	private EntityCollection entityCollection;
+
+	//	private final ArrayList<Map<String, Object>> entitySetResults;
+	//	private EntityCollection entityCollection;
 
 	// TODO clarification of expanded structure
 	// Entityset dataproperty: List<Map<Subject, Map<Property,Value>>>
 	// Expanded to first level: List<Map<Subject, Map<navProp, Map<Object, Map<Property,Value>>>>>
 	// Expanded to second level: List<Map<Subject, Map<navProp, Map<Object, Map<navProp, Map<Object, Map<Property,Value>>>>>>>
 
-
 	SparqlEntityCollection(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) {
 		super();
-		
+
 		this.toSparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
 	}
 
@@ -62,28 +62,18 @@ class SparqlEntityCollection extends EntityCollection{
 		return entitySetResultsMap;
 	}
 
-//	public List<Map<String, Object>> getEntitySetResults() throws ODataException {
-//		if (entitySetResults == null) {
-//			throw new ODataException("No data found");
-//		}
-//		return (List<Map<String, Object>>) entitySetResults;
-//	}
-
 	public EntityCollection getEntityCollection() throws ODataException {
 
 		return this;
 	}
 
 	public Entity getFirstEntity() throws ODataException {
-		return this.iterator().next();
+		if (!this.getEntities().isEmpty()) {
+			return this.iterator().next();
+		} else {
+			return null;
+		}
 	}
-//	public Map<String, Object> getEntityResults() {
-//		if (entitySetResults.isEmpty()) {
-//			return null;
-//		} else {
-//			return (Map<String, Object>) entitySetResults.get(0);
-//		}
-//	}
 
 	public Map<String, Map<String, List<Object>>> getNavPropertyResults() {
 		return navPropertyResults;
@@ -106,20 +96,20 @@ class SparqlEntityCollection extends EntityCollection{
 	}
 
 	// TODO from UCDetector: Method "SparqlEntityCollection.retrieveEntryResultsData(String,String)" has 0 references
-//	private URI createId(SparqlEntity rdfEntity) {
-//		String id = "";
-//		for (RdfPrimaryKey primaryKey : rdfEntity.getEntityType().getPrimaryKeys()) {
-//			if (rdfEntity.containsProperty(primaryKey.getPrimaryKeyName())) {
-//				id += rdfEntity.getProperty(primaryKey.getPrimaryKeyName()).toString();
-//			}
-//		}
-//		try {
-//			return new URI(rdfEntity.getEntityType().entityTypeName + "(" + String.valueOf(id) + ")");
-//		} catch (URISyntaxException e) {
-//			throw new ODataRuntimeException("Unable to create id for entity: "
-//					+ rdfEntity.getEntityType().entityTypeName, e);
-//		}
-//	}
+	//	private URI createId(SparqlEntity rdfEntity) {
+	//		String id = "";
+	//		for (RdfPrimaryKey primaryKey : rdfEntity.getEntityType().getPrimaryKeys()) {
+	//			if (rdfEntity.containsProperty(primaryKey.getPrimaryKeyName())) {
+	//				id += rdfEntity.getProperty(primaryKey.getPrimaryKeyName()).toString();
+	//			}
+	//		}
+	//		try {
+	//			return new URI(rdfEntity.getEntityType().entityTypeName + "(" + String.valueOf(id) + ")");
+	//		} catch (URISyntaxException e) {
+	//			throw new ODataRuntimeException("Unable to create id for entity: "
+	//					+ rdfEntity.getEntityType().entityTypeName, e);
+	//		}
+	//	}
 
 	private Object Cast(Object value, String propertyTypeName) {
 		EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(propertyTypeName);
@@ -219,7 +209,7 @@ class SparqlEntityCollection extends EntityCollection{
 	}
 
 	@SuppressWarnings("unchecked")
-// TODO from UCDetector: Method "SparqlEntityCollection.retrieveEntryResultsData(String,String)" has 0 references
+	// TODO from UCDetector: Method "SparqlEntityCollection.retrieveEntryResultsData(String,String)" has 0 references
 	Map<String, Object> retrieveEntryResultsData(String subjectEntity, String navigationPropertyName) { // NO_UCD (unused code)
 		if (!navPropertyResults.containsKey(subjectEntity)
 				|| !navPropertyResults.get(subjectEntity).containsKey(navigationPropertyName)) {
@@ -231,7 +221,7 @@ class SparqlEntityCollection extends EntityCollection{
 	}
 
 	@SuppressWarnings("unchecked")
-// TODO from UCDetector: Method "SparqlEntityCollection.retrieveFeedResultData(String,String)" has 0 references
+	// TODO from UCDetector: Method "SparqlEntityCollection.retrieveFeedResultData(String,String)" has 0 references
 	List<Map<String, Object>> retrieveFeedResultData(String subjectEntity, String navigationPropertyName) { // NO_UCD (unused code)
 		ArrayList<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
 		if (navPropertyResults.containsKey(subjectEntity)
@@ -246,6 +236,7 @@ class SparqlEntityCollection extends EntityCollection{
 			return null;
 		}
 	}
+
 	private HashMap<String, RdfAssociation> buildNavPropertiesMap(RdfEdmProvider edmProvider,
 	//TODO V2			List<ArrayList<NavigationPropertySegment>> expand, List<SelectItem> select) 
 			ExpandOption expand, SelectOption select) throws EdmException {
@@ -276,6 +267,7 @@ class SparqlEntityCollection extends EntityCollection{
 		}
 		return navPropertiesMap;
 	}
+
 	private SparqlEntityCollection toSparqlEntityCollection(RdfEdmProvider sparqlEdmProvider,
 			RdfEntityType rdfEntityType,
 			//TODO V2			RdfTripleSet results, List<ArrayList<NavigationPropertySegment>> expand, List<SelectItem> select)
@@ -307,8 +299,8 @@ class SparqlEntityCollection extends EntityCollection{
 					RdfAssociation rdfAssociation = navPropertiesMap.get(propertyNode.getIRI().toString());
 					if (rdfAssociation != null) {
 						// Locate which of the $expand this is related to
-						SparqlEntity rdfObjectEntity = findOrCreateEntity(sparqlEdmProvider, rdfEntitiesMap, objectNode,
-								rdfEntityType);
+						SparqlEntity rdfObjectEntity = findOrCreateEntity(sparqlEdmProvider, rdfEntitiesMap,
+								objectNode, rdfEntityType);
 						//this.getEntities().add(rdfObjectEntity);
 						rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
 						this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
@@ -322,8 +314,10 @@ class SparqlEntityCollection extends EntityCollection{
 					if (rdfSubjectEntity.getEntityType().isOperation()) {
 						// An operation so need to use these as the primary key of the record.
 						if (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getLocalName()) != null) {
-							rdfSubjectEntity.addProperty(new Property(null, rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(), 
-									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode))));
+							rdfSubjectEntity.addProperty(new Property(null, rdfSubjectEntity.getEntityType()
+									.findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(),
+									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider
+											.getRdfModel().getRdfPrefixes().toQName(objectNode))));
 							//							rdfSubjectEntity.put(
 							//									rdfSubjectEntity.getEntityType()
 							//											.findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(), RdfEntity
@@ -331,20 +325,21 @@ class SparqlEntityCollection extends EntityCollection{
 							//											.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode)));						}
 						}
 					}
-					} else if (objectNode.isBlank()) {
-						//Must be a navigation property pointing to an expanded entity, but they should really be eliminated from the query in the first place
-					} else if (propertyNode.getIRI().toString().equals(RdfConstants.TARGETENTITY)) {
-						//Mark any targetEntity so that recursive queries can be executed
-						rdfSubjectEntity.setTargetEntity(true);
-					} else {// Must be a property with a value, so put it into a hashmap for processing the second time round when we know the property
-						rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
-					}
+				} else if (objectNode.isBlank()) {
+					//Must be a navigation property pointing to an expanded entity, but they should really be eliminated from the query in the first place
+				} else if (propertyNode.getIRI().toString().equals(RdfConstants.TARGETENTITY)) {
+					//Mark any targetEntity so that recursive queries can be executed
+					rdfSubjectEntity.setTargetEntity(true);
+				} else {// Must be a property with a value, so put it into a hashmap for processing the second time round when we know the property
+					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
 				}
+			}
 		} catch (OData2SparqlException e) {
 			e.printStackTrace();
 		}
 		return this.build();
 	}
+
 	private SparqlEntity findOrCreateEntity(RdfEdmProvider sparqlEdmProvider, Map<String, SparqlEntity> rdfEntitiesMap,
 			RdfNode subjectNode, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
@@ -356,8 +351,10 @@ class SparqlEntityCollection extends EntityCollection{
 		}
 		return rdfEntity;
 	}
+
 	private SparqlEntityCollection build() {
-		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet().iterator();
+		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
+				.iterator();
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
@@ -380,7 +377,8 @@ class SparqlEntityCollection extends EntityCollection{
 							}
 							if (rdfProperty != null) {
 								//rdfEntity.put(rdfProperty.propertyName, Cast(value, rdfProperty.propertyTypeName));				
-								rdfEntity.addProperty(new Property(null,rdfProperty.propertyName,ValueType.PRIMITIVE,Cast(value, rdfProperty.propertyTypeName)));
+								rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
+										Cast(value, rdfProperty.propertyTypeName)));
 							} else {
 								log.error("Ignoring operation property statement that is not part of EDM:"
 										+ propertyNode.getLocalName());
@@ -391,7 +389,8 @@ class SparqlEntityCollection extends EntityCollection{
 								.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 						if (rdfProperty != null) {
 							//rdfEntity.put(rdfProperty.propertyName, Cast(value, rdfProperty.propertyTypeName));
-							rdfEntity.addProperty(new Property(null,rdfProperty.propertyName,ValueType.PRIMITIVE,Cast(value, rdfProperty.propertyTypeName)));
+							rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
+									Cast(value, rdfProperty.propertyTypeName)));
 						} else {
 							log.error("Ignoring property statement that is not part of EDM:"
 									+ propertyNode.getLocalName());

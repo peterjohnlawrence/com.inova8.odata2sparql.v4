@@ -10,6 +10,7 @@ package com.inova8.odata2sparql.SparqlStatement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
@@ -45,7 +46,7 @@ public class SparqlStatement {
 		}
 		return new SparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
 	}
-	RdfResultSet executeSelectQuery(RdfEdmProvider sparqlEdmProvider)
+	RdfResultSet executeSelectQuery(RdfEdmProvider sparqlEdmProvider )
 			throws  OData2SparqlException {
 		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
 				sparql);
