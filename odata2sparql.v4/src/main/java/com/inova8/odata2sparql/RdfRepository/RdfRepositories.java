@@ -70,15 +70,7 @@ public class RdfRepositories {
 		}
 	}
 
-	public void reset(String rdfRepositoryID) {
-		if (rdfRepositoryID.equals(RdfConstants.WILDCARD)) {
-			rdfRepositoryList = new HashMap<String, RdfRepository>();
-		} else {
-			rdfRepositoryList.remove(rdfRepositoryID.toUpperCase());
-		}
-	}
-
-	public void reload(String rdfRepositoryID) {
+	public void reload() {
 		repositoryManager.shutDown();
 		try {
 			loadRepositories();
@@ -521,7 +513,8 @@ public class RdfRepositories {
 	}
 
 	private void readQueries(RepositoryConnection modelsConnection, Value RDFSModel) throws OData2SparqlException {
-		Hashtable<Value, String> queries = RdfConstants.getMetaQueries();// new Hashtable<Value, String>();
+		Hashtable<Value, String> queries = RdfConstants.getMetaQueries();
+		Hashtable<Value, Hashtable<Value, String>> metaModels = RdfConstants.getMetaModels();
 		//Bootstrap the standard queries
 		try {
 			TupleQuery tupleQuery = modelsConnection.prepareTupleQuery(QueryLanguage.SPARQL,
@@ -531,10 +524,21 @@ public class RdfRepositories {
 			try {
 				while (result.hasNext()) {
 					BindingSet bindingSet = result.next();
+					Value valueOfMetaModel = bindingSet.getValue("Metadata");
+					Hashtable<Value, String> metaModelQueries;
+					if( metaModels.containsKey(valueOfMetaModel) ){
+						 metaModelQueries = metaModels.get(valueOfMetaModel);
+					}else{
+						metaModelQueries= new Hashtable<Value, String> ();
+						metaModels.put(valueOfMetaModel, metaModelQueries);
+					}
+					
 					Value valueOfQuery = bindingSet.getValue("Query");
 					Value valueOfQueryString = bindingSet.getValue("QueryString");
-					queries.put(valueOfQuery, valueOfQueryString.stringValue());
+					
+					metaModelQueries.put(valueOfQuery, valueOfQueryString.stringValue());
 				}
+				RdfConstants.setMetaQueries(metaModels.get(RdfConstants.URI_DEFAULTMETAMODEL));
 			} finally {
 				result.close();
 			}

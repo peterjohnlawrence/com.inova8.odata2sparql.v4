@@ -24,6 +24,7 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
+import org.apache.olingo.server.api.uri.queryoption.CustomQueryOption;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
@@ -343,6 +344,7 @@ public class SparqlQueryBuilder {
 		this.uriType = uriType;
 		//Prepare what is required to create the SPARQL
 		prepareBuilder();
+		log.info("Builder for URIType: "+ uriType.toString());
 	}
 
 	private void prepareBuilder() throws EdmException, ODataApplicationException {
@@ -449,12 +451,11 @@ public class SparqlQueryBuilder {
 
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
 		prepareCountEntitySet.append("\t").append("SELECT ");
-	    //primaryKey_Variables(this.rdfTargetEntityType).toString();
+		//primaryKey_Variables(this.rdfTargetEntityType).toString();
 		//prepareCountEntitySet.append("(COUNT(DISTINCT ").append(primaryKey_Variables(this.rdfTargetEntityType))
 		//prepareCountEntitySet.append("(COUNT(DISTINCT ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 		//	.append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName, this.expandOption))
-		prepareCountEntitySet.append("(COUNT(DISTINCT *")
-				.append(") AS ?COUNT)").append("\n");
+		prepareCountEntitySet.append("(COUNT(DISTINCT *").append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));
 		return new SparqlStatement(prepareCountEntitySet.toString());
 	}
@@ -581,19 +582,28 @@ public class SparqlQueryBuilder {
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
 		return clausesOperationProperties;
 	}
-
+ private String getQueryOptionText(List<CustomQueryOption> queryOptions, String parameter){
+	 
+	 for ( CustomQueryOption queryOption: queryOptions){
+		 if(queryOption.getName().equals(parameter)) return queryOption.getText();
+	 }
+	return null;
+	 
+ }
 	private String preprocessOperationQuery(RdfEntityType rdfOperationType) throws EdmException, OData2SparqlException {
-		Map<String, String> queryOptions = null;
+		List<CustomQueryOption> queryOptions = null;
 		if (rdfOperationType.isFunctionImport()) {
-			// queryOptions = uriInfo.getCustomQueryOptions();
+			queryOptions = uriInfo.getCustomQueryOptions();
 		}
 		String queryText = rdfOperationType.queryText;
 		for (Entry<String, com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter> functionImportParameterEntry : rdfOperationType
 				.getFunctionImportParameters().entrySet()) {
 			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 					.getValue();
-			if (queryOptions.containsKey(functionImportParameter.getName())) {
-				String parameterValue = queryOptions.get(functionImportParameter.getName());
+			String parameterValue = getQueryOptionText(queryOptions,functionImportParameter.getName());
+			//if (queryOptions.containsKey(functionImportParameter.getName())) {
+			//	String parameterValue = queryOptions.get(functionImportParameter.getName());
+			if(parameterValue!=null){
 				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
 			} else {
 				if (!functionImportParameter.isNullable())
@@ -601,7 +611,7 @@ public class SparqlQueryBuilder {
 							"FunctionImport cannot be called without values for non-nullable parameters");
 			}
 		}
-		if(uriType!=UriType.URI15){
+		if ((uriType != UriType.URI15) && (uriType != UriType.URI6B)) {
 			queryText += limitClause();
 		}
 		return queryText;
@@ -845,30 +855,31 @@ public class SparqlQueryBuilder {
 		if (rdfEntityType.isOperation()) {
 			//TODO make sure not a complex or value resourceParts URI5 URI3
 			if (segmentSize == 1) {
-				key=primaryKey_Variables(rdfEntityType).toString();
-//				for (RdfPrimaryKey primaryKey : rdfEntityType.getPrimaryKeys()) {
-//					key = key + "?" + primaryKey.getPrimaryKeyName() + " ";
-//				}
+				key = primaryKey_Variables(rdfEntityType).toString();
+				//				for (RdfPrimaryKey primaryKey : rdfEntityType.getPrimaryKeys()) {
+				//					key = key + "?" + primaryKey.getPrimaryKeyName() + " ";
+				//				}
 			} else {
-				if (segmentSize > 1) {
+				if (segmentSize > 2) {
 					log.error("Too many navigation properties for operation:"
 							+ uriInfo.getUriResourceParts().toString());
 				} else {
 					RdfAssociation navProperty = rdfEntityType.findNavigationProperty(uriInfo.getUriResourceParts()
-							.get(0).getSegmentValue());
+							.get(1).getSegmentValue());
 					key = rdfTargetEntityType.entityTypeName;
 					clausesPath_KeyPredicateValues.append(indent).append("VALUES(?" + key + "_s)");
 					//TODO to get key predicates for function import					
-					//					String keyPredicate = navProperty.getVarName();
-					//					if (uriInfo.getKeyPredicates() != null && !uriInfo.getKeyPredicates().isEmpty()) {
-					//						for (KeyPredicate entityKey : uriInfo.getKeyPredicates()) {
-					//							if (entityKey.getProperty().getName().equals(keyPredicate)) {
-					//								String decodedEntityKey = RdfEntity.URLDecodeEntityKey(entityKey.getLiteral());
-					//								String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(decodedEntityKey);
-					//								clausesPath_KeyPredicateValues.append("{(<" + expandedKey + ">)}");
-					//							}
-					//						}
-					//					}
+					String keyPredicate = navProperty.getVarName();
+					//if (uriInfo.getKeyPredicates() != null && !uriInfo.getKeyPredicates().isEmpty()) {
+					if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
+						for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()) {
+							if (entityKey.getName().equals(keyPredicate)) {
+								String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
+								String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
+								clausesPath_KeyPredicateValues.append("{(<" + expandedKey + ">)}");
+							}
+						}
+					}
 					return clausesPath_KeyPredicateValues;
 				}
 			}
@@ -889,14 +900,13 @@ public class SparqlQueryBuilder {
 				}
 			}
 		} else {
-			key=primaryKey_Variables(rdfEntityType).toString();
+			key = primaryKey_Variables(rdfEntityType).toString();
 			//key = "?" + rdfEntityType.entityTypeName + "_s";
 		}
 
 		if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
 			clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key + ") {(");
-			for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
-					.getKeyPredicates()) {
+			for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()) {
 				String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
 				// String leading and trailing single quote from key
 				String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(
@@ -1145,6 +1155,12 @@ public class SparqlQueryBuilder {
 				}
 			}
 			clausesSelect.append("}\n");
+		} else if(!this.rdfTargetEntityType.getProperties().isEmpty()){
+			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
+				for (RdfModel.RdfProperty selectProperty :this.rdfTargetEntityType.getInheritedProperties()) {
+					clausesSelect.append("(<" + selectProperty.getPropertyURI() + ">)");
+				}	
+				clausesSelect.append("}\n");
 		} else {
 			// Assume select=*, and fetch all non object property values
 			clausesSelect.append(indent).append("\t")

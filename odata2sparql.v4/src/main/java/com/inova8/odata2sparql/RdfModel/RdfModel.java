@@ -2,6 +2,7 @@ package com.inova8.odata2sparql.RdfModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -319,16 +320,32 @@ public class RdfModel {
 		public Collection<RdfModel.RdfAssociation> getNavigationProperties() {
 			return navigationProperties.values();
 		}
-
+		public Collection<RdfModel.RdfAssociation> getInheritedNavigationProperties() {
+			 Collection<RdfModel.RdfAssociation> inheritedNavigationProperties= new ArrayList<RdfModel.RdfAssociation>();
+			 inheritedNavigationProperties.addAll(navigationProperties.values());
+			if (this.baseType != null) {
+				inheritedNavigationProperties.addAll(this.baseType.getInheritedNavigationProperties());
+			} 
+		return inheritedNavigationProperties;
+		}
 		public Collection<RdfModel.RdfProperty> getProperties() {
 			return properties.values();
 		}
+		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
+			 Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
+			 inheritedProperties.addAll(properties.values());
+			if (this.baseType != null) {
+				inheritedProperties.addAll(this.baseType.getInheritedProperties());
+			} 
+		return inheritedProperties;
 
+		}
 		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
 
 		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
 
 		public RdfAssociation findNavigationProperty(String navigationPropertyName) {
+			//TODO do we not want to find inherited properties as well?
 			return navigationProperties.get(navigationPropertyName);
 		}
 
