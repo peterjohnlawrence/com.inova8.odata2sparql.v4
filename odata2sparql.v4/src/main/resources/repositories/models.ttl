@@ -75,7 +75,7 @@ odata4sparql:FOAF
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&timeout=0> ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&using-graph-uri=http://northwind.com/operations/&timeout=0> ;
   sparql:update-endpoint <http://localhost:8890/sparql> ;
   rdfs:label "NW Vocabulary Impl"^^xsd:string ;
 .

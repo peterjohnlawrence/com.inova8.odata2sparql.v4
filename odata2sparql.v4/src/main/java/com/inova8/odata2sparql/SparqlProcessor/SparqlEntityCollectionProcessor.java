@@ -40,6 +40,7 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
+import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
@@ -92,8 +93,8 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 	        if(navSegment instanceof UriResourceNavigation){
 	            UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
 	            EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-	            responseEdmEntityType = edmNavigationProperty.getType();
-	            responseEdmEntitySet=SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
+	            responseEdmEntityType = edmNavigationProperty.getType(); 
+	            responseEdmEntitySet=Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
 	        }
 	    }else{
 	        // this would be the case for e.g. Products(1)/Category/Products(1)/Category

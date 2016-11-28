@@ -118,6 +118,8 @@ public class RdfConstants {
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
+	
+	public static final String SPARQL_UNDEF = "UNDEF";
 
 	private static final String ONTOLOGY = "Ontology";
 	private static final String DATATYPE = "Datatype";
@@ -207,6 +209,7 @@ public class RdfConstants {
 		//Initialize the file dependent constants
 		try {
 			repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
+			//	repositoryManagerDirPath = repositoryManagerDirPath + File.separator + "../../../../inova8/odata2sparql" + File.separator;		
 			repositoryManagerDir = new File(repositoryManagerDirPath);
 			odata4sparqlFile = repositoryManagerDirPath + "repositories/odata4sparql.rdf";
 			rdfFile = repositoryManagerDirPath + "repositories/22-rdf-syntax-ns.ttl";
