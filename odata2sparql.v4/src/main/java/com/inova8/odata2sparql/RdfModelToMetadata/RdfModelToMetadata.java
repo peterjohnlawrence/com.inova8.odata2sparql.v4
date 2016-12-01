@@ -348,8 +348,8 @@ public class RdfModelToMetadata {
 			CsdlSchema modelSchema = this.getSchema(rdfModel.getModelNamespace(rdfGraph));
 			for (RdfEntityType rdfEntityType : rdfGraph.classes) {
 				if (rdfEntityType.isFunctionImport()) {
-					CsdlFunctionImport functionImport = new CsdlFunctionImport();
-					CsdlFunction function = new CsdlFunction();
+					final CsdlFunctionImport functionImport = new CsdlFunctionImport();
+					final CsdlFunction function = new CsdlFunction();
 					List<CsdlParameter> functionParameters = new ArrayList<CsdlParameter>(0);
 					for (com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter : rdfEntityType
 							.getFunctionImportParameters().values()) {
@@ -362,14 +362,16 @@ public class RdfModelToMetadata {
 								.setNullable(false);
 						functionParameters.add(edmFunctionParameter);
 					}
-					CsdlReturnType functionImportReturnType = (new CsdlReturnType()).setType(
+					final CsdlReturnType functionImportReturnType = (new CsdlReturnType()).setType(
 							RdfFullQualifiedName.getFullQualifiedName(rdfEntityType)).setCollection(true);
 					List<CsdlAnnotation> functionImportAnnotations = new ArrayList<CsdlAnnotation>();
 					//functionImportAnnotations.add(new AnnotationAttribute().setName("IsBindable").setText("true"));
-					functionImport.setName(rdfEntityType.getEDMEntityTypeName()+"_fn").setEntitySet(
-							rdfEntityType.getEDMEntityTypeName()).setFunction(RdfFullQualifiedName.getFullQualifiedName(rdfEntityType)+"_fn").setIncludeInServiceDocument(true);
-					function.setName(rdfEntityType.getEDMEntityTypeName()+"_fn").setParameters(functionParameters)
-							.setReturnType(functionImportReturnType).setBound(true);
+					function.setComposable(true);
+					functionImport.setName(rdfEntityType.getEDMEntityTypeName()+"_fn").setEntitySet(rdfEntityType.getEDMEntitySetName())
+					.setFunction(RdfFullQualifiedName.getFullQualifiedName(rdfEntityType)+"_fn").setIncludeInServiceDocument(true);//.getEDMEntityTypeName())
+					
+					function.setName(rdfEntityType.getEDMEntityTypeName()+"_fn").setParameters(functionParameters);
+					function.setReturnType(functionImportReturnType);		
 					functionImports.add(functionImport);
 					modelSchema.getFunctions().add(function);
 				}

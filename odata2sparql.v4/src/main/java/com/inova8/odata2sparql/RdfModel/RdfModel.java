@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
@@ -220,35 +221,45 @@ public class RdfModel {
 
 		private RdfSchema schema;
 		private RdfNode entityTypeNode;
-		RdfEntityType baseType;
+		private RdfEntityType baseType;
 		boolean rootClass = false;
 		boolean isOperation = false;
 		private boolean isEntity = false;
 		private boolean functionImport = false;
 		private String description;
-
+		private Set<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
 		public String getEntityTypeName() {
 			return entityTypeName;
 		}
-
 		public void setEntityTypeName(String entityTypeName) {
 			this.entityTypeName = entityTypeName;
 		}
-
 		public RdfNode getEntityTypeNode() {
 			return entityTypeNode;
 		}
-
 		public void setEntityTypeNode(RdfNode entityTypeNode) {
 			this.entityTypeNode = entityTypeNode;
 		}
-
 		public RdfEntityType getBaseType() {
 			return baseType;
 		}
-
+		protected void addSubType(RdfEntityType subType){
+			subTypes.add(subType);
+		}
+		public Set<RdfEntityType> getSubTypes(){
+			return subTypes;
+		}
+		public Set<RdfEntityType> getAllSubTypes(){
+			Set<RdfEntityType> allSubTypes = new HashSet<RdfEntityType>();
+			allSubTypes.addAll(subTypes);
+			for(RdfEntityType subType: subTypes){
+				allSubTypes.addAll(subType.getAllSubTypes());
+			}
+			return allSubTypes;
+		}
 		public void setBaseType(RdfEntityType baseType) {
 			this.baseType = baseType;
+			if(baseType != null) baseType.addSubType(this);
 		}
 
 		public RdfSchema getSchema() {
@@ -323,8 +334,8 @@ public class RdfModel {
 		public Collection<RdfModel.RdfAssociation> getInheritedNavigationProperties() {
 			 Collection<RdfModel.RdfAssociation> inheritedNavigationProperties= new ArrayList<RdfModel.RdfAssociation>();
 			 inheritedNavigationProperties.addAll(navigationProperties.values());
-			if (this.baseType != null) {
-				inheritedNavigationProperties.addAll(this.baseType.getInheritedNavigationProperties());
+			if (this.getBaseType() != null) {
+				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
 			} 
 		return inheritedNavigationProperties;
 		}
@@ -334,8 +345,8 @@ public class RdfModel {
 		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
 			 Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
 			 inheritedProperties.addAll(properties.values());
-			if (this.baseType != null) {
-				inheritedProperties.addAll(this.baseType.getInheritedProperties());
+			if (this.getBaseType() != null) {
+				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
 			} 
 		return inheritedProperties;
 
@@ -352,8 +363,8 @@ public class RdfModel {
 		public RdfProperty findProperty(String propertyName) {
 			if (properties.containsKey(propertyName))
 				return properties.get(propertyName);
-			if (this.baseType != null) {
-				return this.baseType.findProperty(propertyName);
+			if (this.getBaseType() != null) {
+				return this.getBaseType().findProperty(propertyName);
 			} else {
 				return null;
 			}
@@ -742,7 +753,7 @@ public class RdfModel {
 	RdfEntityType getOrCreateEntityType(RdfNode entityTypeNode, RdfNode entityTypeLabelNode, RdfEntityType baseType)
 			throws OData2SparqlException {
 		RdfEntityType clazz = getOrCreateEntityType(entityTypeNode, entityTypeLabelNode);
-		clazz.baseType = baseType;
+		clazz.setBaseType(baseType);
 		return clazz;
 	}
 
@@ -765,7 +776,7 @@ public class RdfModel {
 		}
 		//if (!operationEntityType.isEntity()) {
 		operationEntityType.setOperation(true);
-		operationEntityType.baseType = null;
+		operationEntityType.setBaseType(null);
 		//} else {
 		//	log.info("Operation declared which is already an entityType: " + queryNode.getURI().toString());
 		//	return null;

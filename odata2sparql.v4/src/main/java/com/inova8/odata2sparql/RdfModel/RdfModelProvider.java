@@ -634,12 +634,12 @@ public class RdfModelProvider {
 			Iterator<RdfEntityType> clazzIterator = graph.classes.iterator();
 			while (clazzIterator.hasNext()) {
 				RdfEntityType clazz = clazzIterator.next();
-				if (clazz.baseType == null && !clazz.rootClass && !clazz.isOperation) {
-					clazz.baseType = rdfsResource;
+				if (clazz.getBaseType() == null && !clazz.rootClass && !clazz.isOperation) {
+					clazz.setBaseType(rdfsResource);
 				} else {
 					clazz.isOperation = clazz.isOperation;
 					//Need to define a primary key for an operation that should be the 
-					if (clazz.primaryKeys.isEmpty() && clazz.isOperation && clazz.baseType == null) {
+					if (clazz.primaryKeys.isEmpty() && clazz.isOperation && clazz.getBaseType() == null) {
 						log.info("Class removed as incomplete definition " + clazz.getIRI());
 						clazzIterator.remove();
 					}
