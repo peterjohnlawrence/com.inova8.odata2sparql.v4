@@ -236,9 +236,9 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 					//If sPath="" then the root path so should use entityTypeName instead
 					String visitProperty;
 					if(sPath.equals("")){
-						visitProperty = "?" + entityType.getEDMEntityTypeName() + uriLiteral + RdfConstants.PROPERTY_POSTFIX;
+						visitProperty = "?" + entityType.getEDMEntityTypeName() +  RdfConstants.PROPERTY_POSTFIX; //uriLiteral +
 					}else{
-						visitProperty = "?" + sPath + uriLiteral + RdfConstants.PROPERTY_POSTFIX;
+						visitProperty = "?" + sPath + RdfConstants.PROPERTY_POSTFIX;//uriLiteral + 
 					}
 					sPath = "";
 					return visitProperty;
@@ -354,11 +354,10 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 				sparqlmethod = "substr(" + parameters.get(1) + "," + parameters.get(0) + ")";
 			}
 			break;
-//TODO V2
-//		case SUBSTRINGOF:
-//			sparqlmethod = "regex(" + parameters.get(1) + "," + parameters.get(0) + ", \"i\")";
-//			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
-//			break;
+		case CONTAINS:
+			sparqlmethod = "regex(" + parameters.get(1) + "," + parameters.get(0) + ", \"i\")";
+			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
+			break;
 		case CONCAT:
 			sparqlmethod = "concat(" + parameters.get(0) + "," + parameters.get(1) + ")";
 			break;
@@ -417,11 +416,13 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 				return "null";
 			case "Edm.Time":
 				return "\"" + literal.getText() + "\"^^xsd:time";
+			case "Edm.Date":
+				return "\"" + literal.getText() + "\"^^xsd:dateTime";
 			case "Edm.DateTime":
 				return "\"" + literal.getText() + "\"^^xsd:dateTime";
 			case "Edm.DateTimeOffset":
 			case "Edm.String":
-				return "\"" + literal.getText() + "\"";
+				return "\"" + literal.getText().substring(1, literal.getText().length()-1) + "\"";
 			case "Edm.Guid":
 				return "guid\"" + literal.getText() + "\"";
 			case "Edm.Binary":
@@ -496,9 +497,9 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 					//If sPath="" then the root path so should use entityTypeName instead
 					String visitProperty = null;
 					if(sPath.equals("")){
-						//todo visitProperty = "?" + entityType.getEDMEntityTypeName() + uriLiteral + RdfConstants.PROPERTY_POSTFIX;
+						 visitProperty = "?" + entityType.getEDMEntityTypeName() +  memberProperty + RdfConstants.PROPERTY_POSTFIX;
 					}else{
-						//todo visitProperty = "?" + sPath + uriLiteral + RdfConstants.PROPERTY_POSTFIX;
+						 visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
 					}
 					sPath = "";
 					return visitProperty;
