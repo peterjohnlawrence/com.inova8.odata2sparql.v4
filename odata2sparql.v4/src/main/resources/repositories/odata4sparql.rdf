@@ -17,7 +17,7 @@
     <owl:imports rdf:resource="http://www.openrdf.org/config/sail"/>
     <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
   </owl:Ontology>
-  <owl:Class rdf:ID="Metadata">
+  <owl:Class rdf:ID="Metadata"> 
     <rdfs:comment>An entity that acts as a container for a set of metadata queries used to initialize the service. odata4sparql:RDFSModel is predefined in &lt;http://inova8.com/odata4sparql&gt; and used as the default.</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource=""/>
     <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
