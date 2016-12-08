@@ -148,6 +148,8 @@ public class RdfModelProvider {
 
 		// Classes
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet classes = rdfMetamodelProvider.getClasses();
 			try {
 				while (classes.hasNext()) {
@@ -181,12 +183,15 @@ public class RdfModelProvider {
 							if (!classNode.isBlank())
 								model.getOrCreateEntityType(classNode, classLabelNode).setEntity(true);
 						}
+						count++;
+						debug.append(classNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create class:" + classNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" Classes found ["+debug+"]");
 				classes.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -198,6 +203,8 @@ public class RdfModelProvider {
 	private void getDatatypes() throws OData2SparqlException {
 		// Datatypes
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet datatypes = rdfMetamodelProvider.getDatatypes();
 			try {
 				while (datatypes.hasNext()) {
@@ -207,12 +214,15 @@ public class RdfModelProvider {
 						datatypeNode = soln.getRdfNode("datatype");
 						@SuppressWarnings("unused")
 						RdfDatatype datatype = model.getOrCreateDatatype(datatypeNode);
+						count++;
+						debug.append(datatypeNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create datatype:" + datatypeNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" Datatypes found ["+debug+"]");
 				datatypes.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -232,6 +242,8 @@ public class RdfModelProvider {
 	private void getDataTypeProperties_Domains(HashMap<String, HashSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Domains();
 			try {
 				while (properties.hasNext()) {
@@ -258,12 +270,15 @@ public class RdfModelProvider {
 						} else {
 							classes.add(datatypeProperty.ofClass);
 						}
+						count++;
+						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create property:" + propertyNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" DataTypeProperties_Domains found ["+debug+"]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -276,6 +291,8 @@ public class RdfModelProvider {
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Ranges();
 			try {
 				while (properties.hasNext()) {
@@ -288,12 +305,15 @@ public class RdfModelProvider {
 						rangeNode = soln.getRdfNode("range");
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						model.setPropertyRange(propertyNode, classes, rangeNode);
+						count++;
+						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create property ranges:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" DataTypeProperties_Ranges found ["+debug+"]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -306,6 +326,8 @@ public class RdfModelProvider {
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Cardinality();
 			try {
 				while (properties.hasNext()) {
@@ -330,12 +352,15 @@ public class RdfModelProvider {
 							HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 							model.setPropertyCardinality(propertyNode, classes, cardinality);
 						}
+						count++;
+						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create property cardinality:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" DataTypeProperties_Cardinality found ["+debug+"]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -362,6 +387,8 @@ public class RdfModelProvider {
 	private void getObjectProperties() throws OData2SparqlException {
 		// Object Properties
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet associations = rdfMetamodelProvider.getAssociations();
 			try {
 				while (associations.hasNext()) {
@@ -409,7 +436,8 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("description") != null) {
 							association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
-						
+						count++;
+						debug.append(propertyNode.getIRI().toString()).append(";");							
 					} catch (Exception e) {
 						log.info("Failed to create objectproperty:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
@@ -417,6 +445,7 @@ public class RdfModelProvider {
 
 				}
 			} finally {
+				log.info(count+" ObjectProperties found ["+debug+"]");
 				associations.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -428,6 +457,8 @@ public class RdfModelProvider {
 	private void getInverseProperties() throws OData2SparqlException {
 		// Inverse Properties
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet inverseAssociations = rdfMetamodelProvider.getInverseAssociations();
 			try {
 				while (inverseAssociations.hasNext()) {
@@ -477,7 +508,8 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("description") != null) {
 							inverseAssociation.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
-						
+						count++;
+						debug.append(inversePropertyNode.getIRI().toString()).append(";");						
 					} catch (Exception e) {
 						log.info("Failed to create inverseproperty:" + inversePropertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
@@ -485,6 +517,7 @@ public class RdfModelProvider {
 
 				}
 			} finally {
+				log.info(count+" InverseProperties found ["+debug+"]");
 				inverseAssociations.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -495,6 +528,8 @@ public class RdfModelProvider {
 
 	private void getOperations() throws OData2SparqlException {
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet operations = rdfMetamodelProvider.getOperations();
 			try {
 				while (operations.hasNext()) {
@@ -512,8 +547,11 @@ public class RdfModelProvider {
 						log.info("Failed to create operation:" + queryNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
 					}
+					count++;
+					debug.append(queryNode.getIRI().toString()).append(";");	
 				}
 			} finally {
+				log.info(count+" Operations found ["+debug+"]");
 				operations.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -524,6 +562,8 @@ public class RdfModelProvider {
 
 	private void getOperationAssociationResults() throws OData2SparqlException {
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet operationAssociationResults = rdfMetamodelProvider.getOperationAssociationResults();
 			//?query ?varName ?property ?propertyLabel ?range
 			try {
@@ -545,12 +585,15 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("description") != null) {
 							operationAssociation.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
+						count++;
+						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString()).append(";");		
 					} catch (Exception e) {
 						log.info("Failed to create operation association results:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" OperationAssociationResults found ["+debug+"]");
 				operationAssociationResults.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -561,6 +604,8 @@ public class RdfModelProvider {
 
 	private void getOperationPropertyResults() throws OData2SparqlException {
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet operationPropertyResults = rdfMetamodelProvider.getOperationPropertyResults();
 			//?query ?varName ?property ?propertyLabel ?range
 			try {
@@ -582,12 +627,15 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("description") != null) {
 							operationProperty.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
+						count++;
+						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString()).append(";");	
 					} catch (Exception e) {
 						log.info("Failed to create operation property results:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" OperationPropertyResults found ["+debug+"]");
 				operationPropertyResults.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -598,6 +646,8 @@ public class RdfModelProvider {
 
 	private void getOperationArguments() throws OData2SparqlException {
 		try {
+			int count=0;
+			StringBuilder debug =new StringBuilder();
 			RdfResultSet operationArguments = rdfMetamodelProvider.getOperationArguments();
 			try {
 				while (operationArguments.hasNext()) {
@@ -613,12 +663,15 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("range") != null)
 							range = soln.getRdfNode("range");
 						model.getOrCreateOperationArguments(query, queryProperty, varName, range);
+						count++;
+						debug.append(query.getIRI().toString()).append("\\").append(varName.getLiteralValue().stringValue()).append(";");		
 					} catch (Exception e) {
 						log.info("Failed to create operation arguments:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
+				log.info(count+" OperationArguments found ["+debug+"]");
 				operationArguments.close();
 			}
 		} catch (OData2SparqlException e) {

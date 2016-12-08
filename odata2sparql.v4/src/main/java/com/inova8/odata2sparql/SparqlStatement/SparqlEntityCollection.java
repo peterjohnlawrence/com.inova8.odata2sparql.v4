@@ -21,6 +21,9 @@ import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.ex.ODataException;
+import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceNavigation;
+import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
@@ -128,6 +131,10 @@ class SparqlEntityCollection extends EntityCollection {
 				return null;
 			case "Byte":
 				return (Byte) value;
+			case "Date":
+				//EdmSimpleType instance = org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
+				//instance.valueOfString(value, EdmLiteralKind.JSON, null, org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
+				return DatatypeConverter.parseDateTime(value.toString());
 			case "DateTime":
 				//EdmSimpleType instance = org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
 				//instance.valueOfString(value, EdmLiteralKind.JSON, null, org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
@@ -239,12 +246,17 @@ class SparqlEntityCollection extends EntityCollection {
 
 	private HashMap<String, RdfAssociation> buildNavPropertiesMap(RdfEdmProvider edmProvider,
 	//TODO V2			List<ArrayList<NavigationPropertySegment>> expand, List<SelectItem> select) 
-			ExpandOption expand, SelectOption select) throws EdmException {
+			ExpandOption expandOption, SelectOption selectOption) throws EdmException {
 
+		//for (ExpandItem expandItem : expandOption.getExpandItems()) {
+		//	List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
+		//	UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
+		
 		HashMap<String, RdfAssociation> navPropertiesMap = new HashMap<String, RdfAssociation>();
-		if (expand != null) {
+		if (expandOption != null) {
 			//Add selected navigation properties even if not expanded.
-			for (SelectItem selectItem : select.getSelectItems()) {
+			if (selectOption!=null){
+			for (SelectItem selectItem : selectOption.getSelectItems()) {
 				//TODO V2
 				//			for (NavigationPropertySegment navigationPropertySegment : selectItem.getNavigationPropertySegments()) {
 				//				RdfAssociation rdfAssociation = edmProvider.getMappedNavigationProperty(new FullQualifiedName(
@@ -253,8 +265,12 @@ class SparqlEntityCollection extends EntityCollection {
 				//				navPropertiesMap.put(rdfAssociation.getAssociationNodeIRI(), rdfAssociation);
 				//			}
 			}
+			}
 		}
-		if (expand != null) {
+		if (expandOption != null) {
+			for (ExpandItem expandItem : expandOption.getExpandItems()) {
+				List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
+				UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
 			//TODO V2
 			//			for (ArrayList<NavigationPropertySegment> navigationPropertySegments : expand) {
 			//				for (NavigationPropertySegment navigationPropertySegment : navigationPropertySegments) {
@@ -263,7 +279,7 @@ class SparqlEntityCollection extends EntityCollection {
 			//							navigationPropertySegment.getNavigationProperty().getRelationship().getName()));
 			//					navPropertiesMap.put(rdfAssociation.getAssociationNodeIRI(), rdfAssociation);
 			//				}
-			//			}
+				}
 		}
 		return navPropertiesMap;
 	}
