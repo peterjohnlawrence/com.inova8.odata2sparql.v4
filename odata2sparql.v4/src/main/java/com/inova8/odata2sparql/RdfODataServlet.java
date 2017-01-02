@@ -36,8 +36,10 @@ public class RdfODataServlet extends HttpServlet {
 		try {
 			String service = req.getPathInfo().split("/")[1];
 			if (service.equals(RdfConstants.RESET)) {
+				log.info("Reset: "+ req.getPathInfo().split("/")[2]);
 				RdfEdmProviders.reset(req.getPathInfo().split("/")[2]);
 			} else if (service.equals(RdfConstants.RELOAD)) {
+				log.info("Reload");
 				RdfEdmProviders.reload();
 			} else {
 				//Find provider matching service name			

@@ -12,7 +12,7 @@
 			<artifactId>spring-web</artifactId>
 			<version>4.3.4.RELEASE</version>
 			<scope>test</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -122,6 +122,31 @@
 			<artifactId>rdf4j-rio-turtle</artifactId>
 			<version>${rdf4j.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-http</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-io</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>odata2sparql.v4</finalName>
@@ -139,6 +164,7 @@
 		<javax.version>2.5</javax.version>
 		<slf4j.version>1.7.11</slf4j.version>
 		<rdf4j.version>2.1.4</rdf4j.version>
+		<jetty.version>9.3.15.v20161220</jetty.version>
 	</properties>
 	<url>http://www.inova8.com</url>
 </project>
