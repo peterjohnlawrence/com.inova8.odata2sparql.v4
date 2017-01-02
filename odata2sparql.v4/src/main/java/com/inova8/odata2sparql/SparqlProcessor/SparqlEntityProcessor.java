@@ -94,7 +94,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	    
 		ContextURL contextUrl = null;
 		try {
-			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
+			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients)
 			 String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType,
 					 expandOption, selectOption);
 			 contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList).serviceRoot(new URI(request.getRawBaseUri()+"/")).build();

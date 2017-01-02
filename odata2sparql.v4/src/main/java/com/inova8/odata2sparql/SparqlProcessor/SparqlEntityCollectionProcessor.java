@@ -104,7 +104,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 
 		ContextURL contextUrl = null;
 		try {
-			//Need aboslute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
+			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
 			 String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType,
 					 expandOption, selectOption);
 			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList).serviceRoot(new URI(request.getRawBaseUri()+"/")).build();

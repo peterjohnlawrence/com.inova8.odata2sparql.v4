@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -28,6 +29,7 @@ public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final Log log = LogFactory.getLog(RdfODataServlet.class);
 	static private final RdfEdmProviders rdfEdmProviders = new RdfEdmProviders();
+
 
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
 			IOException {

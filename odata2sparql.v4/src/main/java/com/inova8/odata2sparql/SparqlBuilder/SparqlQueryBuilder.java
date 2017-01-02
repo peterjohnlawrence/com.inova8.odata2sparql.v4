@@ -600,7 +600,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesPathProperties.append("\t#clausesPathProperties\n");
 		clausesPathProperties.append(clausesSelect(edmTargetEntitySet.getEntityType().getName(),
-				edmTargetEntitySet.getEntityType().getName(), "\t"));
+				edmTargetEntitySet.getEntityType().getName(),rdfTargetEntityType, "\t"));
 		return clausesPathProperties;
 	}
 
@@ -1162,8 +1162,9 @@ public class SparqlQueryBuilder {
 			}
 			expandSelectTreeNodeWhere.append(indent);
 			// Not optional if filter imposed on path
-			if (!this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey))
-				expandSelectTreeNodeWhere.append("OPTIONAL");
+			if(this.filterClause!= null)
+				if (!this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey))
+					expandSelectTreeNodeWhere.append("OPTIONAL");
 			expandSelectTreeNodeWhere.append("{\n");
 			if (navProperty.getRangeClass().isOperation()) {
 				expandSelectTreeNodeWhere.append(clausesOperationProperties(navProperty.getRangeClass()));
@@ -1184,7 +1185,7 @@ public class SparqlQueryBuilder {
 					expandSelectTreeNodeWhere.append(indent).append("\t").append("?" + targetKey + "_s <"
 							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
 				}
-				expandSelectTreeNodeWhere.append(clausesSelect(nextTargetKey, nextTargetKey, indent + "\t"));
+				expandSelectTreeNodeWhere.append(clausesSelect(nextTargetKey, nextTargetKey,navProperty.getRangeClass() ,indent + "\t"));
 			}
 //TODO V4
 //			if (expandSelectTreeNodeLinksEntry.getValue() != null) {
@@ -1196,7 +1197,7 @@ public class SparqlQueryBuilder {
 		return expandSelectTreeNodeWhere;
 	}
 
-	private StringBuilder clausesSelect(String nextTargetKey, String navPath, String indent) {
+	private StringBuilder clausesSelect(String nextTargetKey, String navPath, RdfEntityType targetEntityType ,String indent) {
 		StringBuilder clausesSelect = new StringBuilder();
 		clausesSelect.append(indent);
 		// TODO Case URI5 need to fetch only one property as given in
@@ -1220,7 +1221,7 @@ public class SparqlQueryBuilder {
 			clausesSelect.append("}\n");
 		} else if (!this.rdfTargetEntityType.getProperties().isEmpty()) {
 			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
-			for (RdfModel.RdfProperty selectProperty : this.rdfTargetEntityType.getInheritedProperties()) {
+			for (RdfModel.RdfProperty selectProperty :targetEntityType.getInheritedProperties()) {
 				clausesSelect.append("(<" + selectProperty.getPropertyURI() + ">)");
 			}
 			clausesSelect.append("}\n");
@@ -1245,7 +1246,8 @@ public class SparqlQueryBuilder {
 			
 			nextTargetKey = targetKey + resourceNavigation.getProperty().getName(); //+ expandSelectTreeNodeLinksEntry.getKey();
 			// Not included if no filter in path
-			if (this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey)) {
+			if (this.filterClause!=null)
+				if (this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey)) {
 				expandSelectTreeNodeFilter.append(indent).append("{\n");
 				NavPropertyPropertyFilter navPropertyPropertyFilter = this.filterClause.getNavPropertyPropertyFilters()
 						.get(nextTargetKey);
@@ -1290,14 +1292,15 @@ public class SparqlQueryBuilder {
 			nextTargetKey = targetKey  + resourceNavigation.getProperty().getName(); //+ expandSelectTreeNodeLinksEntry.getKey();
 			// Only include in this list if a navProperty indirectly involved in
 			// a filter expression.
-			if (this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey)) {
+			if(this.filterClause!=null) 
+				if (this.filterClause.getNavPropertyPropertyFilters().containsKey(nextTargetKey)) {
 				expandSelectTreeNodeVariables.append(" ?" + nextTargetKey + "_s");
 //TODO  V4
 //				if (expandSelectTreeNodeLinksEntry.getValue() != null) {
 //					expandSelectTreeNodeVariables.append(
 //							expandSelectTreeNodeVariables(nextTargetKey, expandSelectTreeNodeLinksEntry.getValue()));
 //				}
-			}
+				}
 		}
 		return expandSelectTreeNodeVariables;
 	}

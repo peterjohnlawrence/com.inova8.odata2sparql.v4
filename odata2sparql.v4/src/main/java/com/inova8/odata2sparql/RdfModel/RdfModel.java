@@ -77,7 +77,16 @@ public class RdfModel {
 		private String getNsPrefixURI(String sprefix) {
 			return prefixToURI.get(sprefix);
 		}
+		public String convertToUri(String decodedEntityKey) {
 
+			int colon = decodedEntityKey.indexOf(':');
+			if (colon < 0)
+				return null;
+			else {
+				String uri = get(decodedEntityKey.substring(0, colon));
+				return uri == null ? null : "<"+uri + decodedEntityKey.substring(colon + 1)+">";
+			}
+		}
 		public String expandPrefix(String decodedEntityKey) {
 
 			int colon = decodedEntityKey.indexOf(':');
@@ -359,7 +368,13 @@ public class RdfModel {
 			//TODO do we not want to find inherited properties as well?
 			return navigationProperties.get(navigationPropertyName);
 		}
-
+		public RdfAssociation findNavigationProperty(RdfNode navigationPropertyNode) {
+			for (RdfAssociation navigationProperty : this.getInheritedNavigationProperties() ){
+				if( navigationProperty.associationNode.getIRI().toString().equals(navigationPropertyNode.getIRI().toString())) return navigationProperty;			
+			}
+			return null;
+		}
+		
 		public RdfProperty findProperty(String propertyName) {
 			if (properties.containsKey(propertyName))
 				return properties.get(propertyName);

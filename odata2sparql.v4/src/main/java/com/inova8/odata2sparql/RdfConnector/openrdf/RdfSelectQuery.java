@@ -19,11 +19,14 @@ public class RdfSelectQuery extends RdfQuery{
 		super.query = query;
 	}
 	public RdfResultSet execSelect() throws OData2SparqlException {
+		return execSelect(true);
+	}
+	public RdfResultSet execSelect(Boolean logQuery) throws OData2SparqlException {
 		RdfResultSet rdfResultSet = null;
 		try {
 			super.connection = rdfRoleRepository.getRepository().getConnection();
 			tupleQuery = connection.prepareTupleQuery(QueryLanguage.SPARQL, super.query);
-			log.info( super.query);
+			if( logQuery)log.info( super.query);
 			rdfResultSet = new RdfResultSet(connection, tupleQuery.evaluate());
 		} catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
 			log.error( super.query);

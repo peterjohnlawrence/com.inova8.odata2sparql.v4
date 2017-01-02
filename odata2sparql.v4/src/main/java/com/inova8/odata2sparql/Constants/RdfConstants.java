@@ -81,6 +81,7 @@ public class RdfConstants {
 
 	public static final String XSD_STRING = "http://www.w3.org/2001/XMLSchema#string";
 	public static final String RDF_PLAIN_LITERAL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral";
+	public static final String  RDF_LITERAL= "http://www.w3.org/2000/01/rdf-schema#Literal";
 
 	public static final String RDFS_RESOURCE = "http://www.w3.org/2000/01/rdf-schema#Resource";
 	public static final String RDFS_RESOURCE_LABEL = "Resource";
@@ -214,20 +215,31 @@ public class RdfConstants {
 	static {
 		//Initialize the file dependent constants
 		try {
+			String  workingDirectory = System.getenv("AppData");
+			if (workingDirectory==null)
+			{
+			    workingDirectory = System.getProperty("user.home");
+			    //if we are on a Mac, we are not done, we look for "Application Support"
+			    workingDirectory += "/Library/Application Support";
+			}
 			repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
 			//	repositoryManagerDirPath = repositoryManagerDirPath + File.separator + "../../../../inova8/odata2sparql" + File.separator;		
 			repositoryManagerDir = new File(repositoryManagerDirPath);
 			odata4sparqlFile = repositoryManagerDirPath + "repositories/odata4sparql.rdf";
 			rdfFile = repositoryManagerDirPath + "repositories/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "repositories/rdf-schema.ttl";
-			modelFile = repositoryManagerDirPath + "repositories/models.ttl";
+			modelFile = workingDirectory +"/inova8/odata2sparql/models.ttl";
+			//modelFile =  "C:\\Users\\Peter\\AppData\\Local\\inova8\\odata2sparql\\models.ttl";
+			//modelFile = repositoryManagerDirPath + "repositories/models.ttl";
 			sailFile = repositoryManagerDirPath + "repositories/sail.rdf";
 			spFile = repositoryManagerDirPath + "repositories/sp.ttl";
+
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());
 		}
 		//Initialize the RDF datatypes
 		RDF_DATATYPES.add((RdfConstants.RDF_PLAIN_LITERAL));
+		RDF_DATATYPES.add(  (RdfConstants.RDF_LITERAL));
 		RDF_DATATYPES.add(("http://www.w3.org/2000/01/rdf-schema#Literal"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#decimal"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#Literal"));

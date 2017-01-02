@@ -29,6 +29,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.MethodKind;
 import org.apache.olingo.server.api.uri.queryoption.expression.UnaryOperatorKind;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
+import com.inova8.odata2sparql.RdfModel.RdfEntity;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -47,7 +48,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 
 	private final HashMap<String, NavPropertyPropertyFilter> navPropertyPropertyFilters = new HashMap<String, NavPropertyPropertyFilter>();
 
-	private final UrlValidator urlValidator = new UrlValidator();
+	//private final UrlValidator urlValidator = new UrlValidator();
 	//private final RdfEdmProvider rdfEdmProvider;
 	private final RdfModel rdfModel;
 	private final RdfModelToMetadata rdfModelToMetadata;
@@ -406,10 +407,12 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	@Override
 	public Object visitLiteral(Literal literal) throws ExpressionVisitException, ODataApplicationException {
 		String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(literal.toString());	
-		String expandedKey = this.rdfModel.getRdfPrefixes().expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
+		String expandedKey = decodedEntityKey.substring(1, decodedEntityKey.length() - 1);
 
-		if (urlValidator.isValid(expandedKey)) {
-			return "<" + expandedKey + ">";
+		String expandedUri = this.rdfModel.getRdfPrefixes().convertToUri(expandedKey);
+		if (expandedUri!=null) {
+
+			return expandedUri ;
 		} else {
 			switch (literal.getType().toString()) {
 			case "Null":

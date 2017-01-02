@@ -1,7 +1,10 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,7 +18,6 @@ public class RdfEdmProviders {
 	private final Log log = LogFactory.getLog(RdfEdmProviders.class);
 	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
 	static private final RdfRepositories rdfRepositories = new RdfRepositories();
-
 	public static RdfRepositories getRdfRepositories() {
 		return rdfRepositories;
 	}

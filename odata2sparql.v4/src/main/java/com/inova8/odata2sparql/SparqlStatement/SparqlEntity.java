@@ -1,10 +1,13 @@
 package com.inova8.odata2sparql.SparqlStatement;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
+import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
@@ -27,20 +30,29 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 		this.addProperty(new Property(null, RdfConstants.SUBJECT, ValueType.PRIMITIVE, SparqlEntity
 				.URLEncodeEntityKey(this.subject)));
 	}
-
+	
+	@Override
+	public URI getId() {
+	    try {
+	        return new URI(rdfEntityType.getEDMEntitySetName() + "(" + subject.replace(":", "%3A") + ")");
+	    } catch (URISyntaxException e) {
+	        throw new ODataRuntimeException("Unable to create id for entity: " + rdfEntityType.getEDMEntitySetName(), e);
+	    }	
+	}
+	
 	public static String URLDecodeEntityKey(String encodedEntityKey) {
-
+		
 		String decodedEntityKey = encodedEntityKey;
 		decodedEntityKey = encodedEntityKey.replace("@", "/");
+		decodedEntityKey = encodedEntityKey.replace("%25", "%");
 		decodedEntityKey = encodedEntityKey.replace("%3A", ":");
 		return decodedEntityKey;
 	}
-
-	static String URLEncodeEntityKey(String entityKey) {
+	public static String URLEncodeEntityKey(String entityKey) {
 		String encodedEntityKey = entityKey;
 		encodedEntityKey = encodedEntityKey.replace("/", "@");
 		//Required by Batch otherwise URIs fail
-		encodedEntityKey = encodedEntityKey.replace(":", "%3A");
+		//encodedEntityKey = encodedEntityKey.replace(":", "%3A");
 		return encodedEntityKey;
 	}
 
