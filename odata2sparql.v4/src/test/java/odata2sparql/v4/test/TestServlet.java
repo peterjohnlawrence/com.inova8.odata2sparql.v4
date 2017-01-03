@@ -48,17 +48,22 @@ public class TestServlet {
 		BufferedReader file = new BufferedReader(new FileReader(fileName));
 		while ((record = file.readLine()) != null) {
 			// assume tab deliminated
+			
 			String fields[] = record.split("\t");
+			// strip " that Excel will sometimes add
+			if(fields[3].startsWith("\"")) fields[3] =fields[3].substring(1, fields[3].length() - 1);
 			if(fields[4].equals("?")){
 				fields[4]=null;
 			}else if(fields[4].charAt(0)=='"'){
-				fields[4]=fields[4].substring(1, fields[4].length() - 1);
+				// strip " that Excel will sometimes add
+				if(fields[4].startsWith("\"")) fields[4]=fields[4].substring(1, fields[4].length() - 1);
 			}else{
 				
 			}
 			// replace the expected JSON embedded "" as added by Excel
 			fields[6]=fields[6].replace("\"\"", "\"");
-			fields[6] =fields[6].substring(1, fields[6].length() - 1);
+			// strip " that Excel will sometimes add
+			if(fields[6].startsWith("\"")) fields[6] =fields[6].substring(1, fields[6].length() - 1);
 			records.add(fields);
 		}
 		file.close();

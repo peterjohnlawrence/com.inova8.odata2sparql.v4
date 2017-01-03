@@ -52,6 +52,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
 
 public class RdfRepositories {
+
 	private final Log log = LogFactory.getLog(RdfRepositories.class);
 	private RepositoryManager repositoryManager = null;
 
@@ -317,7 +318,7 @@ public class RdfRepositories {
 		InputStream input = null;
 		try {
 
-			input = new FileInputStream(RdfConstants.repositoryManagerDir + "/config.properties");
+			input = new FileInputStream(RdfConstants.repositoryManagerDir + RdfConstants.CONFIG_PROPERTIES);
 
 			// load a properties file
 			properties.load(input);
@@ -343,7 +344,7 @@ public class RdfRepositories {
 
 	private RepositoryManager bootstrapRemoteRepository(String repositoryUrl) throws OData2SparqlException {
 		RemoteRepositoryManager repositoryManager = new RemoteRepositoryManager(repositoryUrl);
-		log.info("Repository loading from " + repositoryUrl);
+		log.info("Trying remote Repository at " + repositoryUrl);
 		try {
 			repositoryManager.initialize();
 			//Make sure we can find the bootstrap repository
@@ -359,7 +360,7 @@ public class RdfRepositories {
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(RdfConstants.repositoryManagerDir);
-		log.info("Repository loaded from " + RdfConstants.repositoryManagerDir.toString());
+		log.info("Using local repository at " + RdfConstants.repositoryManagerDir.toString());
 		try {
 			repositoryManager.initialize();
 		} catch (RepositoryException e) {
@@ -399,21 +400,26 @@ public class RdfRepositories {
 		RepositoryConnection modelsConnection;
 		try {
 			modelsConnection = systemRepository.getConnection();
-
+			log.info("Loading models.ttl from " + RdfConstants.modelFile);
 			try {
-				modelsConnection.add(new File(RdfConstants.modelFile), null, null);
+				modelsConnection.add(new File(RdfConstants.modelFile), null, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse  " + RdfConstants.modelFile + " Check to ensure valid RDF/XML or TTL", e);
+				log.fatal("RDFParseException: Cannot parse  " + RdfConstants.modelFile + " Check to ensure valid RDF/XML or TTL", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.modelFile + " Check it is located in WEBINF/classes/", e);
+				log.fatal("IOException: Cannot access " + RdfConstants.modelFile + " Check it is located AppData/inova8/odata2sparql/", e);
+				System.exit(1);
+				//throw new Olingo2SparqlException();
+			} catch (RepositoryException e) {
+				log.fatal("RepositoryException: Cannot access " + RdfConstants.modelFile + " Check it is located in WEBINF/classes/", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} finally {
 
 			}
 			try {
+				log.info("Loading odata4sparql from " + RdfConstants.odata4sparqlFile);
 				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), null, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.odata4sparqlFile, e);
@@ -425,6 +431,7 @@ public class RdfRepositories {
 
 			}
 			try {
+				log.info("Loading rdf from " + RdfConstants.rdfFile);
 				modelsConnection.add(new File(RdfConstants.rdfFile ), null, null);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.rdfFile, e);
@@ -436,6 +443,7 @@ public class RdfRepositories {
 
 			}
 			try {
+				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
 				modelsConnection.add(new File(RdfConstants.rdfsFile ), null, null);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.rdfsFile, e);
@@ -447,6 +455,7 @@ public class RdfRepositories {
 
 			}
 			try {
+				log.info("Loading sail from " + RdfConstants.sailFile);
 				modelsConnection.add(new File(RdfConstants.sailFile), null, null);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.sailFile, e);
@@ -458,6 +467,7 @@ public class RdfRepositories {
 
 			}
 			try {
+				log.info("Loading sp from " + RdfConstants.spFile);
 				modelsConnection.add(new File(RdfConstants.spFile), null, null);
 			} catch (RDFParseException e) {
 				log.fatal("Cannot parse " + RdfConstants.spFile, e);

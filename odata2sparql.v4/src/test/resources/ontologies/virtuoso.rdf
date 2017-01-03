@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://inova8.com/odata4sparql/virtuoso#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://inova8.com/odata4sparql/virtuoso">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >A patch ontology to assert that an owl:Thing is a subClassOf rdfs:Resource, and owl:Class is a subClassOf rdfs:Class both of which are missing in the builtin models of Virtuoso. This graph should be loaded into the triple store from which the vocabulary is deduced, and the URI included in any SPARQLendpoint using "&amp;using-graph-uri=http://inova8.com/odata4sparql/virtuoso"</rdfs:comment>
+    <owl:imports rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+    <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema"/>
+    <owl:imports rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns"/>
+    <owl:versionIRI rdf:resource="http://inova8.com/odata4sparql/virtuoso/v1.0.0"/>
+    <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >v1.0.0</owl:versionInfo>
+    <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/"/>
+  </owl:Ontology>
+  <rdf:Description rdf:about="http://www.w3.org/2002/07/owl#Thing">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.w3.org/2002/07/owl#Class">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Description>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

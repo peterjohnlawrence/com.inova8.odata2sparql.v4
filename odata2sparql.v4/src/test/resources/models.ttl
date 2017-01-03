@@ -1,0 +1,161 @@
+# baseURI: http://inova8.com/odata4sparql/models
+# imports: http://inova8.com/odata4sparql
+
+@prefix : <http://inova8.com/odata4sparql/models#> .
+@prefix odata4sparql: <http://inova8.com/odata4sparql#> .
+@prefix openrdf: <http://www.openrdf.org#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rep: <http://www.openrdf.org/config/repository#> .
+@prefix sparql: <http://www.openrdf.org/config/repository/sparql#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+odata4sparql:FOAF
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:namespace <http://xmlns.com/foaf/0.1/> ;
+  odata4sparql:prefix "foaf"^^xsd:string ;
+.
+
+<http://inova8.com/odata4sparql/models>
+  rdf:type owl:Ontology ;
+  owl:imports <http://inova8.com/odata4sparql> ;
+.
+:FN
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:namespace <http://www.w3.org/2005/xpath-functions#> ;
+  odata4sparql:prefix "FN"^^xsd:string ;
+.
+:NWD
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:namespace <http://northwind.com/> ;
+  odata4sparql:prefix "NWD"^^xsd:string ;
+.
+:NW
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDF ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;
+  odata4sparql:datasetPrefix :NW ;
+  odata4sparql:datasetPrefix :NWD ;
+  odata4sparql:defaultPrefix :NW ;
+  odata4sparql:namespace <http://northwind.com/model/> ;
+  odata4sparql:prefix "northwind"^^xsd:string ;
+  odata4sparql:dataRepository :NW_Data ;
+  odata4sparql:vocabularyRepository :NW_Vocabulary ;
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
+  rdfs:label "Northwind"^^xsd:string ;
+.
+:NW_Data
+  rdf:type rep:Repository ;
+  rep:repositoryID "NW_Data"^^xsd:string ;
+  rep:repositoryImpl :NW_Data_Impl ;
+  rdfs:label "NW Data"^^xsd:string ;
+.
+:NW_Data_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:defaultQueryLimit 10000 ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://northwind.com/model/&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://www.w3.org/2002/07/owl%23> ;
+  sparql:update-endpoint <http://localhost:8890/sparql?default-graph-uri=http://northwind.com/> ;
+  rdfs:label "NW Data Impl"^^xsd:string ;
+.
+:NW_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "NW_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :NW_Vocabulary_Impl ;
+  rdfs:label "NW Vocabulary"^^xsd:string ;
+.
+:NW_Vocabulary_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://northwind.com/model/&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&using-graph-uri=http://northwind.com/operations/&timeout=0> ;
+  sparql:update-endpoint <http://localhost:8890/sparql> ;
+  rdfs:label "NW Vocabulary Impl"^^xsd:string ;
+.
+
+:NWWO
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDF ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;
+  odata4sparql:datasetPrefix :NW ;
+  odata4sparql:datasetPrefix :NWD ;
+  odata4sparql:defaultPrefix :NW ;
+  odata4sparql:namespace <http://northwind.com/model/> ;
+  odata4sparql:prefix "northwind"^^xsd:string ;
+  odata4sparql:dataRepository :NW_Data ;
+  odata4sparql:vocabularyRepository :NWWO_Vocabulary ;
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
+  rdfs:label "Northwind"^^xsd:string ;
+.
+:NWWO_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "NWWO_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :NWWO_Vocabulary_Impl ;
+  rdfs:label "NWWO Vocabulary"^^xsd:string ;
+.
+:NWWO_Vocabulary_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&timeout=0> ;
+  sparql:update-endpoint <http://localhost:8890/sparql> ;
+  rdfs:label "NWWO Vocabulary Impl"^^xsd:string ;
+.
+:RDF
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDF ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;
+  odata4sparql:defaultPrefix odata4sparql:RDF ;
+  odata4sparql:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ;
+  odata4sparql:prefix "rdf"^^xsd:string ;
+  odata4sparql:dataRepository :RDF_Data ;
+  odata4sparql:vocabularyRepository :RDF_Vocabulary ;
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
+  rdfs:label "RDF"^^xsd:string ;
+.
+:RDF_Data
+  rdf:type rep:Repository ;
+  rep:repositoryID "RDF_Data"^^xsd:string ;
+  rep:repositoryImpl :RDF_Data_Impl ;
+  rdfs:label "RDF Data"^^xsd:string ;
+.
+:RDF_Data_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:defaultQueryLimit 10000 ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://northwind.com/&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://www.w3.org/2002/07/owl%23> ;
+  sparql:update-endpoint <http://localhost:8890/sparql?default-graph-uri=http://northwind.com/> ;
+  rdfs:label "RDF Data Impl"^^xsd:string ;
+.
+:RDF_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "RDF_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :RDF_Vocabulary_Impl ;
+  rdfs:label "RDF Vocabulary"^^xsd:string ;
+.
+:RDF_Vocabulary_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint <http://localhost:8890/sparql?using-graph-uri=http://www.w3.org/2000/01/rdf-schema%23&using-graph-uri=http://www.w3.org/1999/02/22-rdf-syntax-ns%23&using-graph-uri=http://inova8.com/odata4sparql/virtuoso&timeout=0> ;
+  sparql:update-endpoint <http://localhost:8890/sparql> ;
+  rdfs:label "RDF Vocabulary Impl"^^xsd:string ;
+.

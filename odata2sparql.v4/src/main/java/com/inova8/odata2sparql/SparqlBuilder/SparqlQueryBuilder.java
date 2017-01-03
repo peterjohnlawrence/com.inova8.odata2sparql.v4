@@ -514,10 +514,10 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder construct() throws EdmException {
 		StringBuilder construct = new StringBuilder("CONSTRUCT {\n");
-		construct.append(targetEntityIdentifier(edmTargetEntitySet.getEntityType().getName(), "\t"));
 		if (this.rdfTargetEntityType.isOperation()) {
 			construct.append(constructOperation(rdfTargetEntityType, ""));
 		} else {
+			construct.append(targetEntityIdentifier(edmTargetEntitySet.getEntityType().getName(), "\t"));
 			construct.append(constructType(rdfTargetEntityType, edmTargetEntitySet.getEntityType().getName(), "\t"));
 			construct.append(constructPath());
 		}
@@ -549,7 +549,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			constructOperation.append(indent).append("#constructOperation\n");
 		String type = rdfOperationType.getIRI();
-		constructOperation.append(indent + "\t").append("[ a <" + type + "> ;\n");
+		constructOperation.append(indent + "\t").append("[ <http://targetEntity> true ; a <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
 					.append(" <" + property.getPropertyURI() + "> ?" + property.varName + " ;\n");

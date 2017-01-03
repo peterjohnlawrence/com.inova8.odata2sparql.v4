@@ -38,6 +38,7 @@ public class RdfConstants {
 	static private  Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
 	static private final Hashtable<Value,Hashtable<Value, String>> metaModels = new Hashtable<Value, Hashtable<Value, String>>();
 
+	public static final String CONFIG_PROPERTIES = "\\config.properties";
 	public final static String repositoryUrl = "repositoryUrl";
 	public final static String systemId = "ODATA2SPARQL";
 	public final static String bootStrapQuery = "SELECT  ?Metadata ?Query  ?QueryString WHERE { ?Metadata ?Query  ?querys . ?querys <http://spinrdf.org/sp#text> ?QueryString . ?Query  <http://www.w3.org/2000/01/rdf-schema#subPropertyOf>* <http://inova8.com/odata4sparql#metadataQuery> .}";
@@ -222,17 +223,19 @@ public class RdfConstants {
 			    //if we are on a Mac, we are not done, we look for "Application Support"
 			    workingDirectory += "/Library/Application Support";
 			}
+			workingDirectory =workingDirectory+"\\inova8\\odata2sparql\\";
 			repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
+						
 			//	repositoryManagerDirPath = repositoryManagerDirPath + File.separator + "../../../../inova8/odata2sparql" + File.separator;		
-			repositoryManagerDir = new File(repositoryManagerDirPath);
-			odata4sparqlFile = repositoryManagerDirPath + "repositories/odata4sparql.rdf";
-			rdfFile = repositoryManagerDirPath + "repositories/22-rdf-syntax-ns.ttl";
-			rdfsFile = repositoryManagerDirPath + "repositories/rdf-schema.ttl";
-			modelFile = workingDirectory +"/inova8/odata2sparql/models.ttl";
-			//modelFile =  "C:\\Users\\Peter\\AppData\\Local\\inova8\\odata2sparql\\models.ttl";
-			//modelFile = repositoryManagerDirPath + "repositories/models.ttl";
-			sailFile = repositoryManagerDirPath + "repositories/sail.rdf";
-			spFile = repositoryManagerDirPath + "repositories/sp.ttl";
+			repositoryManagerDir = new File(workingDirectory );
+			modelFile = workingDirectory +"models.ttl";
+			//modelFile = repositoryManagerDirPath + "repositories/models.ttl";		
+			
+			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
+			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
+			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
+			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
+			spFile = repositoryManagerDirPath + "ontologies/sp.ttl";
 
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());
