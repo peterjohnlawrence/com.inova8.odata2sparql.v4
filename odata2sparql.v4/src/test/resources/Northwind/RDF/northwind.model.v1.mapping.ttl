@@ -1,0 +1,2364 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+
+_:node1b87ibivsx380 rr:template "http://northwind.com/Category-{categoryid}" .
+
+_:node1b87ibivsx383 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx389 a rr:ObjectMap .
+
+_:node1b87ibivsx392 a rr:TermMap .
+
+_:node1b87ibivsx380 a rr:SubjectMap .
+
+_:node1b87ibivsx390 rr:objectMap _:node1b87ibivsx389 .
+
+_:node1b87ibivsx381 rr:predicateObjectMap _:node1b87ibivsx393 , _:node1b87ibivsx390 .
+
+_:node1b87ibivsx389 a rr:TermMap .
+
+_:node1b87ibivsx386 a rr:TermMap ;
+	rr:column "description" ;
+	a rr:ObjectMap .
+
+_:node1b87ibivsx393 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx387 rr:predicate <http://northwind.com/model/description> .
+
+_:node1b87ibivsx383 a rr:ObjectMap .
+
+_:node1b87ibivsx392 rr:termType rr:Literal .
+
+_:node1b87ibivsx379 a rr:R2RMLView ;
+	rr:sqlQuery "select categoryid,categoryname,description from categories" .
+
+_:node1b87ibivsx390 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx392 rr:column "categoryid" .
+
+_:node1b87ibivsx380 rr:termType rr:IRI .
+
+_:node1b87ibivsx383 rr:column "categoryname" .
+
+_:node1b87ibivsx390 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx389 rr:termType rr:Literal .
+
+_:node1b87ibivsx393 rr:objectMap _:node1b87ibivsx392 .
+
+_:node1b87ibivsx381 a rr:TriplesMap ;
+	rr:subjectMap _:node1b87ibivsx380 .
+
+_:node1b87ibivsx384 rr:objectMap _:node1b87ibivsx383 .
+
+_:node1b87ibivsx383 a rr:TermMap .
+
+_:node1b87ibivsx381 rr:logicalTable _:node1b87ibivsx379 .
+
+_:node1b87ibivsx384 rr:predicate <http://northwind.com/model/categoryName> .
+
+_:node1b87ibivsx381 rr:predicateObjectMap _:node1b87ibivsx387 .
+
+_:node1b87ibivsx380 rr:class <http://northwind.com/model/Category> ;
+	a rr:TermMap .
+
+_:node1b87ibivsx381 rr:predicateObjectMap _:node1b87ibivsx384 .
+
+_:node1b87ibivsx393 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx387 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx383 rr:termType rr:Literal .
+
+_:node1b87ibivsx386 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx384 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx389 rr:template "Category-{categoryid}" .
+
+_:node1b87ibivsx387 rr:objectMap _:node1b87ibivsx386 .
+
+_:node1b87ibivsx392 a rr:ObjectMap .
+
+_:node1b87ibivsx386 rr:termType rr:Literal .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx402 .
+
+_:node1b87ibivsx404 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx413 a rr:TermMap .
+
+_:node1b87ibivsx426 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx420 rr:objectMap _:node1b87ibivsx419 .
+
+_:node1b87ibivsx434 rr:column "region" .
+
+_:node1b87ibivsx417 rr:objectMap _:node1b87ibivsx416 .
+
+_:node1b87ibivsx405 rr:objectMap _:node1b87ibivsx404 .
+
+_:node1b87ibivsx410 rr:termType rr:Literal .
+
+_:node1b87ibivsx429 rr:objectMap _:node1b87ibivsx428 .
+
+_:node1b87ibivsx410 a rr:ObjectMap .
+
+_:node1b87ibivsx394 a rr:R2RMLView .
+
+_:node1b87ibivsx435 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx398 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx414 .
+
+_:node1b87ibivsx434 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx432 rr:objectMap _:node1b87ibivsx431 .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx411 .
+
+_:node1b87ibivsx401 a rr:TermMap .
+
+_:node1b87ibivsx414 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx428 a rr:TermMap .
+
+_:node1b87ibivsx407 rr:termType rr:Literal .
+
+_:node1b87ibivsx431 rr:column "customerid" .
+
+_:node1b87ibivsx422 rr:termType rr:Literal .
+
+_:node1b87ibivsx419 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx425 a rr:ObjectMap .
+
+_:node1b87ibivsx394 rr:sqlQuery "select cast( customerid as text) as customerid,companyname,contactname,contacttitle,address,city,region,postalcode,country,phone,fax, md5( region ) as regionhash from customers" .
+
+_:node1b87ibivsx395 rr:termType rr:IRI ;
+	a rr:SubjectMap .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx408 , _:node1b87ibivsx405 .
+
+_:node1b87ibivsx399 rr:objectMap _:node1b87ibivsx398 .
+
+_:node1b87ibivsx431 a rr:TermMap .
+
+_:node1b87ibivsx423 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx422 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx429 rr:predicate <http://northwind.com/model/customerRegion> .
+
+_:node1b87ibivsx405 rr:predicate <http://northwind.com/model/customerCompanyName> .
+
+_:node1b87ibivsx416 a rr:TermMap .
+
+_:node1b87ibivsx413 rr:termType rr:Literal .
+
+_:node1b87ibivsx401 rr:column "city" .
+
+_:node1b87ibivsx407 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx417 rr:predicate <http://northwind.com/model/customerFax> .
+
+_:node1b87ibivsx426 rr:objectMap _:node1b87ibivsx425 .
+
+_:node1b87ibivsx413 a rr:ObjectMap .
+
+_:node1b87ibivsx402 rr:predicate <http://northwind.com/model/customerCity> .
+
+_:node1b87ibivsx422 rr:column "postalcode" .
+
+_:node1b87ibivsx408 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx407 rr:column "contactname" .
+
+_:node1b87ibivsx411 rr:predicate <http://northwind.com/model/customerContactTitle> .
+
+_:node1b87ibivsx408 rr:predicate <http://northwind.com/model/customerContactName> .
+
+_:node1b87ibivsx413 rr:column "country" .
+
+_:node1b87ibivsx411 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx410 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx398 a rr:ObjectMap .
+
+_:node1b87ibivsx404 a rr:TermMap .
+
+_:node1b87ibivsx425 rr:termType rr:Literal .
+
+_:node1b87ibivsx401 a rr:ObjectMap .
+
+_:node1b87ibivsx428 rr:termType rr:IRI ;
+	a rr:ObjectMap .
+
+_:node1b87ibivsx404 rr:column "companyname" .
+
+_:node1b87ibivsx420 rr:predicate <http://northwind.com/model/customerPhone> ;
+	a rr:PredicateObjectMap .
+
+_:node1b87ibivsx434 a rr:TermMap .
+
+_:node1b87ibivsx432 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx416 rr:termType rr:Literal .
+
+_:node1b87ibivsx398 rr:column "address" .
+
+_:node1b87ibivsx419 a rr:TermMap .
+
+_:node1b87ibivsx395 rr:template "http://northwind.com/Customer-{customerid}" .
+
+_:node1b87ibivsx431 rr:termType rr:Literal ;
+	a rr:ObjectMap .
+
+_:node1b87ibivsx399 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx416 a rr:ObjectMap .
+
+_:node1b87ibivsx405 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx410 rr:column "contacttitle" .
+
+_:node1b87ibivsx419 rr:column "phone" .
+
+_:node1b87ibivsx398 rr:termType rr:Literal .
+
+_:node1b87ibivsx423 rr:predicate <http://northwind.com/model/customerPostalCode> .
+
+_:node1b87ibivsx413 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx435 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx422 a rr:TermMap .
+
+_:node1b87ibivsx414 rr:objectMap _:node1b87ibivsx413 .
+
+_:node1b87ibivsx401 rr:termType rr:Literal .
+
+_:node1b87ibivsx407 a rr:TermMap .
+
+_:node1b87ibivsx402 rr:objectMap _:node1b87ibivsx401 .
+
+_:node1b87ibivsx404 a rr:ObjectMap .
+
+_:node1b87ibivsx398 a rr:TermMap .
+
+_:node1b87ibivsx401 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx416 rr:column "fax" .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx423 .
+
+_:node1b87ibivsx399 rr:predicate <http://northwind.com/model/customerAddress> .
+
+_:node1b87ibivsx396 rr:logicalTable _:node1b87ibivsx394 ;
+	rr:predicateObjectMap _:node1b87ibivsx420 .
+
+_:node1b87ibivsx410 a rr:TermMap .
+
+_:node1b87ibivsx419 rr:termType rr:Literal .
+
+_:node1b87ibivsx396 a rr:TriplesMap .
+
+_:node1b87ibivsx402 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx426 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx434 rr:termType rr:Literal .
+
+_:node1b87ibivsx395 rr:class <http://northwind.com/model/Customer> .
+
+_:node1b87ibivsx434 a rr:ObjectMap .
+
+_:node1b87ibivsx419 a rr:ObjectMap .
+
+_:node1b87ibivsx429 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx408 rr:objectMap _:node1b87ibivsx407 .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx417 .
+
+_:node1b87ibivsx428 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx435 .
+
+_:node1b87ibivsx414 rr:predicate <http://northwind.com/model/customerCountry> .
+
+_:node1b87ibivsx432 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx399 , _:node1b87ibivsx432 .
+
+_:node1b87ibivsx435 rr:objectMap _:node1b87ibivsx434 .
+
+_:node1b87ibivsx404 rr:termType rr:Literal .
+
+_:node1b87ibivsx411 rr:objectMap _:node1b87ibivsx410 .
+
+_:node1b87ibivsx425 a rr:TermMap .
+
+_:node1b87ibivsx416 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx396 rr:subjectMap _:node1b87ibivsx395 .
+
+_:node1b87ibivsx423 rr:objectMap _:node1b87ibivsx422 .
+
+_:node1b87ibivsx422 a rr:ObjectMap .
+
+_:node1b87ibivsx395 a rr:TermMap .
+
+_:node1b87ibivsx417 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx407 a rr:ObjectMap .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx429 .
+
+_:node1b87ibivsx425 rr:column "companyname" .
+
+_:node1b87ibivsx396 rr:predicateObjectMap _:node1b87ibivsx426 .
+
+_:node1b87ibivsx441 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx455 a rr:TermMap .
+
+_:node1b87ibivsx446 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx480 rr:objectMap _:node1b87ibivsx479 .
+
+_:node1b87ibivsx488 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx497 a rr:TermMap .
+
+_:node1b87ibivsx449 rr:column "country" .
+
+_:node1b87ibivsx468 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx452 a rr:ObjectMap .
+
+_:node1b87ibivsx461 rr:column "homephone" .
+
+_:node1b87ibivsx482 rr:termType rr:Literal .
+
+_:node1b87ibivsx494 a rr:ObjectMap .
+
+_:node1b87ibivsx495 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx483 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx443 rr:column "birthdate" .
+
+_:node1b87ibivsx467 rr:termType rr:Literal .
+
+_:node1b87ibivsx479 a rr:ObjectMap .
+
+_:node1b87ibivsx438 a rr:TriplesMap .
+
+_:node1b87ibivsx456 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx498 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx443 a rr:TermMap .
+
+_:node1b87ibivsx485 a rr:TermMap .
+
+_:node1b87ibivsx470 rr:termType rr:Literal .
+
+_:node1b87ibivsx482 a rr:ObjectMap .
+
+_:node1b87ibivsx449 rr:termType rr:Literal .
+
+_:node1b87ibivsx468 rr:objectMap _:node1b87ibivsx467 .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx495 .
+
+_:node1b87ibivsx497 rr:termType rr:Literal .
+
+_:node1b87ibivsx440 a rr:ObjectMap .
+
+_:node1b87ibivsx444 rr:objectMap _:node1b87ibivsx443 .
+
+_:node1b87ibivsx471 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx456 rr:objectMap _:node1b87ibivsx455 .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx498 .
+
+_:node1b87ibivsx455 rr:termType rr:Literal .
+
+_:node1b87ibivsx468 rr:predicate <http://northwind.com/model/notes> .
+
+_:node1b87ibivsx441 rr:predicate <http://northwind.com/model/employeeAddress> .
+
+_:node1b87ibivsx438 rr:subjectMap _:node1b87ibivsx437 .
+
+_:node1b87ibivsx467 a rr:ObjectMap .
+
+_:node1b87ibivsx440 rr:column "address" .
+
+_:node1b87ibivsx492 rr:objectMap _:node1b87ibivsx491 .
+
+_:node1b87ibivsx465 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx467 rr:column "notes" .
+
+_:node1b87ibivsx473 a rr:TermMap .
+
+_:node1b87ibivsx464 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx480 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx486 , _:node1b87ibivsx483 .
+
+_:node1b87ibivsx458 a rr:TermMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx489 .
+
+_:node1b87ibivsx449 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx464 rr:termType rr:Literal .
+
+_:node1b87ibivsx470 a rr:ObjectMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx492 .
+
+_:node1b87ibivsx455 a rr:ObjectMap .
+
+_:node1b87ibivsx497 a rr:ObjectMap .
+
+_:node1b87ibivsx470 rr:column "photopath" .
+
+_:node1b87ibivsx492 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx465 rr:objectMap _:node1b87ibivsx464 .
+
+_:node1b87ibivsx488 a rr:TermMap .
+
+_:node1b87ibivsx453 rr:objectMap _:node1b87ibivsx452 .
+
+_:node1b87ibivsx446 a rr:TermMap .
+
+_:node1b87ibivsx453 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx461 a rr:TermMap .
+
+_:node1b87ibivsx452 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx441 rr:objectMap _:node1b87ibivsx440 .
+
+_:node1b87ibivsx480 rr:predicate <http://northwind.com/model/reportsTo> .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx474 .
+
+_:node1b87ibivsx485 a rr:ObjectMap .
+
+_:node1b87ibivsx494 rr:termType rr:Literal .
+
+_:node1b87ibivsx495 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx444 rr:predicate <http://northwind.com/model/birthDate> .
+
+_:node1b87ibivsx452 rr:termType rr:Literal .
+
+_:node1b87ibivsx489 rr:objectMap _:node1b87ibivsx488 .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx477 .
+
+_:node1b87ibivsx477 rr:objectMap _:node1b87ibivsx476 .
+
+_:node1b87ibivsx450 rr:predicate <http://northwind.com/model/employeeCountry> .
+
+_:node1b87ibivsx443 a rr:ObjectMap .
+
+_:node1b87ibivsx440 rr:termType rr:Literal .
+
+_:node1b87ibivsx437 rr:class <http://northwind.com/model/Employee> .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx480 .
+
+_:node1b87ibivsx440 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx482 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx483 rr:predicate <http://northwind.com/model/reportsToNotation> .
+
+_:node1b87ibivsx491 a rr:TermMap .
+
+_:node1b87ibivsx471 rr:predicate <http://northwind.com/model/photo> .
+
+_:node1b87ibivsx476 a rr:TermMap .
+
+_:node1b87ibivsx467 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx447 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx489 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx462 .
+
+_:node1b87ibivsx461 rr:termType rr:Literal .
+
+_:node1b87ibivsx473 a rr:ObjectMap .
+
+_:node1b87ibivsx446 rr:column "city" .
+
+_:node1b87ibivsx450 rr:objectMap _:node1b87ibivsx449 .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx468 .
+
+_:node1b87ibivsx477 rr:predicate <http://northwind.com/model/employeeRegion> .
+
+_:node1b87ibivsx462 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx497 rr:column "region" .
+
+_:node1b87ibivsx458 rr:datatype <http://www.w3.org/2001/XMLSchema#date> .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx465 .
+
+_:node1b87ibivsx456 rr:predicate <http://northwind.com/model/firstName> .
+
+_:node1b87ibivsx486 rr:predicate <http://northwind.com/model/title> .
+
+_:node1b87ibivsx458 a rr:ObjectMap .
+
+_:node1b87ibivsx488 rr:termType rr:Literal .
+
+_:node1b87ibivsx464 rr:column "lastname" .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx471 .
+
+_:node1b87ibivsx476 rr:termType rr:IRI .
+
+_:node1b87ibivsx459 rr:objectMap _:node1b87ibivsx458 .
+
+_:node1b87ibivsx458 rr:column "hiredate" .
+
+_:node1b87ibivsx470 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx488 rr:column "titleofcourtesy" .
+
+_:node1b87ibivsx489 rr:predicate <http://northwind.com/model/titleOfCourtesy> .
+
+_:node1b87ibivsx498 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx477 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx453 rr:predicate <http://northwind.com/model/extension> .
+
+_:node1b87ibivsx498 rr:objectMap _:node1b87ibivsx497 .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx459 .
+
+_:node1b87ibivsx486 rr:objectMap _:node1b87ibivsx485 .
+
+_:node1b87ibivsx474 rr:objectMap _:node1b87ibivsx473 .
+
+_:node1b87ibivsx455 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx462 rr:objectMap _:node1b87ibivsx461 .
+
+_:node1b87ibivsx473 rr:column "postalcode" .
+
+_:node1b87ibivsx464 a rr:TermMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx453 .
+
+_:node1b87ibivsx492 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx461 a rr:ObjectMap .
+
+_:node1b87ibivsx491 rr:termType rr:Literal .
+
+_:node1b87ibivsx497 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx450 .
+
+_:node1b87ibivsx450 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx452 rr:column "extension" .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx456 .
+
+_:node1b87ibivsx449 a rr:TermMap .
+
+_:node1b87ibivsx443 rr:termType rr:Literal .
+
+_:node1b87ibivsx479 rr:template "http://northwind.com/Employee-{reportsto}" .
+
+_:node1b87ibivsx446 a rr:ObjectMap .
+
+_:node1b87ibivsx488 a rr:ObjectMap .
+
+_:node1b87ibivsx476 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx491 rr:template "Employee-{employeeid}" .
+
+_:node1b87ibivsx444 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx479 a rr:TermMap .
+
+_:node1b87ibivsx486 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx447 .
+
+_:node1b87ibivsx482 rr:column "reportsto" .
+
+_:node1b87ibivsx452 a rr:TermMap .
+
+_:node1b87ibivsx474 rr:predicate <http://northwind.com/model/employeePostalCode> .
+
+_:node1b87ibivsx494 a rr:TermMap .
+
+_:node1b87ibivsx485 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx441 .
+
+_:node1b87ibivsx437 a rr:TermMap .
+
+_:node1b87ibivsx465 rr:predicate <http://northwind.com/model/lastName> .
+
+_:node1b87ibivsx485 rr:termType rr:Literal .
+
+_:node1b87ibivsx491 a rr:ObjectMap .
+
+_:node1b87ibivsx438 rr:predicateObjectMap _:node1b87ibivsx444 .
+
+_:node1b87ibivsx459 rr:predicate <http://northwind.com/model/hireDate> .
+
+_:node1b87ibivsx436 a rr:R2RMLView .
+
+_:node1b87ibivsx443 rr:datatype <http://www.w3.org/2001/XMLSchema#date> .
+
+_:node1b87ibivsx476 a rr:ObjectMap .
+
+_:node1b87ibivsx437 rr:template "http://northwind.com/Employee-{employeeid}" ;
+	rr:termType rr:IRI .
+
+_:node1b87ibivsx479 rr:termType rr:IRI .
+
+_:node1b87ibivsx473 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx482 a rr:TermMap .
+
+_:node1b87ibivsx485 rr:column "title" .
+
+_:node1b87ibivsx494 rr:column "employeeid" .
+
+_:node1b87ibivsx455 rr:column "firstname" .
+
+_:node1b87ibivsx440 a rr:TermMap .
+
+_:node1b87ibivsx467 a rr:TermMap .
+
+_:node1b87ibivsx474 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx459 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx462 rr:predicate <http://northwind.com/model/homePhone> .
+
+_:node1b87ibivsx495 rr:objectMap _:node1b87ibivsx494 .
+
+_:node1b87ibivsx447 rr:objectMap _:node1b87ibivsx446 .
+
+_:node1b87ibivsx436 rr:sqlQuery """select  employeeid,lastname,firstname,title,titleofcourtesy,birthdate,hiredate,address,city,region,postalcode,country,homephone,extension,notes,reportsto,photopath, md5( region ) as regionhash
+from employees""" .
+
+_:node1b87ibivsx446 rr:termType rr:Literal .
+
+_:node1b87ibivsx473 rr:termType rr:Literal .
+
+_:node1b87ibivsx437 a rr:SubjectMap .
+
+_:node1b87ibivsx458 rr:termType rr:Literal .
+
+_:node1b87ibivsx449 a rr:ObjectMap .
+
+_:node1b87ibivsx464 a rr:ObjectMap .
+
+_:node1b87ibivsx438 rr:logicalTable _:node1b87ibivsx436 .
+
+_:node1b87ibivsx461 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx483 rr:objectMap _:node1b87ibivsx482 .
+
+_:node1b87ibivsx471 rr:objectMap _:node1b87ibivsx470 .
+
+_:node1b87ibivsx470 a rr:TermMap .
+
+_:node1b87ibivsx447 rr:predicate <http://northwind.com/model/employeeCity> .
+
+_:node1b87ibivsx554 a rr:ObjectMap .
+
+_:node1b87ibivsx555 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx512 a rr:ObjectMap .
+
+_:node1b87ibivsx528 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx540 .
+
+_:node1b87ibivsx539 a rr:ObjectMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx537 .
+
+_:node1b87ibivsx530 a rr:TermMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx534 , _:node1b87ibivsx531 .
+
+_:node1b87ibivsx506 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx515 a rr:TermMap .
+
+_:node1b87ibivsx527 rr:termType rr:Literal .
+
+_:node1b87ibivsx557 a rr:TermMap .
+
+_:node1b87ibivsx513 rr:objectMap _:node1b87ibivsx512 .
+
+_:node1b87ibivsx543 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx542 a rr:ObjectMap .
+
+_:node1b87ibivsx530 rr:termType rr:Literal .
+
+_:node1b87ibivsx558 rr:objectMap _:node1b87ibivsx557 .
+
+_:node1b87ibivsx499 rr:sqlQuery """select
+orderid,customerid,employeeid,orderdate,requireddate,shippeddate,shipvia,freight,shipname,shipaddress,shipcity,shipregion,shippostalcode,shipcountry, md5( shipregion ) as regionhash
+from orders""" .
+
+_:node1b87ibivsx509 rr:template "http://northwind.com/Employee-{employeeid}" .
+
+_:node1b87ibivsx500 rr:template "http://northwind.com/Order-{orderid}" .
+
+_:node1b87ibivsx516 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx519 rr:predicate <http://northwind.com/model/freight> .
+
+_:node1b87ibivsx527 a rr:ObjectMap .
+
+_:node1b87ibivsx510 rr:predicate <http://northwind.com/model/employee> .
+
+_:node1b87ibivsx515 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx525 ;
+	a rr:TriplesMap ;
+	rr:predicateObjectMap _:node1b87ibivsx522 .
+
+_:node1b87ibivsx536 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx545 a rr:TermMap .
+
+_:node1b87ibivsx551 rr:template "Order-{orderid}" .
+
+_:node1b87ibivsx558 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx503 a rr:TermMap .
+
+_:node1b87ibivsx500 rr:termType rr:IRI .
+
+_:node1b87ibivsx531 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx557 rr:termType rr:Literal .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx528 .
+
+_:node1b87ibivsx557 rr:column "shipregion" .
+
+_:node1b87ibivsx527 rr:column "shipaddress" .
+
+_:node1b87ibivsx542 rr:template "http://northwind.com/Shipper-{shipvia}" .
+
+_:node1b87ibivsx530 rr:column "shipcity" .
+
+_:node1b87ibivsx510 rr:objectMap _:node1b87ibivsx509 .
+
+_:node1b87ibivsx530 a rr:ObjectMap .
+
+_:node1b87ibivsx542 rr:termType rr:IRI .
+
+_:node1b87ibivsx515 a rr:ObjectMap .
+
+_:node1b87ibivsx557 a rr:ObjectMap .
+
+_:node1b87ibivsx548 rr:column "shippeddate" .
+
+_:node1b87ibivsx503 rr:template "http://northwind.com/Customer-{customerid}" .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx513 .
+
+_:node1b87ibivsx499 a rr:R2RMLView .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx510 .
+
+_:node1b87ibivsx533 a rr:TermMap .
+
+_:node1b87ibivsx522 rr:objectMap _:node1b87ibivsx521 .
+
+_:node1b87ibivsx525 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx519 .
+
+_:node1b87ibivsx518 a rr:TermMap .
+
+_:node1b87ibivsx546 rr:objectMap _:node1b87ibivsx545 .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx516 .
+
+_:node1b87ibivsx524 rr:termType rr:Literal .
+
+_:node1b87ibivsx534 rr:objectMap _:node1b87ibivsx533 .
+
+_:node1b87ibivsx540 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx545 a rr:ObjectMap .
+
+_:node1b87ibivsx503 a rr:ObjectMap .
+
+_:node1b87ibivsx515 rr:termType rr:IRI .
+
+_:node1b87ibivsx537 rr:predicate <http://northwind.com/model/shipName> .
+
+_:node1b87ibivsx536 rr:column "shipname" .
+
+_:node1b87ibivsx519 rr:objectMap _:node1b87ibivsx518 .
+
+_:node1b87ibivsx507 rr:predicate <http://northwind.com/model/customerNotation> ;
+	rr:objectMap _:node1b87ibivsx506 .
+
+_:node1b87ibivsx518 rr:column "freight" .
+
+_:node1b87ibivsx522 rr:predicate <http://northwind.com/model/orderDate> .
+
+_:node1b87ibivsx500 rr:class <http://northwind.com/model/Order> .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx504 .
+
+_:node1b87ibivsx506 rr:column "customerid" .
+
+_:node1b87ibivsx552 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx521 a rr:TermMap .
+
+_:node1b87ibivsx555 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx512 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx513 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx548 a rr:TermMap .
+
+_:node1b87ibivsx539 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx503 rr:termType rr:IRI .
+
+_:node1b87ibivsx539 rr:termType rr:Literal .
+
+_:node1b87ibivsx524 rr:datatype <http://www.w3.org/2001/XMLSchema#date> .
+
+_:node1b87ibivsx540 rr:predicate <http://northwind.com/model/shipPostalCode> .
+
+_:node1b87ibivsx506 a rr:TermMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx507 .
+
+_:node1b87ibivsx512 rr:termType rr:Literal .
+
+_:node1b87ibivsx554 rr:termType rr:Literal .
+
+_:node1b87ibivsx533 a rr:ObjectMap .
+
+_:node1b87ibivsx507 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx549 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx518 a rr:ObjectMap .
+
+_:node1b87ibivsx549 rr:predicate <http://northwind.com/model/shippedDate> .
+
+_:node1b87ibivsx521 rr:column "orderdate" .
+
+_:node1b87ibivsx531 rr:predicate <http://northwind.com/model/shipCity> .
+
+_:node1b87ibivsx551 a rr:TermMap .
+
+_:node1b87ibivsx543 rr:predicate <http://northwind.com/model/shipVia> .
+
+_:node1b87ibivsx531 rr:objectMap _:node1b87ibivsx530 .
+
+_:node1b87ibivsx554 rr:column "orderid" .
+
+_:node1b87ibivsx513 rr:predicate <http://northwind.com/model/employeeNotation> .
+
+_:node1b87ibivsx536 a rr:TermMap .
+
+_:node1b87ibivsx548 rr:termType rr:Literal .
+
+_:node1b87ibivsx555 rr:objectMap _:node1b87ibivsx554 .
+
+_:node1b87ibivsx522 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx527 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx506 rr:termType rr:Literal .
+
+_:node1b87ibivsx543 rr:objectMap _:node1b87ibivsx542 .
+
+_:node1b87ibivsx521 rr:termType rr:Literal .
+
+_:node1b87ibivsx528 rr:predicate <http://northwind.com/model/shipAddress> .
+
+_:node1b87ibivsx501 rr:subjectMap _:node1b87ibivsx500 .
+
+_:node1b87ibivsx516 rr:predicate <http://northwind.com/model/orderRegion> .
+
+_:node1b87ibivsx521 a rr:ObjectMap .
+
+_:node1b87ibivsx504 rr:objectMap _:node1b87ibivsx503 .
+
+_:node1b87ibivsx551 rr:termType rr:Literal .
+
+_:node1b87ibivsx528 rr:objectMap _:node1b87ibivsx527 .
+
+_:node1b87ibivsx516 rr:objectMap _:node1b87ibivsx515 .
+
+_:node1b87ibivsx548 a rr:ObjectMap .
+
+_:node1b87ibivsx537 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx545 rr:column "shipvia" .
+
+_:node1b87ibivsx506 a rr:ObjectMap .
+
+_:node1b87ibivsx539 rr:column "shippostalcode" .
+
+_:node1b87ibivsx552 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx530 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx557 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx500 a rr:SubjectMap .
+
+_:node1b87ibivsx524 rr:column "requireddate" .
+
+_:node1b87ibivsx521 rr:datatype <http://www.w3.org/2001/XMLSchema#date> .
+
+_:node1b87ibivsx524 a rr:TermMap .
+
+_:node1b87ibivsx536 rr:termType rr:Literal .
+
+_:node1b87ibivsx533 rr:column "shipcountry" .
+
+_:node1b87ibivsx548 rr:datatype <http://www.w3.org/2001/XMLSchema#date> .
+
+_:node1b87ibivsx510 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx509 a rr:TermMap .
+
+_:node1b87ibivsx504 rr:predicate <http://northwind.com/model/customer> ;
+	a rr:PredicateObjectMap .
+
+_:node1b87ibivsx536 a rr:ObjectMap .
+
+_:node1b87ibivsx546 rr:predicate <http://northwind.com/model/shipViaNotation> .
+
+_:node1b87ibivsx545 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx558 , _:node1b87ibivsx555 .
+
+_:node1b87ibivsx512 a rr:TermMap .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx552 .
+
+_:node1b87ibivsx552 rr:objectMap _:node1b87ibivsx551 .
+
+_:node1b87ibivsx554 a rr:TermMap .
+
+_:node1b87ibivsx546 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx539 a rr:TermMap .
+
+_:node1b87ibivsx551 a rr:ObjectMap .
+
+_:node1b87ibivsx545 rr:termType rr:Literal .
+
+_:node1b87ibivsx534 rr:predicate <http://northwind.com/model/shipCountry> .
+
+_:node1b87ibivsx537 rr:objectMap _:node1b87ibivsx536 .
+
+_:node1b87ibivsx519 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx525 rr:objectMap _:node1b87ibivsx524 .
+
+_:node1b87ibivsx524 a rr:ObjectMap .
+
+_:node1b87ibivsx549 rr:objectMap _:node1b87ibivsx548 .
+
+_:node1b87ibivsx501 rr:logicalTable _:node1b87ibivsx499 .
+
+_:node1b87ibivsx512 rr:column "employeeid" .
+
+_:node1b87ibivsx509 a rr:ObjectMap .
+
+_:node1b87ibivsx558 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx546 .
+
+_:node1b87ibivsx525 rr:predicate <http://northwind.com/model/requiredDate> .
+
+_:node1b87ibivsx509 rr:termType rr:IRI .
+
+_:node1b87ibivsx518 rr:termType rr:Literal .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx543 .
+
+_:node1b87ibivsx500 a rr:TermMap .
+
+_:node1b87ibivsx542 a rr:TermMap .
+
+_:node1b87ibivsx533 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx527 a rr:TermMap .
+
+_:node1b87ibivsx534 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx533 rr:termType rr:Literal .
+
+_:node1b87ibivsx540 rr:objectMap _:node1b87ibivsx539 .
+
+_:node1b87ibivsx501 rr:predicateObjectMap _:node1b87ibivsx549 .
+
+_:node1b87ibivsx563 rr:termType rr:Literal .
+
+_:node1b87ibivsx566 rr:termType rr:IRI .
+
+_:node1b87ibivsx561 rr:predicateObjectMap _:node1b87ibivsx564 .
+
+_:node1b87ibivsx579 rr:predicate <http://northwind.com/model/quantity> .
+
+_:node1b87ibivsx575 a rr:ObjectMap .
+
+_:node1b87ibivsx584 rr:termType rr:Literal .
+
+_:node1b87ibivsx561 rr:predicateObjectMap _:node1b87ibivsx567 .
+
+_:node1b87ibivsx581 a rr:TermMap .
+
+_:node1b87ibivsx585 a rr:PredicateObjectMap ;
+	rr:objectMap _:node1b87ibivsx584 .
+
+_:node1b87ibivsx564 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx569 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx572 a rr:TermMap .
+
+_:node1b87ibivsx578 a rr:TermMap ;
+	rr:column "quantity" .
+
+_:node1b87ibivsx573 rr:objectMap _:node1b87ibivsx572 .
+
+_:node1b87ibivsx567 rr:objectMap _:node1b87ibivsx566 .
+
+_:node1b87ibivsx569 rr:termType rr:Literal .
+
+_:node1b87ibivsx579 rr:objectMap _:node1b87ibivsx578 .
+
+_:node1b87ibivsx560 rr:template "http://northwind.com/OrderDetail-{orderid}-{productid}" .
+
+_:node1b87ibivsx563 a rr:ObjectMap .
+
+_:node1b87ibivsx582 rr:predicate <http://northwind.com/model/orderDetailUnitPrice> .
+
+_:node1b87ibivsx569 a rr:ObjectMap .
+
+_:node1b87ibivsx563 rr:column "discount" .
+
+_:node1b87ibivsx569 rr:column "orderid" .
+
+_:node1b87ibivsx573 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx560 a rr:TermMap .
+
+_:node1b87ibivsx566 a rr:TermMap .
+
+_:node1b87ibivsx561 rr:subjectMap _:node1b87ibivsx560 .
+
+_:node1b87ibivsx579 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx575 rr:column "productid" .
+
+_:node1b87ibivsx581 rr:datatype <http://www.w3.org/2001/XMLSchema#float> .
+
+_:node1b87ibivsx559 a rr:R2RMLView .
+
+_:node1b87ibivsx584 a rr:ObjectMap .
+
+_:node1b87ibivsx578 rr:termType rr:Literal .
+
+_:node1b87ibivsx567 rr:predicate <http://northwind.com/model/order> .
+
+_:node1b87ibivsx561 rr:predicateObjectMap _:node1b87ibivsx585 .
+
+_:node1b87ibivsx581 rr:termType rr:Literal .
+
+_:node1b87ibivsx578 a rr:ObjectMap ;
+	rr:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+_:node1b87ibivsx582 rr:objectMap _:node1b87ibivsx581 .
+
+_:node1b87ibivsx561 rr:predicateObjectMap _:node1b87ibivsx582 .
+
+_:node1b87ibivsx564 rr:objectMap _:node1b87ibivsx563 .
+
+_:node1b87ibivsx559 rr:sqlQuery """select
+orderid,productid,unitprice,quantity,discount
+from order_details""" .
+
+_:node1b87ibivsx564 rr:predicate <http://northwind.com/model/discount> .
+
+_:node1b87ibivsx572 rr:template "http://northwind.com/Product-{productid}" .
+
+_:node1b87ibivsx567 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx585 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx575 a rr:TermMap .
+
+_:node1b87ibivsx573 rr:predicate <http://northwind.com/model/product> .
+
+_:node1b87ibivsx576 rr:objectMap _:node1b87ibivsx575 .
+
+_:node1b87ibivsx572 a rr:ObjectMap ;
+	rr:termType rr:IRI .
+
+_:node1b87ibivsx576 rr:predicate <http://northwind.com/model/productNotation> .
+
+_:node1b87ibivsx582 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx575 rr:termType rr:Literal .
+
+_:node1b87ibivsx566 a rr:ObjectMap ;
+	rr:template "http://northwind.com/Order-{orderid}" .
+
+_:node1b87ibivsx561 rr:predicateObjectMap _:node1b87ibivsx573 , _:node1b87ibivsx579 , _:node1b87ibivsx576 .
+
+_:node1b87ibivsx570 rr:predicate <http://northwind.com/model/orderNotation> .
+
+_:node1b87ibivsx581 rr:column "unitprice" .
+
+_:node1b87ibivsx561 rr:logicalTable _:node1b87ibivsx559 ;
+	rr:predicateObjectMap _:node1b87ibivsx570 .
+
+_:node1b87ibivsx563 a rr:TermMap .
+
+_:node1b87ibivsx584 a rr:TermMap .
+
+_:node1b87ibivsx576 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx560 rr:class <http://northwind.com/model/OrderDetail> .
+
+_:node1b87ibivsx570 rr:objectMap _:node1b87ibivsx569 .
+
+_:node1b87ibivsx561 a rr:TriplesMap .
+
+_:node1b87ibivsx560 a rr:SubjectMap .
+
+_:node1b87ibivsx575 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx584 rr:template "OrderDetail-{orderid}-{productid}" .
+
+_:node1b87ibivsx569 a rr:TermMap .
+
+_:node1b87ibivsx570 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx560 rr:termType rr:IRI .
+
+_:node1b87ibivsx563 rr:datatype <http://www.w3.org/2001/XMLSchema#float> .
+
+_:node1b87ibivsx581 a rr:ObjectMap .
+
+_:node1b87ibivsx587 rr:termType rr:IRI .
+
+_:node1b87ibivsx596 a rr:ObjectMap .
+
+_:node1b87ibivsx618 rr:predicate <http://northwind.com/model/unitsInStock> .
+
+_:node1b87ibivsx611 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx586 a rr:R2RMLView .
+
+_:node1b87ibivsx593 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx614 a rr:ObjectMap .
+
+_:node1b87ibivsx602 rr:termType rr:Literal .
+
+_:node1b87ibivsx618 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx599 a rr:TermMap .
+
+_:node1b87ibivsx597 rr:objectMap _:node1b87ibivsx596 .
+
+_:node1b87ibivsx617 a rr:TermMap .
+
+_:node1b87ibivsx590 rr:termType rr:IRI .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx597 .
+
+_:node1b87ibivsx617 rr:column "unitsinstock" .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx591 .
+
+_:node1b87ibivsx599 rr:termType rr:Literal .
+
+_:node1b87ibivsx617 rr:termType rr:Literal .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx594 .
+
+_:node1b87ibivsx602 a rr:ObjectMap .
+
+_:node1b87ibivsx590 a rr:TermMap .
+
+_:node1b87ibivsx603 rr:objectMap _:node1b87ibivsx602 .
+
+_:node1b87ibivsx587 rr:class <http://northwind.com/model/Product> .
+
+_:node1b87ibivsx591 rr:predicate <http://northwind.com/model/category> .
+
+_:node1b87ibivsx605 a rr:TermMap .
+
+_:node1b87ibivsx600 rr:objectMap _:node1b87ibivsx599 .
+
+_:node1b87ibivsx605 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx627 .
+
+_:node1b87ibivsx603 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx615 rr:objectMap _:node1b87ibivsx614 .
+
+_:node1b87ibivsx587 a rr:TermMap .
+
+_:node1b87ibivsx627 rr:objectMap _:node1b87ibivsx626 .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx621 .
+
+_:node1b87ibivsx620 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> ;
+	a rr:TermMap .
+
+_:node1b87ibivsx614 rr:column "unitprice" .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx624 .
+
+_:node1b87ibivsx617 a rr:ObjectMap .
+
+_:node1b87ibivsx599 a rr:ObjectMap .
+
+_:node1b87ibivsx626 rr:termType rr:Literal .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx618 .
+
+_:node1b87ibivsx617 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+_:node1b87ibivsx594 rr:objectMap _:node1b87ibivsx593 .
+
+_:node1b87ibivsx615 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx596 rr:column "discontinued" .
+
+_:node1b87ibivsx627 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx605 rr:column "reorderlevel" .
+
+_:node1b87ibivsx596 rr:datatype <http://www.w3.org/2001/XMLSchema#boolean> .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx615 , _:node1b87ibivsx612 .
+
+_:node1b87ibivsx605 a rr:ObjectMap .
+
+_:node1b87ibivsx624 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx600 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx588 rr:subjectMap _:node1b87ibivsx587 .
+
+_:node1b87ibivsx620 a rr:ObjectMap .
+
+_:node1b87ibivsx608 rr:template "http://northwind.com/Supplier-{supplierid}" .
+
+_:node1b87ibivsx614 rr:termType rr:Literal .
+
+_:node1b87ibivsx597 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx624 rr:objectMap _:node1b87ibivsx623 .
+
+_:node1b87ibivsx608 a rr:TermMap .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx606 .
+
+_:node1b87ibivsx587 a rr:SubjectMap .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx609 .
+
+_:node1b87ibivsx623 a rr:TermMap .
+
+_:node1b87ibivsx627 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx600 .
+
+_:node1b87ibivsx600 rr:predicate <http://northwind.com/model/productName> .
+
+_:node1b87ibivsx588 rr:predicateObjectMap _:node1b87ibivsx603 .
+
+_:node1b87ibivsx612 rr:predicate <http://northwind.com/model/supplierNotation> .
+
+_:node1b87ibivsx596 rr:termType rr:Literal .
+
+_:node1b87ibivsx623 rr:termType rr:Literal .
+
+_:node1b87ibivsx612 a rr:PredicateObjectMap ;
+	rr:objectMap _:node1b87ibivsx611 .
+
+_:node1b87ibivsx591 rr:objectMap _:node1b87ibivsx590 .
+
+_:node1b87ibivsx593 a rr:TermMap .
+
+_:node1b87ibivsx606 rr:predicate <http://northwind.com/model/reorderLevel> .
+
+_:node1b87ibivsx611 a rr:TermMap ;
+	rr:column "supplierid" .
+
+_:node1b87ibivsx590 a rr:ObjectMap .
+
+_:node1b87ibivsx609 rr:objectMap _:node1b87ibivsx608 .
+
+_:node1b87ibivsx608 a rr:ObjectMap .
+
+_:node1b87ibivsx602 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx611 rr:termType rr:Literal .
+
+_:node1b87ibivsx624 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx623 a rr:ObjectMap .
+
+_:node1b87ibivsx626 rr:column "productid" .
+
+_:node1b87ibivsx594 rr:predicate <http://northwind.com/model/categoryNotation> .
+
+_:node1b87ibivsx587 rr:template "http://northwind.com/Product-{productid}" .
+
+_:node1b87ibivsx599 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx609 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx626 a rr:TermMap .
+
+_:node1b87ibivsx615 rr:predicate <http://northwind.com/model/productUnitPrice> .
+
+_:node1b87ibivsx590 rr:template "http://northwind.com/Category-{categoryid}" .
+
+_:node1b87ibivsx593 rr:termType rr:Literal .
+
+_:node1b87ibivsx594 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx593 rr:column "categoryid" .
+
+_:node1b87ibivsx608 rr:termType rr:IRI .
+
+_:node1b87ibivsx586 rr:sqlQuery """select
+productid,productname,supplierid,categoryid,quantityperunit,unitprice,unitsinstock,unitsonorder,reorderlevel,discontinued
+from products""" .
+
+_:node1b87ibivsx611 a rr:ObjectMap .
+
+_:node1b87ibivsx621 rr:objectMap _:node1b87ibivsx620 .
+
+_:node1b87ibivsx620 rr:termType rr:Literal .
+
+_:node1b87ibivsx597 rr:predicate <http://northwind.com/model/discontinued> .
+
+_:node1b87ibivsx605 rr:termType rr:Literal .
+
+_:node1b87ibivsx588 rr:logicalTable _:node1b87ibivsx586 .
+
+_:node1b87ibivsx614 a rr:TermMap .
+
+_:node1b87ibivsx620 rr:column "unitsonorder" .
+
+_:node1b87ibivsx596 a rr:TermMap .
+
+_:node1b87ibivsx593 a rr:ObjectMap .
+
+_:node1b87ibivsx609 rr:predicate <http://northwind.com/model/supplier> .
+
+_:node1b87ibivsx623 rr:template "Product-{productid}" .
+
+_:node1b87ibivsx606 rr:objectMap _:node1b87ibivsx605 .
+
+_:node1b87ibivsx626 a rr:ObjectMap .
+
+_:node1b87ibivsx614 rr:datatype <http://www.w3.org/2001/XMLSchema#float> .
+
+_:node1b87ibivsx621 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx588 a rr:TriplesMap .
+
+_:node1b87ibivsx602 a rr:TermMap .
+
+_:node1b87ibivsx606 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx602 rr:column "quantityperunit" .
+
+_:node1b87ibivsx618 rr:objectMap _:node1b87ibivsx617 .
+
+_:node1b87ibivsx599 rr:column "productname" .
+
+_:node1b87ibivsx621 rr:predicate <http://northwind.com/model/unitsOnOrder> .
+
+_:node1b87ibivsx603 rr:predicate <http://northwind.com/model/quantityPerUnit> .
+
+_:node1b87ibivsx591 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx632 rr:column "regiondescription" .
+
+_:node1b87ibivsx630 rr:predicateObjectMap _:node1b87ibivsx639 , _:node1b87ibivsx636 .
+
+_:node1b87ibivsx629 rr:termType rr:IRI .
+
+_:node1b87ibivsx632 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx629 rr:class <http://northwind.com/model/Region> .
+
+_:node1b87ibivsx630 rr:predicateObjectMap _:node1b87ibivsx633 .
+
+_:node1b87ibivsx638 a rr:ObjectMap .
+
+_:node1b87ibivsx635 rr:column "regiondescription" .
+
+_:node1b87ibivsx633 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx636 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx635 a rr:ObjectMap .
+
+_:node1b87ibivsx628 a rr:R2RMLView .
+
+_:node1b87ibivsx632 a rr:ObjectMap .
+
+_:node1b87ibivsx633 rr:objectMap _:node1b87ibivsx632 .
+
+_:node1b87ibivsx638 a rr:TermMap .
+
+_:node1b87ibivsx636 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx635 a rr:TermMap .
+
+_:node1b87ibivsx639 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx632 a rr:TermMap .
+
+_:node1b87ibivsx638 rr:column "regionid" .
+
+_:node1b87ibivsx630 a rr:TriplesMap .
+
+_:node1b87ibivsx633 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx632 rr:termType rr:Literal .
+
+_:node1b87ibivsx628 rr:sqlQuery """select
+regionid,regiondescription, md5(cast( regiondescription as text)) as regionhash
+from region""" .
+
+_:node1b87ibivsx629 a rr:SubjectMap .
+
+_:node1b87ibivsx638 rr:termType rr:Literal .
+
+_:node1b87ibivsx635 rr:termType rr:Literal .
+
+_:node1b87ibivsx629 a rr:TermMap .
+
+_:node1b87ibivsx630 rr:logicalTable _:node1b87ibivsx628 .
+
+_:node1b87ibivsx636 rr:objectMap _:node1b87ibivsx635 .
+
+_:node1b87ibivsx630 rr:subjectMap _:node1b87ibivsx629 .
+
+_:node1b87ibivsx639 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> ;
+	rr:objectMap _:node1b87ibivsx638 .
+
+_:node1b87ibivsx629 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx642 rr:predicateObjectMap _:node1b87ibivsx648 .
+
+_:node1b87ibivsx651 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx641 a rr:TermMap .
+
+_:node1b87ibivsx642 rr:predicateObjectMap _:node1b87ibivsx645 .
+
+_:node1b87ibivsx645 rr:predicate <http://northwind.com/model/shipperCompanyName> .
+
+_:node1b87ibivsx651 rr:objectMap _:node1b87ibivsx650 .
+
+_:node1b87ibivsx642 a rr:TriplesMap .
+
+_:node1b87ibivsx644 a rr:TermMap .
+
+_:node1b87ibivsx654 rr:objectMap _:node1b87ibivsx653 .
+
+_:node1b87ibivsx644 rr:termType rr:Literal .
+
+_:node1b87ibivsx647 a rr:TermMap .
+
+_:node1b87ibivsx654 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx647 rr:termType rr:Literal .
+
+_:node1b87ibivsx641 rr:termType rr:IRI .
+
+_:node1b87ibivsx645 rr:objectMap _:node1b87ibivsx644 .
+
+_:node1b87ibivsx651 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx640 a rr:R2RMLView .
+
+_:node1b87ibivsx644 a rr:ObjectMap ;
+	rr:column "companyname" .
+
+_:node1b87ibivsx640 rr:sqlQuery """select
+shipperid,companyname,phone
+from shippers""" .
+
+_:node1b87ibivsx647 a rr:ObjectMap .
+
+_:node1b87ibivsx642 rr:predicateObjectMap _:node1b87ibivsx651 ;
+	rr:subjectMap _:node1b87ibivsx641 .
+
+_:node1b87ibivsx641 rr:class <http://northwind.com/model/Shipper> ;
+	rr:template "http://northwind.com/Shipper-{shipperid}" .
+
+_:node1b87ibivsx647 rr:column "phone" .
+
+_:node1b87ibivsx650 a rr:TermMap .
+
+_:node1b87ibivsx653 rr:column "shipperid" .
+
+_:node1b87ibivsx642 rr:logicalTable _:node1b87ibivsx640 .
+
+_:node1b87ibivsx650 rr:template "Shipper-{shipperid}" .
+
+_:node1b87ibivsx653 a rr:TermMap .
+
+_:node1b87ibivsx642 rr:predicateObjectMap _:node1b87ibivsx654 .
+
+_:node1b87ibivsx641 a rr:SubjectMap .
+
+_:node1b87ibivsx644 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx647 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx645 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx653 rr:termType rr:Literal .
+
+_:node1b87ibivsx650 a rr:ObjectMap ;
+	rr:termType rr:Literal .
+
+_:node1b87ibivsx654 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx653 a rr:ObjectMap .
+
+_:node1b87ibivsx648 rr:objectMap _:node1b87ibivsx647 ;
+	a rr:PredicateObjectMap ;
+	rr:predicate <http://northwind.com/model/shipperPhone> .
+
+_:node1b87ibivsx662 a rr:TermMap .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx672 .
+
+_:node1b87ibivsx689 a rr:TermMap .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx675 .
+
+_:node1b87ibivsx675 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx690 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx678 rr:objectMap _:node1b87ibivsx677 .
+
+_:node1b87ibivsx686 rr:termType rr:Literal .
+
+_:node1b87ibivsx666 rr:objectMap _:node1b87ibivsx665 .
+
+_:node1b87ibivsx692 rr:termType rr:IRI .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx678 .
+
+_:node1b87ibivsx666 rr:predicate <http://northwind.com/model/supplierCompanyName> .
+
+_:node1b87ibivsx686 a rr:ObjectMap .
+
+_:node1b87ibivsx660 rr:predicate <http://northwind.com/model/supplierAddress> .
+
+_:node1b87ibivsx665 rr:column "companyname" .
+
+_:node1b87ibivsx656 rr:class <http://northwind.com/model/Supplier> .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx681 .
+
+_:node1b87ibivsx660 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx662 rr:column "city" .
+
+_:node1b87ibivsx674 a rr:TermMap .
+
+_:node1b87ibivsx690 rr:objectMap _:node1b87ibivsx689 .
+
+_:node1b87ibivsx665 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx659 rr:termType rr:Literal .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx684 .
+
+_:node1b87ibivsx659 a rr:TermMap .
+
+_:node1b87ibivsx687 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx687 .
+
+_:node1b87ibivsx671 a rr:ObjectMap .
+
+_:node1b87ibivsx687 rr:predicate <http://northwind.com/model/supplierPostalCode> .
+
+_:node1b87ibivsx698 a rr:ObjectMap .
+
+_:node1b87ibivsx674 rr:termType rr:Literal .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx690 .
+
+_:node1b87ibivsx699 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx657 a rr:TriplesMap .
+
+_:node1b87ibivsx698 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx663 rr:objectMap _:node1b87ibivsx662 .
+
+_:node1b87ibivsx699 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx665 a rr:TermMap .
+
+_:node1b87ibivsx668 rr:termType rr:Literal .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx693 .
+
+_:node1b87ibivsx669 rr:predicate <http://northwind.com/model/supplierContactName> .
+
+_:node1b87ibivsx687 rr:objectMap _:node1b87ibivsx686 .
+
+_:node1b87ibivsx675 rr:objectMap _:node1b87ibivsx674 .
+
+_:node1b87ibivsx680 rr:column "fax" .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx696 , _:node1b87ibivsx699 .
+
+_:node1b87ibivsx672 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx683 rr:column "homepage" .
+
+_:node1b87ibivsx699 rr:objectMap _:node1b87ibivsx698 .
+
+_:node1b87ibivsx662 a rr:ObjectMap .
+
+_:node1b87ibivsx683 rr:termType rr:Literal .
+
+_:node1b87ibivsx663 rr:predicate <http://northwind.com/model/supplierCity> .
+
+_:node1b87ibivsx689 a rr:ObjectMap .
+
+_:node1b87ibivsx655 rr:sqlQuery """select
+supplierid,companyname,contactname,contacttitle,address,city,region,postalcode,country,phone,fax,homepage, md5( region ) as regionhash
+from suppliers""" .
+
+_:node1b87ibivsx678 rr:predicate <http://northwind.com/model/supplierPhone> .
+
+_:node1b87ibivsx674 rr:column "country" .
+
+_:node1b87ibivsx692 a rr:TermMap .
+
+_:node1b87ibivsx659 rr:column "address" .
+
+_:node1b87ibivsx668 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx683 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx677 a rr:TermMap .
+
+_:node1b87ibivsx696 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx684 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx698 rr:termType rr:Literal .
+
+_:node1b87ibivsx674 a rr:ObjectMap .
+
+_:node1b87ibivsx671 rr:termType rr:Literal .
+
+_:node1b87ibivsx669 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx659 a rr:ObjectMap .
+
+_:node1b87ibivsx671 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx680 a rr:TermMap .
+
+_:node1b87ibivsx672 rr:objectMap _:node1b87ibivsx671 .
+
+_:node1b87ibivsx674 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx696 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx683 a rr:TermMap .
+
+_:node1b87ibivsx681 rr:predicate <http://northwind.com/model/supplierFax> .
+
+_:node1b87ibivsx696 rr:objectMap _:node1b87ibivsx695 .
+
+_:node1b87ibivsx684 rr:objectMap _:node1b87ibivsx683 .
+
+_:node1b87ibivsx668 a rr:TermMap .
+
+_:node1b87ibivsx656 a rr:SubjectMap .
+
+_:node1b87ibivsx659 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx665 rr:termType rr:Literal .
+
+_:node1b87ibivsx680 a rr:ObjectMap .
+
+_:node1b87ibivsx665 a rr:ObjectMap .
+
+_:node1b87ibivsx657 rr:subjectMap _:node1b87ibivsx656 .
+
+_:node1b87ibivsx680 rr:termType rr:Literal .
+
+_:node1b87ibivsx684 rr:predicate <http://northwind.com/model/supplierHomePage> .
+
+_:node1b87ibivsx681 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx695 a rr:TermMap .
+
+_:node1b87ibivsx686 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx660 rr:objectMap _:node1b87ibivsx659 .
+
+_:node1b87ibivsx671 rr:column "contacttitle" .
+
+_:node1b87ibivsx666 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx692 a rr:ObjectMap .
+
+_:node1b87ibivsx669 rr:objectMap _:node1b87ibivsx668 .
+
+_:node1b87ibivsx695 rr:termType rr:Literal .
+
+_:node1b87ibivsx656 rr:termType rr:IRI .
+
+_:node1b87ibivsx677 a rr:ObjectMap .
+
+_:node1b87ibivsx655 a rr:R2RMLView .
+
+_:node1b87ibivsx668 rr:column "contactname" .
+
+_:node1b87ibivsx693 rr:predicate <http://northwind.com/model/supplierRegion> ;
+	rr:objectMap _:node1b87ibivsx692 .
+
+_:node1b87ibivsx656 rr:template "http://northwind.com/Supplier-{supplierid}" .
+
+_:node1b87ibivsx692 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx677 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx686 a rr:TermMap .
+
+_:node1b87ibivsx678 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx683 a rr:ObjectMap .
+
+_:node1b87ibivsx689 rr:termType rr:Literal .
+
+_:node1b87ibivsx693 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx662 rr:termType rr:Literal .
+
+_:node1b87ibivsx668 a rr:ObjectMap .
+
+_:node1b87ibivsx680 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx675 rr:predicate <http://northwind.com/model/supplierCountry> .
+
+_:node1b87ibivsx657 rr:logicalTable _:node1b87ibivsx655 .
+
+_:node1b87ibivsx681 rr:objectMap _:node1b87ibivsx680 .
+
+_:node1b87ibivsx671 a rr:TermMap .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx669 .
+
+_:node1b87ibivsx695 rr:column "supplierid" .
+
+_:node1b87ibivsx662 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx698 a rr:TermMap .
+
+_:node1b87ibivsx672 rr:predicate <http://northwind.com/model/supplierContactTitle> .
+
+_:node1b87ibivsx656 a rr:TermMap .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx660 , _:node1b87ibivsx663 .
+
+_:node1b87ibivsx663 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx698 rr:column "region" .
+
+_:node1b87ibivsx657 rr:predicateObjectMap _:node1b87ibivsx666 .
+
+_:node1b87ibivsx677 rr:termType rr:Literal .
+
+_:node1b87ibivsx695 a rr:ObjectMap .
+
+_:node1b87ibivsx689 rr:template "Supplier-{supplierid}" .
+
+_:node1b87ibivsx686 rr:column "postalcode" .
+
+_:node1b87ibivsx677 rr:column "phone" .
+
+_:node1b87ibivsx690 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx711 rr:objectMap _:node1b87ibivsx710 .
+
+_:node1b87ibivsx707 a rr:TermMap .
+
+_:node1b87ibivsx710 rr:column "territorydescription" .
+
+_:node1b87ibivsx714 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx701 a rr:TermMap ;
+	rr:class <http://northwind.com/model/Territory> .
+
+_:node1b87ibivsx702 rr:subjectMap _:node1b87ibivsx701 .
+
+_:node1b87ibivsx704 a rr:ObjectMap .
+
+_:node1b87ibivsx701 rr:template "http://northwind.com/Territory-{territoryid}" .
+
+_:node1b87ibivsx713 rr:termType rr:Literal .
+
+_:node1b87ibivsx701 rr:termType rr:IRI .
+
+_:node1b87ibivsx705 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx704 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx713 a rr:TermMap .
+
+_:node1b87ibivsx700 a rr:R2RMLView .
+
+_:node1b87ibivsx705 rr:predicate <http://northwind.com/model/territoryRegion> .
+
+_:node1b87ibivsx708 rr:objectMap _:node1b87ibivsx707 .
+
+_:node1b87ibivsx717 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx716 a rr:ObjectMap .
+
+_:node1b87ibivsx710 a rr:ObjectMap .
+
+_:node1b87ibivsx714 rr:objectMap _:node1b87ibivsx713 .
+
+_:node1b87ibivsx704 a rr:TermMap .
+
+_:node1b87ibivsx711 rr:predicate <http://northwind.com/model/territoryDescription> .
+
+_:node1b87ibivsx702 rr:predicateObjectMap _:node1b87ibivsx708 .
+
+_:node1b87ibivsx717 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx702 a rr:TriplesMap .
+
+_:node1b87ibivsx714 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx710 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx707 a rr:ObjectMap .
+
+_:node1b87ibivsx716 rr:termType rr:Literal .
+
+_:node1b87ibivsx704 rr:termType rr:IRI .
+
+_:node1b87ibivsx702 rr:predicateObjectMap _:node1b87ibivsx705 .
+
+_:node1b87ibivsx710 rr:termType rr:Literal .
+
+_:node1b87ibivsx713 rr:template "Territory-{territoryid}" .
+
+_:node1b87ibivsx711 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx700 rr:sqlQuery """select
+territories.territoryid, territories.regionid, territories.territorydescription,md5(cast(  region.regiondescription as text)) as regionhash
+from territories, region
+where territories.regionid=region.regionid""" .
+
+_:node1b87ibivsx716 a rr:TermMap .
+
+_:node1b87ibivsx707 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx708 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx701 a rr:SubjectMap .
+
+_:node1b87ibivsx716 rr:column "territoryid" .
+
+_:node1b87ibivsx710 a rr:TermMap .
+
+_:node1b87ibivsx707 rr:column "regionid" .
+
+_:node1b87ibivsx702 rr:logicalTable _:node1b87ibivsx700 .
+
+_:node1b87ibivsx707 rr:termType rr:Literal .
+
+_:node1b87ibivsx717 rr:objectMap _:node1b87ibivsx716 .
+
+_:node1b87ibivsx705 rr:objectMap _:node1b87ibivsx704 .
+
+_:node1b87ibivsx708 rr:predicate <http://northwind.com/model/regionNotation> .
+
+_:node1b87ibivsx702 rr:predicateObjectMap _:node1b87ibivsx717 .
+
+_:node1b87ibivsx713 a rr:ObjectMap .
+
+_:node1b87ibivsx702 rr:predicateObjectMap _:node1b87ibivsx711 , _:node1b87ibivsx714 .
+
+_:node1b87ibivsx720 rr:logicalTable _:node1b87ibivsx718 .
+
+_:node1b87ibivsx722 a rr:TermMap .
+
+_:node1b87ibivsx719 rr:template "http://northwind.com/Employee-{employeeid}" .
+
+_:node1b87ibivsx718 rr:sqlQuery """select
+employeeid,territoryid
+from employeeterritories""" .
+
+_:node1b87ibivsx723 rr:predicate <http://northwind.com/model/territory> .
+
+_:node1b87ibivsx719 rr:termType rr:IRI .
+
+_:node1b87ibivsx720 rr:predicateObjectMap _:node1b87ibivsx723 .
+
+_:node1b87ibivsx718 a rr:R2RMLView .
+
+_:node1b87ibivsx722 rr:template "http://northwind.com/Territory-{territoryid}" .
+
+_:node1b87ibivsx720 rr:subjectMap _:node1b87ibivsx719 .
+
+_:node1b87ibivsx722 rr:termType rr:IRI ;
+	a rr:ObjectMap .
+
+_:node1b87ibivsx720 a rr:TriplesMap .
+
+_:node1b87ibivsx719 a rr:TermMap .
+
+_:node1b87ibivsx723 a rr:PredicateObjectMap ;
+	rr:objectMap _:node1b87ibivsx722 .
+
+_:node1b87ibivsx719 a rr:SubjectMap .
+
+_:node1b87ibivsx741 rr:predicate <http://www.w3.org/2004/02/skos/core#notation> .
+
+_:node1b87ibivsx738 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx728 a rr:TermMap .
+
+_:node1b87ibivsx735 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx726 a rr:TriplesMap .
+
+_:node1b87ibivsx741 rr:objectMap _:node1b87ibivsx740 .
+
+_:node1b87ibivsx734 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx743 a rr:TermMap .
+
+_:node1b87ibivsx732 rr:predicate <http://northwind.com/model/stateAbbr> .
+
+_:node1b87ibivsx731 rr:column "stateabbr" .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx741 .
+
+_:node1b87ibivsx725 a rr:SubjectMap .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx744 .
+
+_:node1b87ibivsx740 a rr:ObjectMap .
+
+_:node1b87ibivsx734 a rr:TermMap .
+
+_:node1b87ibivsx740 rr:termType rr:Literal .
+
+_:node1b87ibivsx737 a rr:ObjectMap .
+
+_:node1b87ibivsx725 rr:template "http://northwind.com/USState-{stateid}" .
+
+_:node1b87ibivsx740 rr:column "stateid" .
+
+_:node1b87ibivsx726 rr:subjectMap _:node1b87ibivsx725 .
+
+_:node1b87ibivsx738 rr:objectMap _:node1b87ibivsx737 .
+
+_:node1b87ibivsx724 rr:sqlQuery """select
+stateid,statename,stateabbr,stateregion,md5( stateregion ) as regionhash
+from usstates""" .
+
+_:node1b87ibivsx731 a rr:ObjectMap .
+
+_:node1b87ibivsx741 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx738 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx744 rr:objectMap _:node1b87ibivsx743 .
+
+_:node1b87ibivsx728 rr:column "statename" .
+
+_:node1b87ibivsx732 rr:objectMap _:node1b87ibivsx731 .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx729 .
+
+_:node1b87ibivsx725 a rr:TermMap .
+
+_:node1b87ibivsx740 a rr:TermMap .
+
+_:node1b87ibivsx731 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx729 rr:predicate <http://northwind.com/model/stateName> .
+
+_:node1b87ibivsx728 a rr:ObjectMap .
+
+_:node1b87ibivsx731 rr:termType rr:Literal .
+
+_:node1b87ibivsx743 a rr:ObjectMap .
+
+_:node1b87ibivsx725 rr:termType rr:IRI .
+
+_:node1b87ibivsx732 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx737 rr:termType rr:Literal ;
+	a rr:TermMap ;
+	rr:column "statename" .
+
+_:node1b87ibivsx744 rr:predicate <http://northwind.com/model/regionNotation> .
+
+_:node1b87ibivsx728 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx726 rr:logicalTable _:node1b87ibivsx724 .
+
+_:node1b87ibivsx729 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx731 a rr:TermMap .
+
+_:node1b87ibivsx735 rr:predicate <http://northwind.com/model/usstateRegion> .
+
+_:node1b87ibivsx728 rr:termType rr:Literal .
+
+_:node1b87ibivsx729 rr:objectMap _:node1b87ibivsx728 .
+
+_:node1b87ibivsx725 rr:class <http://northwind.com/model/USState> .
+
+_:node1b87ibivsx743 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx724 a rr:R2RMLView .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx735 .
+
+_:node1b87ibivsx734 rr:termType rr:IRI .
+
+_:node1b87ibivsx744 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx734 a rr:ObjectMap .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx738 .
+
+_:node1b87ibivsx743 rr:termType rr:Literal .
+
+_:node1b87ibivsx726 rr:predicateObjectMap _:node1b87ibivsx732 .
+
+_:node1b87ibivsx735 rr:objectMap _:node1b87ibivsx734 .
+
+_:node1b87ibivsx743 rr:column "stateregion" .
+
+_:node1b87ibivsx749 a rr:TermMap .
+
+_:node1b87ibivsx746 a rr:TermMap .
+
+_:node1b87ibivsx747 a rr:TriplesMap .
+
+_:node1b87ibivsx750 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx752 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx749 a rr:ObjectMap .
+
+_:node1b87ibivsx753 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx752 rr:termType rr:Literal .
+
+_:node1b87ibivsx745 rr:sqlQuery """select distinct
+region,md5( region ) as regionhash
+from suppliers
+where region is not null""" .
+
+_:node1b87ibivsx746 rr:termType rr:IRI ;
+	a rr:SubjectMap ;
+	rr:class <http://northwind.com/model/Region> .
+
+_:node1b87ibivsx749 rr:column "region" .
+
+_:node1b87ibivsx750 a rr:PredicateObjectMap ;
+	rr:objectMap _:node1b87ibivsx749 .
+
+_:node1b87ibivsx747 rr:logicalTable _:node1b87ibivsx745 .
+
+_:node1b87ibivsx752 rr:column "region" .
+
+_:node1b87ibivsx745 a rr:R2RMLView .
+
+_:node1b87ibivsx746 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx752 a rr:TermMap .
+
+_:node1b87ibivsx747 rr:predicateObjectMap _:node1b87ibivsx750 .
+
+_:node1b87ibivsx749 rr:termType rr:Literal .
+
+_:node1b87ibivsx747 rr:predicateObjectMap _:node1b87ibivsx753 .
+
+_:node1b87ibivsx753 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx747 rr:subjectMap _:node1b87ibivsx746 .
+
+_:node1b87ibivsx753 rr:objectMap _:node1b87ibivsx752 .
+
+_:node1b87ibivsx752 a rr:ObjectMap .
+
+_:node1b87ibivsx759 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx761 rr:column "region" .
+
+_:node1b87ibivsx754 a rr:R2RMLView .
+
+_:node1b87ibivsx759 a rr:PredicateObjectMap ;
+	rr:objectMap _:node1b87ibivsx758 .
+
+_:node1b87ibivsx756 rr:subjectMap _:node1b87ibivsx755 .
+
+_:node1b87ibivsx755 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx754 rr:sqlQuery """select distinct
+region,md5( region ) as regionhash
+from employees
+where region is not null""" .
+
+_:node1b87ibivsx761 a rr:TermMap .
+
+_:node1b87ibivsx762 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx758 rr:termType rr:Literal .
+
+_:node1b87ibivsx756 rr:predicateObjectMap _:node1b87ibivsx759 .
+
+_:node1b87ibivsx761 a rr:ObjectMap ;
+	rr:termType rr:Literal .
+
+_:node1b87ibivsx758 a rr:TermMap .
+
+_:node1b87ibivsx755 a rr:TermMap .
+
+_:node1b87ibivsx756 a rr:TriplesMap ;
+	rr:logicalTable _:node1b87ibivsx754 .
+
+_:node1b87ibivsx761 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx756 rr:predicateObjectMap _:node1b87ibivsx762 .
+
+_:node1b87ibivsx758 a rr:ObjectMap .
+
+_:node1b87ibivsx762 rr:objectMap _:node1b87ibivsx761 .
+
+_:node1b87ibivsx755 rr:class <http://northwind.com/model/Region> ;
+	a rr:SubjectMap ;
+	rr:termType rr:IRI .
+
+_:node1b87ibivsx758 rr:column "region" .
+
+_:node1b87ibivsx762 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx768 rr:objectMap _:node1b87ibivsx767 .
+
+_:node1b87ibivsx767 a rr:TermMap .
+
+_:node1b87ibivsx770 rr:termType rr:Literal .
+
+_:node1b87ibivsx764 a rr:TermMap .
+
+_:node1b87ibivsx765 rr:predicateObjectMap _:node1b87ibivsx771 ;
+	rr:subjectMap _:node1b87ibivsx764 ;
+	rr:predicateObjectMap _:node1b87ibivsx768 .
+
+_:node1b87ibivsx764 a rr:SubjectMap .
+
+_:node1b87ibivsx765 a rr:TriplesMap .
+
+_:node1b87ibivsx767 a rr:ObjectMap .
+
+_:node1b87ibivsx764 rr:termType rr:IRI .
+
+_:node1b87ibivsx771 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx764 rr:class <http://northwind.com/model/Region> .
+
+_:node1b87ibivsx767 rr:column "region" .
+
+_:node1b87ibivsx770 a rr:ObjectMap .
+
+_:node1b87ibivsx763 a rr:R2RMLView .
+
+_:node1b87ibivsx768 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx770 rr:column "region" .
+
+_:node1b87ibivsx765 rr:logicalTable _:node1b87ibivsx763 .
+
+_:node1b87ibivsx770 a rr:TermMap ;
+	rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx763 rr:sqlQuery """select distinct
+region,md5( region ) as regionhash
+from customers
+where region is not null""" .
+
+_:node1b87ibivsx771 rr:objectMap _:node1b87ibivsx770 .
+
+_:node1b87ibivsx764 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx768 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx771 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx767 rr:termType rr:Literal .
+
+_:node1b87ibivsx772 a rr:R2RMLView .
+
+_:node1b87ibivsx774 rr:predicateObjectMap _:node1b87ibivsx780 ;
+	rr:subjectMap _:node1b87ibivsx773 .
+
+_:node1b87ibivsx772 rr:sqlQuery """select distinct
+stateregion as region,md5( stateregion ) as regionhash
+from usstates
+where stateregion is not null""" .
+
+_:node1b87ibivsx774 rr:logicalTable _:node1b87ibivsx772 ;
+	rr:predicateObjectMap _:node1b87ibivsx777 .
+
+_:node1b87ibivsx773 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx777 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx780 rr:objectMap _:node1b87ibivsx779 .
+
+_:node1b87ibivsx776 rr:termType rr:Literal .
+
+_:node1b87ibivsx779 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node1b87ibivsx777 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx780 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx779 rr:termType rr:Literal .
+
+_:node1b87ibivsx776 rr:column "region" .
+
+_:node1b87ibivsx779 a rr:TermMap .
+
+_:node1b87ibivsx776 a rr:TermMap .
+
+_:node1b87ibivsx773 a rr:TermMap .
+
+_:node1b87ibivsx780 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx774 a rr:TriplesMap .
+
+_:node1b87ibivsx773 a rr:SubjectMap .
+
+_:node1b87ibivsx779 a rr:ObjectMap .
+
+_:node1b87ibivsx776 a rr:ObjectMap .
+
+_:node1b87ibivsx779 rr:column "region" .
+
+_:node1b87ibivsx773 rr:termType rr:IRI ;
+	rr:class <http://northwind.com/model/Region> .
+
+_:node1b87ibivsx777 rr:objectMap _:node1b87ibivsx776 .
+
+_:node1b87ibivsx788 rr:column "region" .
+
+_:node1b87ibivsx789 rr:objectMap _:node1b87ibivsx788 .
+
+_:node1b87ibivsx783 rr:subjectMap _:node1b87ibivsx782 ;
+	a rr:TriplesMap ;
+	rr:logicalTable _:node1b87ibivsx781 .
+
+_:node1b87ibivsx782 a rr:SubjectMap , rr:TermMap .
+
+_:node1b87ibivsx789 rr:predicate <http://northwind.com/model/regionDescription> .
+
+_:node1b87ibivsx785 a rr:TermMap .
+
+_:node1b87ibivsx783 rr:predicateObjectMap _:node1b87ibivsx789 .
+
+_:node1b87ibivsx788 a rr:TermMap , rr:ObjectMap .
+
+_:node1b87ibivsx785 rr:column "region" ;
+	a rr:ObjectMap .
+
+_:node1b87ibivsx782 rr:termType rr:IRI ;
+	rr:class <http://northwind.com/model/Region> .
+
+_:node1b87ibivsx781 rr:sqlQuery """select distinct
+shipregion as region,md5( shipregion ) as regionhash
+from orders
+where shipregion is not null""" .
+
+_:node1b87ibivsx783 rr:predicateObjectMap _:node1b87ibivsx786 .
+
+_:node1b87ibivsx781 a rr:R2RMLView .
+
+_:node1b87ibivsx782 rr:template "http://northwind.com/Region-{regionhash}" .
+
+_:node1b87ibivsx786 rr:predicate <http://www.w3.org/2000/01/rdf-schema#label> .
+
+_:node1b87ibivsx788 rr:datatype <http://www.w3.org/2001/XMLSchema#string> ;
+	rr:termType rr:Literal .
+
+_:node1b87ibivsx786 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx789 a rr:PredicateObjectMap .
+
+_:node1b87ibivsx786 rr:objectMap _:node1b87ibivsx785 .
+
+_:node1b87ibivsx785 rr:termType rr:Literal .

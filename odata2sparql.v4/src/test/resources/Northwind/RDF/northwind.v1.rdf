@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns="http://northwind.com/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://northwind.com/">
+  <owl:Ontology rdf:about="">
+    <owl:versionInfo>v1</owl:versionInfo>
+    <owl:priorVersion rdf:resource="http://northwind.com/v0"/>
+    <owl:imports rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+    <owl:versionIRI rdf:resource="http://northwind.com/v1"/>
+    <owl:imports rdf:resource="http://northwind.com/data/"/>
+    <owl:imports rdf:resource="http://northwind.com/model/"/>
+    <owl:imports rdf:resource="http://northwind.com/operations/"/>
+  </owl:Ontology>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

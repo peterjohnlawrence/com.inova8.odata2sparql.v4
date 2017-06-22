@@ -1,0 +1,1 @@
+ontop materialize -m C:\Users\Peter\git\com.inova8.odata2sparql.v4\odata2sparql.v4\src\test\resources\Northwind\RDF\northwind.model.v1.obda -o C:\Users\Peter\git\com.inova8.odata2sparql.v4\odata2sparql.v4\src\test\resources\Northwind\RDF\northwind.data.v1.rdf

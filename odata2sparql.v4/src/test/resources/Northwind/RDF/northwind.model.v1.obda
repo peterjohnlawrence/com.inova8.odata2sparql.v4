@@ -1,0 +1,124 @@
+[PrefixDeclaration]
+:		http://northwind.com/model/
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+skos:		http://www.w3.org/2004/02/skos/core#
+spin:		http://spinrdf.org/sp#
+model:		http://northwind.com/model/
+northwind:	http://northwind.com/
+
+[SourceDeclaration]
+sourceUri	datasource1
+connectionUrl	jdbc:postgresql://localhost:5433/northwind
+username	northwind_user
+password	admin
+driverClass	org.postgresql.Driver
+
+[MappingDeclaration] @collection [[
+mappingId	Category
+target		northwind:Category-{categoryid} a model:Category ; model:categoryName {categoryname} ; model:description {description} ; rdfs:label "Category-{categoryid}"^^xsd:string ; skos:notation {categoryid} . 
+source		select categoryid,categoryname,description from categories
+
+mappingId	Customer
+target		northwind:Customer-{customerid} a model:Customer ; model:customerAddress {address} ; model:customerCity {city} ; model:customerCompanyName {companyname} ; model:customerContactName {contactname} ; model:customerContactTitle {contacttitle} ; model:customerCountry {country} ; model:customerFax {fax} ; model:customerPhone {phone} ; model:customerPostalCode {postalcode} ; rdfs:label {companyname} ; model:customerRegion northwind:Region-{regionhash} ; skos:notation {customerid} ; model:regionDescription {region} . 
+source		select cast( customerid as text) as customerid,companyname,contactname,contacttitle,address,city,region,postalcode,country,phone,fax, md5( region ) as regionhash from customers
+
+mappingId	Employee
+target		northwind:Employee-{employeeid} a model:Employee ; model:employeeAddress {address} ; model:birthDate {birthdate} ; model:employeeCity {city} ; model:employeeCountry {country} ; model:extension {extension} ; model:firstName {firstname} ; model:hireDate {hiredate} ; model:homePhone {homephone} ; model:lastName {lastname} ; model:notes {notes} ; model:photo {photopath} ; model:employeePostalCode {postalcode} ; model:employeeRegion northwind:Region-{regionhash} ; model:reportsTo northwind:Employee-{reportsto} ; model:reportsToNotation {reportsto} ; model:title {title} ; model:titleOfCourtesy {titleofcourtesy} ; rdfs:label "Employee-{employeeid}"^^rdfs:Literal ; skos:notation {employeeid} ; model:regionDescription {region} . 
+source		select  employeeid,lastname,firstname,title,titleofcourtesy,birthdate,hiredate,address,city,region,postalcode,country,homephone,extension,notes,reportsto,photopath, md5( region ) as regionhash
+			from employees
+
+mappingId	Order
+target		northwind:Order-{orderid} a model:Order ; model:customer northwind:Customer-{customerid} ; model:customerNotation {customerid} ; model:employee northwind:Employee-{employeeid} ; model:employeeNotation {employeeid} ; model:orderRegion northwind:Region-{regionhash} ; model:freight {freight} ; model:orderDate {orderdate} ; model:requiredDate {requireddate} ; model:shipAddress {shipaddress} ; model:shipCity {shipcity} ; model:shipCountry {shipcountry} ; model:shipName {shipname} ; model:shipPostalCode {shippostalcode} ; model:shipVia northwind:Shipper-{shipvia} ; model:shipViaNotation {shipvia} ; model:shippedDate {shippeddate} ; rdfs:label "Order-{orderid}"^^xsd:string ; skos:notation {orderid} ; model:regionDescription {shipregion} . 
+source		select
+			orderid,customerid,employeeid,orderdate,requireddate,shippeddate,shipvia,freight,shipname,shipaddress,shipcity,shipregion,shippostalcode,shipcountry, md5( shipregion ) as regionhash
+			from orders
+
+mappingId	OrderDetail
+target		northwind:OrderDetail-{orderid}-{productid} a model:OrderDetail ; model:discount {discount} ; model:order northwind:Order-{orderid} ; model:orderNotation {orderid} ; model:product northwind:Product-{productid} ; model:productNotation {productid} ; model:quantity {quantity} ; model:orderDetailUnitPrice {unitprice} ; rdfs:label "OrderDetail-{orderid}-{productid}"^^xsd:string . 
+source		select
+			orderid,productid,unitprice,quantity,discount
+			from order_details
+
+mappingId	Product
+target		northwind:Product-{productid} a model:Product ; model:category northwind:Category-{categoryid} ; model:categoryNotation {categoryid} ; model:discontinued {discontinued} ; model:productName {productname} ; model:quantityPerUnit {quantityperunit} ; model:reorderLevel {reorderlevel} ; model:supplier northwind:Supplier-{supplierid} ; model:supplierNotation {supplierid} ; model:productUnitPrice {unitprice} ; model:unitsInStock {unitsinstock} ; model:unitsOnOrder {unitsonorder} ; rdfs:label "Product-{productid}"^^xsd:string ; skos:notation {productid} . 
+source		select
+			productid,productname,supplierid,categoryid,quantityperunit,unitprice,unitsinstock,unitsonorder,reorderlevel,discontinued
+			from products
+
+mappingId	Region
+target		northwind:Region-{regionhash} a model:Region ; model:regionDescription {regiondescription} ; rdfs:label {regiondescription} ; skos:notation {regionid} . 
+source		select
+			regionid,regiondescription, md5(cast( regiondescription as text)) as regionhash
+			from region
+
+mappingId	Shipper
+target		northwind:Shipper-{shipperid} a model:Shipper ; model:shipperCompanyName {companyname} ; model:shipperPhone {phone} ; rdfs:label "Shipper-{shipperid}"^^xsd:string ; skos:notation {shipperid} . 
+source		select
+			shipperid,companyname,phone
+			from shippers
+
+mappingId	Supplier
+target		northwind:Supplier-{supplierid} a model:Supplier ; model:supplierAddress {address} ; model:supplierCity {city} ; model:supplierCompanyName {companyname} ; model:supplierContactName {contactname} ; model:supplierContactTitle {contacttitle} ; model:supplierCountry {country} ; model:supplierPhone {phone} ; model:supplierFax {fax} ; model:supplierHomePage {homepage} ; model:supplierPostalCode {postalcode} ; rdfs:label "Supplier-{supplierid}"^^rdfs:Literal ; model:supplierRegion northwind:Region-{regionhash} ; skos:notation {supplierid} ; model:regionDescription {region} . 
+source		select
+			supplierid,companyname,contactname,contacttitle,address,city,region,postalcode,country,phone,fax,homepage, md5( region ) as regionhash
+			from suppliers
+
+mappingId	Territory
+target		northwind:Territory-{territoryid} a model:Territory ; model:territoryRegion northwind:Region-{regionhash} ; model:regionNotation {regionid} ; model:territoryDescription {territorydescription} ; rdfs:label "Territory-{territoryid}"^^xsd:string ; skos:notation {territoryid} . 
+source		select
+			territories.territoryid, territories.regionid, territories.territorydescription,md5(cast(  region.regiondescription as text)) as regionhash
+			from territories, region
+			where territories.regionid=region.regionid
+
+mappingId	EmployeeTerritory
+target		northwind:Employee-{employeeid} model:territory northwind:Territory-{territoryid} . 
+source		select
+			employeeid,territoryid
+			from employeeterritories
+
+mappingId	USState
+target		northwind:USState-{stateid} a model:USState ; model:stateName {statename} ; model:stateAbbr {stateabbr} ; model:usstateRegion northwind:Region-{regionhash} ; rdfs:label {statename} ; skos:notation {stateid} ; model:regionNotation {stateregion} . 
+source		select
+			stateid,statename,stateabbr,stateregion,md5( stateregion ) as regionhash
+			from usstates
+
+mappingId	Supplier_Region
+target		northwind:Region-{regionhash} a model:Region ; rdfs:label {region} ; model:regionDescription {region} . 
+source		select distinct
+			region,md5( region ) as regionhash
+			from suppliers
+			where region is not null
+
+mappingId	Employee_Region
+target		northwind:Region-{regionhash} a model:Region ; rdfs:label {region} ; model:regionDescription {region} . 
+source		select distinct
+			region,md5( region ) as regionhash
+			from employees
+			where region is not null
+
+mappingId	Customer_Region
+target		northwind:Region-{regionhash} a model:Region ; rdfs:label {region} ; model:regionDescription {region} . 
+source		select distinct
+			region,md5( region ) as regionhash
+			from customers
+			where region is not null
+
+mappingId	USState_Region
+target		northwind:Region-{regionhash} a model:Region ; rdfs:label {region} ; model:regionDescription {region} . 
+source		select distinct
+			stateregion as region,md5( stateregion ) as regionhash
+			from usstates
+			where stateregion is not null
+
+mappingId	Order_Region
+target		northwind:Region-{regionhash} a model:Region ; rdfs:label {region} ; model:regionDescription {region} . 
+source		select distinct
+			shipregion as region,md5( shipregion ) as regionhash
+			from orders
+			where shipregion is not null
+]]
+

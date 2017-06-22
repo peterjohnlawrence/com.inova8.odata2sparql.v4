@@ -28,15 +28,15 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfModelProvider {
 	private final Log log = LogFactory.getLog(RdfModelProvider.class);
 	private final RdfModel model;
-	
+
 	private final RdfMetamodelProvider rdfMetamodelProvider;
 
 	public RdfModelProvider(RdfRepository rdfRepository) {
 		super();
 		this.rdfMetamodelProvider = new RdfMetamodelProvider(rdfRepository);
 		model = new RdfModel(rdfRepository);
-	}	
-	
+	}
+
 	public RdfModel getRdfModel() throws Exception {
 		RdfEntityType rdfsResource = initializeCore();
 		getClasses();
@@ -57,8 +57,8 @@ public class RdfModelProvider {
 		RdfSchema defaultGraph = model.getOrCreateGraph(rdfMetamodelProvider.getRdfRepository().defaultNamespace(),
 				rdfMetamodelProvider.getRdfRepository().getDefaultPrefix());
 		defaultGraph.isDefault = true;
-		model.getOrCreatePrefix(rdfMetamodelProvider.getRdfRepository().getDefaultPrefix(), rdfMetamodelProvider
-				.getRdfRepository().defaultNamespace());
+		model.getOrCreatePrefix(rdfMetamodelProvider.getRdfRepository().getDefaultPrefix(),
+				rdfMetamodelProvider.getRdfRepository().defaultNamespace());
 
 		for (Entry<String, Namespace> namespaceEntry : rdfMetamodelProvider.getRdfRepository().getNamespaces()
 				.entrySet()) {
@@ -132,8 +132,8 @@ public class RdfModelProvider {
 		RdfEntityType owlOntology = model.getOrCreateEntityType(owlOntologyNode, owlOntologyLabelNode, rdfsClass);
 		RdfEntityType rdfProperty = model.getOrCreateEntityType(rdfPropertyNode, rdfPropertyLabelNode, rdfsResource);
 		@SuppressWarnings("unused")
-		RdfEntityType owlObjectProperty = model.getOrCreateEntityType(owlObjectPropertyNode,
-				owlObjectPropertyLabelNode, rdfProperty);
+		RdfEntityType owlObjectProperty = model.getOrCreateEntityType(owlObjectPropertyNode, owlObjectPropertyLabelNode,
+				rdfProperty);
 		@SuppressWarnings("unused")
 		RdfEntityType owlDatatypeProperty = model.getOrCreateEntityType(owlDatatypePropertyNode,
 				owlDatatypePropertyLabelNode, rdfProperty);
@@ -148,8 +148,8 @@ public class RdfModelProvider {
 
 		// Classes
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet classes = rdfMetamodelProvider.getClasses();
 			try {
 				while (classes.hasNext()) {
@@ -170,13 +170,14 @@ public class RdfModelProvider {
 								// make statement the same as all others|| classNode.getIRI().toString().equals(RdfConstants.RDF_STATEMENT)
 								) {
 									//Special cases where we do not want to define basetypes so that OData aligns with RDF/RDFS/OWL
-									entityType=model.getOrCreateEntityType(classNode, classLabelNode);
+									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
 								} else {
-									entityType=model.getOrCreateEntityType(classNode, classLabelNode, baseType);
+									entityType = model.getOrCreateEntityType(classNode, classLabelNode, baseType);
 								}
 								entityType.setEntity(true);
 								if (soln.getRdfNode("description") != null) {
-									entityType.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+									entityType.setDescription(
+											soln.getRdfNode("description").getLiteralValue().getLabel());
 								}
 							}
 						} else {
@@ -191,11 +192,11 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count+" Classes found ["+debug+"]");
+				log.info(count + " Classes found [" + debug + "]");
 				classes.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Class query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Class query. Check availability of triple store. Exception " + e.getMessage());
 			throw new OData2SparqlException("Classes query exception", e);
 		}
 	}
@@ -203,8 +204,8 @@ public class RdfModelProvider {
 	private void getDatatypes() throws OData2SparqlException {
 		// Datatypes
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet datatypes = rdfMetamodelProvider.getDatatypes();
 			try {
 				while (datatypes.hasNext()) {
@@ -222,11 +223,12 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count+" Datatypes found ["+debug+"]");
+				log.info(count + " Datatypes found [" + debug + "]");
 				datatypes.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Datatypes query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Datatypes query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("Datatypes query exception ", e);
 		}
 	}
@@ -242,8 +244,8 @@ public class RdfModelProvider {
 	private void getDataTypeProperties_Domains(HashMap<String, HashSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Domains();
 			try {
 				while (properties.hasNext()) {
@@ -260,7 +262,8 @@ public class RdfModelProvider {
 						RdfProperty datatypeProperty = model.getOrCreateProperty(propertyNode, propertyLabelNode,
 								domainNode);
 						if (soln.getRdfNode("description") != null) {
-							datatypeProperty.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							datatypeProperty
+									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						if (classes == null) {
@@ -278,11 +281,12 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count+" DataTypeProperties_Domains found ["+debug+"]");
+				log.info(count + " DataTypeProperties_Domains found [" + debug + "]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Datatype property query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Datatype property query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("DataTypeProperties_Domains query exception ", e);
 		}
 	}
@@ -291,33 +295,39 @@ public class RdfModelProvider {
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Ranges();
 			try {
 				while (properties.hasNext()) {
 					RdfNode propertyNode = null;
-					RdfQuerySolution soln= null;
+					RdfQuerySolution soln = null;
 					RdfNode rangeNode = null;
 					try {
 						soln = properties.nextSolution();
 						propertyNode = soln.getRdfNode("property");
 						rangeNode = soln.getRdfNode("range");
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
-						model.setPropertyRange(propertyNode, classes, rangeNode);
-						count++;
-						debug.append(propertyNode.getIRI().toString()).append(";");
+						if (classes != null) {
+							model.setPropertyRange(propertyNode, classes, rangeNode);
+							count++;
+							debug.append(propertyNode.getIRI().toString()).append(";");
+						} else {
+							log.info("Failed to create property ranges:" + propertyNode.getIRI().toString()
+									+ " since no defined range classes");
+						}
 					} catch (Exception e) {
 						log.info("Failed to create property ranges:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
-				log.info(count+" DataTypeProperties_Ranges found ["+debug+"]");
+				log.info(count + " DataTypeProperties_Ranges found [" + debug + "]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Datatype property ranges query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Datatype property ranges query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("DataTypeProperties_Ranges query exception ", e);
 		}
 	}
@@ -326,8 +336,8 @@ public class RdfModelProvider {
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet properties = rdfMetamodelProvider.getProperty_Cardinality();
 			try {
 				while (properties.hasNext()) {
@@ -360,11 +370,13 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count+" DataTypeProperties_Cardinality found ["+debug+"]");
+				log.info(count + " DataTypeProperties_Cardinality found [" + debug + "]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Datatype property cardinality query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error(
+					"Failed to execute Datatype property cardinality query. Check availability of triple store. Exception "
+							+ e.getMessage());
 			throw new OData2SparqlException("DataTypeProperties_Cardinality query exception ", e);
 		}
 	}
@@ -387,8 +399,8 @@ public class RdfModelProvider {
 	private void getObjectProperties() throws OData2SparqlException {
 		// Object Properties
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet associations = rdfMetamodelProvider.getAssociations();
 			try {
 				while (associations.hasNext()) {
@@ -430,14 +442,15 @@ public class RdfModelProvider {
 						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
 
-						RdfAssociation association =model.getOrCreateAssociation(propertyNode, propertyLabelNode, domainNode, rangeNode,
-								multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
-						
+						RdfAssociation association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+								domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
+								rangeCardinality);
+
 						if (soln.getRdfNode("description") != null) {
 							association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 						count++;
-						debug.append(propertyNode.getIRI().toString()).append(";");							
+						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create objectproperty:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
@@ -445,11 +458,12 @@ public class RdfModelProvider {
 
 				}
 			} finally {
-				log.info(count+" ObjectProperties found ["+debug+"]");
+				log.info(count + " ObjectProperties found [" + debug + "]");
 				associations.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute associations query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute associations query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("ObjectProperties query exception ", e);
 		}
 	}
@@ -457,8 +471,8 @@ public class RdfModelProvider {
 	private void getInverseProperties() throws OData2SparqlException {
 		// Inverse Properties
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet inverseAssociations = rdfMetamodelProvider.getInverseAssociations();
 			try {
 				while (inverseAssociations.hasNext()) {
@@ -502,14 +516,15 @@ public class RdfModelProvider {
 						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.ZERO_TO_ONE);
 
-						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode, inversePropertyLabelNode,
-								propertyNode, rangeNode, domainNode, multipleDomainNode, multipleRangeNode,
-								domainCardinality, rangeCardinality);
+						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+								inversePropertyLabelNode, propertyNode, rangeNode, domainNode, multipleDomainNode,
+								multipleRangeNode, domainCardinality, rangeCardinality);
 						if (soln.getRdfNode("description") != null) {
-							inverseAssociation.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							inverseAssociation
+									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 						count++;
-						debug.append(inversePropertyNode.getIRI().toString()).append(";");						
+						debug.append(inversePropertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create inverseproperty:" + inversePropertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
@@ -517,19 +532,20 @@ public class RdfModelProvider {
 
 				}
 			} finally {
-				log.info(count+" InverseProperties found ["+debug+"]");
+				log.info(count + " InverseProperties found [" + debug + "]");
 				inverseAssociations.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Inverse Associations query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Inverse Associations query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("InverseProperties query exception ", e);
 		}
 	}
 
 	private void getOperations() throws OData2SparqlException {
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet operations = rdfMetamodelProvider.getOperations();
 			try {
 				while (operations.hasNext()) {
@@ -539,31 +555,34 @@ public class RdfModelProvider {
 						queryNode = soln.getRdfNode("query");
 						RdfNode queryText = soln.getRdfNode("queryText");
 						RdfNode queryLabel = soln.getRdfNode("queryLabel");
-						RdfEntityType operationEntityType = model.getOrCreateOperationEntityType(queryNode, queryLabel, queryText);
+						RdfEntityType operationEntityType = model.getOrCreateOperationEntityType(queryNode, queryLabel,
+								queryText);
 						if (soln.getRdfNode("description") != null) {
-							operationEntityType.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							operationEntityType
+									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 					} catch (Exception e) {
 						log.info("Failed to create operation:" + queryNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
 					}
 					count++;
-					debug.append(queryNode.getIRI().toString()).append(";");	
+					debug.append(queryNode.getIRI().toString()).append(";");
 				}
 			} finally {
-				log.info(count+" Operations found ["+debug+"]");
+				log.info(count + " Operations found [" + debug + "]");
 				operations.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Operations query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Operations query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("Operations query exception ", e);
 		}
 	}
 
 	private void getOperationAssociationResults() throws OData2SparqlException {
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet operationAssociationResults = rdfMetamodelProvider.getOperationAssociationResults();
 			//?query ?varName ?property ?propertyLabel ?range
 			try {
@@ -580,32 +599,35 @@ public class RdfModelProvider {
 						}
 						RdfNode queryPropertyRange = soln.getRdfNode("range");
 
-						RdfAssociation operationAssociation = model.getOrCreateOperationAssociation(query, queryProperty, queryPropertyLabel,
-								queryPropertyRange, varName);
+						RdfAssociation operationAssociation = model.getOrCreateOperationAssociation(query,
+								queryProperty, queryPropertyLabel, queryPropertyRange, varName);
 						if (soln.getRdfNode("description") != null) {
-							operationAssociation.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							operationAssociation
+									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 						count++;
-						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString()).append(";");		
+						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString())
+								.append(";");
 					} catch (Exception e) {
 						log.info("Failed to create operation association results:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
-				log.info(count+" OperationAssociationResults found ["+debug+"]");
+				log.info(count + " OperationAssociationResults found [" + debug + "]");
 				operationAssociationResults.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Operation Associations query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Operation Associations query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("OperationsAssociations query exception ", e);
 		}
 	}
 
 	private void getOperationPropertyResults() throws OData2SparqlException {
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet operationPropertyResults = rdfMetamodelProvider.getOperationPropertyResults();
 			//?query ?varName ?property ?propertyLabel ?range
 			try {
@@ -622,32 +644,35 @@ public class RdfModelProvider {
 						}
 						RdfNode queryPropertyRange = soln.getRdfNode("range");
 
-						RdfProperty operationProperty = model.getOrCreateOperationProperty(query, queryProperty, queryPropertyLabel,
-								queryPropertyRange, varName);
+						RdfProperty operationProperty = model.getOrCreateOperationProperty(query, queryProperty,
+								queryPropertyLabel, queryPropertyRange, varName);
 						if (soln.getRdfNode("description") != null) {
-							operationProperty.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							operationProperty
+									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
 						count++;
-						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString()).append(";");	
+						debug.append(query.getIRI().toString()).append("\\").append(queryProperty.getIRI().toString())
+								.append(";");
 					} catch (Exception e) {
 						log.info("Failed to create operation property results:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
-				log.info(count+" OperationPropertyResults found ["+debug+"]");
+				log.info(count + " OperationPropertyResults found [" + debug + "]");
 				operationPropertyResults.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Operation results query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Operation results query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("OperationsAssociations query exception ", e);
 		}
 	}
 
 	private void getOperationArguments() throws OData2SparqlException {
 		try {
-			int count=0;
-			StringBuilder debug =new StringBuilder();
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
 			RdfResultSet operationArguments = rdfMetamodelProvider.getOperationArguments();
 			try {
 				while (operationArguments.hasNext()) {
@@ -664,18 +689,20 @@ public class RdfModelProvider {
 							range = soln.getRdfNode("range");
 						model.getOrCreateOperationArguments(query, queryProperty, varName, range);
 						count++;
-						debug.append(query.getIRI().toString()).append("\\").append(varName.getLiteralValue().stringValue()).append(";");		
+						debug.append(query.getIRI().toString()).append("\\")
+								.append(varName.getLiteralValue().stringValue()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create operation arguments:" + query.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
-				log.info(count+" OperationArguments found ["+debug+"]");
+				log.info(count + " OperationArguments found [" + debug + "]");
 				operationArguments.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute Operation arguments query. Check availability of triple store. Exception "+ e.getMessage());
+			log.error("Failed to execute Operation arguments query. Check availability of triple store. Exception "
+					+ e.getMessage());
 			throw new OData2SparqlException("OperationsAssociations query exception ", e);
 		}
 	}
@@ -691,11 +718,21 @@ public class RdfModelProvider {
 					clazz.setBaseType(rdfsResource);
 				} else {
 					clazz.isOperation = clazz.isOperation;
-					//Need to define a primary key for an operation that should be the 
+					//Need to define a primary key for an operation
 					if (clazz.primaryKeys.isEmpty() && clazz.isOperation && clazz.getBaseType() == null) {
-						log.info("Class removed as incomplete definition " + clazz.getIRI());
+						log.warn("Class and related associations removed because incomplete definition " + clazz.getIRI());
+						//Remove any association  that uses this class
+						for (RdfSchema associationGraph : model.graphs) {
+							 Iterator<RdfAssociation> associationsIterator = graph.associations.iterator();
+							 while (associationsIterator.hasNext()) {
+								  RdfAssociation association = associationsIterator.next();
+								  if((association.getDomainClass()==clazz)||(association.getRangeClass()==clazz)){
+									  associationsIterator.remove();
+								  }			 
+							 }		
+						}	
+						//Now remove this class
 						clazzIterator.remove();
-					}
 				}
 			}
 		}
