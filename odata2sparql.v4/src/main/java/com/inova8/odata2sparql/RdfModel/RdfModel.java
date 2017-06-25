@@ -21,6 +21,8 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 public class RdfModel {
@@ -398,9 +400,18 @@ public class RdfModel {
 		}
 
 		public Collection<RdfPrimaryKey> getPrimaryKeys() {
-			return primaryKeys.values();
+			return getPrimaryKeys(true);
 		}
-
+		public Collection<RdfPrimaryKey> getPrimaryKeys(boolean withBaseType) {
+			Collection<RdfPrimaryKey> primaryKeyValues = new ArrayList<RdfPrimaryKey>();;
+			RdfEntityType currentEntityType = this;
+			do{
+				primaryKeyValues.addAll(currentEntityType.primaryKeys.values());
+				currentEntityType=currentEntityType.getBaseType();
+				if(withBaseType ) currentEntityType=null;
+			}while(currentEntityType!=null);
+			return primaryKeyValues;
+		}
 		public void setFunctionImport(boolean b) {
 			this.functionImport = true;
 		}

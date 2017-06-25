@@ -60,6 +60,7 @@ public class RdfRepository  {
 	private final String modelName;
 	private Boolean withRdfAnnotations;
 	private Boolean withSapAnnotations;
+	private Boolean useBaseType;
 //	
 //    public /*static*/ class RdfRoleRepository{
 //  
@@ -144,5 +145,11 @@ public class RdfRepository  {
 
 	public void setWithSapAnnotations(Boolean withSapAnnotations) {
 		this.withSapAnnotations = withSapAnnotations;
+	}
+	public Boolean getUseBaseType() {
+		return useBaseType;
+	}
+	public void setUseBaseType(boolean useBaseType) {
+		this.useBaseType = useBaseType;	
 	}
 }

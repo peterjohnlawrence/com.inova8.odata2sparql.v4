@@ -160,6 +160,7 @@ public class RdfRepositories {
 									.getValue("VocabularyRepositoryImplQueryLimit");
 							Literal valueOfWithRdfAnnotations = (Literal) bindingSet.getValue("withRdfAnnotations");
 							Literal valueOfWithSapAnnotations = (Literal) bindingSet.getValue("withSapAnnotations");
+							Literal valueOfUseBaseType = (Literal) bindingSet.getValue("useBaseType");
 							//Create and add the corresponding repositories
 							RepositoryConfig dataRepositoryConfig = repositoryManager
 									.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
@@ -283,6 +284,12 @@ public class RdfRepositories {
 										.stringValue()));
 							} else {
 								repository.setWithSapAnnotations(false);
+							}
+							if (valueOfUseBaseType != null) {
+								repository.setUseBaseType(Boolean.parseBoolean(valueOfUseBaseType
+										.stringValue()));
+							} else {
+								repository.setUseBaseType(true);
 							}
 							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
 

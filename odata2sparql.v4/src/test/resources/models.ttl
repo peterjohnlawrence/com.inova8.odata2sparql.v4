@@ -48,6 +48,7 @@ odata4sparql:FOAF
   odata4sparql:vocabularyRepository :NW_Vocabulary ;
   odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
   odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
+  odata4sparql:useBaseType "true"^^xsd:boolean ;
   rdfs:label "Northwind"^^xsd:string ;
 .
 :NW_Data

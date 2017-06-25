@@ -55,7 +55,7 @@ public class RdfODataServlet extends HttpServlet {
 					handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 					handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
 					handler.register(new SparqlServiceDocumentProcessor());
-					log.info("Path: "+ req.getPathInfo()+" Query: "+req.getQueryString());
+					log.info(req.getMethod() + ": "+ req.getPathInfo()+" Query: "+req.getQueryString());
 					// let the handler do the work
 					handler.process(req, resp);
 				} else {
