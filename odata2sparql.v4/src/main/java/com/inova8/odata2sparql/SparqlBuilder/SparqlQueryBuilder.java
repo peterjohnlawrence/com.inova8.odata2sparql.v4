@@ -470,13 +470,6 @@ public class SparqlQueryBuilder {
 
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
 		prepareCountEntitySet.append("\t").append("SELECT ");
-		// primaryKey_Variables(this.rdfTargetEntityType).toString();
-		// prepareCountEntitySet.append("(COUNT(DISTINCT
-		// ").append(primaryKey_Variables(this.rdfTargetEntityType))
-		// prepareCountEntitySet.append("(COUNT(DISTINCT ?" +
-		// edmTargetEntitySet.getEntityType().getName() + "_s")
-		// .append(expandSelectTreeNodeVariables(rdfTargetEntityType.entityTypeName,
-		// this.expandOption))
 		prepareCountEntitySet.append("(COUNT(DISTINCT *").append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));
 		return new SparqlStatement(prepareCountEntitySet.toString());
@@ -552,7 +545,7 @@ public class SparqlQueryBuilder {
 		constructOperation.append(indent + "\t").append("[ <http://targetEntity> true ; a <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
-					.append(" <" + property.getPropertyURI() + "> ?" + property.varName + " ;\n");
+					.append(" <" + property.getPropertyURI() + "> ?" + property.getVarName() + " ;\n");
 		}
 		constructOperation.replace(constructOperation.length() - 2, constructOperation.length() - 1, "] .");
 		return constructOperation;
@@ -1157,7 +1150,7 @@ public class SparqlQueryBuilder {
 				for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
 					if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
 						expandSelectTreeNodeWhere.append(indent)
-								.append("BIND(?" + property.varName + " AS ?" + nextTargetKey + "_s)\n");
+								.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 				}
 			}
 			expandSelectTreeNodeWhere.append(indent);
@@ -1173,7 +1166,7 @@ public class SparqlQueryBuilder {
 				// )
 				for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
 					if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
-						expandSelectTreeNodeWhere.append("BIND(?" + property.varName + " AS ?" + targetKey + "_s)\n");
+						expandSelectTreeNodeWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
 				}
 			} else {
 				if (navProperty.getDomainClass().isOperation()) {

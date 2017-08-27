@@ -555,8 +555,12 @@ public class RdfModelProvider {
 						queryNode = soln.getRdfNode("query");
 						RdfNode queryText = soln.getRdfNode("queryText");
 						RdfNode queryLabel = soln.getRdfNode("queryLabel");
+						RdfNode deleteText = soln.getRdfNode("deleteText"); 
+						RdfNode insertText = soln.getRdfNode("insertText");
+						RdfNode updateText = soln.getRdfNode("updateText");
+						RdfNode updatePropertyText = soln.getRdfNode("updatePropertyText");
 						RdfEntityType operationEntityType = model.getOrCreateOperationEntityType(queryNode, queryLabel,
-								queryText);
+								queryText,deleteText,insertText,updateText,updatePropertyText );
 						if (soln.getRdfNode("description") != null) {
 							operationEntityType
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());

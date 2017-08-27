@@ -21,6 +21,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
+import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
@@ -239,6 +240,35 @@ public class RdfModel {
 		private boolean functionImport = false;
 		private String description;
 		private Set<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
+		private String deleteText;
+		private String insertText;
+		private String updateText;
+		private String updatePropertyText;
+		
+		public String getDeleteText() {
+			return deleteText;
+		}
+		public void setDeleteText(String deleteText) {
+			this.deleteText = deleteText;
+		}
+		public String getInsertText() {
+			return insertText;
+		}
+		public void setInsertText(String insertText) {
+			this.insertText = insertText;
+		}
+		public String getUpdateText() {
+			return updateText;
+		}
+		public void setUpdateText(String updateText) {
+			this.updateText = updateText;
+		}
+		public String getUpdatePropertyText() {
+			return updatePropertyText;
+		}
+		public void setUpdatePropertyText(String updatePropertyText) {
+			this.updatePropertyText = updatePropertyText;
+		}
 		public String getEntityTypeName() {
 			return entityTypeName;
 		}
@@ -479,8 +509,7 @@ public class RdfModel {
 		public String propertyName;
 		private String propertyLabel;
 		public String propertyTypeName;
-		public String varName;
-		//public EdmSimpleTypeKind propertyType;
+		private String varName;
 		public RdfNode propertyNode;
 		private Boolean isKey = false;
 		private RdfConstants.Cardinality cardinality = RdfConstants.Cardinality.MANY;
@@ -545,7 +574,13 @@ public class RdfModel {
 		public void setIsKey(Boolean isKey) {
 			this.isKey = isKey;
 		}
+		public String getVarName() {
+			return varName;
+		}
 
+		public void setVarName(String varName) {
+			this.varName = varName;
+		}
 	}
 
 	public static class RdfAssociation {
@@ -793,64 +828,56 @@ public class RdfModel {
 		}
 		return datatype;
 	}
-
-	RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode, RdfNode queryLabel, RdfNode queryText)
+	RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode) throws OData2SparqlException
+	{
+		return getOrCreateOperationEntityType(queryNode, null,null,null,null,null,null);
+	}
+	RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode, RdfNode queryLabel, RdfNode queryText,RdfNode deleteText,RdfNode insertText,RdfNode updateText,RdfNode updatePropertyText)
 			throws OData2SparqlException {
 		RdfEntityType operationEntityType = getOrCreateEntityType(queryNode, queryLabel);
 		if (queryText != null) {
 			operationEntityType.queryText = queryText.getLiteral().getLexicalForm();
 		}
-		//if (!operationEntityType.isEntity()) {
+		if (deleteText != null) {
+			operationEntityType.deleteText = deleteText.getLiteral().getLexicalForm();
+		}
+		if (insertText != null) {
+			operationEntityType.insertText = insertText.getLiteral().getLexicalForm();
+		}
+		if (updateText != null) {
+			operationEntityType.updateText = updateText.getLiteral().getLexicalForm();
+		}
+		if (updatePropertyText != null) {
+			operationEntityType.updatePropertyText = updatePropertyText.getLiteral().getLexicalForm();
+		}
 		operationEntityType.setOperation(true);
 		operationEntityType.setBaseType(null);
-		//} else {
-		//	log.info("Operation declared which is already an entityType: " + queryNode.getURI().toString());
-		//	return null;
-		//}
+
 		return operationEntityType;
 	}
 
-//	@Deprecated
-//	public RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode) throws OData2SparqlException {
-//		return getOrCreateOperationEntityType(queryNode, null, null);
-//	}
-
 	void getOrCreateOperationArguments(RdfNode queryNode, RdfNode queryPropertyNode, RdfNode varName, RdfNode rangeNode)
 			throws OData2SparqlException {
-		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode, null, null);
+		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (operationEntityType.isOperation()) {
 			operationEntityType.setFunctionImport(true);
-//			List<AnnotationAttribute> nullableAnnotations = new ArrayList<AnnotationAttribute>();
+
 			String propertyTypeName = rangeNode.getIRI().toString();
-//			nullableAnnotations.add((new AnnotationAttribute()).setName(RdfConstants.NULLABLE).setText(
-//					RdfConstants.FALSE));
-//			FunctionImportParameter functionImportParameter = new FunctionImportParameter();
-//			functionImportParameter.setName(varName.getLiteralValue().getLabel())
-//					.setType(SIMPLE_TYPE_MAPPING.get(propertyTypeName))
-//					.setAnnotationAttributes(nullableAnnotations);
-//			operationEntityType.getFunctionImportParameters().put(varName.getLiteralValue().getLabel(),
-//					functionImportParameter);
-//			
-//			nullableAnnotations.add((new AnnotationAttribute()).setName(RdfConstants.NULLABLE).setText(
-//					RdfConstants.FALSE));
+
 			FunctionImportParameter functionImportParameter = new FunctionImportParameter(varName.getLiteralValue().getLabel(), propertyTypeName, false);
 			operationEntityType.getFunctionImportParameters().put(varName.getLiteralValue().getLabel(),
 					functionImportParameter);
 		} else {
-
 		}
-
 	}
 
 	RdfProperty getOrCreateOperationProperty(RdfNode queryNode, RdfNode propertyNode, RdfNode propertyLabelNode,
 			RdfNode rangeNode, RdfNode varName) throws OData2SparqlException {
 
 		RdfURI propertyURI = new RdfURI(propertyNode);
-		//RdfURI rangeURI = new RdfURI(rangeNode);
-
 		String propertyTypeName = rangeNode.getIRI().toString();
 
-		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode, null, null);
+		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (!operationEntityType.isEntity()) {
 			RdfProperty property = Enumerable.create(operationEntityType.getProperties()).firstOrNull(
 					propertyNameEquals(propertyURI.localName));
@@ -875,7 +902,7 @@ public class RdfModel {
 				}
 				property.propertyNode = propertyNode;
 			}
-			property.varName = varName.getLiteralValue().getLabel();
+			property.setVarName(varName.getLiteralValue().getLabel());
 			operationEntityType.properties.put(property.propertyName, property);
 			return property;
 		} else {
@@ -890,7 +917,7 @@ public class RdfModel {
 		RdfURI operationURI = new RdfURI(queryNode);
 		RdfURI rangeURI = new RdfURI(rangeNode);
 
-		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode, null, null);
+		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (!operationEntityType.isEntity()) {
 			//String associationName = rdfToOdata(operationURI.localName) + RdfConstants.PREDICATE_SEPARATOR	+ rdfToOdata(propertyURI.localName);
 			String associationName = rdfToOdata(propertyURI.localName);
@@ -948,11 +975,6 @@ public class RdfModel {
 				property.propertyLabel = propertyLabelNode.getLiteralObject().toString();
 			}
 			property.propertyTypeName = propertyTypeName;
-			//property.propertyType = SIMPLE_TYPE_MAPPING.get(propertyTypeName);
-			// Workaround for non XMLSchema or XMLSchema2 property types.
-			// TODO iterate through datatype structure to determine base type
-//			if (property.propertyType == null)
-//				property.propertyType = EdmSimpleTypeKind.String;
 			property.propertyNode = propertyNode;
 			property.cardinality = cardinality;
 
@@ -993,11 +1015,6 @@ public class RdfModel {
 					propertyNameEquals(propertyURI.localName));
 			String propertyTypeName = rangeNode.getIRI().toString();
 			property.propertyTypeName = propertyTypeName;
-			//property.propertyType = SIMPLE_TYPE_MAPPING.get(propertyTypeName);
-			// Workaround for non XMLSchema or XMLSchema2 property types.
-			// TODO iterate through datatype structure to determine base type
-//			if (property.propertyType == null)
-//				property.propertyType = EdmSimpleTypeKind.String;
 		}
 	}
 

@@ -178,7 +178,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		RdfProperty rdfProperty;
 		try {
 			if (entityType.isOperation()) {
-				return "?" + entityType.findProperty(edmProperty.getName()).varName;
+				return "?" + entityType.findProperty(edmProperty.getName()).getVarName();
 
 			} else {
 				if (edmProperty instanceof EdmNavigationProperty) {
