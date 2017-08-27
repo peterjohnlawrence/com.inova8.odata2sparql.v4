@@ -38,7 +38,8 @@ public class RdfModelProvider {
 	}
 
 	public RdfModel getRdfModel() throws Exception {
-		RdfEntityType rdfsResource = initializeCore();
+		log.info("Loading model " + model.getRdfRepository().getModelName() + " from endpoint: " + model.getRdfRepository().getModelRepository().getRepository().toString());
+		RdfEntityType rdfsResource = initializeCore(); 
 		getClasses();
 		getDatatypes();
 		getDataTypeProperties();
