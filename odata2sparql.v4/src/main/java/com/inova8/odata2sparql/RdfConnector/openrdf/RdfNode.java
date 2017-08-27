@@ -197,7 +197,14 @@ public class RdfNode {
 	}
 
 	public String getNamespace() {
-		return ((IRI) node).getNamespace();
+		String nameSpace = ((IRI) node).getNamespace();
+		if(this.isIRI()) return ((IRI) node).getNamespace();
+		//String nameSpace =   node.getNamespace();
+		String lastCharacter = nameSpace.substring(nameSpace.length() - 1);
+		if (lastCharacter.equals(":"))
+			return nameSpace.substring(0, nameSpace.length() - 1);
+		else
+			return nameSpace;
 	}
 
 	public RdfLiteral getLiteral() {
