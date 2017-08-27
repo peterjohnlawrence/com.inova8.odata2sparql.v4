@@ -22,6 +22,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
@@ -598,8 +599,8 @@ public class RdfModel {
 		private RdfNode inversePropertyOf;
 		private String description;
 		private RdfEntityType rangeClass;
-		private Cardinality rangeCardinality;// = RdfConstants.Cardinality.ONE; formerly fromCardinality
-		private Cardinality domainCardinality;// = RdfConstants.Cardinality.MANY; formerly toCardinality
+		private Cardinality rangeCardinality;
+		private Cardinality domainCardinality;
 
 		public String getAssociationName() {
 			return associationName;
@@ -1079,7 +1080,7 @@ public class RdfModel {
 		RdfAssociation association = getOrCreateAssociation(propertyNode, null, domainNode, rangeNode,
 				multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
 		RdfAssociation inverseAssociation = getOrCreateAssociation(inversePropertyNode, inversePropertyLabelNode,
-				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality);
+				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
 		association.setIsInverse(false);
