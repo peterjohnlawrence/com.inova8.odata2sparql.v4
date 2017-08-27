@@ -733,6 +733,7 @@ public class RdfModelProvider {
 						}	
 						//Now remove this class
 						clazzIterator.remove();
+					}
 				}
 			}
 		}

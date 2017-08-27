@@ -461,7 +461,7 @@ public class SparqlQueryBuilder {
 		prepareConstruct.append("WHERE {\n");
 		prepareConstruct.append(where());
 		prepareConstruct.append("}");
-		prepareConstruct.append(defaultLimitClause());
+		prepareConstruct.append(limitClause());
 		return new SparqlStatement(prepareConstruct.toString());
 	}
 

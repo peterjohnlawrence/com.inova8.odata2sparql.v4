@@ -89,7 +89,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	}
 
 	Boolean containsProperty(final String name) {
-		Boolean result = null;
+		Boolean result = false;
 		for (Property property : this.getProperties()) {
 			if (name.equals(property.getName())) {
 				result = true;
