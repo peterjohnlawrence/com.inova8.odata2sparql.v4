@@ -161,6 +161,8 @@ class SparqlEntityCollection extends EntityCollection {
 			case "Double":
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).doubleValue();
+				} else if (value instanceof Integer) {
+					return ((Integer) value).doubleValue();
 				} else {
 					return (Double) value;
 				}

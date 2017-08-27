@@ -602,10 +602,18 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesOperationProperties = new StringBuilder();
 		if (DEBUG)
 			clausesOperationProperties.append("\t#clausesOperationProperties\n");
+		clausesOperationProperties.append("\t").append(filterOperationQuery(rdfOperationType)).append("\n");
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
 		return clausesOperationProperties;
 	}
-
+	private StringBuilder filterOperationQuery(RdfEntityType rdfOperationType) throws EdmException, OData2SparqlException {
+		StringBuilder filter = new StringBuilder();
+		if (DEBUG)
+			filter.append("#operationFilter\n");
+		if (!filterClause.getFilterClause().isEmpty())
+			filter.append(filterClause.getFilterClause()).append("\n");
+		return filter;
+	}
 	private String getQueryOptionText(List<CustomQueryOption> queryOptions, String parameter) {
 
 		for (CustomQueryOption queryOption : queryOptions) {
@@ -627,10 +635,7 @@ public class SparqlQueryBuilder {
 			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 					.getValue();
 			String parameterValue = getQueryOptionText(queryOptions, functionImportParameter.getName());
-			// if (queryOptions.containsKey(functionImportParameter.getName()))
-			// {
-			// String parameterValue =
-			// queryOptions.get(functionImportParameter.getName());
+
 			if (parameterValue != null) {
 				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
 			} else {
