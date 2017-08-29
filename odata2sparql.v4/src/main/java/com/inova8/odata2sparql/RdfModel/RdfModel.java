@@ -611,6 +611,7 @@ public class RdfModel {
 		private RdfNode associationNode;
 		private Boolean isInverse = false;
 		private RdfNode inversePropertyOf;
+		private RdfAssociation inverseAssociation;
 		private String description;
 		private RdfEntityType rangeClass;
 		private Cardinality rangeCardinality;
@@ -756,6 +757,12 @@ public class RdfModel {
 
 		public void setIsInverse(Boolean isInverse) {
 			this.isInverse = isInverse;
+		}
+		public RdfAssociation getInverseAssociation() {
+			 return inverseAssociation;
+		}
+		public void setInverseAssociation(RdfAssociation inverseAssociation) {
+			this.inverseAssociation = inverseAssociation;
 		}
 	}
 
@@ -940,13 +947,22 @@ public class RdfModel {
 			} else {
 				association.associationLabel = propertyLabelNode.getLiteralValue().getLabel();
 			}
-			association.setIsInverse(false);
+
 			association.setVarName(varName.getLiteralValue().getLabel());
-
-			//Since this is not a primary entity we need to add the keys of the navigation properties are properties, as well as adding them as primarykeys.
-
+			
+			if(association.IsInverse()){  // is it the inverse of something?
+				RdfAssociation inverseAssociation = association.getInverseAssociation();
+				inverseAssociation.rangeCardinality = RdfConstants.Cardinality.ONE;
+				inverseAssociation.domainCardinality = RdfConstants.Cardinality.MANY;				
+				
+			}else{
+				association.setIsInverse(false);	
+			}
+	
 			association.rangeCardinality = RdfConstants.Cardinality.MANY;
 			association.domainCardinality = RdfConstants.Cardinality.ONE;
+			
+			//Since this is not a primary entity we need to add the keys of the navigation properties are properties, as well as adding them as primarykeys.
 			RdfProperty property = getOrCreateOperationProperty(queryNode, propertyNode, propertyLabelNode, rangeNode,
 					varName);
 			property.isKey = true;
@@ -1097,7 +1113,8 @@ public class RdfModel {
 				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
-		association.setIsInverse(false);
+		association.setIsInverse(true);
+		association.setInverseAssociation(inverseAssociation);
 		return inverseAssociation;
 	}
 

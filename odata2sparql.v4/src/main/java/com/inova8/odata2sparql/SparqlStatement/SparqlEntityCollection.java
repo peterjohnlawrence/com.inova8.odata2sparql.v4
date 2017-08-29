@@ -445,7 +445,7 @@ class SparqlEntityCollection extends EntityCollection {
 				rdfSubjectEntity.getNavigationLinks().add(link);
 			}
 		}
-		if (rdfAssociation.getToCardinality().equals(Cardinality.MANY)) {
+		if (rdfAssociation.getRangeCardinality().equals(Cardinality.MANY)) {
 			// to MANY, MULTIPLE
 			EntityCollection inlineEntitySet = link.getInlineEntitySet();
 			if (inlineEntitySet == null) {

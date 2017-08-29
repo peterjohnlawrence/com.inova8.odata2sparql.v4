@@ -41,9 +41,7 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFParseException;
 //import org.eclipse.rdf4j.sail.config.SailImplConfig;
 //import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
-
-
-
+import org.eclipse.rdf4j.sail.SailReadOnlyException;
 import org.eclipse.rdf4j.sail.config.SailImplConfig;
 import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
 
@@ -384,6 +382,9 @@ public class RdfRepositories {
 		RepositoryConfig systemRepositoryConfig = new RepositoryConfig(RdfConstants.systemId, systemRepositoryTypeSpec);
 		try {
 			repositoryManager.addRepositoryConfig(systemRepositoryConfig);
+		} catch (SailReadOnlyException e) {
+			log.info("Repository read-only: will clear and reload", e);
+			throw new OData2SparqlException();
 		} catch (RepositoryException e) {
 			log.fatal("Cannot add configuration to repository", e);
 			throw new OData2SparqlException();
@@ -415,7 +416,7 @@ public class RdfRepositories {
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (IOException e) {
-				log.fatal("IOException: Cannot access " + RdfConstants.modelFile + " Check it is located AppData/inova8/odata2sparql/", e);
+				log.fatal("Cannot access " + RdfConstants.modelFile + " Check it is located in correct directory and is visible", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (RepositoryException e) {

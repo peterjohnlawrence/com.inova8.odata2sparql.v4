@@ -3,6 +3,7 @@ package com.inova8.odata2sparql;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,11 +37,13 @@ public class RdfODataServlet extends HttpServlet {
 		try {
 			String service = req.getPathInfo().split("/")[1];
 			if (service.equals(RdfConstants.RESET)) {
-				log.info("Reset: "+ req.getPathInfo().split("/")[2]);
+				log.info(RdfConstants.RESET +  " requested: " + req.getPathInfo().split("/")[2]);
 				RdfEdmProviders.reset(req.getPathInfo().split("/")[2]);
-			} else if (service.equals(RdfConstants.RELOAD)) {
-				log.info("Reload");
+				simpleResponse(req,resp,RdfConstants.RESET +  ": " + req.getPathInfo().split("/")[2] );
+			} else if (service.equals(RdfConstants.RELOAD )) {
+				log.info(RdfConstants.RELOAD +  " requested");
 				RdfEdmProviders.reload();
+				simpleResponse(req,resp,RdfConstants.RELOAD );
 			} else {
 				//Find provider matching service name			
 				RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider(service);
@@ -66,5 +69,14 @@ public class RdfODataServlet extends HttpServlet {
 			log.error("Server Error occurred in ExampleServlet", e);
 			throw new ServletException(e);
 		}
+	}
+	private void simpleResponse(final HttpServletRequest req, final HttpServletResponse resp, String textResponce) throws IOException{
+		  Scanner scanner = new Scanner(req.getInputStream());
+		  StringBuilder sb = new StringBuilder();
+		  while (scanner.hasNextLine()) {
+		    sb.append(scanner.nextLine());
+		  }
+		  resp.getOutputStream().println(textResponce);
+		
 	}
 }

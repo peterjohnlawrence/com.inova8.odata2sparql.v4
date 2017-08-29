@@ -230,7 +230,7 @@ public class RdfConstants {
 						
 			//	repositoryManagerDirPath = repositoryManagerDirPath + File.separator + "../../../../inova8/odata2sparql" + File.separator;		
 			repositoryManagerDir = new File(workingDirectory );
-			modelFile = workingDirectory +"models.ttl";
+			modelFile =Paths.get( workingDirectory , "models.ttl").toString();
 			//modelFile = repositoryManagerDirPath + "repositories/models.ttl";		
 			
 			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";

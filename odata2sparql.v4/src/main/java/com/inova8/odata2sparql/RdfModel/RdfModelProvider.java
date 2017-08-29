@@ -429,7 +429,7 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("rangeCardinality") != null)
 							rangeCardinalityNode = soln.getRdfNode("rangeCardinality");
 						Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
-								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.ZERO_TO_ONE);
+								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfNode maxDomainCardinalityNode = null;
 						RdfNode minDomainCardinalityNode = null;
@@ -503,7 +503,7 @@ public class RdfModelProvider {
 						if (soln.getRdfNode("rangeCardinality") != null)
 							rangeCardinalityNode = soln.getRdfNode("rangeCardinality");
 						Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
-								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.ZERO_TO_ONE);
+								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfNode maxDomainCardinalityNode = null;
 						RdfNode minDomainCardinalityNode = null;
