@@ -17,22 +17,25 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfEdmProviders {
 	private final Log log = LogFactory.getLog(RdfEdmProviders.class);
 	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
-	static private final RdfRepositories rdfRepositories = new RdfRepositories();
-	public static RdfRepositories getRdfRepositories() {
-		return rdfRepositories;
-	}
-
-	public RdfEdmProviders() {
+	private final RdfRepositories rdfRepositories;// = new RdfRepositories();
+//	public static RdfRepositories getRdfRepositories() {
+//		return rdfRepositories;
+//	}
+	public RdfEdmProviders(String repositoryFolder,String repositoryUrl) {
 		super();
+		rdfRepositories = new RdfRepositories(repositoryFolder,repositoryUrl);
 	}
-	public static void reset(String rdfRepositoryID) {
+//	public RdfEdmProviders() {
+//		super();
+//	}
+	public  void reset(String rdfRepositoryID) {
 		if (rdfRepositoryID.equals(RdfConstants.WILDCARD)) {
 			rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
 		} else {
 			rdfEdmProviders.remove(rdfRepositoryID.toUpperCase());
 		}
 	}
-	public static void reload() {
+	public  void reload() {
 		rdfRepositories.reload();
 		reset(RdfConstants.WILDCARD);
 	}

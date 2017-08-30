@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -53,13 +55,14 @@ public class RdfRepositories {
 
 	private final Log log = LogFactory.getLog(RdfRepositories.class);
 	private RepositoryManager repositoryManager = null;
-
+	private final String repositoryFolder;
+	private final String repositoryUrl;
 	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
 
-	private final Properties properties = new Properties();
-
-	public RdfRepositories() {
+	public RdfRepositories(String repositoryFolder,String repositoryUrl) {
 		super();
+		this.repositoryFolder = repositoryFolder;
+		this.repositoryUrl = repositoryUrl;
 		try {
 			loadRepositories();
 		} catch (OData2SparqlException e) {
@@ -91,10 +94,11 @@ public class RdfRepositories {
 	private void loadRepositories() throws OData2SparqlException, RepositoryConfigException {
 		//RepositoryManager repositoryManager = null;
 		try {
-			if (loadProperties()) {
+			if (this.repositoryUrl!=null && !this.repositoryUrl.isEmpty()) {
 				try {
-					repositoryManager = bootstrapRemoteRepository(properties.getProperty(RdfConstants.repositoryUrl));
-				} catch (OData2SparqlException e) {
+					//repositoryManager = bootstrapRemoteRepository(properties.getProperty(RdfConstants.repositoryUrl));
+					repositoryManager = bootstrapRemoteRepository(this.repositoryUrl);
+					} catch (OData2SparqlException e) {
 					try {
 						repositoryManager = bootstrapLocalRepository();
 					} catch (OData2SparqlException e1) {
@@ -319,34 +323,6 @@ public class RdfRepositories {
 		}
 	}
 
-	private boolean loadProperties() {
-		InputStream input = null;
-		try {
-
-			input = new FileInputStream(RdfConstants.repositoryManagerDir + RdfConstants.CONFIG_PROPERTIES);
-
-			// load a properties file
-			properties.load(input);
-
-			// get the property value and print it out
-			log.info("repositoryUrl: " + properties.getProperty("repositoryUrl"));
-
-		} catch (IOException ex) {
-			return false;
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-					return true;
-				} catch (IOException e) {
-					e.printStackTrace();
-					return false;
-				}
-			}
-		}
-		return false;
-	}
-
 	private RepositoryManager bootstrapRemoteRepository(String repositoryUrl) throws OData2SparqlException {
 		RemoteRepositoryManager repositoryManager = new RemoteRepositoryManager(repositoryUrl);
 		log.info("Trying remote Repository at " + repositoryUrl);
@@ -364,12 +340,16 @@ public class RdfRepositories {
 
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
-		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(RdfConstants.repositoryManagerDir);
-		log.info("Using local repository at " + RdfConstants.repositoryManagerDir.toString());
+		String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
+		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
+			localRepositoryManagerDirectory = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder).toString();
+		}
+		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(new File(localRepositoryManagerDirectory));
+		log.info("Using local repository at " + localRepositoryManagerDirectory);
 		try {
 			repositoryManager.initialize();
 		} catch (RepositoryException e) {
-			log.fatal("Cannot initialize repository manager at " + RdfConstants.repositoryManagerDir.toString(), e);
+			log.fatal("Cannot initialize repository manager at " + localRepositoryManagerDirectory + "Check also web-xml init-param repositoryFolder", e);
 			throw new OData2SparqlException("RdfRepositories loadRepositories failure", e);
 		}
 
@@ -408,19 +388,25 @@ public class RdfRepositories {
 		RepositoryConnection modelsConnection;
 		try {
 			modelsConnection = systemRepository.getConnection();
-			log.info("Loading models.ttl from " + RdfConstants.modelFile);
+			String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
+			if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
+				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder,"models.ttl").toString();
+			}else{
+				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,"models.ttl").toString();
+			}
+			log.info("Loading models.ttl from " + localRepositoryManagerModel);
 			try {
-				modelsConnection.add(new File(RdfConstants.modelFile), null, RDFFormat.TURTLE);
+				modelsConnection.add(new File(localRepositoryManagerModel), null, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
-				log.fatal("RDFParseException: Cannot parse  " + RdfConstants.modelFile + " Check to ensure valid RDF/XML or TTL", e);
+				log.fatal("RDFParseException: Cannot parse  " + localRepositoryManagerModel + " Check to ensure valid RDF/XML or TTL", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.modelFile + " Check it is located in correct directory and is visible", e);
+				log.fatal("Cannot access " + localRepositoryManagerModel + " Check it is located in correct directory and is visible", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (RepositoryException e) {
-				log.fatal("RepositoryException: Cannot access " + RdfConstants.modelFile + " Check it is located in WEBINF/classes/", e);
+				log.fatal("RepositoryException: Cannot access " + localRepositoryManagerModel + " Check it is located in WEBINF/classes/", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} finally {

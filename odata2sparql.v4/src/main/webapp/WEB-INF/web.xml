@@ -7,6 +7,14 @@
 	<servlet>
 		<servlet-name>OData2SparqlServiceServlet</servlet-name>
 		<servlet-class>com.inova8.odata2sparql.RdfODataServlet</servlet-class>
+		<init-param>
+			<param-name>repositoryFolder</param-name>
+			<param-value>V4</param-value>
+		</init-param>
+		<init-param>
+			<param-name>repositoryUrl</param-name>
+			<param-value></param-value>
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>

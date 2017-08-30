@@ -29,20 +29,23 @@ import com.inova8.odata2sparql.SparqlProcessor.SparqlServiceDocumentProcessor;
 public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final Log log = LogFactory.getLog(RdfODataServlet.class);
-	static private final RdfEdmProviders rdfEdmProviders = new RdfEdmProviders();
+	static private RdfEdmProviders rdfEdmProviders=null;// = new RdfEdmProviders(RdfODataServlet.getInitParamter());
 
 
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
 			IOException {
 		try {
+			if(rdfEdmProviders==null){
+				 rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("repositoryFolder"),this.getInitParameter("repositoryUrl"));
+			}
 			String service = req.getPathInfo().split("/")[1];
 			if (service.equals(RdfConstants.RESET)) {
 				log.info(RdfConstants.RESET +  " requested: " + req.getPathInfo().split("/")[2]);
-				RdfEdmProviders.reset(req.getPathInfo().split("/")[2]);
+				rdfEdmProviders.reset(req.getPathInfo().split("/")[2]);
 				simpleResponse(req,resp,RdfConstants.RESET +  ": " + req.getPathInfo().split("/")[2] );
 			} else if (service.equals(RdfConstants.RELOAD )) {
 				log.info(RdfConstants.RELOAD +  " requested");
-				RdfEdmProviders.reload();
+				rdfEdmProviders.reload();
 				simpleResponse(req,resp,RdfConstants.RELOAD );
 			} else {
 				//Find provider matching service name			

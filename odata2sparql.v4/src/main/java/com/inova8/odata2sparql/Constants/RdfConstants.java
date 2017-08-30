@@ -45,12 +45,12 @@ public class RdfConstants {
 	public final static String systemId = "ODATA2SPARQL";
 	public final static String bootStrapQuery = "SELECT  ?Metadata ?Query  ?QueryString WHERE { ?Metadata ?Query  ?querys . ?querys <http://spinrdf.org/sp#text> ?QueryString . ?Query  <http://www.w3.org/2000/01/rdf-schema#subPropertyOf>* <http://inova8.com/odata4sparql#metadataQuery> .}";
 	public final static Value URI_DEFAULTMETAMODEL = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
-	private static String repositoryManagerDirPath; // NO_UCD (use final)
+	public static String repositoryWorkingDirectory; // NO_UCD (use final)
 	public static File repositoryManagerDir; // NO_UCD (use final)
 	public static String odata4sparqlFile; // NO_UCD (use final)
 	public static String rdfFile; // NO_UCD (use final)
 	public static String rdfsFile; // NO_UCD (use final)
-	public static String modelFile; // NO_UCD (use final)
+	//public static String modelFile; // NO_UCD (use final)
 	public static String sailFile; // NO_UCD (use final)
 	public static String spFile; // NO_UCD (use final)
 
@@ -227,14 +227,13 @@ public class RdfConstants {
 			    //if we are on a Mac, we are not done, we look for "Application Support"
 				workingDirectory = Paths.get(System.getProperty("user.home"),"Library", "Application Support", "inova8", "odata2sparql").toString();
 			}else{
-				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();// workingDirectory + "\\inova8\\odata2sparql\\";
+				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
 			}
-			repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
-						
-			//	repositoryManagerDirPath = repositoryManagerDirPath + File.separator + "../../../../inova8/odata2sparql" + File.separator;		
+			String repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
+
 			repositoryManagerDir = new File(workingDirectory );
-			modelFile =Paths.get( workingDirectory , "models.ttl").toString();
-			//modelFile = repositoryManagerDirPath + "repositories/models.ttl";		
+			repositoryWorkingDirectory = workingDirectory;
+			//modelFile =Paths.get( workingDirectory , "models.ttl").toString();	
 			
 			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
