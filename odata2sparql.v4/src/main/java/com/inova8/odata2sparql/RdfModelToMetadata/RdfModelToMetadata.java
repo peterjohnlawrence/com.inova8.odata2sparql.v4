@@ -281,8 +281,8 @@ public class RdfModelToMetadata {
 					CsdlNavigationProperty navigationProperty = new CsdlNavigationProperty().setName(associationName)
 							.setType(new FullQualifiedName(rdfAssociation.getRangeClass().getSchema().getSchemaPrefix(),
 									rdfAssociation.getRangeName()))
-							.setCollection((rdfAssociation.getRangeCardinality() == Cardinality.MANY)
-									|| (rdfAssociation.getRangeCardinality() == Cardinality.MULTIPLE));
+							.setCollection((rdfAssociation.getDomainCardinality() == Cardinality.MANY)
+									|| (rdfAssociation.getDomainCardinality() == Cardinality.MULTIPLE));
 
 					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
 					if (withRdfAnnotations)

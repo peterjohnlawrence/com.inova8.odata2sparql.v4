@@ -24,6 +24,7 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 public class RdfConstants {
+
 	private final static Log log = LogFactory.getLog(RdfConstants.class);
 
 	public enum Cardinality {
@@ -82,6 +83,8 @@ public class RdfConstants {
 	public static final String DC = "dc";
 
 	public static final String XSD_STRING = "http://www.w3.org/2001/XMLSchema#string";
+	public static final String XSD_DATE = "http://www.w3.org/2001/XMLSchema#date";
+	public static final String XSD_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 	public static final String RDF_PLAIN_LITERAL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral";
 	public static final String  RDF_LITERAL= "http://www.w3.org/2000/01/rdf-schema#Literal";
 
@@ -253,9 +256,9 @@ public class RdfConstants {
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#float"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#double"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#duration"));
-		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#dateTime"));
+		RDF_DATATYPES.add((RdfConstants.XSD_DATETIME));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#time"));
-		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#date"));
+		RDF_DATATYPES.add(RdfConstants.XSD_DATE);
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#gYearMonth"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#gYear"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#gMonthDay"));

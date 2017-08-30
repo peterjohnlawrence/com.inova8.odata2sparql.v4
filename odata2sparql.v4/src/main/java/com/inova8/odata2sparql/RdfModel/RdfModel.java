@@ -610,6 +610,7 @@ public class RdfModel {
 		private String rangeName;
 		private RdfNode associationNode;
 		private Boolean isInverse = false;
+		private Boolean hasInverse = false;
 		private RdfNode inversePropertyOf;
 		private RdfAssociation inverseAssociation;
 		private String description;
@@ -757,6 +758,9 @@ public class RdfModel {
 
 		public void setIsInverse(Boolean isInverse) {
 			this.isInverse = isInverse;
+		}
+		public void setHasInverse(Boolean hasInverse) {
+			this.hasInverse = hasInverse;
 		}
 		public RdfAssociation getInverseAssociation() {
 			 return inverseAssociation;
@@ -1113,7 +1117,7 @@ public class RdfModel {
 				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
-		association.setIsInverse(true);
+		association.setHasInverse(true);
 		association.setInverseAssociation(inverseAssociation);
 		return inverseAssociation;
 	}

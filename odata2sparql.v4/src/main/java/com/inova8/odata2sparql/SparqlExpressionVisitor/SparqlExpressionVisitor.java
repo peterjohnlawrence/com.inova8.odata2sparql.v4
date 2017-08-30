@@ -356,7 +356,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			}
 			break;
 		case CONTAINS:
-			sparqlmethod = "regex(" + parameters.get(1) + "," + parameters.get(0) + ", \"i\")";
+			sparqlmethod = "regex(" + parameters.get(0) + "," + parameters.get(1) + ", \"i\")";
 			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
 			break;
 		case CONCAT:
@@ -420,7 +420,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			case "Edm.Time":
 				return "\"" + literal.getText() + "\"^^xsd:time";
 			case "Edm.Date":
-				return "\"" + literal.getText() + "\"^^xsd:dateTime";
+				return "\"" + literal.getText() + "\"^^xsd:date";
 			case "Edm.DateTime":
 				return "\"" + literal.getText() + "\"^^xsd:dateTime";
 			case "Edm.DateTimeOffset":
@@ -437,11 +437,11 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	}
 	@Override
 	public Object visitMember(Member member) throws ExpressionVisitException, ODataApplicationException {
-		RdfProperty rdfProperty;
+		RdfProperty rdfProperty = null;
 		String memberProperty = member.getResourcePath().getUriResourceParts().get(0).toString();
 		try {
 			if (entityType.isOperation()) {
-				return "?" + entityType.findProperty(memberProperty).varName;
+				return "?" + entityType.findProperty(memberProperty).getVarName();
 
 			} else {
 				if (member instanceof UriResourceNavigation) {
@@ -494,8 +494,9 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 //						}
 //						putNavPropertyPropertyFilter(sPath,null,rdfProperty,null); 
 					} else {
-						properties.add(entityType.findProperty(memberProperty));
-						putNavPropertyPropertyFilter(entityType.entityTypeName,null,entityType.findProperty(memberProperty),null); 
+						rdfProperty = entityType.findProperty(memberProperty);
+						properties.add(rdfProperty);
+						putNavPropertyPropertyFilter(entityType.entityTypeName,null,rdfProperty,null); 
 					}
 					//If sPath="" then the root path so should use entityTypeName instead
 					String visitProperty = null;
@@ -504,6 +505,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 					}else{
 						 visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
 					}
+					visitProperty = castVariable(rdfProperty, visitProperty);
 					sPath = "";
 					return visitProperty;
 				}
@@ -512,6 +514,19 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			throw new UnsupportedOperationException("Unrecognized property" );//+ uriLiteral);
 		}
 
+	}
+	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
+		switch(rdfProperty.getPropertyTypeName()){
+		case RdfConstants.XSD_DATETIME :
+			visitProperty = "<"+RdfConstants.XSD_DATETIME+">(" + visitProperty + ")";
+			break;
+		case RdfConstants.XSD_DATE:
+			visitProperty = "<"+RdfConstants.XSD_DATE+">(" + visitProperty + ")";
+			break;
+		default:
+			break;					
+		}
+		return visitProperty;
 	}
 	@Override
 	public Object visitAlias(String aliasName) throws ExpressionVisitException, ODataApplicationException {

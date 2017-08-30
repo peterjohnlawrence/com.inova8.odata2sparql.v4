@@ -95,8 +95,7 @@ class SparqlEntityCollection extends EntityCollection {
 			for (int index = 0; index < navPropertyResults.get(entityKey).get(navProperty).size(); index++) {
 				SparqlEntity navLink = (SparqlEntity) (navPropertyResults.get(entityKey).get(navProperty).get(index));
 				HashMap<String, Object> link = new HashMap<String, Object>();
-				// No point looking up Id property as we know it is the same as
-				// the subject
+				// No point looking up Id property as we know it is the same as the subject
 				link.put(RdfConstants.SUBJECT, SparqlEntity.URLEncodeEntityKey(navLink.getSubject().toString()));
 				links.add(link);
 			}
@@ -125,97 +124,6 @@ class SparqlEntityCollection extends EntityCollection {
 	// }
 	// }
 
-	private Object Cast(Object value, String propertyTypeName) {
-		EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(propertyTypeName);
-		try {
-			switch (propertyType.toString()) {
-			case "Binary":
-				return (Byte[]) value;
-			case "Boolean":
-				if (value instanceof java.lang.Boolean) {
-					return value;
-				} else if ((int) value == 0) {
-					return false;
-				} else if ((int) value != 0) {
-					return true;
-				}
-				return null;
-			case "Byte":
-				return (Byte) value;
-			case "Date":
-				// EdmSimpleType instance =
-				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
-				// instance.valueOfString(value, EdmLiteralKind.JSON, null,
-				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
-				return DatatypeConverter.parseDateTime(value.toString());
-			case "DateTime":
-				// EdmSimpleType instance =
-				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
-				// instance.valueOfString(value, EdmLiteralKind.JSON, null,
-				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
-				return DatatypeConverter.parseDateTime(value.toString());
-			case "DateTimeOffset":
-				return (Calendar) value;
-			case "Decimal":
-				return (BigDecimal) value;
-			case "Double":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).doubleValue();
-				} else if (value instanceof Integer) {
-					return ((Integer) value).doubleValue();
-				} else {
-					return (Double) value;
-				}
-			case "Guid":
-				return (UUID) value;
-			case "Int16":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).shortValue();
-				} else {
-					return (Short) value;
-				}
-			case "Int32":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).intValue();
-				} else {
-					return (Integer) value;
-				}
-			case "Int64":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).longValue();
-				} else {
-					return (Long) value;
-				}
-			case "SByte":
-				return (Byte) value;
-			case "Single":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).toString();
-				} else if (value instanceof java.math.BigInteger) {
-					return ((BigInteger) value).toString();
-				} else if (value instanceof Integer) {
-					return ((Integer) value).toString();
-				} else if (value instanceof javax.xml.datatype.XMLGregorianCalendar) {
-					return ((XMLGregorianCalendar) value).toString();
-				} else {
-					return (String) value;
-				}
-			case "String":
-				if (value instanceof java.math.BigDecimal) {
-					return ((BigDecimal) value).toString();
-				} else {
-					return (String) value;
-				}
-			case "Time":
-				return DatatypeConverter.parseTime(value.toString());
-			default:
-				return null;
-			}
-		} catch (Exception e) {
-			log.error(value + " cannot be cast to " + propertyTypeName.toString());
-		}
-		return null;
-	}
 
 	private void addNavPropertyObjectValues(String subject, String associationName, SparqlEntity rdfObjectEntity) {
 
@@ -445,7 +353,7 @@ class SparqlEntityCollection extends EntityCollection {
 				rdfSubjectEntity.getNavigationLinks().add(link);
 			}
 		}
-		if (rdfAssociation.getRangeCardinality().equals(Cardinality.MANY)) {
+		if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
 			// to MANY, MULTIPLE
 			EntityCollection inlineEntitySet = link.getInlineEntitySet();
 			if (inlineEntitySet == null) {
@@ -555,4 +463,95 @@ class SparqlEntityCollection extends EntityCollection {
 		return this;
 	}
 
+	private Object Cast(Object value, String propertyTypeName) {
+		EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(propertyTypeName);
+		try {
+			switch (propertyType.toString()) {
+			case "Binary":
+				return (Byte[]) value;
+			case "Boolean":
+				if (value instanceof java.lang.Boolean) {
+					return value;
+				} else if ((int) value == 0) {
+					return false;
+				} else if ((int) value != 0) {
+					return true;
+				}
+				return null;
+			case "Byte":
+				return (Byte) value;
+			case "Date":
+				// EdmSimpleType instance =
+				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
+				// instance.valueOfString(value, EdmLiteralKind.JSON, null,
+				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
+				return DatatypeConverter.parseDateTime(value.toString());
+			case "DateTime":
+				// EdmSimpleType instance =
+				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getEdmSimpleTypeInstance();
+				// instance.valueOfString(value, EdmLiteralKind.JSON, null,
+				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
+				return DatatypeConverter.parseDateTime(value.toString());
+			case "DateTimeOffset":
+				return (Calendar) value;
+			case "Decimal":
+				return (BigDecimal) value;
+			case "Double":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).doubleValue();
+				} else if (value instanceof Integer) {
+					return ((Integer) value).doubleValue();
+				} else {
+					return (Double) value;
+				}
+			case "Guid":
+				return (UUID) value;
+			case "Int16":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).shortValue();
+				} else {
+					return (Short) value;
+				}
+			case "Int32":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).intValue();
+				} else {
+					return (Integer) value;
+				}
+			case "Int64":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).longValue();
+				} else {
+					return (Long) value;
+				}
+			case "SByte":
+				return (Byte) value;
+			case "Single":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).toString();
+				} else if (value instanceof java.math.BigInteger) {
+					return ((BigInteger) value).toString();
+				} else if (value instanceof Integer) {
+					return ((Integer) value).toString();
+				} else if (value instanceof javax.xml.datatype.XMLGregorianCalendar) {
+					return ((XMLGregorianCalendar) value).toString();
+				} else {
+					return (String) value;
+				}
+			case "String":
+				if (value instanceof java.math.BigDecimal) {
+					return ((BigDecimal) value).toString();
+				} else {
+					return (String) value;
+				}
+			case "Time":
+				return DatatypeConverter.parseTime(value.toString());
+			default:
+				return null;
+			}
+		} catch (Exception e) {
+			log.error(value + " cannot be cast to " + propertyTypeName.toString());
+		}
+		return null;
+	}
 }

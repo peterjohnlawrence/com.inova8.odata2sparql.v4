@@ -69,6 +69,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	    Entity entity = null;
 		try {
 			entity = SparqlBaseCommand.readEntity( rdfEdmProvider,uriInfo,(uriInfo.getUriResourceParts().size() > 1)?UriType.URI6A:UriType.URI2);
+			if (entity==null) throw new OData2SparqlException("No data found");
 		} catch (EdmException | OData2SparqlException | ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
 		}
