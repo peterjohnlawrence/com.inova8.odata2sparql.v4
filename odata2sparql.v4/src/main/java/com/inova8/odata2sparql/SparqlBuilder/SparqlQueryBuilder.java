@@ -1454,9 +1454,6 @@ public class SparqlQueryBuilder {
 			) throws EdmException, ODataApplicationException {
 		
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
-		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
-
 		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);
 		int minSize = 1;
 		if (lastResourcePart.getSegmentValue().equals("$ref")) { // which it should do
@@ -1464,13 +1461,7 @@ public class SparqlQueryBuilder {
 		}
 		UriResourceNavigation uriNavigation = (UriResourceNavigation) resourceParts.get(resourceParts.size() - minSize);
 		EdmNavigationProperty edmNavigationProperty = uriNavigation.getProperty();
-		String edmPropertyName = edmNavigationProperty.getName();
-		
-		
-		
-		
-		
-		
+
 		UrlValidator urlValidator = new UrlValidator();
 		String entityKey = ((UriResourceEntitySet)resourceParts.get(0)).getKeyPredicates().get(0).getText();//. "";//uriInfo..getKeyPredicates().get(0).getLiteral();
 		entityKey= entityKey.substring(1, entityKey.length()-1);
@@ -1487,18 +1478,19 @@ public class SparqlQueryBuilder {
 				.findNavigationProperty(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getAssociationIRI();
 		StringBuilder sparql = new StringBuilder(
-				"CONSTRUCT {?" + key + "_s <" + expandedProperty + "> ?" + key + "_o .}");
+	//			"CONSTRUCT {?" + key + "_s <" + expandedProperty + "> ?" + key + "_o . ?"+ key +"_o <http://targetEntity> true . }\n");
+  		"CONSTRUCT { ?"+ key +"_o <http://targetEntity> true . }\n");
 		if (rdfProperty.IsInverse()) {
 			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
 			sparql.append(
-					"WHERE {?" + key + "_o ?" + key + "_p ?" + key + "_s . VALUES(?" + key + "_s ?" + key + "_p){(");
+					"WHERE {?" + key + "_o ?" + key + "_p ?" + key + "_s . \nVALUES(?" + key + "_s ?" + key + "_p){(");
 			sparql.append("<" + expandedKey + "> ");
-			sparql.append("<" + expandedInverseProperty + ">)}}");
+			sparql.append("<" + expandedInverseProperty + ">)}\n}");
 		} else {
 			sparql.append(
-					"WHERE {?" + key + "_s ?" + key + "_p ?" + key + "_o . VALUES(?" + key + "_s ?" + key + "_p){(");
+					"WHERE {?" + key + "_s ?" + key + "_p ?" + key + "_o .\n VALUES(?" + key + "_s ?" + key + "_p){(");
 			sparql.append("<" + expandedKey + "> ");
-			sparql.append("<" + expandedProperty + ">)}}");
+			sparql.append("<" + expandedProperty + ">)}\n}");
 		}
 
 		return new SparqlStatement(sparql.toString());

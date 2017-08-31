@@ -183,19 +183,20 @@ public class SparqlBaseCommand {
 		}
 
 	} 
-	static public AbstractEntityCollection readReferenceCollection(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
+	static public EntityCollection readReferenceCollection(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
 		RdfEntityType rdfEntityType = null;
 		EdmEntitySet edmEntitySet = null;
+		
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+		edmEntitySet = uriResourceEntitySet.getEntitySet();
+		rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
 				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType);
 
 		//prepareQuery
-		SparqlStatement sparqlStatement = null;
-
-
-		sparqlStatement = sparqlBuilder.prepareEntityLinksSparql();
+		SparqlStatement sparqlStatement = sparqlBuilder.prepareEntityLinksSparql();
 		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider, rdfEntityType,null,null);
 
 		if (rdfResults == null) {

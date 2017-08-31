@@ -24,11 +24,7 @@ import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.ex.ODataException;
-import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceNavigation;
-import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
-import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
@@ -50,8 +46,6 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
 	private RdfEdmProvider sparqlEdmProvider;
-	// private final ArrayList<Map<String, Object>> entitySetResults;
-	// private EntityCollection entityCollection;
 
 	// TODO clarification of expanded structure
 	// Entityset dataproperty: List<Map<Subject, Map<Property,Value>>>
@@ -64,7 +58,7 @@ class SparqlEntityCollection extends EntityCollection {
 			ExpandOption expand, SelectOption select) {
 		super();
 		this.sparqlEdmProvider = sparqlEdmProvider;
-		this.toSparqlEntityCollection(/* sparqlEdmProvider, */ entityType, results, expand, select);
+		this.toSparqlEntityCollection(entityType, results, expand, select);
 	}
 
 	public Map<String, SparqlEntity> getEntitySetResultsMap() {
@@ -104,27 +98,6 @@ class SparqlEntityCollection extends EntityCollection {
 		return links;
 	}
 
-	// TODO from UCDetector: Method
-	// "SparqlEntityCollection.retrieveEntryResultsData(String,String)" has 0
-	// references
-	// private URI createId(SparqlEntity rdfEntity) {
-	// String id = "";
-	// for (RdfPrimaryKey primaryKey :
-	// rdfEntity.getEntityType().getPrimaryKeys()) {
-	// if (rdfEntity.containsProperty(primaryKey.getPrimaryKeyName())) {
-	// id += rdfEntity.getProperty(primaryKey.getPrimaryKeyName()).toString();
-	// }
-	// }
-	// try {
-	// return new URI(rdfEntity.getEntityType().entityTypeName + "(" +
-	// String.valueOf(id) + ")");
-	// } catch (URISyntaxException e) {
-	// throw new ODataRuntimeException("Unable to create id for entity: "
-	// + rdfEntity.getEntityType().entityTypeName, e);
-	// }
-	// }
-
-
 	private void addNavPropertyObjectValues(String subject, String associationName, SparqlEntity rdfObjectEntity) {
 
 		List<Object> navPropertyObjectValues;
@@ -151,107 +124,8 @@ class SparqlEntityCollection extends EntityCollection {
 		rdfObjectEntity.setExpandedEntity(true);
 	}
 
-	@SuppressWarnings("unchecked")
-	// TODO from UCDetector: Method
-	// "SparqlEntityCollection.retrieveEntryResultsData(String,String)" has 0
-	// references
-	Map<String, Object> retrieveEntryResultsData(String subjectEntity, String navigationPropertyName) { // NO_UCD
-																										// (unused
-																										// code)
-		if (!navPropertyResults.containsKey(subjectEntity)
-				|| !navPropertyResults.get(subjectEntity).containsKey(navigationPropertyName)) {
-			// if (navPropertyResults.get(subjectEntity) == null) {
-			return null;
-		} else {
-			return (Map<String, Object>) navPropertyResults.get(subjectEntity).get(navigationPropertyName).get(0);
-		}
-	}
 
-	@SuppressWarnings("unchecked")
-	// TODO from UCDetector: Method
-	// "SparqlEntityCollection.retrieveFeedResultData(String,String)" has 0
-	// references
-	List<Map<String, Object>> retrieveFeedResultData(String subjectEntity, String navigationPropertyName) { // NO_UCD
-																											// (unused
-																											// code)
-		ArrayList<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
-		if (navPropertyResults.containsKey(subjectEntity)
-				&& navPropertyResults.get(subjectEntity).containsKey(navigationPropertyName)) {
-			for (Object rdfEntity : navPropertyResults.get(subjectEntity).get(navigationPropertyName)) {
-				// Check rdfEntity exists in results, if not it either returned
-				// no data or was removed because incomplete PK
-				if (entitySetResultsMap.containsKey(((SparqlEntity) rdfEntity).getSubject()))
-					results.add((Map<String, Object>) rdfEntity);
-			}
-			return results;
-		} else {
-			return null;
-		}
-	}
-
-	private HashMap<String, RdfAssociation> buildNavPropertiesMap(RdfEdmProvider edmProvider,
-			// TODO V2 List<ArrayList<NavigationPropertySegment>> expand,
-			// List<SelectItem> select)
-			ExpandOption expandOption, SelectOption selectOption) throws EdmException {
-
-		// for (ExpandItem expandItem : expandOption.getExpandItems()) {
-		// List<UriResource> resourceParts =
-		// expandItem.getResourcePath().getUriResourceParts();
-		// UriResourceNavigation resourceNavigation = (UriResourceNavigation)
-		// resourceParts.get(0);
-
-		HashMap<String, RdfAssociation> navPropertiesMap = new HashMap<String, RdfAssociation>();
-		if (expandOption != null) {
-			// Add selected navigation properties even if not expanded.
-			if (selectOption != null) {
-				for (SelectItem selectItem : selectOption.getSelectItems()) {
-					// TODO V2
-					// for (NavigationPropertySegment navigationPropertySegment
-					// : selectItem.getNavigationPropertySegments()) {
-					// RdfAssociation rdfAssociation =
-					// edmProvider.getMappedNavigationProperty(new
-					// FullQualifiedName(
-					// navigationPropertySegment.getNavigationProperty().getRelationship().getNamespace(),
-					// navigationPropertySegment.getNavigationProperty().getRelationship().getName()));
-					// navPropertiesMap.put(rdfAssociation.getAssociationNodeIRI(),
-					// rdfAssociation);
-					// }
-				}
-			}
-		}
-		if (expandOption != null) {
-			for (ExpandItem expandItem : expandOption.getExpandItems()) {
-				List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
-				UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
-				// TODO V2
-				// for (ArrayList<NavigationPropertySegment>
-				// navigationPropertySegments : expand) {
-				// for (NavigationPropertySegment navigationPropertySegment :
-				// navigationPropertySegments) {
-				// RdfAssociation rdfAssociation =
-				// edmProvider.getMappedNavigationProperty(new
-				// FullQualifiedName(
-				// navigationPropertySegment.getNavigationProperty().getRelationship().getNamespace(),
-				// navigationPropertySegment.getNavigationProperty().getRelationship().getName()));
-				// navPropertiesMap.put(rdfAssociation.getAssociationNodeIRI(),
-				// rdfAssociation);
-				// }
-			}
-		}
-		return navPropertiesMap;
-	}
-
-	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType,
-			// TODO V2 RdfTripleSet results,
-			// List<ArrayList<NavigationPropertySegment>> expand,
-			// List<SelectItem> select)
-			RdfTripleSet results, ExpandOption expand, SelectOption select) throws EdmException {
-
-		// Map<String, SparqlEntity> rdfEntitiesMap =
-		// this.getEntitySetResultsMap();
-
-		// HashMap<String, RdfAssociation> navPropertiesMap =
-		// buildNavPropertiesMap(sparqlEdmProvider, expand, select);
+	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType,RdfTripleSet results, ExpandOption expand, SelectOption select) throws EdmException {
 
 		try {
 			while (results.hasNext()) {
@@ -371,12 +245,7 @@ class SparqlEntityCollection extends EntityCollection {
 
 	}
 
-	private SparqlEntity findOrCreateEntity(/*
-											 * RdfEdmProvider sparqlEdmProvider,
-											 * Map<String, SparqlEntity>
-											 * rdfEntitiesMap,
-											 */
-			RdfNode subjectNode, RdfEntityType rdfEntityType) {
+	private SparqlEntity findOrCreateEntity(RdfNode subjectNode, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
 		rdfEntity = entitySetResultsMap.get(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode));
 		if (rdfEntity == null) {

@@ -6,16 +6,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.olingo.commons.api.data.AbstractEntityCollection;
 import org.apache.olingo.commons.api.data.ContextURL;
-import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
-import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
-import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
-import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
-import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -26,41 +20,37 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
-import org.apache.olingo.server.api.processor.ReferenceCollectionProcessor;
-import org.apache.olingo.server.api.serializer.EntityCollectionSerializerOptions;
+import org.apache.olingo.server.api.processor.ReferenceProcessor;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.ReferenceCollectionSerializerOptions;
+import org.apache.olingo.server.api.serializer.ReferenceSerializerOptions;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
-import org.apache.olingo.server.api.uri.UriResourceNavigation;
-import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.UriType;
 
-public class SparqlReferenceCollectionProcessor implements ReferenceCollectionProcessor{
+public class SparqlReferenceProcessor implements ReferenceProcessor{
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	public SparqlReferenceCollectionProcessor(RdfEdmProvider rdfEdmProvider) {
+	public SparqlReferenceProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
-	
-	
+
 	@Override
-	public void readReferenceCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
+	public void readReference(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
+			throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
@@ -87,13 +77,13 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 		ContextURL contextUrl = null;
 		try {
 			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-			contextUrl = ContextURL.with().serviceRoot(new URI(request.getRawBaseUri()+"/")).asCollection().build();
+			contextUrl = ContextURL.with().serviceRoot(new URI(request.getRawBaseUri()+"/")).build();
 		} catch (URISyntaxException e) {
 			throw new ODataApplicationException("Inavlid RawBaseURI "+ request.getRawBaseUri(), HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 		}
 
-		ReferenceCollectionSerializerOptions opts = ReferenceCollectionSerializerOptions.with().contextURL(contextUrl).build();
-		SerializerResult serializerResult = serializer.referenceCollection(serviceMetadata, edmEntitySet,entityCollection, opts);
+		ReferenceSerializerOptions opts = ReferenceSerializerOptions.with().contextURL(contextUrl).build();
+		SerializerResult serializerResult = serializer.reference(serviceMetadata, edmEntitySet,entityCollection.getEntities().get(0), opts);
 		InputStream serializedContent = serializerResult.getContent();
 
 		// Finally: configure the response object: set the body, headers and status code
@@ -101,4 +91,29 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());	
 	}
+
+	@Override
+	public void createReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException(new Object() {
+		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				Locale.ENGLISH);
+	}
+
+	@Override
+	public void updateReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException(new Object() {
+		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				Locale.ENGLISH);
+	}
+
+	@Override
+	public void deleteReference(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+			throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException(new Object() {
+		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				Locale.ENGLISH);
+	}
+
 }
