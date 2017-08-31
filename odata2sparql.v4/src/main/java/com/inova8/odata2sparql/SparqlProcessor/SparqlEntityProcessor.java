@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
-import org.apache.olingo.commons.api.data.ContextURL.Suffix;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -40,13 +39,13 @@ import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlEntityProcessor implements EntityProcessor {
+	private final RdfEdmProvider rdfEdmProvider;
+	private OData odata;
+	private ServiceMetadata serviceMetadata;
 	public SparqlEntityProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-	private final RdfEdmProvider rdfEdmProvider;
-	private OData odata;
-	private ServiceMetadata serviceMetadata;
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;

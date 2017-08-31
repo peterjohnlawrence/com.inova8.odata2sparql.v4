@@ -24,6 +24,8 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlServiceDocumentProcessor;
 
 public class RdfODataServlet extends HttpServlet {
@@ -59,8 +61,9 @@ public class RdfODataServlet extends HttpServlet {
 					handler.setSplit(1);
 					handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
 					handler.register(new SparqlEntityProcessor(rdfEdmProvider));
-					handler.register(new SparqlPrimitiveProcessor(rdfEdmProvider));
+					handler.register(new SparqlPrimitiveValueProcessor(rdfEdmProvider));
 					handler.register(new SparqlServiceDocumentProcessor());
+					handler.register(new SparqlReferenceCollectionProcessor(rdfEdmProvider));
 					log.info(req.getMethod() + ": "+ req.getPathInfo()+" Query: "+req.getQueryString());
 					// let the handler do the work
 					handler.process(req, resp);

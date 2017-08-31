@@ -54,6 +54,7 @@ public class RdfModel {
 		private final Map<String, String> prefixToURI = new HashMap<String, String>();
 		private final Map<String, String> URItoPrefix = new HashMap<String, String>();
 
+		
 		private void setStandardNsPrefixes() {
 			set(RdfConstants.RDF, RdfConstants.RDF_NS);
 			set(RdfConstants.RDFS, RdfConstants.RDFS_NS);

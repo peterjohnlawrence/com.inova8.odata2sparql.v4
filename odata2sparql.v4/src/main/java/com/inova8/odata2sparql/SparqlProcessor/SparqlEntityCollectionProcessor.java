@@ -25,7 +25,6 @@ import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
 import org.apache.olingo.server.api.processor.CountEntityCollectionProcessor;
-import org.apache.olingo.server.api.processor.EntityCollectionProcessor;
 import org.apache.olingo.server.api.serializer.EntityCollectionSerializerOptions;
 import org.apache.olingo.server.api.serializer.FixedFormatSerializer;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
@@ -45,15 +44,13 @@ import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
 	private final Log log = LogFactory.getLog(SparqlEntityCollectionProcessor.class);
+	private final RdfEdmProvider rdfEdmProvider;
+	private OData odata;
+	private ServiceMetadata serviceMetadata;
 	public SparqlEntityCollectionProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-
-	private final RdfEdmProvider rdfEdmProvider;
-	private OData odata;
-	private ServiceMetadata serviceMetadata;
-
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;

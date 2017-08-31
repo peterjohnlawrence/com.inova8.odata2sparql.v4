@@ -33,10 +33,11 @@ public class SparqlStatement {
 	public String getSparql() {
 		return sparql;
 	}
-	SparqlEntityCollection executeQuery(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
+	SparqlEntityCollection executeConstruct(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
 			ExpandOption expand, SelectOption select) throws OData2SparqlException {
 		RdfConstructQuery rdfQuery = new RdfConstructQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
 				sparql);
+		
 		RdfTripleSet results;
 		try {
 			results = rdfQuery.execConstruct();
@@ -46,7 +47,7 @@ public class SparqlStatement {
 		}
 		return new SparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
 	}
-	RdfResultSet executeSelectQuery(RdfEdmProvider sparqlEdmProvider )
+	RdfResultSet executeSelect(RdfEdmProvider sparqlEdmProvider )
 			throws  OData2SparqlException {
 		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
 				sparql);

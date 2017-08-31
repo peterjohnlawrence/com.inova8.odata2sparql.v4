@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,9 +24,10 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
-import org.apache.olingo.server.api.processor.PrimitiveProcessor;
+import org.apache.olingo.server.api.processor.PrimitiveValueProcessor;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.PrimitiveSerializerOptions;
+import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
@@ -34,19 +36,17 @@ import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
-import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
+import com.inova8.odata2sparql.uri.UriType;
 
-public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
+public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	public SparqlPrimitiveProcessor(RdfEdmProvider rdfEdmProvider) {
+	public SparqlPrimitiveValueProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
-
-
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -54,8 +54,19 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 	}
 
 	@Override
+	public void readPrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
+		this.readPrimitiveOrValue(request, response, uriInfo, responseFormat, true);
+	}
+
+	@Override
 	public void readPrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
+		readPrimitiveOrValue(request, response, uriInfo, responseFormat,false);
+	}
+
+	private void readPrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType responseFormat, Boolean isValue) throws ODataApplicationException, SerializerException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
@@ -63,8 +74,13 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
 
 		// 1.2. retrieve the requested (Edm) property
-		// the last segment is the Property
-		UriResourceProperty uriProperty = (UriResourceProperty) resourceParts.get(resourceParts.size() - 1);
+		// the second to last segment is the Property, if the last is $value
+		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);
+		int minSize = 1;
+		if (lastResourcePart.getSegmentValue().equals("$value")) {
+			minSize++;
+		}
+		UriResourceProperty uriProperty = (UriResourceProperty) resourceParts.get(resourceParts.size() - minSize);
 		EdmProperty edmProperty = uriProperty.getProperty();
 		String edmPropertyName = edmProperty.getName();
 		EdmPrimitiveType edmPropertyType = (EdmPrimitiveType) edmProperty.getType();
@@ -90,6 +106,34 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 		}
 
 		// 3. serialize
+		if(isValue){
+			writePropertyValue(response, property);
+		}else{
+			writeProperty(request, response, responseFormat, edmEntitySet, edmPropertyName, edmPropertyType, property);
+		}
+		
+	}
+
+	private void writePropertyValue(ODataResponse response, Property property) throws ODataApplicationException {
+		if (property == null) {
+			throw new ODataApplicationException("No property found", HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
+		} else {
+			if (property.getValue() == null) {
+				response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+			} else {
+				String value = String.valueOf(property.getValue());
+				ByteArrayInputStream serializerContent = new ByteArrayInputStream(
+						value.getBytes());//Charset.forName("UTF-8")));
+				response.setContent(serializerContent);
+				response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+				response.setHeader(HttpHeader.CONTENT_TYPE, ContentType.TEXT_PLAIN.toContentTypeString());
+			}
+		}
+	}
+	private void writeProperty(ODataRequest request, ODataResponse response, ContentType responseFormat,
+			EdmEntitySet edmEntitySet, String edmPropertyName, EdmPrimitiveType edmPropertyType, Property property)
+			throws SerializerException, ODataApplicationException {
 		Object value = property.getValue();
 		if (value != null) {
 
@@ -121,11 +165,29 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 		}
 	}
 
+
 	@Override
 	public void updatePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-			ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException,
-			ODataLibraryException {
-		// TODO Auto-generated method stub
+			ContentType requestFormat, ContentType responseFormat)
+			throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException(new Object() {
+		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				Locale.ENGLISH);
+
+	}
+
+	@Override
+	public void updatePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType requestFormat, ContentType responseFormat)
+			throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException(new Object() {
+		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
+				Locale.ENGLISH);
+	}
+
+	@Override
+	public void deletePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+			throws ODataApplicationException, ODataLibraryException {
 		throw new ODataApplicationException(new Object() {
 		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
 				Locale.ENGLISH);
@@ -135,10 +197,10 @@ public class SparqlPrimitiveProcessor implements PrimitiveProcessor {
 	@Override
 	public void deletePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
-		// TODO Auto-generated method stub
 		throw new ODataApplicationException(new Object() {
 		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
 				Locale.ENGLISH);
+
 	}
 
 }
