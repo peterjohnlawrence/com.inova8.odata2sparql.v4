@@ -2,6 +2,7 @@ package com.inova8.odata2sparql.SparqlStatement;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -362,7 +363,7 @@ class SparqlEntityCollection extends EntityCollection {
 				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
 				return DatatypeConverter.parseDateTime(value.toString());
 			case "DateTimeOffset":
-				return (Calendar) value;
+				return  new Timestamp( DatatypeConverter.parseDateTime(value.toString()).getTimeInMillis());  
 			case "Decimal":
 				return (BigDecimal) value;
 			case "Double":

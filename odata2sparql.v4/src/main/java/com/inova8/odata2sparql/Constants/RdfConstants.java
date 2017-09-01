@@ -45,14 +45,13 @@ public class RdfConstants {
 	public final static String systemId = "ODATA2SPARQL";
 	public final static String bootStrapQuery = "SELECT  ?Metadata ?Query  ?QueryString WHERE { ?Metadata ?Query  ?querys . ?querys <http://spinrdf.org/sp#text> ?QueryString . ?Query  <http://www.w3.org/2000/01/rdf-schema#subPropertyOf>* <http://inova8.com/odata4sparql#metadataQuery> .}";
 	public final static Value URI_DEFAULTMETAMODEL = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
-	public static String repositoryWorkingDirectory; // NO_UCD (use final)
-	public static File repositoryManagerDir; // NO_UCD (use final)
-	public static String odata4sparqlFile; // NO_UCD (use final)
-	public static String rdfFile; // NO_UCD (use final)
-	public static String rdfsFile; // NO_UCD (use final)
-	//public static String modelFile; // NO_UCD (use final)
-	public static String sailFile; // NO_UCD (use final)
-	public static String spFile; // NO_UCD (use final)
+	public static String repositoryWorkingDirectory; 
+	public static File repositoryManagerDir; 
+	public static String odata4sparqlFile;
+	public static String rdfFile; 
+	public static String rdfsFile;
+	public static String sailFile; 
+	public static String spFile; 
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 

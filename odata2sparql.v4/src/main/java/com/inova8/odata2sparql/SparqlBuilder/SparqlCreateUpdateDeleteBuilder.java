@@ -32,13 +32,13 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 
-public class SparqlUpdateInsertBuilder {
+public class SparqlCreateUpdateDeleteBuilder {
 	@SuppressWarnings("unused")
 	private final Log log = LogFactory.getLog(SparqlStatement.class);
 	private final RdfModel rdfModel;
 	private final RdfEdmProvider rdfEdmProvider;
 
-	public SparqlUpdateInsertBuilder(RdfEdmProvider rdfEdmProvider) {
+	public SparqlCreateUpdateDeleteBuilder(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfModel = rdfEdmProvider.getRdfModel();
 		this.rdfEdmProvider = rdfEdmProvider;

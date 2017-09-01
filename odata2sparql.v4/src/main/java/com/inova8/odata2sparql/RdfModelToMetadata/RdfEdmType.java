@@ -21,8 +21,8 @@ public class RdfEdmType {
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#float", EdmPrimitiveTypeKind.Double);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#double", EdmPrimitiveTypeKind.Double);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#duration", EdmPrimitiveTypeKind.Int16);
-		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#dateTime", EdmPrimitiveTypeKind.Date);
-		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#time", EdmPrimitiveTypeKind.Date);
+		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#dateTime", EdmPrimitiveTypeKind.DateTimeOffset);
+		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#time", EdmPrimitiveTypeKind.DateTimeOffset);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#date", EdmPrimitiveTypeKind.Date);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#gYearMonth", EdmPrimitiveTypeKind.Date);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#gYear", EdmPrimitiveTypeKind.Date);

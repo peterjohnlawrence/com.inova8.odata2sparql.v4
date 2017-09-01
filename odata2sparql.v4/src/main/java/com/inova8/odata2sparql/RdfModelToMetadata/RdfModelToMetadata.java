@@ -175,6 +175,7 @@ public class RdfModelToMetadata {
 						//						propertyType = langLiteralType;
 						CsdlProperty property = new CsdlProperty().setName(propertyName)
 								.setType(propertyType.getFullQualifiedName());
+						if(propertyType==EdmPrimitiveTypeKind.DateTimeOffset)		property.setPrecision(3);
 
 						List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
 						if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {
