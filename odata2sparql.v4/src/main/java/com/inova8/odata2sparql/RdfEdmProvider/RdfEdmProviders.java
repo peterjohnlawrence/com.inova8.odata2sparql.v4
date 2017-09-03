@@ -1,10 +1,7 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

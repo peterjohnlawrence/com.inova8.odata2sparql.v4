@@ -1,6 +1,5 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;

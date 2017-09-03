@@ -75,7 +75,7 @@ public class RdfModelToMetadata {
 		Map<String, CsdlEntityType> globalEntityTypes = new HashMap<String, CsdlEntityType>();
 
 		Map<String, RdfAssociation> navigationPropertyLookup = new HashMap<String, RdfAssociation>();
-		Map<String, RdfAssociation> associationLookup = new HashMap<String, RdfAssociation>();
+		//Map<String, RdfAssociation> associationLookup = new HashMap<String, RdfAssociation>();
 		Map<String, CsdlEntitySet> entitySetsMapping = new HashMap<String, CsdlEntitySet>();
 
 		ArrayList<PrefixedNamespace> nameSpaces = new ArrayList<PrefixedNamespace>();
@@ -372,7 +372,7 @@ public class RdfModelToMetadata {
 					}
 					final CsdlReturnType functionImportReturnType = (new CsdlReturnType())
 							.setType(RdfFullQualifiedName.getFullQualifiedName(rdfEntityType)).setCollection(true);
-					List<CsdlAnnotation> functionImportAnnotations = new ArrayList<CsdlAnnotation>();
+					//List<CsdlAnnotation> functionImportAnnotations = new ArrayList<CsdlAnnotation>();
 					//functionImportAnnotations.add(new AnnotationAttribute().setName("IsBindable").setText("true"));
 					function.setComposable(true);
 					functionImport.setName(rdfEntityType.getEDMEntityTypeName() + "_fn")

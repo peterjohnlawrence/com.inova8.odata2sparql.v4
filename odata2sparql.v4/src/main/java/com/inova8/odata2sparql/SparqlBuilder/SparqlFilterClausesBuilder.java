@@ -2,14 +2,12 @@ package com.inova8.odata2sparql.SparqlBuilder;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
-import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
@@ -26,9 +24,7 @@ import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
-import com.inova8.odata2sparql.SparqlExpressionVisitor.NavPropertyPropertyFilter;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.PropertyFilter;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.SparqlExpressionVisitor;
 import com.inova8.odata2sparql.uri.UriType;
@@ -70,7 +66,6 @@ public class SparqlFilterClausesBuilder {
 		}
 			break;
 		case URI2: {
-//			filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType,"");
 		}
 			break;
 		case URI5: {
@@ -184,45 +179,48 @@ public class SparqlFilterClausesBuilder {
 			RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
 			//Now do the work
 			if( expandItem.getFilterOption()!=null){
-				SparqlExpressionVisitor filterClause = filterClause(expandItem.getFilterOption(), nextTargetEntityType,nextTargetKey);
-				filter.append(filterClause.getFilterClause());
-	
-				clausesExpandFilter.append(indent).append("{\n");		
-				
-				if (navProperty.IsInverse()) {
-					clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"
-							+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
-				} else {
-					clausesExpandFilter.append(indent).append("\t").append("?" + targetKey + "_s <"
-							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
-				}
-				
-					
-				HashMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters().get(nextTargetEntityType.entityTypeName).getPropertyFilters();
-				clausesExpandFilter.append(indent).append("\t").append("{\n");
-				// Repeat for each filtered property associated with this navProperty
-				for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
-					PropertyFilter propertyFilter = propertyFilterEntry.getValue();
-					clausesExpandFilter.append(indent).append("\t").append("\t")
-							.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
-									+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
-					for (String filter : propertyFilter.getFilters()) {
-						clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
-					}
-				}
-				clausesExpandFilter.append(indent).append("\t").append("}\n");		
-					
-				clausesExpandFilter.append(indent).append("}\n");			
-				
-				expandItemVariables.append(" ?" + nextTargetKey + "_s");
+				expandItem(targetKey, indent, expandItem, navProperty, nextTargetKey, nextTargetEntityType);
 			}
 			if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 				expandItems(nextTargetEntityType, nextTargetKey, expandItem.getExpandOption().getExpandItems(),
 						indent + "\t");
 			}
-
 		}
+	}
 
+	private void expandItem(String targetKey, String indent, ExpandItem expandItem, RdfAssociation navProperty,
+			String nextTargetKey, RdfEntityType nextTargetEntityType)
+			throws ODataApplicationException, ExpressionVisitException {
+		SparqlExpressionVisitor filterClause = filterClause(expandItem.getFilterOption(), nextTargetEntityType,nextTargetKey);
+		filter.append(filterClause.getFilterClause());
+
+		clausesExpandFilter.append(indent).append("{\n");		
+		
+		if (navProperty.IsInverse()) {
+			clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"
+					+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
+		} else {
+			clausesExpandFilter.append(indent).append("\t").append("?" + targetKey + "_s <"
+					+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+		}
+				
+		HashMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters().get(nextTargetEntityType.entityTypeName).getPropertyFilters();
+		clausesExpandFilter.append(indent).append("\t").append("{\n");
+		// Repeat for each filtered property associated with this navProperty
+		for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
+			PropertyFilter propertyFilter = propertyFilterEntry.getValue();
+			clausesExpandFilter.append(indent).append("\t").append("\t")
+					.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
+							+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
+			for (String filter : propertyFilter.getFilters()) {
+				clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
+			}
+		}
+		clausesExpandFilter.append(indent).append("\t").append("}\n");		
+			
+		clausesExpandFilter.append(indent).append("}\n");			
+		
+		expandItemVariables.append(" ?" + nextTargetKey + "_s");
 	}
 
 }

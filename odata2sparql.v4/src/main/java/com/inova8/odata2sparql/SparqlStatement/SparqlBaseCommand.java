@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.olingo.commons.api.data.AbstractEntityCollection;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
-import org.apache.olingo.commons.api.edm.EdmBindingTarget;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
@@ -16,7 +14,6 @@ import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
@@ -156,15 +153,15 @@ public class SparqlBaseCommand {
 
 	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {
-		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		RdfEntityType rdfEntityType = null;
-		EdmEntitySet edmEntitySet = null;
+		//List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		//RdfEntityType rdfEntityType = null;
+		//EdmEntitySet edmEntitySet = null;
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
 				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType);
 
 		//prepareQuery
 		SparqlStatement sparqlStatement = null;
-		UriResourceEntitySet uriResourceEntitySet;
+		//UriResourceEntitySet uriResourceEntitySet;
 
 		sparqlStatement = sparqlBuilder.prepareCountEntitySetSparql();
 		RdfResultSet rdfResults = sparqlStatement.executeSelect(rdfEdmProvider);

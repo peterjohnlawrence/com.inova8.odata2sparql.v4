@@ -1,6 +1,5 @@
 package com.inova8.odata2sparql;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -25,7 +24,6 @@ import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlErrorProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceProcessor;
@@ -89,6 +87,6 @@ public class RdfODataServlet extends HttpServlet {
 		    sb.append(scanner.nextLine());
 		  }
 		  resp.getOutputStream().println(textResponce);
-		
+		  scanner.close();
 	}
 }

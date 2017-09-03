@@ -512,7 +512,6 @@ public class RdfRepositories {
 	}
 
 	private void readQueries(RepositoryConnection modelsConnection, Value RDFSModel) throws OData2SparqlException {
-		Hashtable<Value, String> queries = RdfConstants.getMetaQueries();
 		Hashtable<Value, Hashtable<Value, String>> metaModels = RdfConstants.getMetaModels();
 		//Bootstrap the standard queries
 		try {

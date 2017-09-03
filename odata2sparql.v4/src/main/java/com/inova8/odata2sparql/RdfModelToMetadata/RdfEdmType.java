@@ -3,7 +3,6 @@ package com.inova8.odata2sparql.RdfModelToMetadata;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;

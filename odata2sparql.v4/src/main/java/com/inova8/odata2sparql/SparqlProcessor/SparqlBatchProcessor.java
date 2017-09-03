@@ -3,7 +3,6 @@ package com.inova8.odata2sparql.SparqlProcessor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import org.apache.olingo.commons.api.format.ContentType;

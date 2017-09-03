@@ -2,7 +2,6 @@ package com.inova8.odata2sparql.RdfModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,10 +21,6 @@ import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNodeFactory;
-import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 public class RdfModel {
