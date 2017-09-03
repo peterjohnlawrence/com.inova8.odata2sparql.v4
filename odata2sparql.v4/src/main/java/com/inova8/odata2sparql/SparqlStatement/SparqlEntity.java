@@ -25,7 +25,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	SparqlEntity(RdfNode subjectNode, RdfPrefixes rdfPrefixes) {
 		super();
 		this.rdfPrefixes = rdfPrefixes;
-		this.subject = this.rdfPrefixes.toQName(subjectNode); //subjectNode.toQName(this.rdfPrefixes);
+		this.subject = this.rdfPrefixes.toQName(subjectNode,RdfConstants.QNAME_SEPARATOR); //subjectNode.toQName(this.rdfPrefixes);
 		//this.put(RdfConstants.SUBJECT, RdfEntity.URLEncodeEntityKey(this.subject));	
 		this.addProperty(new Property(null, RdfConstants.SUBJECT, ValueType.PRIMITIVE, SparqlEntity
 				.URLEncodeEntityKey(this.subject)));
@@ -34,7 +34,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	@Override
 	public URI getId() {
 	    try {
-	        return new URI(rdfEntityType.getEDMEntitySetName() + "(" + subject.replace(":", "%3A") + ")");
+	        return new URI(rdfEntityType.getEDMEntitySetName() + "('" + subject.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED ) + "')");
 	    } catch (URISyntaxException e) {
 	        throw new ODataRuntimeException("Unable to create id for entity: " + rdfEntityType.getEDMEntitySetName(), e);
 	    }	

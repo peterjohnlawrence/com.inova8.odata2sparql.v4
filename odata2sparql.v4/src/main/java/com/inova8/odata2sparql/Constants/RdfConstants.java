@@ -139,18 +139,45 @@ public class RdfConstants {
 	private static final String INVERSEOF = "inverseOf ";
 	public static final String SPARQL_MODEL = "SparqlModel";
 
-
 	public static final String ENTITYCONTAINER = "Container";
 	public static final String ENTITYCONTAINERNAMESPACE = "Instances";
 
-	public static final String PREDICATE_SEPARATOR = "_";;
-	public static final String CLASS_SEPARATOR = "_";;
+	/*
+	 * Modifiers for classes and properties as they appear in $metadata
+	*/
+	
+	public static final String PREDICATE_SEPARATOR = "_";
+	public static final String CLASS_SEPARATOR = "_";
 
 	public static final String CLASS_LABEL_PREFIX = "";
 	public static final String PROPERTY_LABEL_PREFIX = "";
 	public static final String NAVIGATIONPROPERTY_LABEL_PREFIX = "";
 
+	
+	
+	/*	
+ 	The following from http://www.ietf.org/ defining what is allowed in a URI
+    Needed to match ':' of qname with embeded key in odata.
+     
+     2.3. Unreserved Characters
 
+	   Data characters that are allowed in a URI but do not have a reserved
+	   purpose are called unreserved.  These include upper and lower case
+	   letters, decimal digits, and a limited set of punctuation marks and
+	   symbols.
+
+	      unreserved  = alphanum | mark
+
+	      mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+
+	   Unreserved characters can be escaped without changing the semantics
+	   of the URI, but this should not be done unless the URI is being used
+	   in a context that does not allow the unescaped character to appear.
+	*/
+	
+	public static final String QNAME_SEPARATOR = "~";// ":";
+	public static final String QNAME_SEPARATOR_ENCODED = "~";// "%3A";
+	
 	public static final Object RDF_LANG_STRING = RDF + "." + LANGSTRING;
 
 	public static final Value URI_ASSOCIATIONQUERY = valueFactoryImpl

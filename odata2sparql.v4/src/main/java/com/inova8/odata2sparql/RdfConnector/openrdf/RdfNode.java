@@ -9,6 +9,7 @@ import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 
+import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
 
@@ -201,7 +202,7 @@ public class RdfNode {
 		if(this.isIRI()) return ((IRI) node).getNamespace();
 		//String nameSpace =   node.getNamespace();
 		String lastCharacter = nameSpace.substring(nameSpace.length() - 1);
-		if (lastCharacter.equals(":"))
+		if (lastCharacter.equals(RdfConstants.QNAME_SEPARATOR))
 			return nameSpace.substring(0, nameSpace.length() - 1);
 		else
 			return nameSpace;

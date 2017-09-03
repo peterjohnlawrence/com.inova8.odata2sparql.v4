@@ -177,7 +177,7 @@ class SparqlEntityCollection extends EntityCollection {
 									rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getLocalName())
 											.getRelatedKey(),
 									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(
-											sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode))));
+											sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode,RdfConstants.QNAME_SEPARATOR))));
 							// rdfSubjectEntity.put(
 							// rdfSubjectEntity.getEntityType()
 							// .findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(),
@@ -248,12 +248,12 @@ class SparqlEntityCollection extends EntityCollection {
 
 	private SparqlEntity findOrCreateEntity(RdfNode subjectNode, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
-		rdfEntity = entitySetResultsMap.get(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode));
+		rdfEntity = entitySetResultsMap.get(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode,RdfConstants.QNAME_SEPARATOR));
 		if (rdfEntity == null) {
 			rdfEntity = new SparqlEntity(subjectNode, sparqlEdmProvider.getRdfModel().getRdfPrefixes());
 			// Only add at build time
 			// this.getEntities().add(rdfEntity);
-			entitySetResultsMap.put(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode), rdfEntity);
+			entitySetResultsMap.put(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode,RdfConstants.QNAME_SEPARATOR), rdfEntity);
 		}
 		return rdfEntity;
 	}

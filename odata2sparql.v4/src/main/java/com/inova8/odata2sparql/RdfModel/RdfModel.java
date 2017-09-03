@@ -105,7 +105,7 @@ public class RdfModel {
 		}
 		public String expandPrefix(String decodedEntityKey) {
 
-			int colon = decodedEntityKey.indexOf(':');
+			int colon = decodedEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);//':');
 			if (colon < 0)
 				return decodedEntityKey;
 			else {
@@ -186,13 +186,13 @@ public class RdfModel {
 			}
 		}
 
-		public String toQName(RdfNode node) {
+		public String toQName(RdfNode node,String qNameSeparator) {
 			String qname = null;
 			if (node.isBlank()) {
 				return ((BNode) node.getNode()).toString();
 			} else {
 				try {
-					qname = rdfPrefixes.getOrCreatePrefix(null, node.getNamespace()) + ":" + node.getLocalName();
+					qname = rdfPrefixes.getOrCreatePrefix(null, node.getNamespace()) + qNameSeparator + node.getLocalName();
 				} catch (OData2SparqlException e) {
 					log.error("RdfNode toQName failure. Node:" + node.toString() + " with exception " + e.toString());
 				}
@@ -201,7 +201,7 @@ public class RdfModel {
 		}
 		public String entitykeyToQName(String decodedEntityKey){
 			String urlEntityKey = rdfPrefixes.convertToUriString(decodedEntityKey);
-			return this.toQName(RdfNodeFactory.createURI(urlEntityKey));
+			return this.toQName(RdfNodeFactory.createURI(urlEntityKey),RdfConstants.QNAME_SEPARATOR);
 		}
 		@Deprecated
 		public String qName(String uri) {
@@ -782,7 +782,7 @@ public class RdfModel {
 
 		RdfURI(RdfNode node) throws OData2SparqlException {
 			this.node = node;
-			String[] parts = rdfPrefixes.toQName(node).split(":"); //node.toQName(rdfPrefixes).split(":");
+			String[] parts = rdfPrefixes.toQName(node,":").split(":"); //node.toQName(rdfPrefixes).split(":");
 			if (parts[0].equals("http") || parts[0].equals("null")) {
 				localName = node.getLocalName();
 				graphName = node.getNamespace();

@@ -367,7 +367,7 @@ public class RdfRepositories {
 			log.fatal("Cannot add configuration to repository", e);
 			throw new OData2SparqlException();
 		}
-
+		
 		Repository systemRepository = null;
 
 		try {

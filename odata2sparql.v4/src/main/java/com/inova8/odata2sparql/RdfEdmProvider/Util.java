@@ -41,18 +41,4 @@ public class Util {
 
 		return navigationTargetEntitySet;
 	}
-//	public static String URLDecodeEntityKey(String encodedEntityKey) {
-//
-//		String decodedEntityKey = encodedEntityKey;
-//		decodedEntityKey = encodedEntityKey.replace("@", "/");
-//		decodedEntityKey = encodedEntityKey.replace("%3A", ":");
-//		return decodedEntityKey;
-//	}
-//	public static String URLEncodeEntityKey(String entityKey) {
-//		String encodedEntityKey = entityKey;
-//		encodedEntityKey = encodedEntityKey.replace("/", "@");
-//		//Required by Batch otherwise URIs fail
-//		encodedEntityKey = encodedEntityKey.replace(":", "%3A");
-//		return encodedEntityKey;
-//	}
 }
