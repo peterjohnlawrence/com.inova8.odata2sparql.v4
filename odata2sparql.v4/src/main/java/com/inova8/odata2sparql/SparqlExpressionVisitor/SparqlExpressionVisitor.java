@@ -309,6 +309,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public Object visitMethodCall(MethodKind methodCall, List parameters)
 			throws ExpressionVisitException, ODataApplicationException {
 		String sparqlmethod = "";
@@ -514,7 +515,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	}
 
 	@Override
-	//@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object visitEnum(EdmEnumType type, List enumValues)
 			throws ExpressionVisitException, ODataApplicationException {
 		// TODO Auto-generated method stub

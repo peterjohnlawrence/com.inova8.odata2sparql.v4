@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.SparqlStatement;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.logging.Log;
@@ -21,6 +22,7 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
+import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
@@ -28,6 +30,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfQuerySolution;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.SparqlBuilder.SparqlCreateUpdateDeleteBuilder;
 import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
@@ -35,24 +38,6 @@ import com.inova8.odata2sparql.uri.UriType;
 
 public class SparqlBaseCommand {
 	private final static Log log = LogFactory.getLog(SparqlBaseCommand.class);
-
-	//	private HashMap<String, RdfAssociation> buildLinksMap(RdfEdmProvider edmProvider,
-	//			List<NavigationSegment> navigationSegments) throws EdmException {
-	//
-	//		HashMap<String, RdfAssociation> navPropertiesMap = new HashMap<String, RdfAssociation>();
-	//
-	//		if (navigationSegments != null) {
-	//
-	//			for (NavigationSegment navigationSegment : navigationSegments) {
-	//				RdfAssociation rdfAssociation = edmProvider.getMappedNavigationProperty(new FullQualifiedName(
-	//						navigationSegment.getNavigationProperty().getRelationship().getNamespace(), navigationSegment
-	//								.getNavigationProperty().getRelationship().getName()));
-	//				navPropertiesMap.put(rdfAssociation.getAssociationNodeIRI(), rdfAssociation);
-	//			}
-	//
-	//		}
-	//		return navPropertiesMap;
-	//	}
 
 	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {
@@ -88,18 +73,6 @@ public class SparqlBaseCommand {
 		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider, rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
 		return rdfResults.getEntityCollection();
-		//TODO needs to be included
-		//		ExpandSelectTreeNode expandSelectTreeNode = UriParser.createExpandSelectTree(uriInfo.getSelectOption(),
-		//				uriInfo.getExpandOption());
-		//
-		//		Map<String, ODataCallback> callbacks = locateCallbacks(expandSelectTreeNode, rdfResults);
-		//		if (data == null) {
-		//			//TODO correct exception
-		//			throw new ODataRuntimeException("No data found");
-		//		} else {
-		//			return EntityProvider.writeFeed(contentType, edmEntitySet, data,
-		//					buildEntitySetProperties(expandSelectTreeNode, callbacks).build());
-		//		}
 	}
 
 	static public Entity readEntity(RdfEdmProvider rdfEdmProvider, final UriInfo uriInfo, UriType uriType)
@@ -159,7 +132,7 @@ public class SparqlBaseCommand {
 	}
 
 	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
-			throws ODataException, OData2SparqlException {
+			throws  OData2SparqlException, EdmException, ODataApplicationException, ExpressionVisitException {
 		//List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
 		//RdfEntityType rdfEntityType = null;
 		//EdmEntitySet edmEntitySet = null;
@@ -188,7 +161,7 @@ public class SparqlBaseCommand {
 	}
 
 	static public EntityCollection readReferenceCollection(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
-			UriType uriType) throws ODataException, OData2SparqlException {
+			UriType uriType) throws OData2SparqlException, EdmException, ODataApplicationException, ExpressionVisitException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
 		RdfEntityType rdfEntityType = null;
 		EdmEntitySet edmEntitySet = null;
@@ -212,7 +185,7 @@ public class SparqlBaseCommand {
 	}
 
 	public static Entity writeEntity(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, Entity requestEntity)
-			throws OData2SparqlException, ODataException {
+			throws OData2SparqlException, ODataApplicationException {
 		SparqlStatement sparqlStatement = null;
 		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
 		RdfEntityType entityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
@@ -222,13 +195,13 @@ public class SparqlBaseCommand {
 			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateInsertEntity(entityType, requestEntity);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			throw new ODataException(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
 		}
 		sparqlStatement.executeInsert(rdfEdmProvider);
 		return requestEntity;
 	}
 
-	public static void deleteEntity(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws ODataException {
+	public static void deleteEntity(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -245,13 +218,13 @@ public class SparqlBaseCommand {
 			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteEntity(entityType, keyPredicates);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			throw new ODataException(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
 		}
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
 	public static void updateEntity(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, Entity requestEntity,
-			HttpMethod httpMethod) throws ODataException {
+			HttpMethod httpMethod) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -271,12 +244,13 @@ public class SparqlBaseCommand {
 					requestEntity);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			throw new ODataException(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
 		}
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
-	public static void updatePrimitiveValue(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, Object entry) throws OData2SparqlException {
+	public static void updatePrimitiveValue(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, Object entry)
+			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -289,20 +263,21 @@ public class SparqlBaseCommand {
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
 		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
-		
+
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
 		try {
-			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateUpdateEntitySimplePropertyValue(entityType, keyPredicates,
-					edmProperty.getName(), entry);
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateUpdateEntitySimplePropertyValue(entityType,
+					keyPredicates, edmProperty.getName(), entry);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new OData2SparqlException(e.getMessage());
 		}
-		sparqlStatement.executeUpdate(rdfEdmProvider);	
+		sparqlStatement.executeUpdate(rdfEdmProvider);
 	}
 
-	public static void deletePrimitiveValue(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws OData2SparqlException {
+	public static void deletePrimitiveValue(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo)
+			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -315,17 +290,100 @@ public class SparqlBaseCommand {
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
 		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
-		
+
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
 		try {
-			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteEntitySimplePropertyValue(entityType, keyPredicates,
-					edmProperty.getName());
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteEntitySimplePropertyValue(entityType,
+					keyPredicates, edmProperty.getName());
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new OData2SparqlException(e.getMessage());
 		}
-		sparqlStatement.executeDelete(rdfEdmProvider);	
-		
+		sparqlStatement.executeDelete(rdfEdmProvider);
+
+	}
+
+	public static void writeEntityReference(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
+			List<URI> requestEntityReferences) throws  OData2SparqlException {
+		SparqlStatement sparqlStatement = null;
+		// 1. Retrieve the entity set which belongs to the requested entity
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		// Note: only in our example we can assume that the first segment is the EntitySet
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+		RdfEntityType entityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+
+		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+		RdfAssociation navigationProperty = entityType
+				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+
+		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
+				rdfEdmProvider);
+		try {
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateInsertLinkQuery( entityType, keyPredicates,navigationProperty,
+					requestEntityReferences);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
+		}
+		sparqlStatement.executeInsert(rdfEdmProvider);
+
+	}
+
+	public static void updateEntityReference(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
+			List<URI> requestEntityReferences) throws OData2SparqlException {
+		SparqlStatement sparqlStatement = null;
+		// 1. Retrieve the entity set which belongs to the requested entity
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		// Note: only in our example we can assume that the first segment is the EntitySet
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+		RdfEntityType entityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+
+		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+		RdfAssociation navigationProperty = entityType
+				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+		List<UriParameter> navigationKeyPredicates = uriResourceNavigation.getKeyPredicates();
+		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
+				rdfEdmProvider);
+		try {
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateUpdateLinkQuery( entityType, keyPredicates,navigationProperty,navigationKeyPredicates,
+					requestEntityReferences);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
+		}
+		sparqlStatement.executeInsert(rdfEdmProvider);	
+	}
+
+	public static void deleteEntityReference(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws OData2SparqlException {
+		SparqlStatement sparqlStatement = null;
+		// 1. Retrieve the entity set which belongs to the requested entity
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		// Note: only in our example we can assume that the first segment is the EntitySet
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+		RdfEntityType entityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+
+		List<UriParameter> entityKeyPredicates = uriResourceEntitySet.getKeyPredicates();
+		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+		RdfAssociation navigationProperty = entityType
+				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+		List<UriParameter> navigationKeyPredicates = uriResourceNavigation.getKeyPredicates();
+		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
+				rdfEdmProvider);
+		try {
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteLinkQuery( entityType, entityKeyPredicates,navigationProperty,navigationKeyPredicates);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new OData2SparqlException(e.getMessage());
+		}
+		sparqlStatement.executeInsert(rdfEdmProvider);
 	}
 }

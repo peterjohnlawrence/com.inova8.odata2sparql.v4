@@ -20,6 +20,8 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.deserializer.DeserializerResult;
+import org.apache.olingo.server.api.deserializer.ODataDeserializer;
 import org.apache.olingo.server.api.processor.ReferenceProcessor;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.ReferenceSerializerOptions;
@@ -94,25 +96,64 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 	@Override
 	public void createReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
+		// 2. create the data in backend
+		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
+		InputStream requestInputStream = request.getBody();
+		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
+		DeserializerResult result = deserializer.entityReferences(requestInputStream);
+		List<URI> requestEntityReferences = result.getEntityReferences();
+		// 2.2 do the creation in backend, 
+
+		try {
+			SparqlBaseCommand.writeEntityReference(rdfEdmProvider, uriInfo, requestEntityReferences);
+		} catch (EdmException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		// 3. serialize the response
+		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
 	@Override
 	public void updateReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
+		// 1. Retrieve the entity type from the URI
+//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
+//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+
+		// 2. create the data in backend
+		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
+		InputStream requestInputStream = request.getBody();
+		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
+		DeserializerResult result = deserializer.entityReferences(requestInputStream);
+		List<URI> requestEntityReferences = result.getEntityReferences();
+		// 2.2 do the creation in backend, 
+
+		try {
+			SparqlBaseCommand.updateEntityReference(rdfEdmProvider, uriInfo, requestEntityReferences);
+		} catch (EdmException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		// 3. serialize the response
+		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
 	@Override
 	public void deleteReference(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
+		// 1. Retrieve the entity type from the URI
+//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
+//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+
+		try {
+			SparqlBaseCommand.deleteEntityReference(rdfEdmProvider, uriInfo);
+		} catch (EdmException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		// 3. serialize the response
+		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
 }

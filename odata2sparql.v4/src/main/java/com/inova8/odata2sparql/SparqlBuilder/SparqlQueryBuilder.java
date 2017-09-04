@@ -1370,7 +1370,7 @@ public class SparqlQueryBuilder {
 		this.isPrimitiveValue = isPrimitiveValue;
 	}
 
-	public SparqlStatement prepareEntityLinksSparql(	) throws EdmException, ODataApplicationException {
+	public SparqlStatement prepareEntityLinksSparql(	) throws EdmException, ODataApplicationException, OData2SparqlException {
 
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
 		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);

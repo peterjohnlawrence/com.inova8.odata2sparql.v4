@@ -13,6 +13,7 @@ import org.core4j.Predicate1;
 import org.eclipse.rdf4j.model.BNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.xerces.util.XMLChar;
 
@@ -109,12 +110,16 @@ public class RdfModel {
 				return uri == null ? decodedEntityKey : uri + decodedEntityKey.substring(colon + 1);
 			}
 		}
-		public String expandPredicateKey(String predicateKey) {
-
+		public String expandPredicateKey(String predicateKey) throws OData2SparqlException {
+			UrlValidator urlValidator = new UrlValidator();
 			String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
 			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey);
-			return expandPrefix(decodedEntityKey);
-
+			String expandedEntityKey  = expandPrefix(decodedEntityKey);
+			if (urlValidator.isValid(expandedEntityKey)) {
+				return expandedEntityKey;
+			} else {
+				throw new OData2SparqlException("Invalid key: " + predicateKey, null);
+			}
 		}
 		private void checkLegal(String prefix) throws OData2SparqlException {
 			if (prefix.length() > 0 && !XMLChar.isValidNCName(prefix))

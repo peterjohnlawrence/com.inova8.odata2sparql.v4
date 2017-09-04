@@ -148,7 +148,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 
 		try {
 			SparqlBaseCommand.updateEntity(rdfEdmProvider, uriInfo, requestEntity, httpMethod);
-		} catch (EdmException | ODataException e) {
+		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
 		}
@@ -177,7 +177,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			createdEntity = SparqlBaseCommand.writeEntity(rdfEdmProvider, uriInfo, requestEntity);
 			if (createdEntity == null)
 				throw new OData2SparqlException("Entity not created");
-		} catch (EdmException | OData2SparqlException | ODataException e) {
+		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
 		}
@@ -202,7 +202,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 
 		try {
 			SparqlBaseCommand.deleteEntity(rdfEdmProvider, uriInfo);
-		} catch (ODataException e) {
+		} catch (OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
 		}

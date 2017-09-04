@@ -35,6 +35,7 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
@@ -133,7 +134,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		RdfLiteral count = null;
 		try {
 			count = SparqlBaseCommand.countEntitySet(rdfEdmProvider, uriInfo, UriType.URI15);
-		} catch (EdmException | OData2SparqlException | ODataException e) {
+		} catch (EdmException | OData2SparqlException | ExpressionVisitException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		}
