@@ -24,6 +24,9 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.deserializer.DeserializerResult;
+import org.apache.olingo.server.api.deserializer.FixedFormatDeserializer;
+import org.apache.olingo.server.api.deserializer.ODataDeserializer;
 import org.apache.olingo.server.api.processor.PrimitiveValueProcessor;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.PrimitiveSerializerOptions;
@@ -32,6 +35,7 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -43,10 +47,12 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
+
 	public SparqlPrimitiveValueProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
+
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -62,7 +68,7 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 	@Override
 	public void readPrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		readPrimitiveOrValue(request, response, uriInfo, responseFormat,false);
+		this.readPrimitiveOrValue(request, response, uriInfo, responseFormat, false);
 	}
 
 	private void readPrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
@@ -106,12 +112,12 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 
 		// 3. serialize
-		if(isValue){
+		if (isValue) {
 			writePropertyValue(response, property);
-		}else{
+		} else {
 			writeProperty(request, response, responseFormat, edmEntitySet, edmPropertyName, edmPropertyType, property);
 		}
-		
+
 	}
 
 	private void writePropertyValue(ODataResponse response, Property property) throws ODataApplicationException {
@@ -123,14 +129,14 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 				response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 			} else {
 				String value = String.valueOf(property.getValue());
-				ByteArrayInputStream serializerContent = new ByteArrayInputStream(
-						value.getBytes());//Charset.forName("UTF-8")));
+				ByteArrayInputStream serializerContent = new ByteArrayInputStream(value.getBytes());//Charset.forName("UTF-8")));
 				response.setContent(serializerContent);
 				response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 				response.setHeader(HttpHeader.CONTENT_TYPE, ContentType.TEXT_PLAIN.toContentTypeString());
 			}
 		}
 	}
+
 	private void writeProperty(ODataRequest request, ODataResponse response, ContentType responseFormat,
 			EdmEntitySet edmEntitySet, String edmPropertyName, EdmPrimitiveType edmPropertyType, Property property)
 			throws SerializerException, ODataApplicationException {
@@ -165,42 +171,69 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
-
 	@Override
 	public void updatePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
+		// 1. Retrieve the entity set which belongs to the requested entity
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
+		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
 
+		InputStream requestInputStream = request.getBody();
+		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
+		DeserializerResult result = deserializer.property(requestInputStream, edmProperty);
+		//TODO we need to better handle different formats of the object provided
+		this.updatePrimitiveOrValue(request, response, uriInfo, result.getProperty().getValue().toString(), false);
 	}
 
 	@Override
 	public void updatePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
+		// 1. Retrieve the entity set which belongs to the requested entity
+		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
+		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
+
+		InputStream requestInputStream = request.getBody();
+		FixedFormatDeserializer deserializer = this.odata.createFixedFormatDeserializer();
+		Object result = deserializer.primitiveValue(requestInputStream, edmProperty);
+
+		this.updatePrimitiveOrValue(request, response, uriInfo, result, true);
+	}
+
+	private void updatePrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo, Object entry,
+			Boolean isValue) throws ODataApplicationException {
+		try {
+			SparqlBaseCommand.updatePrimitiveValue(rdfEdmProvider, uriInfo, entry);
+		} catch (Exception e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
 	@Override
 	public void deletePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo)
-			throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
-
+			throws ODataApplicationException {
+		this.deletePrimitiveOrValue(request, response, uriInfo, false);
 	}
 
 	@Override
 	public void deletePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo)
-			throws ODataApplicationException, ODataLibraryException {
-		throw new ODataApplicationException(new Object() {
-		}.getClass().getEnclosingMethod().getName() + " not yet implemented", HttpStatusCode.NOT_FOUND.getStatusCode(),
-				Locale.ENGLISH);
-
+			throws ODataApplicationException{
+		this.deletePrimitiveOrValue(request, response, uriInfo, true);
 	}
 
+	private void deletePrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			Boolean isValue) throws ODataApplicationException {
+		try {
+			SparqlBaseCommand.deletePrimitiveValue(rdfEdmProvider, uriInfo);
+		} catch (Exception e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+	}
 }

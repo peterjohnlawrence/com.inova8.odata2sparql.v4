@@ -22,6 +22,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNodeFactory;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
+import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
 public class RdfModel {
 	private final Log log = LogFactory.getLog(RdfModel.class);
@@ -100,7 +101,7 @@ public class RdfModel {
 		}
 		public String expandPrefix(String decodedEntityKey) {
 
-			int colon = decodedEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);//':');
+			int colon = decodedEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
 			if (colon < 0)
 				return decodedEntityKey;
 			else {
@@ -108,7 +109,13 @@ public class RdfModel {
 				return uri == null ? decodedEntityKey : uri + decodedEntityKey.substring(colon + 1);
 			}
 		}
+		public String expandPredicateKey(String predicateKey) {
 
+			String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
+			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey);
+			return expandPrefix(decodedEntityKey);
+
+		}
 		private void checkLegal(String prefix) throws OData2SparqlException {
 			if (prefix.length() > 0 && !XMLChar.isValidNCName(prefix))
 				throw new OData2SparqlException("RdfPrefixes checkLegal failure");
@@ -606,7 +613,7 @@ public class RdfModel {
 		private String rangeName;
 		private RdfNode associationNode;
 		private Boolean isInverse = false;
-		private Boolean hasInverse = false;
+//		private Boolean hasInverse = false;
 		private RdfNode inversePropertyOf;
 		private RdfAssociation inverseAssociation;
 		private String description;
@@ -755,9 +762,9 @@ public class RdfModel {
 		public void setIsInverse(Boolean isInverse) {
 			this.isInverse = isInverse;
 		}
-		public void setHasInverse(Boolean hasInverse) {
-			this.hasInverse = hasInverse;
-		}
+//		public void setHasInverse(Boolean hasInverse) {
+//			this.hasInverse = hasInverse;
+//		}
 		public RdfAssociation getInverseAssociation() {
 			 return inverseAssociation;
 		}
@@ -898,16 +905,9 @@ public class RdfModel {
 				property = new RdfProperty();
 
 				property.propertyTypeName = propertyTypeName;
-				
-				//property.propertyType = SIMPLE_TYPE_MAPPING.get(propertyTypeName);
-				// Workaround for non XMLSchema or XMLSchema2 property types.
-				// TODO iterate through datatype structure to determine base type
-//				if (property.propertyType == null) {
-//					property.propertyType = EdmSimpleTypeKind.String;
-					property.propertyName = varName.getLiteralValue().getLabel();
-//				} else {
-//					property.propertyName = rdfToOdata(propertyURI.localName);
-//				}
+
+				property.propertyName = varName.getLiteralValue().getLabel();
+
 				if (propertyLabelNode == null) {
 					property.propertyLabel = RdfConstants.PROPERTY_LABEL_PREFIX + property.propertyName;
 				} else {
@@ -1113,7 +1113,7 @@ public class RdfModel {
 				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
-		association.setHasInverse(true);
+		//association.setHasInverse(true);
 		association.setInverseAssociation(inverseAssociation);
 		return inverseAssociation;
 	}
@@ -1176,22 +1176,6 @@ public class RdfModel {
 	public String getOrCreatePrefix(String prefix, String uri) throws OData2SparqlException {
 		return rdfPrefixes.getOrCreatePrefix(prefix, uri);
 	}
-
-//	@Deprecated
-//	public RdfProperty getOrCreateKeyProperty(RdfEntityType clazz) {
-//
-//		RdfProperty property = Enumerable.create(clazz.getProperties()).firstOrNull(propertyNameEquals(KEY(clazz)));
-//		if (property == null) {
-//			property = new RdfProperty();
-//			property.propertyName = KEY(clazz);
-//			property.propertyTypeName = "http://www.w3.org/2001/XMLSchema#string";
-//			property.propertyType = SIMPLE_TYPE_MAPPING
-//					.get("http://www.w3.org/2001/XMLSchema#string");
-//		}
-//		property.isKey = true;
-//		clazz.properties.put(property.propertyName, property);
-//		return property;
-//	}
 
 	public static String rdfToOdata(String rdfName) {
 		return rdfName.replace("-", "_").replace("/", "_");

@@ -37,7 +37,6 @@ public class SparqlFilterClausesBuilder {
 	private SparqlExpressionVisitor filterClause;
 
 	private final UriType uriType;
-	private final UriInfo uriInfo;
 	private final RdfModelToMetadata rdfModelToMetadata;
 	private final RdfModel rdfModel;
 	private EdmEntitySet edmEntitySet;
@@ -50,7 +49,6 @@ public class SparqlFilterClausesBuilder {
 			throws ODataApplicationException, ExpressionVisitException, EdmException, OData2SparqlException {
 		this.rdfModel = rdfModel;
 		this.rdfModelToMetadata = rdfModelToMetadata;
-		this.uriInfo = uriInfo;
 		this.uriType = uriType;
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
 		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
@@ -171,7 +169,6 @@ public class SparqlFilterClausesBuilder {
 		for (ExpandItem expandItem : expandItems) {
 			List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
 			UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
-			EdmNavigationProperty navigationProperty = resourceNavigation.getProperty();
 			RdfAssociation navProperty = rdfModelToMetadata
 					.getMappedNavigationProperty(new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), //resourceNavigation.getProperty().getType().getNamespace(),//resourceNavigation.getProperty().getType().getNamespace(),
 							resourceNavigation.getProperty().getName()));

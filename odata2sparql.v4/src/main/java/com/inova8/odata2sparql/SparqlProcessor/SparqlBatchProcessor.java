@@ -23,19 +23,14 @@ import org.apache.olingo.server.api.processor.BatchProcessor;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 
 public class SparqlBatchProcessor implements BatchProcessor {
-	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
-	private ServiceMetadata serviceMetadata;
-
 	public SparqlBatchProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
-		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
-		this.serviceMetadata = serviceMetadata;
 	}
 
 	@Override

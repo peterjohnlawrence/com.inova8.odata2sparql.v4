@@ -18,6 +18,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfConstructQuery;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfSelectQuery;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTripleSet;
+import com.inova8.odata2sparql.RdfConnector.openrdf.RdfUpdate;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 
@@ -32,11 +33,12 @@ public class SparqlStatement {
 	public String getSparql() {
 		return sparql;
 	}
+
 	SparqlEntityCollection executeConstruct(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
 			ExpandOption expand, SelectOption select) throws OData2SparqlException {
 		RdfConstructQuery rdfQuery = new RdfConstructQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
 				sparql);
-		
+
 		RdfTripleSet results;
 		try {
 			results = rdfQuery.execConstruct();
@@ -46,10 +48,9 @@ public class SparqlStatement {
 		}
 		return new SparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
 	}
-	RdfResultSet executeSelect(RdfEdmProvider sparqlEdmProvider )
-			throws  OData2SparqlException {
-		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
-				sparql);
+
+	RdfResultSet executeSelect(RdfEdmProvider sparqlEdmProvider) throws OData2SparqlException {
+		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(), sparql);
 		RdfResultSet results = null;
 		try {
 			results = rdfQuery.execSelect();
@@ -57,13 +58,48 @@ public class SparqlStatement {
 			log.error(e.getMessage());
 			throw new ODataRuntimeException(e.getMessage(), null);
 		}
-//
-//		RdfLiteral countLiteral = null;
-//		while (results.hasNext()) {
-//			RdfQuerySolution solution = results.next();
-//			countLiteral = solution.getRdfLiteral("COUNT");
-//			break; // Only one record, but no reason for more anyway
-//		}
 		return results;
+	}
+
+	void executeInsert(RdfEdmProvider sparqlEdmProvider)
+			throws OData2SparqlException {
+
+		RdfUpdate rdfInsert = new RdfUpdate(sparqlEdmProvider.getRdfRepository().getDataRepository(),
+				sparql);
+		try {
+			rdfInsert.execUpdate();
+		} catch (OData2SparqlException e) {
+			log.error(e.getMessage());
+			throw new ODataRuntimeException(e.getMessage(), null);
+		} finally {
+			rdfInsert.close();
+		}
+	}
+
+	public void executeDelete(RdfEdmProvider rdfEdmProvider) {
+		
+		RdfUpdate rdfDelete = new RdfUpdate(rdfEdmProvider.getRdfRepository().getDataRepository(),
+				sparql);
+		try {
+			rdfDelete.execUpdate();
+		} catch (OData2SparqlException e) {
+			log.error(e.getMessage());
+			throw new ODataRuntimeException(e.getMessage(), null);
+		} finally {
+			rdfDelete.close();
+		}	
+	}
+	public void executeUpdate(RdfEdmProvider rdfEdmProvider) {
+		
+		RdfUpdate rdfUpdate = new RdfUpdate(rdfEdmProvider.getRdfRepository().getDataRepository(),
+				sparql);
+		try {
+			rdfUpdate.execUpdate();
+		} catch (OData2SparqlException e) {
+			log.error(e.getMessage());
+			throw new ODataRuntimeException(e.getMessage(), null);
+		} finally {
+			rdfUpdate.close();
+		}	
 	}
 }

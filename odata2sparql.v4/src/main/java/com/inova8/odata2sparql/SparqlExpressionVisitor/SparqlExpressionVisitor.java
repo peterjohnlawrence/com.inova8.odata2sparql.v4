@@ -514,6 +514,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	}
 
 	@Override
+	//@SuppressWarnings("unchecked")
 	public Object visitEnum(EdmEnumType type, List enumValues)
 			throws ExpressionVisitException, ODataApplicationException {
 		// TODO Auto-generated method stub

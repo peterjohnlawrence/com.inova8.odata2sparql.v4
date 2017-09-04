@@ -75,6 +75,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			try {
 				entitySet = SparqlBaseCommand.readEntitySet( this.rdfEdmProvider, uriInfo,(uriInfo.getUriResourceParts().size() > 1)?UriType.URI6B:UriType.URI1);
 			} catch (ODataException | OData2SparqlException e) {
+				log.info("No data found");
 				throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
 			}
 

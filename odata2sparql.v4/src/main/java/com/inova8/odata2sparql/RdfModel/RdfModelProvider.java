@@ -728,7 +728,7 @@ public class RdfModelProvider {
 						log.warn("Class and related associations removed because incomplete definition " + clazz.getIRI());
 						//Remove any association  that uses this class
 						for (RdfSchema associationGraph : model.graphs) {
-							 Iterator<RdfAssociation> associationsIterator = graph.associations.iterator();
+							 Iterator<RdfAssociation> associationsIterator = associationGraph.associations.iterator();
 							 while (associationsIterator.hasNext()) {
 								  RdfAssociation association = associationsIterator.next();
 								  if((association.getDomainClass()==clazz)||(association.getRangeClass()==clazz)){

@@ -1370,9 +1370,7 @@ public class SparqlQueryBuilder {
 		this.isPrimitiveValue = isPrimitiveValue;
 	}
 
-	public SparqlStatement prepareEntityLinksSparql(
-	//		RdfEntityType entityType, NavigationSegment navigationProperty,	EdmEntitySet targetEntitySet, String entityKey
-	) throws EdmException, ODataApplicationException {
+	public SparqlStatement prepareEntityLinksSparql(	) throws EdmException, ODataApplicationException {
 
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
 		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);
@@ -1384,16 +1382,13 @@ public class SparqlQueryBuilder {
 		EdmNavigationProperty edmNavigationProperty = uriNavigation.getProperty();
 
 		UrlValidator urlValidator = new UrlValidator();
-		String entityKey = ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText();//. "";//uriInfo..getKeyPredicates().get(0).getLiteral();
-		entityKey = entityKey.substring(1, entityKey.length() - 1);
-		String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey);
-
+		String expandedKey =  rdfModel.getRdfPrefixes().expandPredicateKey( ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText());
+		
 		String key = rdfEntityType.entityTypeName;
 
-		String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(decodedEntityKey);
 		if (urlValidator.isValid(expandedKey)) {
 		} else {
-			throw new EdmException("Invalid key: " + entityKey, null);
+			throw new EdmException("Invalid key: " + ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText(), null);
 		}
 		RdfAssociation rdfProperty = rdfEntityType.findNavigationProperty(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getAssociationIRI();

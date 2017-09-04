@@ -19,12 +19,10 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 
 public class SparqlErrorProcessor implements ErrorProcessor {
 	private OData odata;
-	private ServiceMetadata serviceMetadata;
 	private final Log log = LogFactory.getLog(SparqlErrorProcessor.class);
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
-		this.serviceMetadata = serviceMetadata;
 	}
 
 	@Override
