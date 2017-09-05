@@ -393,13 +393,10 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	@Override
 	public Object visitLiteral(Literal literal) throws ExpressionVisitException, ODataApplicationException {
 		String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(literal.toString());
-		String expandedKey = decodedEntityKey.substring(1, decodedEntityKey.length() - 1);
-
-		String expandedUri = this.rdfModel.getRdfPrefixes().convertToUri(expandedKey);
-		if (expandedUri != null) {
-
-			return expandedUri;
-		} else {
+		try{
+			return "<"+ this.rdfModel.getRdfPrefixes().expandPredicateKey(decodedEntityKey)+">";
+		
+		} catch(Exception e) {
 			switch (literal.getType().toString()) {
 			case "Null":
 				return "null";
