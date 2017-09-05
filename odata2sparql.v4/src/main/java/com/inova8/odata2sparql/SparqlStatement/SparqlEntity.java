@@ -13,6 +13,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrefixes;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 
 public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	private final HashMap<RdfNode, Object> datatypeProperties = new HashMap<RdfNode, Object>();
@@ -25,8 +26,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	SparqlEntity(RdfNode subjectNode, RdfPrefixes rdfPrefixes) {
 		super();
 		this.rdfPrefixes = rdfPrefixes;
-		this.subject = this.rdfPrefixes.toQName(subjectNode,RdfConstants.QNAME_SEPARATOR); //subjectNode.toQName(this.rdfPrefixes);
-		//this.put(RdfConstants.SUBJECT, RdfEntity.URLEncodeEntityKey(this.subject));	
+		this.subject = this.rdfPrefixes.toQName(subjectNode,RdfConstants.QNAME_SEPARATOR); 
 		this.addProperty(new Property(null, RdfConstants.SUBJECT, ValueType.PRIMITIVE, SparqlEntity
 				.URLEncodeEntityKey(this.subject)));
 	}
@@ -34,7 +34,22 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	@Override
 	public URI getId() {
 	    try {
-	        return new URI(rdfEntityType.getEDMEntitySetName() + "('" + subject.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED ) + "')");
+	    	if(this.getEntityType().isOperation()){
+	    		String id=rdfEntityType.getEDMEntitySetName() + "(";
+	    		boolean first = true;
+	    		for( RdfPrimaryKey keyProperty: rdfEntityType.getPrimaryKeys())
+	    		{
+	    			if(!first)id=id+",";
+	    			Property propertyValue = this.getProperty(keyProperty.getPrimaryKeyName());
+	    			id= id + propertyValue.getName()+"='"+ propertyValue.getValue().toString().replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED )+ "'";
+	    			first=false;
+	    		}
+	    		id=id + ")";
+	    		return new URI(id);
+	    	}else{
+	    		 return new URI(rdfEntityType.getEDMEntitySetName() + "('" + subject.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED ) + "')");
+	    	}
+	       
 	    } catch (URISyntaxException e) {
 	        throw new ODataRuntimeException("Unable to create id for entity: " + rdfEntityType.getEDMEntitySetName(), e);
 	    }	
