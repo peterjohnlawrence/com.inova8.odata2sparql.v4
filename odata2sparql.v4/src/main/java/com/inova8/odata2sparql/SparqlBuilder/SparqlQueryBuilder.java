@@ -500,7 +500,7 @@ public class SparqlQueryBuilder {
 	private StringBuilder construct() throws EdmException {
 		StringBuilder construct = new StringBuilder("CONSTRUCT {\n");
 		if (this.rdfTargetEntityType.isOperation()) {
-			construct.append(constructOperation(rdfTargetEntityType, ""));
+			construct.append(constructOperation(rdfTargetEntityType, "",false));
 		} else {
 			construct.append(targetEntityIdentifier(edmTargetEntitySet.getEntityType().getName(), "\t"));
 			construct.append(constructType(rdfTargetEntityType, edmTargetEntitySet.getEntityType().getName(), "\t"));
@@ -528,12 +528,17 @@ public class SparqlQueryBuilder {
 		return constructType;
 	}
 
-	private StringBuilder constructOperation(RdfEntityType rdfOperationType, String indent) throws EdmException {
+	private StringBuilder constructOperation(RdfEntityType rdfOperationType, String indent, Boolean isExpand) throws EdmException {
 		StringBuilder constructOperation = new StringBuilder();
 		if (DEBUG)
 			constructOperation.append(indent).append("#constructOperation\n");
 		String type = rdfOperationType.getIRI();
-		constructOperation.append(indent + "\t").append("[ <http://targetEntity> true ; a <" + type + "> ;\n");
+		//TODO only need target when operation is the primary entity
+		constructOperation.append(indent + "\t");
+		if(isExpand)
+			constructOperation.append("[ a <" + type + "> ;\n");
+		else
+			constructOperation.append("[ <http://targetEntity> true ; a <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
 					.append(" <" + property.getPropertyURI() + "> ?" + property.getVarName() + " ;\n");
@@ -1103,7 +1108,7 @@ public class SparqlQueryBuilder {
 				expandSelectTreeNodeConstruct.append(indent + "\t")
 						.append("?" + targetKey + "_s <" + navProperty.getAssociationIRI() + ">\n");
 				expandSelectTreeNodeConstruct.append(indent)
-						.append(constructOperation(navProperty.getRangeClass(), indent));
+						.append(constructOperation(navProperty.getRangeClass(), indent,true));
 			} else if (navProperty.getDomainClass().isOperation()) {
 
 			} else {

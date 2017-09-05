@@ -80,16 +80,16 @@ public class RdfModel {
 		private String getNsPrefixURI(String sprefix) {
 			return prefixToURI.get(sprefix);
 		}
-		public String convertToUri(String decodedEntityKey) {
-
-			int colon = decodedEntityKey.indexOf(':');
-			if (colon < 0)
-				return null;
-			else {
-				String uri = get(decodedEntityKey.substring(0, colon));
-				return uri == null ? null : "<"+uri + decodedEntityKey.substring(colon + 1)+">";
-			}
-		}
+//		public String convertToUri(String decodedEntityKey) {
+//
+//			int colon = decodedEntityKey.indexOf(':');
+//			if (colon < 0)
+//				return null;
+//			else {
+//				String uri = get(decodedEntityKey.substring(0, colon));
+//				return uri == null ? null : "<"+uri + decodedEntityKey.substring(colon + 1)+">";
+//			}
+//		}
 		public String convertToUriString(String decodedEntityKey) {
 
 			int colon = decodedEntityKey.indexOf(':');
@@ -210,10 +210,10 @@ public class RdfModel {
 			String urlEntityKey = rdfPrefixes.convertToUriString(decodedEntityKey);
 			return this.toQName(RdfNodeFactory.createURI(urlEntityKey),RdfConstants.QNAME_SEPARATOR);
 		}
-		@Deprecated
-		public String qName(String uri) {
-			return uri;
-		}
+//		@Deprecated
+//		public String qName(String uri) {
+//			return uri;
+//		}
 	}
 
 	public static class RdfSchema {

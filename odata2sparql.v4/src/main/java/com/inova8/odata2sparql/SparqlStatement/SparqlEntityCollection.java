@@ -142,8 +142,7 @@ class SparqlEntityCollection extends EntityCollection {
 					rdfSubjectEntity.setEntityType(rdfEntityType);
 				}
 				if (objectNode.isIRI() || objectNode.isBlank()) {
-					// Must be a navigation property pointing to an expanded
-					// entity
+					// Must be a navigation property pointing to an expanded entity
 					if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
 						rdfSubjectEntity
 								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode));
@@ -177,13 +176,6 @@ class SparqlEntityCollection extends EntityCollection {
 											.getRelatedKey(),
 									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(
 											sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode,RdfConstants.QNAME_SEPARATOR))));
-							// rdfSubjectEntity.put(
-							// rdfSubjectEntity.getEntityType()
-							// .findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(),
-							// RdfEntity
-							// //.URLEncodeEntityKey(objectNode.toQName(sparqlEdmProvider.getRdfModel().getRdfPrefixes())));
-							// .URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode)));
-							// }
 						}
 					}
 
