@@ -175,7 +175,8 @@ public class RdfModelToMetadata {
 						//						propertyType = langLiteralType;
 						CsdlProperty property = new CsdlProperty().setName(propertyName)
 								.setType(propertyType.getFullQualifiedName());
-						if(propertyType==EdmPrimitiveTypeKind.DateTimeOffset)		property.setPrecision(3);
+						if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
+							property.setPrecision(3);
 
 						List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
 						if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {
@@ -315,30 +316,26 @@ public class RdfModelToMetadata {
 
 				}
 			}
+			//Only add if  schema is not empty of entityTypes
+			if (!entityTypes.isEmpty()) {
+				List<CsdlAnnotation> schemaAnnotations = new ArrayList<CsdlAnnotation>();
+				schemaAnnotations.add(buildCsdlAnnotation(RdfConstants.ONTOLOGY_FQN, rdfGraph.getSchemaName()));
 
-			//List<CsdlSchema> edmSchemas = new ArrayList<CsdlSchema>();
-
-			List<CsdlAnnotation> schemaAnnotations = new ArrayList<CsdlAnnotation>();
-			schemaAnnotations.add(buildCsdlAnnotation(RdfConstants.ONTOLOGY_FQN, rdfGraph.getSchemaName()));
-
-			CsdlSchema modelSchema = new CsdlSchema().setNamespace(modelNamespace)
-					.setEntityTypes(new ArrayList<CsdlEntityType>(entityTypes.values()))
-					.setComplexTypes(new ArrayList<CsdlComplexType>());
-			//TODO MS does not support annotations to the schema
-			//	modelSchema.setAnnotations(schemaAnnotations);
-			if (modelNamespace.equals(RdfConstants.RDF)) {
-				modelSchema.getComplexTypes().add(langLiteralType);
+				CsdlSchema modelSchema = new CsdlSchema().setNamespace(modelNamespace)
+						.setEntityTypes(new ArrayList<CsdlEntityType>(entityTypes.values()))
+						.setComplexTypes(new ArrayList<CsdlComplexType>());
+				//TODO MS does not support annotations to the schema
+				//	modelSchema.setAnnotations(schemaAnnotations);
+				if (modelNamespace.equals(RdfConstants.RDF)) {
+					modelSchema.getComplexTypes().add(langLiteralType);
+				}
+				rdfEdm.put(modelNamespace, modelSchema);
 			}
-
-			//edmSchemas.add(modelSchema);
-
-			rdfEdm.put(modelNamespace, modelSchema);
 		}
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Third pass to add navigationPropertyBinding
 			for (RdfAssociation rdfAssociation : rdfGraph.associations) {
-				// if (!rdfAssociation.isInverse)
 				{
 					String path = rdfAssociation.getEDMAssociationName();
 					String target = rdfAssociation.getRangeClass().getEDMEntitySetName();//.getRangeName();
@@ -346,7 +343,6 @@ public class RdfModelToMetadata {
 							.setPath(path).setTarget(target);
 					entitySets.get(rdfAssociation.getDomainClass().getEDMEntitySetName())
 							.getNavigationPropertyBindings().add(navigationPropertyBinding);
-
 				}
 			}
 		}
@@ -405,19 +401,8 @@ public class RdfModelToMetadata {
 		return propertyMapping.get(fqnProperty);
 	}
 
-	/*
-	 * public RdfProperty getMappedProperty(EdmAssociation edmAssociation, EdmTyped edmTyped) throws EdmException {
-	 * FullQualifiedName fqnProperty = new FullQualifiedName(edmAssociation.getNamespace(), edmTyped.toString()); return
-	 * propertyMapping.get(fqnProperty); }
-	 */
-
 	public RdfAssociation getMappedNavigationProperty(FullQualifiedName edmNavigationProperty) {
 		return navigationPropertyMapping.get(edmNavigationProperty);
 	}
 
-	/*
-	 * public RdfAssociation getMappedNavigationProperty(EdmAssociation edmAssociation) throws EdmException {
-	 * FullQualifiedName edmNavigationProperty = new FullQualifiedName(edmAssociation.getNamespace(),
-	 * edmAssociation.getName()); return navigationPropertyMapping.get(edmNavigationProperty); }
-	 */
 }

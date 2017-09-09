@@ -47,12 +47,10 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
 	private RdfEdmProvider sparqlEdmProvider;
 
-	// TODO clarification of expanded structure
+	// Clarification of expanded structure
 	// Entityset dataproperty: List<Map<Subject, Map<Property,Value>>>
-	// Expanded to first level: List<Map<Subject, Map<navProp, Map<Object,
-	// Map<Property,Value>>>>>
-	// Expanded to second level: List<Map<Subject, Map<navProp, Map<Object,
-	// Map<navProp, Map<Object, Map<Property,Value>>>>>>>
+	// Expanded to first level: List<Map<Subject, Map<navProp, Map<Object, Map<Property,Value>>>>>
+	// Expanded to second level: List<Map<Subject, Map<navProp, Map<Object, Map<navProp, Map<Object, Map<Property,Value>>>>>>>
 
 	SparqlEntityCollection(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) {
@@ -263,12 +261,7 @@ class SparqlEntityCollection extends EntityCollection {
 				RdfNode propertyNode = entry.getKey();
 				Object value = entry.getValue();
 				RdfEntityType rdfSubjectEntityType = rdfEntity.getEntityType();
-				if (rdfSubjectEntityType != null) {// TODO
-													// rdfEntity.getEntityType()
-													// failing or getting
-													// rdfs_Resource by mistake,
-													// not the correct type of
-													// the entity
+				if (rdfSubjectEntityType != null) {
 					RdfProperty rdfProperty = null;
 					if (rdfSubjectEntityType.isOperation()) {
 						// test to make sure a objectproperty first?

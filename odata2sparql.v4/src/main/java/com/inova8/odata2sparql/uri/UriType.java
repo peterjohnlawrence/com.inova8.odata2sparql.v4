@@ -104,9 +104,4 @@ public enum UriType {
 			whiteList.add(queryOption);
 		}
 	}
-
-// TODO Remove unused code found by UCDetector
-// 	public boolean isCompatible(final SystemQueryOption queryOption) {
-// 		return whiteList.contains(queryOption);
-// 	}
 }

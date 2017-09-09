@@ -27,7 +27,7 @@ import com.inova8.odata2sparql.SparqlProcessor.SparqlErrorProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlServiceDocumentProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
 
 public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -63,11 +63,11 @@ public class RdfODataServlet extends HttpServlet {
 					handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
 					handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 					handler.register(new SparqlPrimitiveValueProcessor(rdfEdmProvider));
-					handler.register(new SparqlServiceDocumentProcessor());
+					handler.register(new SparqlDefaultProcessor());
 					handler.register(new SparqlReferenceCollectionProcessor(rdfEdmProvider));
 					handler.register(new SparqlReferenceProcessor(rdfEdmProvider));
 					handler.register(new SparqlBatchProcessor(rdfEdmProvider));
-					handler.register(new SparqlErrorProcessor());
+					//handler.register(new SparqlErrorProcessor());
 					log.info(req.getMethod() + ": "+ req.getPathInfo()+" Query: "+req.getQueryString());
 					// let the handler do the work
 					handler.process(req, resp);

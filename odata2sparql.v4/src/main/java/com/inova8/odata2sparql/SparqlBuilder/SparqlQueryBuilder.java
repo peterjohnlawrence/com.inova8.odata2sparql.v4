@@ -533,7 +533,6 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			constructOperation.append(indent).append("#constructOperation\n");
 		String type = rdfOperationType.getIRI();
-		//TODO only need target when operation is the primary entity
 		constructOperation.append(indent + "\t");
 		if(isExpand)
 			constructOperation.append("[ a <" + type + "> ;\n");
@@ -1160,9 +1159,6 @@ public class SparqlQueryBuilder {
 			//SparqlExpressionVisitor expandFilterClause;
 			if (expandItem.getFilterOption() == null){
 				expandSelectTreeNodeWhere.append("OPTIONAL");
-			}else{
-				//TODO
-				//expandFilterClause = filterClause(uriInfo.getFilterOption(), targetEntityType);
 			}
 			expandSelectTreeNodeWhere.append("{\n");
 			if (navProperty.getRangeClass().isOperation()) {
@@ -1179,8 +1175,14 @@ public class SparqlQueryBuilder {
 				if (navProperty.getDomainClass().isOperation()) {
 					// Nothing to add as BIND assumed to be created
 				} else if (navProperty.IsInverse()) {
-					expandSelectTreeNodeWhere.append(indent).append("\t").append("?" + nextTargetKey + "_s <"
+					expandSelectTreeNodeWhere.append(indent).append("\t").append("{\n");
+					expandSelectTreeNodeWhere.append(indent).append("\t").append("\t").append("?" + nextTargetKey + "_s <"
 							+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
+					expandSelectTreeNodeWhere.append(indent).append("\t").append("}UNION{\n");
+					expandSelectTreeNodeWhere.append(indent).append("\t").append("\t").append("?" + targetKey + "_s <"
+							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+					expandSelectTreeNodeWhere.append(indent).append("\t").append("}\n");
+					
 				} else {
 					expandSelectTreeNodeWhere.append(indent).append("\t").append("?" + targetKey + "_s <"
 							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
@@ -1201,8 +1203,7 @@ public class SparqlQueryBuilder {
 			String indent) {
 		StringBuilder clausesSelect = new StringBuilder();
 		clausesSelect.append(indent);
-		// TODO Case URI5 need to fetch only one property as given in
-		// resourceParts
+		// Case URI5 need to fetch only one property as given in resourceParts
 		if (navPath.equals(nextTargetKey) || this.filterClause.getNavPropertyPropertyFilters().containsKey(navPath)) {
 		} else {
 			clausesSelect.append("OPTIONAL");
@@ -1282,24 +1283,12 @@ public class SparqlQueryBuilder {
 		RdfEntityType entityType = rdfTargetEntityType;
 		String key = entityType.entityTypeName;
 		HashMap<String, HashSet<String>> values = new HashMap<String, HashSet<String>>();
-		// Boolean emptyClause = true;
 		if (selectOption != null) {
 			for (SelectItem property : selectOption.getSelectItems()) {
 				HashSet<String> valueProperties;
 				RdfEntityType segmentEntityType = entityType;
-				//RdfEntityType priorSegmentEntityType = null;
+
 				key = entityType.entityTypeName;
-				// check property.getNavigationPropertySegments()
-				// if so then
-				// V4 for (NavigationPropertySegment navigationPropertySegment :
-				// property.getNavigationPropertySegments()) {
-				// priorSegmentEntityType = segmentEntityType;
-				// segmentEntityType =
-				// rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(navigationPropertySegment
-				// .getTargetEntitySet());
-				// key = key +
-				// navigationPropertySegment.getNavigationProperty().getName();
-				// }
 				if (!values.containsKey(key)) {
 					valueProperties = new HashSet<String>();
 					values.put(key, valueProperties);
@@ -1308,8 +1297,7 @@ public class SparqlQueryBuilder {
 				}
 
 				if (property.isStar()) {
-					// TODO Does/should segmentEntityType.getProperties get
-					// inhererited properties as well?
+					// TODO Does/should segmentEntityType.getProperties get inherited properties as well?
 					// TODO Why not get all
 					for (RdfProperty rdfProperty : segmentEntityType.getProperties()) {
 						if (rdfProperty.propertyNode != null) {
@@ -1335,32 +1323,13 @@ public class SparqlQueryBuilder {
 						}
 
 						if (rdfProperty.getIsKey()) {
-							// TODO specifically asked for key so should be
-							// added to VALUES
+							// TODO specifically asked for key so should be added to VALUES
 							valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-							// emptyClause = false;
-
 						} else {
 							valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
-							// emptyClause = false;
 						}
 					}
-				} else {
-					// Must be a navigation property
-					// @SuppressWarnings("unused")
-					// RdfAssociation rdfAssociation = null;
-					// try {
-					// //TODO which of the navigation properties???
-					// rdfAssociation =
-					// priorSegmentEntityType.findNavigationProperty(property
-					// .getNavigationPropertySegments().get(0).getNavigationProperty().getName());
-					// } catch (EdmException e) {
-					// log.error("Failed to locate navigation property:"
-					// +
-					// property.getNavigationPropertySegments().get(0).getNavigationProperty().getName());
-					// }
-				}
-
+				} 
 			}
 			return values;
 		}

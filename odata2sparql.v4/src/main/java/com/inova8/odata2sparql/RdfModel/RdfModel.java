@@ -1088,7 +1088,24 @@ public class RdfModel {
 
 		return association;
 	}
+	RdfAssociation getOrCreateInverseAssociation(RdfNode inversePropertyNode, RdfNode inversePropertyLabelNode,
+			RdfNode propertyNode, RdfNode domainNode, RdfNode rangeNode, RdfNode multipleDomainNode,
+			RdfNode multipleRangeNode, Cardinality domainCardinality, Cardinality rangeCardinality)
+			throws OData2SparqlException {
 
+		RdfAssociation association = getOrCreateAssociation(propertyNode, null, domainNode, rangeNode,
+				multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
+		RdfAssociation inverseAssociation = getOrCreateAssociation(inversePropertyNode, inversePropertyLabelNode,
+				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
+		inverseAssociation.setIsInverse(true);
+		inverseAssociation.inversePropertyOf = propertyNode;
+		//Added because inverse is symmetrical
+		inverseAssociation.setInverseAssociation(association);
+		association.setIsInverse(true);
+		association.setInverseAssociation(inverseAssociation);
+		association.inversePropertyOf = inversePropertyNode;
+		return inverseAssociation;
+	}
 	private String createAssociationName(RdfNode multipleDomainNode, RdfNode multipleRangeNode, RdfURI domainURI,
 			RdfURI propertyURI, RdfURI rangeURI) throws OData2SparqlException {
 		if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
@@ -1107,21 +1124,7 @@ public class RdfModel {
 		return rdfToOdata(propertyURI.localName);
 	}
 
-	RdfAssociation getOrCreateInverseAssociation(RdfNode inversePropertyNode, RdfNode inversePropertyLabelNode,
-			RdfNode propertyNode, RdfNode domainNode, RdfNode rangeNode, RdfNode multipleDomainNode,
-			RdfNode multipleRangeNode, Cardinality domainCardinality, Cardinality rangeCardinality)
-			throws OData2SparqlException {
 
-		RdfAssociation association = getOrCreateAssociation(propertyNode, null, domainNode, rangeNode,
-				multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
-		RdfAssociation inverseAssociation = getOrCreateAssociation(inversePropertyNode, inversePropertyLabelNode,
-				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
-		inverseAssociation.setIsInverse(true);
-		inverseAssociation.inversePropertyOf = propertyNode;
-		//association.setHasInverse(true);
-		association.setInverseAssociation(inverseAssociation);
-		return inverseAssociation;
-	}
 
 	private RdfAssociation buildAssociation(String associationName, RdfNode propertyNode, RdfURI propertyURI,
 			RdfNode domainNode, RdfURI domainURI, RdfNode rangeNode, RdfURI rangeURI) throws OData2SparqlException {
