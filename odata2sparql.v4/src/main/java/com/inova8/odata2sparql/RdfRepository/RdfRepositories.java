@@ -383,6 +383,8 @@ public class RdfRepositories {
 		RepositoryConnection modelsConnection;
 		try {
 			modelsConnection = systemRepository.getConnection();
+			//Clear any contents to make sure we load a fresh models.ttl
+			modelsConnection.clear();
 			String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
 			if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
 				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder,"models.ttl").toString();

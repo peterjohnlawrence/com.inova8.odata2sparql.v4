@@ -21,13 +21,13 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlErrorProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
+
 
 public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
