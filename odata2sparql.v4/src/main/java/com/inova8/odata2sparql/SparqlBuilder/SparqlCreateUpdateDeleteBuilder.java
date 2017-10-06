@@ -15,6 +15,7 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
+
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -141,13 +142,19 @@ public class SparqlCreateUpdateDeleteBuilder {
 					first = false;
 				}
 				RdfProperty property = entityType.findProperty(prop.getName());
-				if (property.getIsKey()) {
-					properties
-							.append("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getIRI() + ">");
-					entityKey = prop.getValue().toString();
+				if (property != null) {
+					if (property.getIsKey()) {
+						properties.append(
+								"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getIRI() + ">");
+						entityKey = prop.getValue().toString();
+					} else {
+						properties.append("<" + property.propertyNode.getIRI() + "> ");
+						properties.append(castObjectToXsd(prop.getValue()));
+					}
 				} else {
-					properties.append("<" + property.propertyNode.getIRI() + "> ");
-					properties.append("\"" + prop.getValue().toString() + "\"");
+					RdfAssociation association = entityType.findNavigationProperty(prop.getName());
+					properties.append("<" + association.getAssociationIRI() + "> ");
+					properties.append(castObjectToXsd(prop.getValue()));
 				}
 			}
 		}
@@ -167,6 +174,29 @@ public class SparqlCreateUpdateDeleteBuilder {
 				throw new OData2SparqlException("Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(),
 						null);
 			}
+		}
+	}
+
+	private String castObjectToXsd(Object object) throws OData2SparqlException {
+		switch (object.getClass().getName()) {
+		case "Null":
+			return "null";
+		case "java.util.GregorianCalendar":
+			return "\"" + ((java.util.GregorianCalendar) object).toZonedDateTime().toLocalDateTime().toString()
+					+ "\"^^xsd:dateTime";
+		//		case "org.apache.olingo.odata2.core.ep.entry.ODataEntryImpl":
+		//			String odataUrl= ((org.apache.olingo.odata2.core.ep.entry.ODataEntryImpl)object).getMetadata().getUri();
+		//			String entityUrl= RdfEntity.URLDecodeEntityKey(getExpandedMetadaEntitykey( odataUrl));
+		//			return "<" + entityUrl + ">";
+		case "Edm.DateTimeOffset":
+		case "java.lang.String":
+			return "'''" + object.toString() + "'''";
+		case "Edm.Guid":
+			return "guid\"" + object.toString() + "\"";
+		case "Edm.Binary":
+			return "X\"" + object.toString() + "\"";
+		default:
+			return "\"" + object.toString() + "\"";
 		}
 	}
 
@@ -293,7 +323,8 @@ public class SparqlCreateUpdateDeleteBuilder {
 	}
 
 	private SparqlStatement generateOperationUpdateEntitySimplePropertyValue(String updatePropertyText,
-			RdfEntityType entityType, List<UriParameter> entityKeys, String property, Object entry) throws OData2SparqlException {
+			RdfEntityType entityType, List<UriParameter> entityKeys, String property, Object entry)
+			throws OData2SparqlException {
 		return new SparqlStatement(generateOperationFromTemplate(entityType.getUpdatePropertyText(), entityType,
 				entityKeys, null, property, entry).toString());
 	}

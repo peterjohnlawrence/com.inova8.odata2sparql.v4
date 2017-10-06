@@ -21,7 +21,6 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNodeFactory;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
@@ -63,7 +62,15 @@ public class RdfModel {
 		void log() {
 			log.info("Deduced prefixes: " + prefixToURI.toString());
 		}
-
+		public StringBuilder sparqlPrefixes() {
+			StringBuilder sparqlPrefixes = new StringBuilder();
+			for (Map.Entry<String, String> prefixEntry : prefixToURI.entrySet()) {
+				String prefix = prefixEntry.getKey();
+				String url = prefixEntry.getValue();
+				sparqlPrefixes.append("PREFIX ").append(prefix).append(": <").append(url).append("> ");
+			}
+			return sparqlPrefixes;
+		}
 		private void setNsPrefix(String graphPrefix, String graphName) throws OData2SparqlException {
 
 			checkLegal(graphPrefix);
@@ -90,16 +97,17 @@ public class RdfModel {
 //				return uri == null ? null : "<"+uri + decodedEntityKey.substring(colon + 1)+">";
 //			}
 //		}
-		public String convertToUriString(String decodedEntityKey) {
-
-			int colon = decodedEntityKey.indexOf(':');
-			if (colon < 0)
-				return null;
-			else {
-				String uri = get(decodedEntityKey.substring(0, colon));
-				return uri == null ? null : uri + decodedEntityKey.substring(colon + 1);
-			}
-		}
+//		@Deprecated
+//		public String convertToUriString(String decodedEntityKey) {
+//
+//			int colon = decodedEntityKey.indexOf(':');
+//			if (colon < 0)
+//				return null;
+//			else {
+//				String uri = get(decodedEntityKey.substring(0, colon));
+//				return uri == null ? null : uri + decodedEntityKey.substring(colon + 1);
+//			}
+//		}
 		public String expandPrefix(String decodedEntityKey) {
 
 			int colon = decodedEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
@@ -206,10 +214,11 @@ public class RdfModel {
 			}
 			return qname;
 		}
-		public String entitykeyToQName(String decodedEntityKey){
-			String urlEntityKey = rdfPrefixes.convertToUriString(decodedEntityKey);
-			return this.toQName(RdfNodeFactory.createURI(urlEntityKey),RdfConstants.QNAME_SEPARATOR);
-		}
+//		@Deprecated
+//		public String entitykeyToQName(String decodedEntityKey){
+//			String urlEntityKey = rdfPrefixes.convertToUriString(decodedEntityKey);
+//			return this.toQName(RdfNodeFactory.createURI(urlEntityKey),RdfConstants.QNAME_SEPARATOR);
+//		}
 //		@Deprecated
 //		public String qName(String uri) {
 //			return uri;
@@ -789,7 +798,7 @@ public class RdfModel {
 
 		RdfURI(RdfNode node) throws OData2SparqlException {
 			this.node = node;
-			String[] parts = rdfPrefixes.toQName(node,":").split(":"); //node.toQName(rdfPrefixes).split(":");
+			String[] parts = rdfPrefixes.toQName(node,RdfConstants.QNAME_SEPARATOR).split(RdfConstants.QNAME_SEPARATOR); //node.toQName(rdfPrefixes).split(":");
 			if (parts[0].equals("http") || parts[0].equals("null")) {
 				localName = node.getLocalName();
 				graphName = node.getNamespace();

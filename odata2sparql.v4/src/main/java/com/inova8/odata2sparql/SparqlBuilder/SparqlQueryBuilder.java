@@ -449,6 +449,7 @@ public class SparqlQueryBuilder {
 			throws EdmException, ODataApplicationException, OData2SparqlException, ExpressionVisitException {
 
 		StringBuilder prepareConstruct = new StringBuilder("");
+		prepareConstruct.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareConstruct.append(construct());
 		prepareConstruct.append("WHERE {\n");
 		prepareConstruct.append(where());
@@ -461,6 +462,7 @@ public class SparqlQueryBuilder {
 			throws ODataApplicationException, EdmException, OData2SparqlException {
 
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
+		prepareCountEntitySet.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareCountEntitySet.append("\t").append("SELECT ");
 		prepareCountEntitySet.append("(COUNT(DISTINCT *").append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));

@@ -725,7 +725,7 @@ public class RdfModelProvider {
 					clazz.isOperation = clazz.isOperation;
 					//Need to define a primary key for an operation
 					if (clazz.primaryKeys.isEmpty() && clazz.isOperation && clazz.getBaseType() == null) {
-						log.warn("Class and related associations removed because incomplete definition " + clazz.getIRI());
+						log.warn("Class and related associations removed because incomplete definition, possibly no objectproperty results: " + clazz.getIRI());
 						//Remove any association  that uses this class
 						for (RdfSchema associationGraph : model.graphs) {
 							 Iterator<RdfAssociation> associationsIterator = associationGraph.associations.iterator();
