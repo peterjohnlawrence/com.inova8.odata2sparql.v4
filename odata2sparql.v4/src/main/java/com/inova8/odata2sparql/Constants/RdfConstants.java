@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
@@ -245,16 +246,28 @@ public class RdfConstants {
 	}
 	static {
 		//Initialize the file dependent constants
+		
 		try {
-			String  workingDirectory = System.getenv("AppData");
-			if (workingDirectory==null)
-			{
-			    workingDirectory = System.getProperty("user.home");
-			    //if we are on a Mac, we are not done, we look for "Application Support"
-				workingDirectory = Paths.get(System.getProperty("user.home"),"Library", "Application Support", "inova8", "odata2sparql").toString();
-			}else{
+			String workingDirectory = null;
+			if(SystemUtils.IS_OS_WINDOWS){
 				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
+			}else if(SystemUtils.IS_OS_LINUX){
+				workingDirectory = Paths.get("/etc", "inova8", "odata2sparql").toString();
+			}else{
+				log.error("Unsupported OS: " + SystemUtils.OS_NAME);
+				throw new RuntimeException("Unsupported OS: " + SystemUtils.OS_NAME,null);
 			}
+		
+//		try {
+//			String  workingDirectory = System.getenv("AppData");
+//			if (workingDirectory==null)
+//			{
+//			    workingDirectory = System.getProperty("user.home");
+//			    //if we are on a Mac, we are not done, we look for "Application Support"
+//				workingDirectory = Paths.get(System.getProperty("user.home"),"Library", "Application Support", "inova8", "odata2sparql").toString();
+//			}else{
+//				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
+//			}
 			String repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
 
 			repositoryManagerDir = new File(workingDirectory );
