@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -26,6 +24,8 @@ import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -310,7 +310,7 @@ import com.inova8.odata2sparql.uri.UriType;
 public class SparqlQueryBuilder {
 	
 
-	private final Log log = LogFactory.getLog(SparqlQueryBuilder.class);
+	private final Logger log = LoggerFactory.getLogger(SparqlQueryBuilder.class);
 	private final RdfModel rdfModel;
 	private final RdfModelToMetadata rdfModelToMetadata;
 

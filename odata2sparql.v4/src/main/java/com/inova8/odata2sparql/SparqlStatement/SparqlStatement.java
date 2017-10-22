@@ -7,11 +7,11 @@
  */
 package com.inova8.odata2sparql.SparqlStatement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfConstructQuery;
@@ -23,7 +23,7 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 
 public class SparqlStatement {
-	private final static Log log = LogFactory.getLog(SparqlStatement.class);
+	private final static Logger log = LoggerFactory.getLogger(SparqlStatement.class);
 	private static String sparql;
 
 	public SparqlStatement(String sparql) {

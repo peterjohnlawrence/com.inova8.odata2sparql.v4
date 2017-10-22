@@ -3,8 +3,6 @@ package com.inova8.odata2sparql.SparqlStatement;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -23,6 +21,8 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
@@ -37,7 +37,7 @@ import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
 import com.inova8.odata2sparql.uri.UriType;
 
 public class SparqlBaseCommand {
-	private final static Log log = LogFactory.getLog(SparqlBaseCommand.class);
+	private final static Logger log = LoggerFactory.getLogger(SparqlBaseCommand.class);
 
 	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws ODataException, OData2SparqlException {

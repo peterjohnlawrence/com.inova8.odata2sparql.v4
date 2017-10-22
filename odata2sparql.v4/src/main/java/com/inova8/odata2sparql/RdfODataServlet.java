@@ -9,12 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -31,8 +31,8 @@ import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceProcessor;
 
 public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private final Log log = LogFactory.getLog(RdfODataServlet.class);
-	static private RdfEdmProviders rdfEdmProviders=null;// = new RdfEdmProviders(RdfODataServlet.getInitParamter());
+	private final Logger log = LoggerFactory.getLogger(RdfODataServlet.class);
+	static private RdfEdmProviders rdfEdmProviders=null;
 
 
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,

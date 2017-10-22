@@ -1,8 +1,8 @@
 package com.inova8.odata2sparql.RdfModel;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -13,7 +13,7 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 class RdfMetamodelProvider {
 	@SuppressWarnings("unused")
-	private final Log log = LogFactory.getLog(RdfMetamodelProvider.class);
+	private final Logger log = LoggerFactory.getLogger(RdfMetamodelProvider.class);
 	private final RdfRepository rdfRepository;
 	
 	public RdfRepository getRdfRepository() {

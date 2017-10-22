@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.server.api.uri.UriParameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
@@ -24,7 +25,7 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 
 public class SparqlCreateUpdateDeleteBuilder {
 	@SuppressWarnings("unused")
-	private final Log log = LogFactory.getLog(SparqlStatement.class);
+	private final Logger log = LoggerFactory.getLogger(SparqlStatement.class);
 	private final RdfModel rdfModel;
 
 	public SparqlCreateUpdateDeleteBuilder(RdfEdmProvider rdfEdmProvider) {

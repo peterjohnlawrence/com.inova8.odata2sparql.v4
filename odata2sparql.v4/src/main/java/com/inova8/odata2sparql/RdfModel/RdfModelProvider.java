@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.rdf4j.model.Namespace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
@@ -26,7 +26,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfSchema;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 public class RdfModelProvider {
-	private final Log log = LogFactory.getLog(RdfModelProvider.class);
+	private final Logger log = LoggerFactory.getLogger(RdfModelProvider.class);
 	private final RdfModel model;
 
 	private final RdfMetamodelProvider rdfMetamodelProvider;

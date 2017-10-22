@@ -1,17 +1,17 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.rdf4j.query.GraphQueryResult;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
 
 public class RdfTripleSet {
-	private final Log log = LogFactory.getLog(RdfTripleSet.class);
+	private final Logger log = LoggerFactory.getLogger(RdfTripleSet.class);
 	private final GraphQueryResult tripleSet;
 	private final RepositoryConnection connection;
 

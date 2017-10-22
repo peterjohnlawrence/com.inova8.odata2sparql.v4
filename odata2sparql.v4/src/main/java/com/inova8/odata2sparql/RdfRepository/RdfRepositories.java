@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Hashtable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.IRI;
@@ -41,6 +39,8 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.sail.SailReadOnlyException;
 import org.eclipse.rdf4j.sail.config.SailImplConfig;
 import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.*;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -48,22 +48,26 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
 public class RdfRepositories {
 
-	private final Log log = LogFactory.getLog(RdfRepositories.class);
+	private final Logger log = LoggerFactory.getLogger(RdfRepositories.class);
 	private RepositoryManager repositoryManager = null;
 	private final String repositoryFolder;
 	private final String repositoryUrl;
 	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
 
 	public RdfRepositories(String repositoryFolder,String repositoryUrl) {
-		super();
-		this.repositoryFolder = repositoryFolder;
+		super();	
+		if(repositoryFolder==null || repositoryFolder.isEmpty()){
+			this.repositoryFolder=RdfConstants.DEFAULT;
+		}else{
+			this.repositoryFolder = repositoryFolder;
+		}
 		this.repositoryUrl = repositoryUrl;
 		try {
 			loadRepositories();
 		} catch (OData2SparqlException e) {
-			log.fatal("Cannot load repositories", e);
+			log.error("Cannot load repositories", e);
 		} catch (RepositoryConfigException e) {
-			log.fatal("Cannot load repositories", e);
+			log.error("Cannot load repositories", e);
 		}
 	}
 
@@ -72,9 +76,9 @@ public class RdfRepositories {
 		try {
 			loadRepositories();
 		} catch (OData2SparqlException e) {
-			log.fatal("Cannot load repositories", e);
+			log.error("Cannot load repositories", e);
 		} catch (RepositoryConfigException e) {
-			log.fatal("Cannot load repositories", e);
+			log.error("Cannot load repositories", e);
 		}
 	}
 
@@ -87,7 +91,6 @@ public class RdfRepositories {
 	}
 
 	private void loadRepositories() throws OData2SparqlException, RepositoryConfigException {
-		//RepositoryManager repositoryManager = null;
 		try {
 			if (this.repositoryUrl!=null && !this.repositoryUrl.isEmpty()) {
 				try {
@@ -97,14 +100,14 @@ public class RdfRepositories {
 					try {
 						repositoryManager = bootstrapLocalRepository();
 					} catch (OData2SparqlException e1) {
-						log.fatal("Tried everything. Cannot locate a suitable repository", e1);
+						log.error("Tried everything. Cannot locate a suitable repository", e1);
 					}
 				}
 			} else {
 				try {
 					repositoryManager = bootstrapLocalRepository();
 				} catch (OData2SparqlException e1) {
-					log.fatal("Tried everything. Cannot locate a suitable repository", e1);
+					log.error("Tried everything. Cannot locate a suitable repository", e1);
 				}
 			}
 
@@ -299,10 +302,10 @@ public class RdfRepositories {
 				}
 
 			} catch (MalformedQueryException e) {
-				log.fatal("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
+				log.error("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
 				throw new OData2SparqlException();
 			} catch (QueryEvaluationException e) {
-				log.fatal(
+				log.error(
 						"Query Evaluation Exception "
 								+ RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
 				throw new OData2SparqlException();
@@ -310,7 +313,7 @@ public class RdfRepositories {
 				modelsConnection.close();
 			}
 		} catch (RepositoryException e) {
-			log.fatal("Cannot get connection to repository: check directory", e);
+			log.error("Cannot get connection to repository: check directory", e);
 			throw new OData2SparqlException();
 		} finally {
 			//Cannot shutdown repositoryManager at this stage as it will terminate the connections to the individual repositories
@@ -327,7 +330,7 @@ public class RdfRepositories {
 			repositoryManager.getRepositoryInfo(RdfConstants.systemId);
 		} catch (RepositoryException e) {
 			log.warn("Cannot initialize remote repository manager at " + repositoryUrl
-					+ ". Will use local repository instead", null);
+					+ ". Will use local repository instead");
 			throw new OData2SparqlException("RdfRepositories bootstrapRemoteRepository failure", null);
 		}
 		return repositoryManager;
@@ -344,7 +347,7 @@ public class RdfRepositories {
 		try {
 			repositoryManager.initialize();
 		} catch (RepositoryException e) {
-			log.fatal("Cannot initialize repository manager at " + localRepositoryManagerDirectory + "Check also web-xml init-param repositoryFolder", e);
+			log.error("Cannot initialize repository manager at " + localRepositoryManagerDirectory + "Check also web-xml init-param repositoryFolder", e);
 			throw new OData2SparqlException("RdfRepositories loadRepositories failure", e);
 		}
 
@@ -361,10 +364,10 @@ public class RdfRepositories {
 			log.info("Repository read-only: will clear and reload", e);
 			throw new OData2SparqlException();
 		} catch (RepositoryException e) {
-			log.fatal("Cannot add configuration to repository", e);
+			log.error("Cannot add configuration to repository", e);
 			throw new OData2SparqlException();
 		} catch (RepositoryConfigException e) {
-			log.fatal("Cannot add configuration to repository", e);
+			log.error("Cannot add configuration to repository", e);
 			throw new OData2SparqlException();
 		}
 		
@@ -373,10 +376,10 @@ public class RdfRepositories {
 		try {
 			systemRepository = repositoryManager.getRepository(RdfConstants.systemId);
 		} catch (RepositoryConfigException e) {
-			log.fatal("Cannot find " + RdfConstants.systemId + " repository", e);
+			log.error("Cannot find " + RdfConstants.systemId + " repository", e);
 			throw new OData2SparqlException();
 		} catch (RepositoryException e) {
-			log.fatal("Cannot find " + RdfConstants.systemId + " repository", e);
+			log.error("Cannot find " + RdfConstants.systemId + " repository", e);
 			throw new OData2SparqlException();
 		}
 
@@ -395,15 +398,15 @@ public class RdfRepositories {
 			try {
 				modelsConnection.add(new File(localRepositoryManagerModel), null, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
-				log.fatal("RDFParseException: Cannot parse  " + localRepositoryManagerModel + " Check to ensure valid RDF/XML or TTL", e);
+				log.error("RDFParseException: Cannot parse  " + localRepositoryManagerModel + " Check to ensure valid RDF/XML or TTL", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + localRepositoryManagerModel + " Check it is located in correct directory and is visible", e);
+				log.error("Cannot access " + localRepositoryManagerModel + " Check it is located in correct directory and is visible", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (RepositoryException e) {
-				log.fatal("RepositoryException: Cannot access " + localRepositoryManagerModel + " Check it is located in WEBINF/classes/", e);
+				log.error("RepositoryException: Cannot access " + localRepositoryManagerModel + " Check it is located in WEBINF/classes/", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} finally {
@@ -413,10 +416,10 @@ public class RdfRepositories {
 				log.info("Loading odata4sparql from " + RdfConstants.odata4sparqlFile);
 				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), null, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse " + RdfConstants.odata4sparqlFile, e);
+				log.error("Cannot parse " + RdfConstants.odata4sparqlFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.odata4sparqlFile, e);
+				log.error("Cannot access " + RdfConstants.odata4sparqlFile, e);
 				throw new OData2SparqlException();
 			} finally {
 
@@ -425,10 +428,10 @@ public class RdfRepositories {
 				log.info("Loading rdf from " + RdfConstants.rdfFile);
 				modelsConnection.add(new File(RdfConstants.rdfFile ), null, null);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse " + RdfConstants.rdfFile, e);
+				log.error("Cannot parse " + RdfConstants.rdfFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.rdfFile, e);
+				log.error("Cannot access " + RdfConstants.rdfFile, e);
 				throw new OData2SparqlException();
 			} finally {
 
@@ -437,10 +440,10 @@ public class RdfRepositories {
 				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
 				modelsConnection.add(new File(RdfConstants.rdfsFile ), null, null);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse " + RdfConstants.rdfsFile, e);
+				log.error("Cannot parse " + RdfConstants.rdfsFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.rdfsFile, e);
+				log.error("Cannot access " + RdfConstants.rdfsFile, e);
 				throw new OData2SparqlException();
 			} finally {
 
@@ -449,10 +452,10 @@ public class RdfRepositories {
 				log.info("Loading sail from " + RdfConstants.sailFile);
 				modelsConnection.add(new File(RdfConstants.sailFile), null, null);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse " + RdfConstants.sailFile, e);
+				log.error("Cannot parse " + RdfConstants.sailFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.sailFile, e);
+				log.error("Cannot access " + RdfConstants.sailFile, e);
 				throw new OData2SparqlException();
 			} finally {
 
@@ -461,16 +464,16 @@ public class RdfRepositories {
 				log.info("Loading sp from " + RdfConstants.spFile);
 				modelsConnection.add(new File(RdfConstants.spFile), null, null);
 			} catch (RDFParseException e) {
-				log.fatal("Cannot parse " + RdfConstants.spFile, e);
+				log.error("Cannot parse " + RdfConstants.spFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.fatal("Cannot access " + RdfConstants.spFile, e);
+				log.error("Cannot access " + RdfConstants.spFile, e);
 				throw new OData2SparqlException();
 			} finally {
 
 			}
 		} catch (RepositoryException e) {
-			log.fatal("Cannot connect to local system repository", e);
+			log.error("Cannot connect to local system repository", e);
 			throw new OData2SparqlException();
 		}
 		return repositoryManager;
@@ -499,13 +502,13 @@ public class RdfRepositories {
 			}
 
 		} catch (MalformedQueryException e) {
-			log.fatal("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
+			log.error("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
 			throw new OData2SparqlException("RdfRepositories readPrefixes failure", e);
 		} catch (RepositoryException e) {
-			log.fatal("RepositoryException " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
+			log.error("RepositoryException " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
 			throw new OData2SparqlException("RdfRepositories readPrefixes failure", e);
 		} catch (QueryEvaluationException e) {
-			log.fatal("QueryEvaluationException " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
+			log.error("QueryEvaluationException " + RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY), e);
 			throw new OData2SparqlException("RdfRepositories readPrefixes failure", e);
 		} finally {
 		}
@@ -543,13 +546,13 @@ public class RdfRepositories {
 				result.close();
 			}
 		} catch (MalformedQueryException e) {
-			log.fatal("Malformed Bootstrap Query ", e);
+			log.error("Malformed Bootstrap Query ", e);
 			throw new OData2SparqlException("RdfRepositories readQueries failure", e);
 		} catch (RepositoryException e) {
-			log.fatal("RepositoryException Bootstrap Query  ", e);
+			log.error("RepositoryException Bootstrap Query  ", e);
 			throw new OData2SparqlException("RdfRepositories readQueries failure", e);
 		} catch (QueryEvaluationException e) {
-			log.fatal("QueryEvaluationException Bootstrap Query ", e);
+			log.error("QueryEvaluationException Bootstrap Query ", e);
 			throw new OData2SparqlException("RdfRepositories readQueries failure", e);
 		} finally {
 		}

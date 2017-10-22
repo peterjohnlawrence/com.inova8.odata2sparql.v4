@@ -7,21 +7,17 @@
 	</appender>
 	<appender name="LOGFILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${catalina.base}/logs/odata2sparql.log</file>
+		<file>${catalina.base}/logs/odata2sparql.v4.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern>${catalina.base}/logs/odata2sparql.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${catalina.base}/logs/odata2sparql.v4.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<!-- keep 30 days' worth of history capped at 3GB total size -->
 			<maxHistory>30</maxHistory>
-<!-- 			<totalSizeCap>3GB</totalSizeCap> -->
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
-<!-- 	<category name="org.apache.olingo.odata2"> -->
-<!-- 		<priority value="warn" /> -->
-<!-- 	</category> -->
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="LOGFILE" />

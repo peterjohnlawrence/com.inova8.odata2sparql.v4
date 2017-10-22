@@ -11,8 +11,8 @@ import java.util.Set;
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
 import org.eclipse.rdf4j.model.BNode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.xerces.util.XMLChar;
@@ -25,7 +25,7 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
 public class RdfModel {
-	private final Log log = LogFactory.getLog(RdfModel.class);
+	private final Logger log = LoggerFactory.getLogger(RdfModel.class);
 
 	static String KEY(RdfEntityType clazz) {
 		return RdfConstants.SUBJECT;

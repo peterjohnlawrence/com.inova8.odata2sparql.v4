@@ -1,15 +1,15 @@
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.rdf4j.query.GraphQuery;
 import org.eclipse.rdf4j.query.QueryLanguage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;
 
 public class RdfConstructQuery extends RdfQuery{
-	private final Log log = LogFactory.getLog(RdfConstructQuery.class);
+	private final Logger log = LoggerFactory.getLogger(RdfConstructQuery.class);
 	private GraphQuery graphQuery;
 	public RdfConstructQuery(RdfRoleRepository rdfRoleRepository, String query) {
 		super.rdfRoleRepository = rdfRoleRepository;

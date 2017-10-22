@@ -3,8 +3,6 @@ package com.inova8.odata2sparql.SparqlProcessor;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
@@ -22,11 +20,13 @@ import org.apache.olingo.server.api.processor.MetadataProcessor;
 import org.apache.olingo.server.api.processor.ServiceDocumentProcessor;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumentProcessor, ErrorProcessor {
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	private final Log log = LogFactory.getLog(SparqlErrorProcessor.class);
+	private final Logger log = LoggerFactory.getLogger(SparqlErrorProcessor.class);
 
 	@Override
 	public void init(final OData odata, final ServiceMetadata serviceMetadata) {

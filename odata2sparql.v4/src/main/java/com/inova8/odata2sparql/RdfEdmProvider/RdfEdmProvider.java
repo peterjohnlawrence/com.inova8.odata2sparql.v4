@@ -2,8 +2,6 @@ package com.inova8.odata2sparql.RdfEdmProvider;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.edm.provider.CsdlAbstractEdmProvider;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -18,6 +16,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlFunctionImport;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.apache.olingo.commons.api.ex.ODataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -29,7 +29,7 @@ import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 public class RdfEdmProvider extends CsdlAbstractEdmProvider {
-	private final Log log = LogFactory.getLog(RdfEdmProvider.class);
+	private final Logger log = LoggerFactory.getLogger(RdfEdmProvider.class);
 	private final RdfEdmModelProvider rdfEdmModelProvider;
 	
 
@@ -88,7 +88,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 				}
 			}
 		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getEntityType " + edmFQName);
+			log.error("NullPointerException getEntityType " + edmFQName);
 			throw new ODataException("NullPointerException getEntityType " + edmFQName);
 		}
 		return null;
@@ -110,7 +110,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 				}
 			}
 		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getComplexType " + edmFQName);
+			log.error("NullPointerException getComplexType " + edmFQName);
 			throw new ODataException("NullPointerException getComplexType " + edmFQName);
 		}
 		return null;
@@ -132,7 +132,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 				//}
 		//	}
 		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getEntitySet " + entityContainer + " " + name);
+			log.error("NullPointerException getEntitySet " + entityContainer + " " + name);
 			throw new ODataException("NullPointerException getEntitySet " + entityContainer + " " + name);
 		}
 		return null;
@@ -156,7 +156,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 				//}
 			//}
 		} catch (NullPointerException e) {
-			log.fatal("NullPointerException getFunctionImport " + entityContainer + " " + name);
+			log.error("NullPointerException getFunctionImport " + entityContainer + " " + name);
 			throw new ODataException("NullPointerException getFunctionImport " + entityContainer + " " + name);
 		}
 
@@ -177,7 +177,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 					}
 				}
 			} catch (NullPointerException e) {
-				log.fatal("NullPointerException getEntityContainerInfo " + entityContainer);
+				log.error("NullPointerException getEntityContainerInfo " + entityContainer);
 				throw new ODataException("NullPointerException getEntityContainerInfo " + entityContainer);
 			}
 		}

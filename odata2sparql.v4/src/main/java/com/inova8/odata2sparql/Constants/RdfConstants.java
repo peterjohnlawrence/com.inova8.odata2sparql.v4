@@ -17,16 +17,16 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RdfConstants {
 
-	private final static Log log = LogFactory.getLog(RdfConstants.class);
+	private final static Logger log = LoggerFactory.getLogger(RdfConstants.class);
 
 	public enum Cardinality {
 		// Cardinality corresponding to
@@ -34,6 +34,7 @@ public class RdfConstants {
 		ZERO_TO_ONE, ONE, MANY, MULTIPLE
 	}
 
+	public static final String DEFAULT = ".default";
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
 	public static final String WILDCARD = "*";

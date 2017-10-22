@@ -22,7 +22,7 @@ import org.openrdf.model.impl.SimpleValueFactory;
 
 
 public class RdfConstants {
-	private final static Log log = LogFactory.getLog(RdfConstants.class);
+	private final static Logger log = LoggerFactory.getLogger(RdfConstants.class);
 	public enum Cardinality {
 		// Cardinality corresponding to
 		// 0..1, 1..1, 0..*, 1..*
