@@ -8,6 +8,10 @@
 		<servlet-name>OData2SparqlServiceServlet</servlet-name>
 		<servlet-class>com.inova8.odata2sparql.RdfODataServlet</servlet-class>
 		<init-param>
+			<param-name>configFolder</param-name>
+			<param-value>/var/opt/inova8/odata2sparql</param-value>
+		</init-param>
+				<init-param>
 			<param-name>repositoryFolder</param-name>
 			<param-value>V4</param-value>
 		</init-param>

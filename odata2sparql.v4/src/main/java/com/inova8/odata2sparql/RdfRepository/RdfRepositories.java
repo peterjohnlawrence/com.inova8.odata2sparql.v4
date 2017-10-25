@@ -50,14 +50,20 @@ public class RdfRepositories {
 
 	private final Logger log = LoggerFactory.getLogger(RdfRepositories.class);
 	private RepositoryManager repositoryManager = null;
+	private final String configFolder;
 	private final String repositoryFolder;
 	private final String repositoryUrl;
 	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
 
-	public RdfRepositories(String repositoryFolder,String repositoryUrl) {
+	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl) {
 		super();	
+		if(configFolder==null || configFolder.isEmpty()){
+			this.configFolder=RdfConstants.DEFAULTCONFIG;
+		}else{
+			this.configFolder = configFolder;
+		}
 		if(repositoryFolder==null || repositoryFolder.isEmpty()){
-			this.repositoryFolder=RdfConstants.DEFAULT;
+			this.repositoryFolder=RdfConstants.DEFAULTFOLDER;
 		}else{
 			this.repositoryFolder = repositoryFolder;
 		}

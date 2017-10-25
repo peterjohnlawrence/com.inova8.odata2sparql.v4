@@ -33,8 +33,9 @@ public class RdfConstants {
 		// 0..1, 1..1, 0..*, 1..*
 		ZERO_TO_ONE, ONE, MANY, MULTIPLE
 	}
-
-	public static final String DEFAULT = ".default";
+	public static final String DEFAULTCONFIG= "/var/opt/inova8/odata2sparql/";
+	public static final String DEFAULTFOLDER = ".default";
+	
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
 	public static final String WILDCARD = "*";
@@ -246,34 +247,23 @@ public class RdfConstants {
 		return metaModels;
 	}
 	static {
-		//Initialize the file dependent constants
-		
+		//Initialize the file dependent constants	
 		try {
 			String workingDirectory = null;
 			if(SystemUtils.IS_OS_WINDOWS){
 				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
 			}else if(SystemUtils.IS_OS_LINUX){
-				workingDirectory = Paths.get("/etc", "inova8", "odata2sparql").toString();
+				//workingDirectory = Paths.get("/etc", "inova8", "odata2sparql").toString();
+				workingDirectory = Paths.get( DEFAULTCONFIG).toString();
 			}else{
 				log.error("Unsupported OS: " + SystemUtils.OS_NAME);
 				throw new RuntimeException("Unsupported OS: " + SystemUtils.OS_NAME,null);
 			}
 		
-//		try {
-//			String  workingDirectory = System.getenv("AppData");
-//			if (workingDirectory==null)
-//			{
-//			    workingDirectory = System.getProperty("user.home");
-//			    //if we are on a Mac, we are not done, we look for "Application Support"
-//				workingDirectory = Paths.get(System.getProperty("user.home"),"Library", "Application Support", "inova8", "odata2sparql").toString();
-//			}else{
-//				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
-//			}
 			String repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
 
 			repositoryManagerDir = new File(workingDirectory );
-			repositoryWorkingDirectory = workingDirectory;
-			//modelFile =Paths.get( workingDirectory , "models.ttl").toString();	
+			repositoryWorkingDirectory = workingDirectory;	
 			
 			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
