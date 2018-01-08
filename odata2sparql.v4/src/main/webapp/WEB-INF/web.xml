@@ -11,7 +11,7 @@
 			<param-name>configFolder</param-name>
 			<param-value>/var/opt/inova8/odata2sparql</param-value>
 		</init-param>
-				<init-param>
+		<init-param>
 			<param-name>repositoryFolder</param-name>
 			<param-value>V4</param-value>
 		</init-param>
