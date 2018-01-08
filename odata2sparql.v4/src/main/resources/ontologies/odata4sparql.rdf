@@ -1986,6 +1986,872 @@ BIND (coalesce(?VocRepositoryImplQueryLimit, ?DataRepositoryImplQueryLimit,100) 
         </sp:where>
       </sp:Select>
     </odata4sparql:repositoryQuery>
+    <odata4sparql:inverseAssociationQuery>
+      <sp:Select>
+        <sp:text>PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&#xD;
+ 	PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; &#xD;
+ 	PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt; &#xD;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;&#xD;
+ 	SELECT  distinct ?inverseProperty (COALESCE(?prefLabel, ?ipLabel,"" ) as ?inversePropertyLabel )      ?property   ?domain ?multipleDomain  ?range ?multipleRange ?maxDomainCardinality ?minDomainCardinality  ?domainCardinality  ?maxRangeCardinality ?minRangeCardinality ?rangeCardinality (COALESCE(?definition, ?comment,"") as ?description ) &#xD;
+ 	WHERE { { ?property owl:inverseOf ?inverseProperty .} UNION { ?inverseProperty owl:inverseOf ?property  } &#xD;
+ 	{SELECT  ?property (count(?mdomain  ) as ?multipleDomain) WHERE {?property rdfs:domain ?mdomain . } group by ?property  }&#xD;
+ 	{SELECT ?property (count(?mrange  ) as ?multipleRange) WHERE {?property rdfs:range ?mrange . } group by ?property  }&#xD;
+ 	?property rdfs:domain ?domain .&#xD;
+ 	?property rdfs:range ?range .&#xD;
+ 	?property rdf:type ?propertyType .&#xD;
+ OPTIONAL { ?inverseProperty rdfs:label ?ipLabel }   OPTIONAL { ?inverseProperty skos:prefLabel ?prefLabel }  . OPTIONAL{ ?inverseProperty rdfs:comment ?comment. } OPTIONAL{ ?inverseProperty skos:definition ?definition . } .&#xD;
+OPTIONAL{?domain rdfs:subClassOf+ ?superDomainClass .    ?property  rdfs:domain ?superDomainClass .  } FILTER( (?superDomainClass = ?domain )|| !Bound (?superDomainClass) )&#xD;
+OPTIONAL{?range rdfs:subClassOf+ ?superRangeClass .    ?property  rdfs:range ?superRangeClass .  } FILTER( (?superRangeClass = ?range )|| !Bound (?superRangeClass) ) &#xD;
+     FILTER(isIRI(?inverseProperty) &amp;&amp; isIRI(?property) &amp;&amp; isIRI(?domain) &amp;&amp; isIRI(?range) &amp;&amp; !(?range = rdfs:Literal) )  &#xD;
+ 	FILTER( (?propertyType = owl:ObjectProperty)||&#xD;
+ 	(?range = rdfs:Resource) ||&#xD;
+ 	(?range = rdfs:Class) ||&#xD;
+ 	(?range = owl:Class) ||&#xD;
+ 	(?range = owl:ObjectProperty) ||&#xD;
+ 	(?range = rdf:Property) ||&#xD;
+ 	(?range = rdf:List) ||&#xD;
+ 	(?range = owl:Ontology) ||&#xD;
+ 	(?range = owl:Thing)&#xD;
+ 	)&#xD;
+ OPTIONAL&#xD;
+  { ?domain rdfs:subClassOf ?minrdomainestriction .&#xD;
+ ?minrdomainestriction rdf:type owl:Restriction .&#xD;
+ ?minrdomainestriction owl:onProperty ?property .&#xD;
+ ?minrdomainestriction owl:minCardinality ?minDomainCardinality&#xD;
+ }&#xD;
+ OPTIONAL&#xD;
+ { ?domain rdfs:subClassOf ?maxdomainrestriction .&#xD;
+ ?maxdomainrestriction rdf:type owl:Restriction .&#xD;
+ ?maxdomainrestriction owl:onProperty ?property .&#xD;
+ ?maxdomainrestriction owl:maxCardinality ?maxDomainCardinality&#xD;
+ }&#xD;
+  OPTIONAL&#xD;
+ { ?domain rdfs:subClassOf ?domainrestriction .&#xD;
+ ?domainrestriction rdf:type owl:Restriction .&#xD;
+ ?domainrestriction owl:onProperty ?property .&#xD;
+ ?domainrestriction owl:cardinality ?domainCardinality&#xD;
+  }&#xD;
+  OPTIONAL&#xD;
+ { ?range rdfs:subClassOf ?minrangerestriction .&#xD;
+  ?minrangerestriction rdf:type owl:Restriction .&#xD;
+ ?minrangerestriction owl:onProperty ?property .&#xD;
+  ?minrangerestriction owl:minCardinality ?minRangeCardinality. FILTER(?range !=?domain)&#xD;
+ }&#xD;
+ OPTIONAL&#xD;
+ { ?range rdfs:subClassOf ?maxrangerestriction .&#xD;
+ ?maxrangerestriction rdf:type owl:Restriction .&#xD;
+ ?maxrangerestriction owl:onProperty ?property .&#xD;
+ ?maxrangerestriction owl:maxCardinality ?maxRangeCardinality. FILTER(?range !=?domain)&#xD;
+ }&#xD;
+ OPTIONAL&#xD;
+ { ?range rdfs:subClassOf ?rangerestriction .&#xD;
+ ?rangerestriction rdf:type owl:Restriction .&#xD;
+ ?rangerestriction owl:onProperty ?property .&#xD;
+ ?rangerestriction owl:cardinality ?rangeCardinality. FILTER(?range !=?domain)&#xD;
+ }&#xD;
+ 	}ORDER BY ?propertyLabel</sp:text>
+        <sp:orderBy rdf:parseType="Collection">
+          <rdf:Description>
+            <sp:varName>propertyLabel</sp:varName>
+          </rdf:Description>
+        </sp:orderBy>
+        <sp:resultVariables rdf:parseType="Collection">
+          <rdf:Description>
+            <sp:varName>inverseProperty</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:expression>
+              <sp:coalesce>
+                <sp:arg3></sp:arg3>
+                <sp:arg2 rdf:parseType="Resource">
+                  <sp:varName>ipLabel</sp:varName>
+                </sp:arg2>
+                <sp:arg1 rdf:parseType="Resource">
+                  <sp:varName>prefLabel</sp:varName>
+                </sp:arg1>
+              </sp:coalesce>
+            </sp:expression>
+            <sp:varName>inversePropertyLabel</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>property</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>domain</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>multipleDomain</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>range</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>multipleRange</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>maxDomainCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>minDomainCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>domainCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>maxRangeCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>minRangeCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:varName>rangeCardinality</sp:varName>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:expression>
+              <sp:coalesce>
+                <sp:arg3></sp:arg3>
+                <sp:arg2 rdf:parseType="Resource">
+                  <sp:varName>comment</sp:varName>
+                </sp:arg2>
+                <sp:arg1 rdf:parseType="Resource">
+                  <sp:varName>definition</sp:varName>
+                </sp:arg1>
+              </sp:coalesce>
+            </sp:expression>
+            <sp:varName>description</sp:varName>
+          </rdf:Description>
+        </sp:resultVariables>
+        <sp:distinct rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</sp:distinct>
+        <sp:where rdf:parseType="Collection">
+          <sp:Union>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <rdf:first rdf:parseType="Resource">
+                  <sp:object rdf:parseType="Resource">
+                    <sp:varName>inverseProperty</sp:varName>
+                  </sp:object>
+                  <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
+                  <sp:subject rdf:parseType="Resource">
+                    <sp:varName>property</sp:varName>
+                  </sp:subject>
+                </rdf:first>
+              </rdf:Description>
+              <rdf:Description>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <rdf:first rdf:parseType="Resource">
+                  <sp:object rdf:parseType="Resource">
+                    <sp:varName>property</sp:varName>
+                  </sp:object>
+                  <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
+                  <sp:subject rdf:parseType="Resource">
+                    <sp:varName>inverseProperty</sp:varName>
+                  </sp:subject>
+                </rdf:first>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Union>
+          <sp:SubQuery>
+            <sp:query>
+              <sp:Select>
+                <sp:groupBy rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:varName>property</sp:varName>
+                  </rdf:Description>
+                </sp:groupBy>
+                <sp:resultVariables rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:varName>property</sp:varName>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:expression>
+                      <sp:Count>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>mdomain</sp:varName>
+                        </sp:expression>
+                      </sp:Count>
+                    </sp:expression>
+                    <sp:varName>multipleDomain</sp:varName>
+                  </rdf:Description>
+                </sp:resultVariables>
+                <sp:where rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>mdomain</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>property</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                </sp:where>
+              </sp:Select>
+            </sp:query>
+          </sp:SubQuery>
+          <sp:SubQuery>
+            <sp:query>
+              <sp:Select>
+                <sp:groupBy rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:varName>property</sp:varName>
+                  </rdf:Description>
+                </sp:groupBy>
+                <sp:resultVariables rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:varName>property</sp:varName>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:expression>
+                      <sp:Count>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>mrange</sp:varName>
+                        </sp:expression>
+                      </sp:Count>
+                    </sp:expression>
+                    <sp:varName>multipleRange</sp:varName>
+                  </rdf:Description>
+                </sp:resultVariables>
+                <sp:where rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>mrange</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>property</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                </sp:where>
+              </sp:Select>
+            </sp:query>
+          </sp:SubQuery>
+          <rdf:Description>
+            <sp:object rdf:parseType="Resource">
+              <sp:varName>domain</sp:varName>
+            </sp:object>
+            <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+            <sp:subject rdf:parseType="Resource">
+              <sp:varName>property</sp:varName>
+            </sp:subject>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:object rdf:parseType="Resource">
+              <sp:varName>range</sp:varName>
+            </sp:object>
+            <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+            <sp:subject rdf:parseType="Resource">
+              <sp:varName>property</sp:varName>
+            </sp:subject>
+          </rdf:Description>
+          <rdf:Description>
+            <sp:object rdf:parseType="Resource">
+              <sp:varName>propertyType</sp:varName>
+            </sp:object>
+            <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+            <sp:subject rdf:parseType="Resource">
+              <sp:varName>property</sp:varName>
+            </sp:subject>
+          </rdf:Description>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>ipLabel</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>inverseProperty</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>prefLabel</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2004/02/skos/core#prefLabel"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>inverseProperty</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>comment</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#comment"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>inverseProperty</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>definition</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2004/02/skos/core#definition"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>inverseProperty</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <sp:TriplePath>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>superDomainClass</sp:varName>
+                </sp:object>
+                <sp:path>
+                  <sp:ModPath>
+                    <sp:modMin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+                    >1</sp:modMin>
+                    <sp:modMax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+                    >-2</sp:modMax>
+                    <sp:subPath rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                  </sp:ModPath>
+                </sp:path>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domain</sp:varName>
+                </sp:subject>
+              </sp:TriplePath>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>superDomainClass</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Filter>
+            <sp:expression>
+              <sp:or>
+                <sp:arg2>
+                  <sp:not>
+                    <sp:arg1>
+                      <sp:bound>
+                        <sp:arg1 rdf:parseType="Resource">
+                          <sp:varName>superDomainClass</sp:varName>
+                        </sp:arg1>
+                      </sp:bound>
+                    </sp:arg1>
+                  </sp:not>
+                </sp:arg2>
+                <sp:arg1>
+                  <sp:eq>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>domain</sp:varName>
+                    </sp:arg2>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>superDomainClass</sp:varName>
+                    </sp:arg1>
+                  </sp:eq>
+                </sp:arg1>
+              </sp:or>
+            </sp:expression>
+          </sp:Filter>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <sp:TriplePath>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>superRangeClass</sp:varName>
+                </sp:object>
+                <sp:path>
+                  <sp:ModPath>
+                    <sp:modMin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+                    >1</sp:modMin>
+                    <sp:modMax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+                    >-2</sp:modMax>
+                    <sp:subPath rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                  </sp:ModPath>
+                </sp:path>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>range</sp:varName>
+                </sp:subject>
+              </sp:TriplePath>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>superRangeClass</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Filter>
+            <sp:expression>
+              <sp:or>
+                <sp:arg2>
+                  <sp:not>
+                    <sp:arg1>
+                      <sp:bound>
+                        <sp:arg1 rdf:parseType="Resource">
+                          <sp:varName>superRangeClass</sp:varName>
+                        </sp:arg1>
+                      </sp:bound>
+                    </sp:arg1>
+                  </sp:not>
+                </sp:arg2>
+                <sp:arg1>
+                  <sp:eq>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>range</sp:varName>
+                    </sp:arg2>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>superRangeClass</sp:varName>
+                    </sp:arg1>
+                  </sp:eq>
+                </sp:arg1>
+              </sp:or>
+            </sp:expression>
+          </sp:Filter>
+          <sp:Filter>
+            <sp:expression>
+              <sp:and>
+                <sp:arg2>
+                  <sp:not>
+                    <sp:arg1>
+                      <sp:eq>
+                        <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                        <sp:arg1 rdf:parseType="Resource">
+                          <sp:varName>range</sp:varName>
+                        </sp:arg1>
+                      </sp:eq>
+                    </sp:arg1>
+                  </sp:not>
+                </sp:arg2>
+                <sp:arg1>
+                  <sp:and>
+                    <sp:arg2>
+                      <sp:isIRI>
+                        <sp:arg1 rdf:parseType="Resource">
+                          <sp:varName>range</sp:varName>
+                        </sp:arg1>
+                      </sp:isIRI>
+                    </sp:arg2>
+                    <sp:arg1>
+                      <sp:and>
+                        <sp:arg2>
+                          <sp:isIRI>
+                            <sp:arg1 rdf:parseType="Resource">
+                              <sp:varName>domain</sp:varName>
+                            </sp:arg1>
+                          </sp:isIRI>
+                        </sp:arg2>
+                        <sp:arg1>
+                          <sp:and>
+                            <sp:arg2>
+                              <sp:isIRI>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>property</sp:varName>
+                                </sp:arg1>
+                              </sp:isIRI>
+                            </sp:arg2>
+                            <sp:arg1>
+                              <sp:isIRI>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>inverseProperty</sp:varName>
+                                </sp:arg1>
+                              </sp:isIRI>
+                            </sp:arg1>
+                          </sp:and>
+                        </sp:arg1>
+                      </sp:and>
+                    </sp:arg1>
+                  </sp:and>
+                </sp:arg1>
+              </sp:and>
+            </sp:expression>
+          </sp:Filter>
+          <sp:Filter>
+            <sp:expression>
+              <sp:or>
+                <sp:arg2>
+                  <sp:eq>
+                    <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>range</sp:varName>
+                    </sp:arg1>
+                  </sp:eq>
+                </sp:arg2>
+                <sp:arg1>
+                  <sp:or>
+                    <sp:arg2>
+                      <sp:eq>
+                        <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+                        <sp:arg1 rdf:parseType="Resource">
+                          <sp:varName>range</sp:varName>
+                        </sp:arg1>
+                      </sp:eq>
+                    </sp:arg2>
+                    <sp:arg1>
+                      <sp:or>
+                        <sp:arg2>
+                          <sp:eq>
+                            <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                            <sp:arg1 rdf:parseType="Resource">
+                              <sp:varName>range</sp:varName>
+                            </sp:arg1>
+                          </sp:eq>
+                        </sp:arg2>
+                        <sp:arg1>
+                          <sp:or>
+                            <sp:arg2>
+                              <sp:eq>
+                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>range</sp:varName>
+                                </sp:arg1>
+                              </sp:eq>
+                            </sp:arg2>
+                            <sp:arg1>
+                              <sp:or>
+                                <sp:arg2>
+                                  <sp:eq>
+                                    <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+                                    <sp:arg1 rdf:parseType="Resource">
+                                      <sp:varName>range</sp:varName>
+                                    </sp:arg1>
+                                  </sp:eq>
+                                </sp:arg2>
+                                <sp:arg1>
+                                  <sp:or>
+                                    <sp:arg2>
+                                      <sp:eq>
+                                        <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+                                        <sp:arg1 rdf:parseType="Resource">
+                                          <sp:varName>range</sp:varName>
+                                        </sp:arg1>
+                                      </sp:eq>
+                                    </sp:arg2>
+                                    <sp:arg1>
+                                      <sp:or>
+                                        <sp:arg2>
+                                          <sp:eq>
+                                            <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+                                            <sp:arg1 rdf:parseType="Resource">
+                                              <sp:varName>range</sp:varName>
+                                            </sp:arg1>
+                                          </sp:eq>
+                                        </sp:arg2>
+                                        <sp:arg1>
+                                          <sp:or>
+                                            <sp:arg2>
+                                              <sp:eq>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >range</sp:varName>
+                                                </sp:arg1>
+                                              </sp:eq>
+                                            </sp:arg2>
+                                            <sp:arg1>
+                                              <sp:eq>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >propertyType</sp:varName>
+                                                </sp:arg1>
+                                              </sp:eq>
+                                            </sp:arg1>
+                                          </sp:or>
+                                        </sp:arg1>
+                                      </sp:or>
+                                    </sp:arg1>
+                                  </sp:or>
+                                </sp:arg1>
+                              </sp:or>
+                            </sp:arg1>
+                          </sp:or>
+                        </sp:arg1>
+                      </sp:or>
+                    </sp:arg1>
+                  </sp:or>
+                </sp:arg1>
+              </sp:or>
+            </sp:expression>
+          </sp:Filter>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>minrdomainestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domain</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrdomainestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrdomainestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>minDomainCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#minCardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrdomainestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>maxdomainrestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domain</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxdomainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxdomainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>maxDomainCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#maxCardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxdomainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>domainrestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domain</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>domainCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#cardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>domainrestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>minrangerestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>range</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>minRangeCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#minCardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>minrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <sp:Filter>
+                <sp:expression>
+                  <sp:ne>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>domain</sp:varName>
+                    </sp:arg2>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>range</sp:varName>
+                    </sp:arg1>
+                  </sp:ne>
+                </sp:expression>
+              </sp:Filter>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>maxrangerestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>range</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>maxRangeCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#maxCardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>maxrangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <sp:Filter>
+                <sp:expression>
+                  <sp:ne>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>domain</sp:varName>
+                    </sp:arg2>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>range</sp:varName>
+                    </sp:arg1>
+                  </sp:ne>
+                </sp:expression>
+              </sp:Filter>
+            </sp:elements>
+          </sp:Optional>
+          <sp:Optional>
+            <sp:elements rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>rangerestriction</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>range</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>rangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>rangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>rangeCardinality</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#cardinality"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>rangerestriction</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <sp:Filter>
+                <sp:expression>
+                  <sp:ne>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>domain</sp:varName>
+                    </sp:arg2>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>range</sp:varName>
+                    </sp:arg1>
+                  </sp:ne>
+                </sp:expression>
+              </sp:Filter>
+            </sp:elements>
+          </sp:Optional>
+        </sp:where>
+      </sp:Select>
+    </odata4sparql:inverseAssociationQuery>
     <odata4sparql:operationArgumentQuery>
       <sp:Select>
         <sp:text>PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; &#xD;
@@ -3169,844 +4035,6 @@ WHERE {  &#xD;
         </sp:where>
       </sp:Select>
     </odata4sparql:propertyQuery_Domains>
-    <odata4sparql:inverseAssociationQuery>
-      <sp:Select>
-        <sp:text>PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&#xD;
- 	PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; &#xD;
- 	PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt; &#xD;
-PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;&#xD;
- 	SELECT  distinct ?inverseProperty (COALESCE(?prefLabel, ?ipLabel,"" ) as ?inversePropertyLabel )      ?property   ?domain ?multipleDomain  ?range ?multipleRange ?maxDomainCardinality ?minDomainCardinality  ?domainCardinality  ?maxRangeCardinality ?minRangeCardinality ?rangeCardinality (COALESCE(?definition, ?comment,"") as ?description ) &#xD;
- 	WHERE { { ?property owl:inverseOf ?inverseProperty .} UNION { ?inverseProperty owl:inverseOf ?property  } &#xD;
- 	{SELECT  ?property (count(?mdomain  ) as ?multipleDomain) WHERE {?property rdfs:domain ?mdomain . } group by ?property  }&#xD;
- 	{SELECT ?property (count(?mrange  ) as ?multipleRange) WHERE {?property rdfs:range ?mrange . } group by ?property  }&#xD;
- 	?property rdfs:domain ?domain .&#xD;
- 	?property rdfs:range ?range .&#xD;
- 	?property rdf:type ?propertyType .&#xD;
- OPTIONAL { ?inverseProperty rdfs:label ?ipLabel }   OPTIONAL { ?inverseProperty skos:prefLabel ?prefLabel }  . OPTIONAL{ ?inverseProperty rdfs:comment ?comment. } OPTIONAL{ ?inverseProperty skos:definition ?definition . } .&#xD;
-OPTIONAL{?domain rdfs:subClassOf+ ?superDomainClass .    ?property  rdfs:domain ?superDomainClass .  } FILTER( !Bound (?superDomainClass) )&#xD;
-OPTIONAL{?range rdfs:subClassOf+ ?superRangeClass .    ?property  rdfs:range ?superRangeClass .  } FILTER( !Bound (?superRangeClass) )&#xD;
-     FILTER(isIRI(?inverseProperty) &amp;&amp; isIRI(?property) &amp;&amp; isIRI(?domain) &amp;&amp; isIRI(?range) &amp;&amp; !(?range = rdfs:Literal) )  &#xD;
- 	FILTER( (?propertyType = owl:ObjectProperty)||&#xD;
- 	(?range = rdfs:Resource) ||&#xD;
- 	(?range = rdfs:Class) ||&#xD;
- 	(?range = owl:Class) ||&#xD;
- 	(?range = owl:ObjectProperty) ||&#xD;
- 	(?range = rdf:Property) ||&#xD;
- 	(?range = rdf:List) ||&#xD;
- 	(?range = owl:Ontology) ||&#xD;
- 	(?range = owl:Thing)&#xD;
- 	)&#xD;
- OPTIONAL&#xD;
-  { ?domain rdfs:subClassOf ?minrdomainestriction .&#xD;
- ?minrdomainestriction rdf:type owl:Restriction .&#xD;
- ?minrdomainestriction owl:onProperty ?property .&#xD;
- ?minrdomainestriction owl:minCardinality ?minDomainCardinality&#xD;
- }&#xD;
- OPTIONAL&#xD;
- { ?domain rdfs:subClassOf ?maxdomainrestriction .&#xD;
- ?maxdomainrestriction rdf:type owl:Restriction .&#xD;
- ?maxdomainrestriction owl:onProperty ?property .&#xD;
- ?maxdomainrestriction owl:maxCardinality ?maxDomainCardinality&#xD;
- }&#xD;
-  OPTIONAL&#xD;
- { ?domain rdfs:subClassOf ?domainrestriction .&#xD;
- ?domainrestriction rdf:type owl:Restriction .&#xD;
- ?domainrestriction owl:onProperty ?property .&#xD;
- ?domainrestriction owl:cardinality ?domainCardinality&#xD;
-  }&#xD;
-  OPTIONAL&#xD;
- { ?range rdfs:subClassOf ?minrangerestriction .&#xD;
-  ?minrangerestriction rdf:type owl:Restriction .&#xD;
- ?minrangerestriction owl:onProperty ?property .&#xD;
-  ?minrangerestriction owl:minCardinality ?minRangeCardinality. FILTER(?range !=?domain)&#xD;
- }&#xD;
- OPTIONAL&#xD;
- { ?range rdfs:subClassOf ?maxrangerestriction .&#xD;
- ?maxrangerestriction rdf:type owl:Restriction .&#xD;
- ?maxrangerestriction owl:onProperty ?property .&#xD;
- ?maxrangerestriction owl:maxCardinality ?maxRangeCardinality. FILTER(?range !=?domain)&#xD;
- }&#xD;
- OPTIONAL&#xD;
- { ?range rdfs:subClassOf ?rangerestriction .&#xD;
- ?rangerestriction rdf:type owl:Restriction .&#xD;
- ?rangerestriction owl:onProperty ?property .&#xD;
- ?rangerestriction owl:cardinality ?rangeCardinality. FILTER(?range !=?domain)&#xD;
- }&#xD;
- 	}ORDER BY ?propertyLabel</sp:text>
-        <sp:orderBy rdf:parseType="Collection">
-          <rdf:Description>
-            <sp:varName>propertyLabel</sp:varName>
-          </rdf:Description>
-        </sp:orderBy>
-        <sp:resultVariables rdf:parseType="Collection">
-          <rdf:Description>
-            <sp:varName>inverseProperty</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:expression>
-              <sp:coalesce>
-                <sp:arg3></sp:arg3>
-                <sp:arg2 rdf:parseType="Resource">
-                  <sp:varName>ipLabel</sp:varName>
-                </sp:arg2>
-                <sp:arg1 rdf:parseType="Resource">
-                  <sp:varName>prefLabel</sp:varName>
-                </sp:arg1>
-              </sp:coalesce>
-            </sp:expression>
-            <sp:varName>inversePropertyLabel</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>property</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>domain</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>multipleDomain</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>range</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>multipleRange</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>maxDomainCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>minDomainCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>domainCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>maxRangeCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>minRangeCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:varName>rangeCardinality</sp:varName>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:expression>
-              <sp:coalesce>
-                <sp:arg3></sp:arg3>
-                <sp:arg2 rdf:parseType="Resource">
-                  <sp:varName>comment</sp:varName>
-                </sp:arg2>
-                <sp:arg1 rdf:parseType="Resource">
-                  <sp:varName>definition</sp:varName>
-                </sp:arg1>
-              </sp:coalesce>
-            </sp:expression>
-            <sp:varName>description</sp:varName>
-          </rdf:Description>
-        </sp:resultVariables>
-        <sp:distinct rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</sp:distinct>
-        <sp:where rdf:parseType="Collection">
-          <sp:Union>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-                <rdf:first rdf:parseType="Resource">
-                  <sp:object rdf:parseType="Resource">
-                    <sp:varName>inverseProperty</sp:varName>
-                  </sp:object>
-                  <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
-                  <sp:subject rdf:parseType="Resource">
-                    <sp:varName>property</sp:varName>
-                  </sp:subject>
-                </rdf:first>
-              </rdf:Description>
-              <rdf:Description>
-                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-                <rdf:first rdf:parseType="Resource">
-                  <sp:object rdf:parseType="Resource">
-                    <sp:varName>property</sp:varName>
-                  </sp:object>
-                  <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
-                  <sp:subject rdf:parseType="Resource">
-                    <sp:varName>inverseProperty</sp:varName>
-                  </sp:subject>
-                </rdf:first>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Union>
-          <sp:SubQuery>
-            <sp:query>
-              <sp:Select>
-                <sp:groupBy rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:varName>property</sp:varName>
-                  </rdf:Description>
-                </sp:groupBy>
-                <sp:resultVariables rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:varName>property</sp:varName>
-                  </rdf:Description>
-                  <rdf:Description>
-                    <sp:expression>
-                      <sp:Count>
-                        <sp:expression rdf:parseType="Resource">
-                          <sp:varName>mdomain</sp:varName>
-                        </sp:expression>
-                      </sp:Count>
-                    </sp:expression>
-                    <sp:varName>multipleDomain</sp:varName>
-                  </rdf:Description>
-                </sp:resultVariables>
-                <sp:where rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:object rdf:parseType="Resource">
-                      <sp:varName>mdomain</sp:varName>
-                    </sp:object>
-                    <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
-                    <sp:subject rdf:parseType="Resource">
-                      <sp:varName>property</sp:varName>
-                    </sp:subject>
-                  </rdf:Description>
-                </sp:where>
-              </sp:Select>
-            </sp:query>
-          </sp:SubQuery>
-          <sp:SubQuery>
-            <sp:query>
-              <sp:Select>
-                <sp:groupBy rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:varName>property</sp:varName>
-                  </rdf:Description>
-                </sp:groupBy>
-                <sp:resultVariables rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:varName>property</sp:varName>
-                  </rdf:Description>
-                  <rdf:Description>
-                    <sp:expression>
-                      <sp:Count>
-                        <sp:expression rdf:parseType="Resource">
-                          <sp:varName>mrange</sp:varName>
-                        </sp:expression>
-                      </sp:Count>
-                    </sp:expression>
-                    <sp:varName>multipleRange</sp:varName>
-                  </rdf:Description>
-                </sp:resultVariables>
-                <sp:where rdf:parseType="Collection">
-                  <rdf:Description>
-                    <sp:object rdf:parseType="Resource">
-                      <sp:varName>mrange</sp:varName>
-                    </sp:object>
-                    <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
-                    <sp:subject rdf:parseType="Resource">
-                      <sp:varName>property</sp:varName>
-                    </sp:subject>
-                  </rdf:Description>
-                </sp:where>
-              </sp:Select>
-            </sp:query>
-          </sp:SubQuery>
-          <rdf:Description>
-            <sp:object rdf:parseType="Resource">
-              <sp:varName>domain</sp:varName>
-            </sp:object>
-            <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
-            <sp:subject rdf:parseType="Resource">
-              <sp:varName>property</sp:varName>
-            </sp:subject>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:object rdf:parseType="Resource">
-              <sp:varName>range</sp:varName>
-            </sp:object>
-            <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
-            <sp:subject rdf:parseType="Resource">
-              <sp:varName>property</sp:varName>
-            </sp:subject>
-          </rdf:Description>
-          <rdf:Description>
-            <sp:object rdf:parseType="Resource">
-              <sp:varName>propertyType</sp:varName>
-            </sp:object>
-            <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-            <sp:subject rdf:parseType="Resource">
-              <sp:varName>property</sp:varName>
-            </sp:subject>
-          </rdf:Description>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>ipLabel</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>inverseProperty</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>prefLabel</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2004/02/skos/core#prefLabel"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>inverseProperty</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>comment</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#comment"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>inverseProperty</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>definition</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2004/02/skos/core#definition"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>inverseProperty</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <sp:TriplePath>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>superDomainClass</sp:varName>
-                </sp:object>
-                <sp:path>
-                  <sp:ModPath>
-                    <sp:modMin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
-                    >1</sp:modMin>
-                    <sp:modMax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
-                    >-2</sp:modMax>
-                    <sp:subPath rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                  </sp:ModPath>
-                </sp:path>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domain</sp:varName>
-                </sp:subject>
-              </sp:TriplePath>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>superDomainClass</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Filter>
-            <sp:expression>
-              <sp:not>
-                <sp:arg1>
-                  <sp:bound>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>superDomainClass</sp:varName>
-                    </sp:arg1>
-                  </sp:bound>
-                </sp:arg1>
-              </sp:not>
-            </sp:expression>
-          </sp:Filter>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <sp:TriplePath>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>superRangeClass</sp:varName>
-                </sp:object>
-                <sp:path>
-                  <sp:ModPath>
-                    <sp:modMin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
-                    >1</sp:modMin>
-                    <sp:modMax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
-                    >-2</sp:modMax>
-                    <sp:subPath rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                  </sp:ModPath>
-                </sp:path>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>range</sp:varName>
-                </sp:subject>
-              </sp:TriplePath>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>superRangeClass</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Filter>
-            <sp:expression>
-              <sp:not>
-                <sp:arg1>
-                  <sp:bound>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>superRangeClass</sp:varName>
-                    </sp:arg1>
-                  </sp:bound>
-                </sp:arg1>
-              </sp:not>
-            </sp:expression>
-          </sp:Filter>
-          <sp:Filter>
-            <sp:expression>
-              <sp:and>
-                <sp:arg2>
-                  <sp:not>
-                    <sp:arg1>
-                      <sp:eq>
-                        <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                        <sp:arg1 rdf:parseType="Resource">
-                          <sp:varName>range</sp:varName>
-                        </sp:arg1>
-                      </sp:eq>
-                    </sp:arg1>
-                  </sp:not>
-                </sp:arg2>
-                <sp:arg1>
-                  <sp:and>
-                    <sp:arg2>
-                      <sp:isIRI>
-                        <sp:arg1 rdf:parseType="Resource">
-                          <sp:varName>range</sp:varName>
-                        </sp:arg1>
-                      </sp:isIRI>
-                    </sp:arg2>
-                    <sp:arg1>
-                      <sp:and>
-                        <sp:arg2>
-                          <sp:isIRI>
-                            <sp:arg1 rdf:parseType="Resource">
-                              <sp:varName>domain</sp:varName>
-                            </sp:arg1>
-                          </sp:isIRI>
-                        </sp:arg2>
-                        <sp:arg1>
-                          <sp:and>
-                            <sp:arg2>
-                              <sp:isIRI>
-                                <sp:arg1 rdf:parseType="Resource">
-                                  <sp:varName>property</sp:varName>
-                                </sp:arg1>
-                              </sp:isIRI>
-                            </sp:arg2>
-                            <sp:arg1>
-                              <sp:isIRI>
-                                <sp:arg1 rdf:parseType="Resource">
-                                  <sp:varName>inverseProperty</sp:varName>
-                                </sp:arg1>
-                              </sp:isIRI>
-                            </sp:arg1>
-                          </sp:and>
-                        </sp:arg1>
-                      </sp:and>
-                    </sp:arg1>
-                  </sp:and>
-                </sp:arg1>
-              </sp:and>
-            </sp:expression>
-          </sp:Filter>
-          <sp:Filter>
-            <sp:expression>
-              <sp:or>
-                <sp:arg2>
-                  <sp:eq>
-                    <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>range</sp:varName>
-                    </sp:arg1>
-                  </sp:eq>
-                </sp:arg2>
-                <sp:arg1>
-                  <sp:or>
-                    <sp:arg2>
-                      <sp:eq>
-                        <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
-                        <sp:arg1 rdf:parseType="Resource">
-                          <sp:varName>range</sp:varName>
-                        </sp:arg1>
-                      </sp:eq>
-                    </sp:arg2>
-                    <sp:arg1>
-                      <sp:or>
-                        <sp:arg2>
-                          <sp:eq>
-                            <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-                            <sp:arg1 rdf:parseType="Resource">
-                              <sp:varName>range</sp:varName>
-                            </sp:arg1>
-                          </sp:eq>
-                        </sp:arg2>
-                        <sp:arg1>
-                          <sp:or>
-                            <sp:arg2>
-                              <sp:eq>
-                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-                                <sp:arg1 rdf:parseType="Resource">
-                                  <sp:varName>range</sp:varName>
-                                </sp:arg1>
-                              </sp:eq>
-                            </sp:arg2>
-                            <sp:arg1>
-                              <sp:or>
-                                <sp:arg2>
-                                  <sp:eq>
-                                    <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-                                    <sp:arg1 rdf:parseType="Resource">
-                                      <sp:varName>range</sp:varName>
-                                    </sp:arg1>
-                                  </sp:eq>
-                                </sp:arg2>
-                                <sp:arg1>
-                                  <sp:or>
-                                    <sp:arg2>
-                                      <sp:eq>
-                                        <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-                                        <sp:arg1 rdf:parseType="Resource">
-                                          <sp:varName>range</sp:varName>
-                                        </sp:arg1>
-                                      </sp:eq>
-                                    </sp:arg2>
-                                    <sp:arg1>
-                                      <sp:or>
-                                        <sp:arg2>
-                                          <sp:eq>
-                                            <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
-                                            <sp:arg1 rdf:parseType="Resource">
-                                              <sp:varName>range</sp:varName>
-                                            </sp:arg1>
-                                          </sp:eq>
-                                        </sp:arg2>
-                                        <sp:arg1>
-                                          <sp:or>
-                                            <sp:arg2>
-                                              <sp:eq>
-                                                <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-                                                <sp:arg1 rdf:parseType="Resource">
-                                                  <sp:varName
-                                                  >range</sp:varName>
-                                                </sp:arg1>
-                                              </sp:eq>
-                                            </sp:arg2>
-                                            <sp:arg1>
-                                              <sp:eq>
-                                                <sp:arg2 rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-                                                <sp:arg1 rdf:parseType="Resource">
-                                                  <sp:varName
-                                                  >propertyType</sp:varName>
-                                                </sp:arg1>
-                                              </sp:eq>
-                                            </sp:arg1>
-                                          </sp:or>
-                                        </sp:arg1>
-                                      </sp:or>
-                                    </sp:arg1>
-                                  </sp:or>
-                                </sp:arg1>
-                              </sp:or>
-                            </sp:arg1>
-                          </sp:or>
-                        </sp:arg1>
-                      </sp:or>
-                    </sp:arg1>
-                  </sp:or>
-                </sp:arg1>
-              </sp:or>
-            </sp:expression>
-          </sp:Filter>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>minrdomainestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domain</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrdomainestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrdomainestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>minDomainCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#minCardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrdomainestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>maxdomainrestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domain</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxdomainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxdomainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>maxDomainCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#maxCardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxdomainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>domainrestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domain</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>domainCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#cardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>domainrestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>minrangerestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>range</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>minRangeCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#minCardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>minrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <sp:Filter>
-                <sp:expression>
-                  <sp:ne>
-                    <sp:arg2 rdf:parseType="Resource">
-                      <sp:varName>domain</sp:varName>
-                    </sp:arg2>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>range</sp:varName>
-                    </sp:arg1>
-                  </sp:ne>
-                </sp:expression>
-              </sp:Filter>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>maxrangerestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>range</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>maxRangeCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#maxCardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>maxrangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <sp:Filter>
-                <sp:expression>
-                  <sp:ne>
-                    <sp:arg2 rdf:parseType="Resource">
-                      <sp:varName>domain</sp:varName>
-                    </sp:arg2>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>range</sp:varName>
-                    </sp:arg1>
-                  </sp:ne>
-                </sp:expression>
-              </sp:Filter>
-            </sp:elements>
-          </sp:Optional>
-          <sp:Optional>
-            <sp:elements rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>rangerestriction</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#subClassOf"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>range</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>rangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#onProperty"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>rangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>rangeCardinality</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#cardinality"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>rangerestriction</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <sp:Filter>
-                <sp:expression>
-                  <sp:ne>
-                    <sp:arg2 rdf:parseType="Resource">
-                      <sp:varName>domain</sp:varName>
-                    </sp:arg2>
-                    <sp:arg1 rdf:parseType="Resource">
-                      <sp:varName>range</sp:varName>
-                    </sp:arg1>
-                  </sp:ne>
-                </sp:expression>
-              </sp:Filter>
-            </sp:elements>
-          </sp:Optional>
-        </sp:where>
-      </sp:Select>
-    </odata4sparql:inverseAssociationQuery>
     <odata4sparql:datasetQuery>
       <sp:Select>
         <sp:text>PREFIX odata4sparql: &lt;http://inova8.com/odata4sparql#&gt;&#xD;
