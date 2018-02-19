@@ -2,6 +2,7 @@ package com.inova8.odata2sparql.RdfConnector.openrdf;
 
 import org.eclipse.rdf4j.query.GraphQuery;
 import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class RdfConstructQuery extends RdfQuery{
 		try {
 			super.connection = rdfRoleRepository.getRepository().getConnection();
 			graphQuery = connection.prepareGraphQuery(QueryLanguage.SPARQL, super.query);
-			rdfTripleSet = new RdfTripleSet(connection, graphQuery.evaluate());
+			rdfTripleSet = new RdfTripleSet(connection, QueryResults.distinctResults(graphQuery.evaluate()));
 			log.info( super.query);
 		} catch (Exception e) {		
 			log.error( " RdfTripleSet execConstruct() failure with exception" + e.getMessage());

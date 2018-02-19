@@ -173,7 +173,8 @@ public class RdfModelProvider {
 									//Special cases where we do not want to define basetypes so that OData aligns with RDF/RDFS/OWL
 									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
 								} else {
-									entityType = model.getOrCreateEntityType(classNode, classLabelNode, baseType);
+									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
+									if(entityType!=baseType)entityType.setBaseType(baseType);
 								}
 								entityType.setEntity(true);
 								if (soln.getRdfNode("description") != null) {
