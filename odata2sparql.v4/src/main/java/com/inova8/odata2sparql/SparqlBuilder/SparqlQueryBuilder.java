@@ -1011,8 +1011,11 @@ public class SparqlQueryBuilder {
 				targetVariable = "?" + path + navProperty.getAssociationName() + "_s";
 			}
 			if (navProperty.IsInverse()) {
-				clausesPathNavigation.append(indent).append(targetVariable + " <"
-						+ navProperty.getInversePropertyOf().getIRI() + "> " + pathVariable + " .\n");
+				clausesPathNavigation.append(indent).append("{\n");
+				clausesPathNavigation.append(indent).append("\t"+ targetVariable + " <"	+ navProperty.getInversePropertyOf().getIRI() + "> " + pathVariable + " .\n");
+				clausesPathNavigation.append(indent).append("} UNION {\n");
+				clausesPathNavigation.append(indent).append("\t"+ pathVariable + " <" + navProperty.getAssociationIRI() + "> " + targetVariable + " .\n");
+				clausesPathNavigation.append(indent).append("}\n");
 			} else {
 				clausesPathNavigation.append(indent)
 						.append(pathVariable + " <" + navProperty.getAssociationIRI() + "> " + targetVariable + " .\n");
