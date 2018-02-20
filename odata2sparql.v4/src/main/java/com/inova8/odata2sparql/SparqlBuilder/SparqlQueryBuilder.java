@@ -327,7 +327,7 @@ public class SparqlQueryBuilder {
 	private Boolean isPrimitiveValue = false;
 	private SparqlExpressionVisitor filterClause;
 	private SparqlFilterClausesBuilder filterClauses;
-	private HashMap<String, HashSet<String>> selectPropertyMap;
+	private HashSet<String> selectPropertyMap;
 
 	private static final boolean DEBUG = true;
 
@@ -589,7 +589,7 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesPathProperties = new StringBuilder();
 		if (DEBUG)
 			clausesPathProperties.append("\t#clausesPathProperties\n");
-		clausesPathProperties.append(clausesSelect(edmTargetEntitySet.getEntityType().getName(),
+		clausesPathProperties.append(clausesSelect(this.selectPropertyMap,edmTargetEntitySet.getEntityType().getName(),
 				edmTargetEntitySet.getEntityType().getName(), rdfTargetEntityType, "\t"));
 		return clausesPathProperties;
 	}
@@ -1193,7 +1193,7 @@ public class SparqlQueryBuilder {
 							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
 				}
 				expandSelectTreeNodeWhere.append(
-						clausesSelect(nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
+						clausesSelect(createSelectPropertyMap(expandItem.getSelectOption()), nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
 			}
 			if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 				expandSelectTreeNodeWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
@@ -1204,7 +1204,7 @@ public class SparqlQueryBuilder {
 		return expandSelectTreeNodeWhere;
 	}
 
-	private StringBuilder clausesSelect(String nextTargetKey, String navPath, RdfEntityType targetEntityType,
+	private StringBuilder clausesSelect(HashSet<String> selectPropertyMap, String nextTargetKey, String navPath, RdfEntityType targetEntityType,
 			String indent) {
 		StringBuilder clausesSelect = new StringBuilder();
 		clausesSelect.append(indent);
@@ -1217,14 +1217,11 @@ public class SparqlQueryBuilder {
 		clausesSelect.append(indent).append("\t")
 				.append("?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
 
-		if ((this.selectPropertyMap != null && this.selectPropertyMap.containsKey(navPath)
-				&& !this.selectPropertyMap.get(navPath).isEmpty())) {
+		if (selectPropertyMap != null) {
 			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
-			if (this.selectPropertyMap != null && this.selectPropertyMap.containsKey(navPath)) {
-				for (String selectProperty : this.selectPropertyMap.get(navPath)) {
+				for (String selectProperty : selectPropertyMap) {
 					clausesSelect.append("(<" + selectProperty + ">)");
 				}
-			}
 			clausesSelect.append("}\n");
 		} else if (!this.rdfTargetEntityType.getProperties().isEmpty()) {
 			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
@@ -1283,23 +1280,14 @@ public class SparqlQueryBuilder {
 		return defaultLimitClause;
 	}
 
-	private HashMap<String, HashSet<String>> createSelectPropertyMap(SelectOption selectOption) throws EdmException {
+	private  HashSet<String> createSelectPropertyMap(SelectOption selectOption) throws EdmException {
 		// Align variables
 		RdfEntityType entityType = rdfTargetEntityType;
 		String key = entityType.entityTypeName;
-		HashMap<String, HashSet<String>> values = new HashMap<String, HashSet<String>>();
+		HashSet<String> valueProperties = new  HashSet<String>();
 		if (selectOption != null) {
 			for (SelectItem property : selectOption.getSelectItems()) {
-				HashSet<String> valueProperties;
 				RdfEntityType segmentEntityType = entityType;
-
-				key = entityType.entityTypeName;
-				if (!values.containsKey(key)) {
-					valueProperties = new HashSet<String>();
-					values.put(key, valueProperties);
-				} else {
-					valueProperties = values.get(key);
-				}
 
 				if (property.isStar()) {
 					// TODO Does/should segmentEntityType.getProperties get inherited properties as well?
@@ -1336,7 +1324,7 @@ public class SparqlQueryBuilder {
 					}
 				} 
 			}
-			return values;
+			return valueProperties;
 		}
 		return null;
 	}
