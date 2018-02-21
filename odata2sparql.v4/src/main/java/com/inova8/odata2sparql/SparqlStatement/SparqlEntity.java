@@ -41,7 +41,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	    		{
 	    			if(!first)id=id+",";
 	    			Property propertyValue = this.getProperty(keyProperty.getPrimaryKeyName());
-	    			id= id + propertyValue.getName()+"='"+ propertyValue.getValue().toString().replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED )+ "'";
+	    			id= id + propertyValue.getName()+"='"+ propertyValue.getValue().toString().replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED ).replace(":", RdfConstants.QNAME_SEPARATOR_ENCODED )+ "'";
 	    			first=false;
 	    		}
 	    		id=id + ")";
