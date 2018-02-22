@@ -535,15 +535,16 @@ public class SparqlQueryBuilder {
 			constructOperation.append(indent).append("#constructOperation\n");
 		String type = rdfOperationType.getIRI();
 		constructOperation.append(indent + "\t");
+		constructOperation.append("?"+rdfOperationType.getEntityTypeName() +"_key ");
 		if(isExpand)
-			constructOperation.append("[ <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
+			constructOperation.append("<" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		else
-			constructOperation.append("[ <http://targetEntity> true ; <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
+			constructOperation.append("<http://targetEntity> true ; <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
 					.append(" <" + property.getPropertyURI() + "> ?" + property.getVarName() + " ;\n");
 		}
-		constructOperation.replace(constructOperation.length() - 2, constructOperation.length() - 1, "] .");
+		constructOperation.replace(constructOperation.length() - 2, constructOperation.length() - 1, ".");
 		return constructOperation;
 	}
 
@@ -600,6 +601,7 @@ public class SparqlQueryBuilder {
 			clausesOperationProperties.append("\t#clausesOperationProperties\n");
 		clausesOperationProperties.append("\t").append(filterOperationQuery(rdfOperationType)).append("\n");
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
+		clausesOperationProperties.append("BIND(UUID()  AS ?" + rdfOperationType.getEntityTypeName() + "_key)\n");
 		return clausesOperationProperties;
 	}
 
@@ -1154,8 +1156,8 @@ public class SparqlQueryBuilder {
 			if (navProperty.getDomainClass().isOperation()) {
 				for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
 					if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
-						expandSelectTreeNodeWhere.append(indent)
-								.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
+						expandSelectTreeNodeWhere
+								.append(indent).append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 				}
 			}
 			expandSelectTreeNodeWhere.append(indent);
