@@ -2,7 +2,11 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sp="http://spinrdf.org/sp#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:smf="http://topbraid.org/sparqlmotionfunctions#"
+    xmlns:spin="http://spinrdf.org/spin#"
+    xmlns:spl="http://spinrdf.org/spl#"
     xmlns="http://northwind.com/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://northwind.com/">
@@ -15,6 +19,1053 @@
     <owl:imports rdf:resource="http://northwind.com/model/"/>
     <owl:imports rdf:resource="http://northwind.com/operations/"/>
   </owl:Ontology>
+  <spin:MagicProperty rdf:about="http://northwind.com/modelDefinition">
+    <spin:body>
+      <sp:Select>
+        <sp:text>SELECT ?modelDefinition
+WHERE {
+    {
+        SELECT ?arg1 ?arg2 ?arg3 ((CONCAT("&lt;b&gt;", ?classLabel, "&lt;/b&gt;", ?nextClassProperties, "&lt;blockquote&gt;that ", ?classDefinition, "&lt;/blockquote&gt;")) AS ?modelDefinition)
+        WHERE {
+           # BIND (model:Order AS ?arg1) .  BIND (4 AS ?arg2) . BIND (false AS ?arg3) .
+            ( ?arg1 ?arg2 ?arg3 "") :classDefinition (?classDefinition "") .
+            ( ?arg1 ?arg3 ) :classProperties ?nextClassProperties .
+            ?arg1 rdfs:label ?classLabel .
+        }
+    } .
+}</sp:text>
+        <sp:resultVariables rdf:parseType="Collection">
+          <rdf:Description>
+            <sp:varName>modelDefinition</sp:varName>
+          </rdf:Description>
+        </sp:resultVariables>
+        <sp:where rdf:parseType="Collection">
+          <sp:SubQuery>
+            <sp:query>
+              <sp:Select>
+                <sp:resultVariables rdf:parseType="Collection">
+                  <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+                  <rdf:Description rdf:about="http://spinrdf.org/spin#_arg2"/>
+                  <rdf:Description rdf:about="http://spinrdf.org/spin#_arg3"/>
+                  <rdf:Description>
+                    <sp:expression>
+                      <sp:concat>
+                        <sp:arg7>&lt;/blockquote&gt;</sp:arg7>
+                        <sp:arg6 rdf:parseType="Resource">
+                          <sp:varName>classDefinition</sp:varName>
+                        </sp:arg6>
+                        <sp:arg5>&lt;blockquote&gt;that </sp:arg5>
+                        <sp:arg4 rdf:parseType="Resource">
+                          <sp:varName>nextClassProperties</sp:varName>
+                        </sp:arg4>
+                        <sp:arg3>&lt;/b&gt;</sp:arg3>
+                        <sp:arg2 rdf:parseType="Resource">
+                          <sp:varName>classLabel</sp:varName>
+                        </sp:arg2>
+                        <sp:arg1>&lt;b&gt;</sp:arg1>
+                      </sp:concat>
+                    </sp:expression>
+                    <sp:varName>modelDefinition</sp:varName>
+                  </rdf:Description>
+                </sp:resultVariables>
+                <sp:where rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?0</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?1</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?0</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://spinrdf.org/spin#_arg2"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?1</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?2</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?1</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://spinrdf.org/spin#_arg3"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?2</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?3</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?2</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object></sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?3</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?3</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?4</sp:varName>
+                    </sp:object>
+                    <sp:predicate>
+                      <spin:MagicProperty rdf:about="http://northwind.com/classDefinition">
+                        <spin:body>
+                          <sp:Select>
+                            <sp:text>SELECT ?classDefinition ?priorPath
+WHERE {
+    {
+        SELECT ?arg1 ?arg2  ((GROUP_CONCAT( ?definition; SEPARATOR='&lt;br/&gt;and that ')) AS ?classDefinition)  ((GROUP_CONCAT( ?pastPath; SEPARATOR='\t')) AS ?priorPath) 
+        WHERE {
+            ?arg1 a ?class . FILTER( ?class in (rdfs:Class, owl:Class ))
+#,  odata4sparql:Operation))  .
+            ?arg1 rdfs:label ?classLabel .
+            ?objectProperty a owl:ObjectProperty .
+            {
+                        ?objectProperty rdfs:domain ?arg1 .
+                        ?objectProperty rdfs:label ?objectPropertyLabel .
+                        ?objectProperty rdfs:range ?nextClass .
+                        ?nextClass rdfs:label ?nextClassLabel .   BIND(?objectProperty as ?property)
+            }UNION{
+				       ?objectProperty  owl:inverseOf ?inverseObjectProperty .
+                        ?objectProperty rdfs:domain  ?nextClass.
+                        ?inverseObjectProperty rdfs:label ?objectPropertyLabel .
+                        ?objectProperty rdfs:range ?arg1 . 
+                        ?nextClass rdfs:label ?nextClassLabel .    BIND(?inverseObjectProperty as ?property)
+            }UNION{
+				       ?inverseObjectProperty  owl:inverseOf ?objectProperty .
+                        ?objectProperty rdfs:domain  ?nextClass.
+                        ?inverseObjectProperty rdfs:label ?objectPropertyLabel .
+                        ?objectProperty rdfs:range  ?arg1 . 
+                        ?nextClass rdfs:label ?nextClassLabel .    BIND(?inverseObjectProperty as ?property)
+            }&#xD;
+#Stop from going too deep
+            BIND(?arg2 -1 as ?span) FILTER(?span&gt;0).  
+            ?nextClass a ?nextClassClass. FILTER( ?nextClassClass in (rdfs:Class, owl:Class ))
+#,  odata4sparql:Operation))  . &#xD;
+#Do not process an already processed arc (objectProperty)          
+            BIND(CONCAT(?arg4,"\t",?objectPropertyLabel) as ?forwardPath) FILTER( !CONTAINS(?arg4, ?objectPropertyLabel ))   
+            (?nextClass ?span ?arg3 ?forwardPath ) :classDefinition (?nextClassDefinition  ?nextPath).            &#xD;
+#Do not include if arc (objectProperty) appears already    &#xD;
+            FILTER(  !CONTAINS(?nextPath, ?objectPropertyLabel )) BIND(CONCAT( ?objectPropertyLabel, IF(?nextPath="","",CONCAT("\t",?nextPath))) as ?pastPath)
+ 		    (?nextClass ?arg3) :classProperties ?nextClassProperties .
+            BIND (CONCAT("&lt;u&gt;",?objectPropertyLabel , "&lt;/u&gt; &lt;b&gt;", ?nextClassLabel, "&lt;/b&gt;",  ?nextClassProperties, IF ((?nextClassDefinition!=""), CONCAT("&lt;br/&gt;&lt;blockquote&gt;that ",  ?nextClassDefinition, "&lt;/blockquote&gt;"), "")  ) as ?definition)
+        }
+        GROUP BY ?arg1 ?arg2
+    } .
+}</sp:text>                 <sp:resultVariables rdf:parseType="Collection">
+                              <rdf:Description>
+                                <sp:varName>classDefinition</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>priorPath</sp:varName>
+                              </rdf:Description>
+                            </sp:resultVariables>
+                            <sp:where rdf:parseType="Collection">
+                              <sp:SubQuery>
+                                <sp:query>
+                                  <sp:Select>
+                                    <sp:groupBy rdf:parseType="Collection">
+                                      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+                                      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg2"/>
+                                    </sp:groupBy>
+                                    <sp:resultVariables rdf:parseType="Collection">
+                                      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+                                      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg2"/>
+                                      <rdf:Description>
+                                        <sp:expression>
+                                          <sp:GroupConcat>
+                                            <sp:separator>&lt;br/&gt;and that </sp:separator>
+                                            <sp:expression rdf:parseType="Resource">
+                                              <sp:varName>definition</sp:varName>
+                                            </sp:expression>
+                                          </sp:GroupConcat>
+                                        </sp:expression>
+                                        <sp:varName>classDefinition</sp:varName>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:expression>
+                                          <sp:GroupConcat>
+                                            <sp:separator>	</sp:separator>
+                                            <sp:expression rdf:parseType="Resource">
+                                              <sp:varName>pastPath</sp:varName>
+                                            </sp:expression>
+                                          </sp:GroupConcat>
+                                        </sp:expression>
+                                        <sp:varName>priorPath</sp:varName>
+                                      </rdf:Description>
+                                    </sp:resultVariables>
+                                    <sp:where rdf:parseType="Collection">
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>class</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                        <sp:subject rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                                      </rdf:Description>
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:in>
+                                            <sp:arg3 rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+                                            <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+                                            <sp:arg1 rdf:parseType="Resource">
+                                              <sp:varName>class</sp:varName>
+                                            </sp:arg1>
+                                          </sp:in>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>classLabel</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                        <sp:subject rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>objectProperty</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <sp:Union>
+                                        <sp:elements rdf:parseType="Collection">
+                                          <rdf:Description>
+                                            <rdf:rest rdf:parseType="Collection">
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectPropertyLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClassLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <sp:Bind>
+                                                <sp:expression rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:expression>
+                                                <sp:variable rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >property</sp:varName>
+                                                </sp:variable>
+                                              </sp:Bind>
+                                            </rdf:rest>
+                                            <rdf:first rdf:parseType="Resource">
+                                              <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                                              <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+                                              <sp:subject rdf:parseType="Resource">
+                                                <sp:varName>objectProperty</sp:varName>
+                                              </sp:subject>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:rest rdf:parseType="Collection">
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectPropertyLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >inverseObjectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClassLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <sp:Bind>
+                                                <sp:expression rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >inverseObjectProperty</sp:varName>
+                                                </sp:expression>
+                                                <sp:variable rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >property</sp:varName>
+                                                </sp:variable>
+                                              </sp:Bind>
+                                            </rdf:rest>
+                                            <rdf:first rdf:parseType="Resource">
+                                              <sp:object rdf:parseType="Resource">
+                                                <sp:varName>inverseObjectProperty</sp:varName>
+                                              </sp:object>
+                                              <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
+                                              <sp:subject rdf:parseType="Resource">
+                                                <sp:varName>objectProperty</sp:varName>
+                                              </sp:subject>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:rest rdf:parseType="Collection">
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectPropertyLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >inverseObjectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#range"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectProperty</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <rdf:Description>
+                                                <sp:object rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClassLabel</sp:varName>
+                                                </sp:object>
+                                                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                                                <sp:subject rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextClass</sp:varName>
+                                                </sp:subject>
+                                              </rdf:Description>
+                                              <sp:Bind>
+                                                <sp:expression rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >inverseObjectProperty</sp:varName>
+                                                </sp:expression>
+                                                <sp:variable rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >property</sp:varName>
+                                                </sp:variable>
+                                              </sp:Bind>
+                                            </rdf:rest>
+                                            <rdf:first rdf:parseType="Resource">
+                                              <sp:object rdf:parseType="Resource">
+                                                <sp:varName>objectProperty</sp:varName>
+                                              </sp:object>
+                                              <sp:predicate rdf:resource="http://www.w3.org/2002/07/owl#inverseOf"/>
+                                              <sp:subject rdf:parseType="Resource">
+                                                <sp:varName>inverseObjectProperty</sp:varName>
+                                              </sp:subject>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                        </sp:elements>
+                                      </sp:Union>
+                                      <sp:Bind>
+                                        <sp:expression>
+                                          <sp:sub>
+                                            <sp:arg2 rdf:datatype=
+                                            "http://www.w3.org/2001/XMLSchema#integer"
+                                            >1</sp:arg2>
+                                            <sp:arg1 rdf:resource="http://spinrdf.org/spin#_arg2"/>
+                                          </sp:sub>
+                                        </sp:expression>
+                                        <sp:variable rdf:parseType="Resource">
+                                          <sp:varName>span</sp:varName>
+                                        </sp:variable>
+                                      </sp:Bind>
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:gt>
+                                            <sp:arg2 rdf:datatype=
+                                            "http://www.w3.org/2001/XMLSchema#integer"
+                                            >0</sp:arg2>
+                                            <sp:arg1 rdf:parseType="Resource">
+                                              <sp:varName>span</sp:varName>
+                                            </sp:arg1>
+                                          </sp:gt>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextClassClass</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>nextClass</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:in>
+                                            <sp:arg3 rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+                                            <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+                                            <sp:arg1 rdf:parseType="Resource">
+                                              <sp:varName>nextClassClass</sp:varName>
+                                            </sp:arg1>
+                                          </sp:in>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Bind>
+                                        <sp:expression>
+                                          <sp:concat>
+                                            <sp:arg3 rdf:parseType="Resource">
+                                              <sp:varName>objectPropertyLabel</sp:varName>
+                                            </sp:arg3>
+                                            <sp:arg2>	</sp:arg2>
+                                            <sp:arg1 rdf:resource="http://spinrdf.org/spin#_arg4"/>
+                                          </sp:concat>
+                                        </sp:expression>
+                                        <sp:variable rdf:parseType="Resource">
+                                          <sp:varName>forwardPath</sp:varName>
+                                        </sp:variable>
+                                      </sp:Bind>
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:not>
+                                            <sp:arg1>
+                                              <sp:contains>
+                                                <sp:arg2 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectPropertyLabel</sp:varName>
+                                                </sp:arg2>
+                                                <sp:arg1 rdf:resource="http://spinrdf.org/spin#_arg4"/>
+                                              </sp:contains>
+                                            </sp:arg1>
+                                          </sp:not>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextClass</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?0</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?1</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?0</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>span</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?1</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?2</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?1</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://spinrdf.org/spin#_arg3"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?2</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?3</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?2</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>forwardPath</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?3</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?3</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?4</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://northwind.com/classDefinition"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?0</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextClassDefinition</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?4</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?5</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?4</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextPath</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?5</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?5</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:not>
+                                            <sp:arg1>
+                                              <sp:contains>
+                                                <sp:arg2 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >objectPropertyLabel</sp:varName>
+                                                </sp:arg2>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >nextPath</sp:varName>
+                                                </sp:arg1>
+                                              </sp:contains>
+                                            </sp:arg1>
+                                          </sp:not>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Bind>
+                                        <sp:expression>
+                                          <sp:concat>
+                                            <sp:arg2>
+                                              <sp:if>
+                                                <sp:arg3>
+                                                  <sp:concat>
+                                                    <sp:arg2 rdf:parseType="Resource">
+                                                      <sp:varName
+                                                      >nextPath</sp:varName>
+                                                    </sp:arg2>
+                                                    <sp:arg1>	</sp:arg1>
+                                                  </sp:concat>
+                                                </sp:arg3>
+                                                <sp:arg2></sp:arg2>
+                                                <sp:arg1>
+                                                  <sp:eq>
+                                                    <sp:arg2></sp:arg2>
+                                                    <sp:arg1 rdf:parseType="Resource">
+                                                      <sp:varName
+                                                      >nextPath</sp:varName>
+                                                    </sp:arg1>
+                                                  </sp:eq>
+                                                </sp:arg1>
+                                              </sp:if>
+                                            </sp:arg2>
+                                            <sp:arg1 rdf:parseType="Resource">
+                                              <sp:varName>objectPropertyLabel</sp:varName>
+                                            </sp:arg1>
+                                          </sp:concat>
+                                        </sp:expression>
+                                        <sp:variable rdf:parseType="Resource">
+                                          <sp:varName>pastPath</sp:varName>
+                                        </sp:variable>
+                                      </sp:Bind>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextClass</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?6</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>?7</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?6</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://spinrdf.org/spin#_arg3"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?7</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?7</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <sp:object rdf:parseType="Resource">
+                                          <sp:varName>nextClassProperties</sp:varName>
+                                        </sp:object>
+                                        <sp:predicate>
+                                          <spin:MagicProperty rdf:about="http://northwind.com/classProperties">
+                                            <spin:constraint>
+                                              <spl:Argument>
+                                                <spl:predicate rdf:resource="http://spinrdf.org/sp#arg1"/>
+                                                <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+                                              </spl:Argument>
+                                            </spin:constraint>
+                                            <spin:body>
+                                              <sp:Select>
+                                                <sp:text>SELECT ?classProperties
+WHERE {
+{SELECT  ?arg1   (    IF(?arg2,  CONCAT("(",?properties,")"),"") as ?classProperties) WHERE
+    {
+        SELECT ?arg1 ((GROUP_CONCAT(CONCAT("&lt;i&gt;", ?dataPropertyLabel, "&lt;/i&gt;"); SEPARATOR=', ')) AS ?properties)
+        WHERE {
+           # BIND (model:Product AS ?arg1) .
+            ?arg1 a ?class .
+            FILTER (?class IN (rdfs:Class, owl:Class)) .
+            ?arg1 rdfs:label ?classLabel .
+            ?dataProperty a owl:DatatypeProperty .
+            ?dataProperty rdfs:domain ?arg1 .
+            ?dataProperty rdfs:label ?dataPropertyLabel .
+        }
+        GROUP BY ?arg1
+    } 
+}
+}</sp:text>                                     <sp:resultVariables rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <sp:varName
+                                                    >classProperties</sp:varName>
+                                                  </rdf:Description>
+                                                </sp:resultVariables>
+                                                <sp:where rdf:parseType="Collection">
+                                                  <sp:SubQuery>
+                                                    <sp:query>
+                                                      <sp:Select>
+                                                        <sp:resultVariables rdf:parseType="Collection">
+                                                          <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+                                                          <rdf:Description>
+                                                            <sp:varName
+                                                            >classProperties</sp:varName>
+                                                            <sp:expression>
+                                                              <sp:if>
+    <sp:arg3></sp:arg3>
+    <sp:arg2>
+      <sp:concat>
+        <sp:arg1>(</sp:arg1>
+        <sp:arg2 rdf:parseType="Resource">
+          <sp:varName>properties</sp:varName>
+        </sp:arg2>
+        <sp:arg3>)</sp:arg3>
+      </sp:concat>
+    </sp:arg2>
+    <sp:arg1 rdf:resource="http://spinrdf.org/spin#_arg2"/>   </sp:if>
+                                                            </sp:expression>
+                                                          </rdf:Description>
+                                                        </sp:resultVariables>
+                                                        <sp:where rdf:parseType="Collection">
+                                                          <sp:SubQuery>
+                                                            <sp:query>
+                                                              <sp:Select>
+    <sp:groupBy rdf:parseType="Collection">
+      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+    </sp:groupBy>
+    <sp:where rdf:parseType="Collection">
+      <rdf:Description>
+        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+        <sp:subject rdf:resource="http://spinrdf.org/spin#_arg1"/>
+        <sp:object rdf:parseType="Resource">
+          <sp:varName>class</sp:varName>
+        </sp:object>
+      </rdf:Description>
+      <sp:Filter>
+        <sp:expression>
+          <sp:in>
+            <sp:arg1 rdf:parseType="Resource">
+              <sp:varName>class</sp:varName>
+            </sp:arg1>
+            <sp:arg3 rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+            <sp:arg2 rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+          </sp:in>
+        </sp:expression>
+      </sp:Filter>
+      <rdf:Description>
+        <sp:object rdf:parseType="Resource">
+          <sp:varName>classLabel</sp:varName>
+        </sp:object>
+        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+        <sp:subject rdf:resource="http://spinrdf.org/spin#_arg1"/>
+      </rdf:Description>
+      <rdf:Description>
+        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+        <sp:object rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+        <sp:subject rdf:parseType="Resource">
+          <sp:varName>dataProperty</sp:varName>
+        </sp:subject>
+      </rdf:Description>
+      <rdf:Description>
+        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#domain"/>
+        <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+        <sp:subject rdf:parseType="Resource">
+          <sp:varName>dataProperty</sp:varName>
+        </sp:subject>
+      </rdf:Description>
+      <rdf:Description>
+        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+        <sp:subject rdf:parseType="Resource">
+          <sp:varName>dataProperty</sp:varName>
+        </sp:subject>
+        <sp:object rdf:parseType="Resource">
+          <sp:varName>dataPropertyLabel</sp:varName>
+        </sp:object>
+      </rdf:Description>
+    </sp:where>
+    <sp:resultVariables rdf:parseType="Collection">
+      <rdf:Description rdf:about="http://spinrdf.org/spin#_arg1"/>
+      <rdf:Description>
+        <sp:expression>
+          <sp:GroupConcat>
+            <sp:separator>, </sp:separator>
+            <sp:expression>
+              <sp:concat>
+                <sp:arg1>&lt;i&gt;</sp:arg1>
+                <sp:arg3>&lt;/i&gt;</sp:arg3>
+                <sp:arg2 rdf:parseType="Resource">
+                  <sp:varName>dataPropertyLabel</sp:varName>
+                </sp:arg2>
+              </sp:concat>
+            </sp:expression>
+          </sp:GroupConcat>
+        </sp:expression>
+        <sp:varName>properties</sp:varName>
+      </rdf:Description>
+    </sp:resultVariables>                                     </sp:Select>
+                                                            </sp:query>
+                                                          </sp:SubQuery>
+                                                        </sp:where>
+                                                      </sp:Select>
+                                                    </sp:query>
+                                                  </sp:SubQuery>
+                                                </sp:where>
+                                              </sp:Select>
+                                            </spin:body>
+                                            <spin:constraint>
+                                              <spl:Argument>
+                                                <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+                                                <spl:predicate rdf:resource="http://spinrdf.org/sp#arg2"/>
+                                              </spl:Argument>
+                                            </spin:constraint>
+                                            <spin:returnType rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML"/>
+                                            <rdfs:subClassOf rdf:resource="http://spinrdf.org/spin#MagicProperties"/>
+                                          </spin:MagicProperty>
+                                        </sp:predicate>
+                                        <sp:subject rdf:parseType="Resource">
+                                          <sp:varName>?6</sp:varName>
+                                        </sp:subject>
+                                      </rdf:Description>
+                                      <sp:Bind>
+                                        <sp:expression>
+                                          <sp:concat>
+                                            <sp:arg7>
+                                              <sp:if>
+                                                <sp:arg3></sp:arg3>
+                                                <sp:arg2>
+                                                  <sp:concat>
+                                                    <sp:arg3>&lt;/blockquote&gt;</sp:arg3>
+                                                    <sp:arg2 rdf:parseType="Resource">
+                                                      <sp:varName
+                                                      >nextClassDefinition</sp:varName>
+                                                    </sp:arg2>
+                                                    <sp:arg1>&lt;br/&gt;&lt;blockquote&gt;that </sp:arg1>
+                                                  </sp:concat>
+                                                </sp:arg2>
+                                                <sp:arg1>
+                                                  <sp:ne>
+                                                    <sp:arg2></sp:arg2>
+                                                    <sp:arg1 rdf:parseType="Resource">
+                                                      <sp:varName
+                                                      >nextClassDefinition</sp:varName>
+                                                    </sp:arg1>
+                                                  </sp:ne>
+                                                </sp:arg1>
+                                              </sp:if>
+                                            </sp:arg7>
+                                            <sp:arg6 rdf:parseType="Resource">
+                                              <sp:varName>nextClassProperties</sp:varName>
+                                            </sp:arg6>
+                                            <sp:arg5>&lt;/b&gt;</sp:arg5>
+                                            <sp:arg4 rdf:parseType="Resource">
+                                              <sp:varName>nextClassLabel</sp:varName>
+                                            </sp:arg4>
+                                            <sp:arg3>&lt;/u&gt; &lt;b&gt;</sp:arg3>
+                                            <sp:arg2 rdf:parseType="Resource">
+                                              <sp:varName>objectPropertyLabel</sp:varName>
+                                            </sp:arg2>
+                                            <sp:arg1>&lt;u&gt;</sp:arg1>
+                                          </sp:concat>
+                                        </sp:expression>
+                                        <sp:variable rdf:parseType="Resource">
+                                          <sp:varName>definition</sp:varName>
+                                        </sp:variable>
+                                      </sp:Bind>
+                                    </sp:where>
+                                  </sp:Select>
+                                </sp:query>
+                              </sp:SubQuery>
+                            </sp:where>
+                          </sp:Select>
+                        </spin:body>
+                        <spin:constraint>
+                          <spl:Argument>
+                            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+                            <spl:predicate rdf:resource="http://spinrdf.org/sp#arg2"/>
+                          </spl:Argument>
+                        </spin:constraint>
+                        <spin:constraint>
+                          <spl:Argument>
+                            <spl:predicate rdf:resource="http://spinrdf.org/sp#arg3"/>
+                            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+                          </spl:Argument>
+                        </spin:constraint>
+                        <spin:constraint>
+                          <spl:Argument>
+                            <spl:predicate rdf:resource="http://spinrdf.org/sp#arg4"/>
+                            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+                          </spl:Argument>
+                        </spin:constraint>
+                        <spin:constraint>
+                          <spl:Argument>
+                            <spl:predicate rdf:resource="http://spinrdf.org/sp#arg1"/>
+                            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+                          </spl:Argument>
+                        </spin:constraint>
+                        <spin:returnType rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML"/>
+                        <rdfs:subClassOf rdf:resource="http://spinrdf.org/spin#MagicProperties"/>
+                      </spin:MagicProperty>
+                    </sp:predicate>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?0</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>classDefinition</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?4</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?5</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?4</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object></sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?5</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?5</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?6</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>?7</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?6</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://spinrdf.org/spin#_arg3"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?7</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?7</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>nextClassProperties</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://northwind.com/classProperties"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>?6</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>classLabel</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                    <sp:subject rdf:resource="http://spinrdf.org/spin#_arg1"/>
+                  </rdf:Description>
+                </sp:where>
+              </sp:Select>
+            </sp:query>
+          </sp:SubQuery>
+        </sp:where>
+      </sp:Select>
+    </spin:body>
+    <spin:constraint>
+      <spl:Argument>
+        <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <spl:predicate rdf:resource="http://spinrdf.org/sp#arg2"/>
+      </spl:Argument>
+    </spin:constraint>
+    <spin:constraint>
+      <spl:Argument>
+        <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+        <spl:predicate rdf:resource="http://spinrdf.org/sp#arg1"/>
+      </spl:Argument>
+    </spin:constraint>
+    <rdfs:comment>arg1: class&#xD;
+arg2: span&#xD;
+arg3: include datatypeProperties</rdfs:comment>
+    <spin:returnType rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML"/>
+    <spin:constraint>
+      <spl:Argument>
+        <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <spl:predicate rdf:resource="http://spinrdf.org/sp#arg3"/>
+      </spl:Argument>
+    </spin:constraint>
+    <rdfs:subClassOf rdf:resource="http://spinrdf.org/spin#MagicProperties"/>
+  </spin:MagicProperty>
 </rdf:RDF>
 
 <!-- Created with TopBraid -->

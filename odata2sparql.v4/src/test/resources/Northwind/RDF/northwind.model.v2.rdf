@@ -1,0 +1,1036 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:terms="http://purl.org/dc/terms/"
+    xmlns:model="http://northwind.com/model/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:spin="http://spinrdf.org/sp#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:northwind="http://northwind.com/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://northwind.com/model/">
+  <owl:Ontology rdf:about="">
+    <owl:versionInfo>http://northwind.com/model/v1</owl:versionInfo>
+    <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema"/>
+    <owl:imports rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+    <owl:priorVersion rdf:resource="http://northwind.com/model/v0"/>
+    <owl:versionIRI rdf:resource="http://northwind.com/model/v1"/>
+  </owl:Ontology>
+  <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+  <owl:Class rdf:about="http://northwind.com/model/Category">
+    <rdfs:label>Category</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/categoryName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Product">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/reorderLevel"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/category"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitsOnOrder"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>Product</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/supplier"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/productName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitsInStock"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/discontinued"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/orderDetailUnitPrice"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/quantityPerUnit"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Employee">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/lastName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/homePhone"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/reportsTo"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierAddress"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/firstName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPostalCode"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/titleOfCourtesy"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/extension"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCountry"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>Employee</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Supplier">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerContactTitle"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierContactName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>Supplier</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPhone"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCompanyName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerFax"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPostalCode"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/homePage"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCountry"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/USState">
+    <rdfs:label>USState</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Customer">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerFax"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCompanyName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPostalCode"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierAddress"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierContactName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerContactTitle"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>Customer</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPhone"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCountry"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Territory">
+    <rdfs:label>Territory</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/OrderDetail">
+    <rdfs:label>Order detail</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/quantity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/orderDetailUnitPrice"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/product"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/order"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Shipper">
+    <rdfs:label>Shipper</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCompanyName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPhone"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Order">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/freight"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipCountry"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipPostalCode"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/employee"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipCity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/orderRegion"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/customer"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://northwind.com/model/shipVia"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipAddress"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>Order</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/Region">
+    <rdfs:label>Region</rdfs:label>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/customerRegion">
+    <rdfs:label>is part of region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/shipVia">
+    <rdfs:label>is shipped by</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Shipper"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://northwind.com/model/shipsOrder"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/supplierRegion">
+    <rdfs:label>supplies in region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/managesEmployee">
+    <rdfs:label>manages employee</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://northwind.com/model/reportsTo"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/hasPlacedOrder">
+    <rdfs:label>has placed Order</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/reportsTo">
+    <rdfs:label>reports to employee</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/order">
+    <rdfs:label>is part of order</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Order"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/product">
+    <rdfs:label>includes product</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Product"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/orderRegion">
+    <rdfs:label>is ordered in region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/customer">
+    <rdfs:label>placed by customer</rdfs:label>
+    <rdfs:comment>The customer who placed the order</rdfs:comment>
+    <rdfs:range rdf:resource="http://northwind.com/model/Customer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+    <owl:inverseOf rdf:resource="http://northwind.com/model/hasPlacedOrder"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/territoryRegion">
+    <rdfs:label>is located within region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Territory"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/supplier">
+    <rdfs:label>is supplied by</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Supplier"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://northwind.com/model/suppliesProduct"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/employeeRegion">
+    <rdfs:label>supports region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/category">
+    <rdfs:label>is categorized as</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Category"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://northwind.com/model/isCategoryOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/managesOrder">
+    <rdfs:label>manages order</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/hasOrderDetail">
+    <rdfs:label>has order details</rdfs:label>
+    <owl:inverseOf rdf:resource="http://northwind.com/model/order"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/shipsOrder">
+    <rdfs:label>ships Order</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/isCategoryOf">
+    <rdfs:label>is category of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/territoryOf">
+    <rdfs:label>within which operates employee</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/employee">
+    <rdfs:label>is managed by</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+    <owl:inverseOf rdf:resource="http://northwind.com/model/managesOrder"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/territory">
+    <rdfs:label>operates within territory</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Territory"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+    <owl:inverseOf rdf:resource="http://northwind.com/model/territoryOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/suppliesProduct">
+    <rdfs:label>supplies product</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/isPartOfOrderDetail">
+    <rdfs:label>is part of order detail</rdfs:label>
+    <owl:inverseOf rdf:resource="http://northwind.com/model/product"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/usstateRegion">
+    <rdfs:label>usstate region</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/USState"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/orderDetailUnitPrice">
+    <rdfs:label>unit price</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/homePage">
+    <rdfs:label>home page</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/regionDescription">
+    <rdfs:label>regionDescription</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/USState"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Region"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPostalCode">
+    <rdfs:label>postal code</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerCompanyName">
+    <rdfs:label>company name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/extension">
+    <rdfs:label>extension</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierPostalCode">
+    <rdfs:label>postal code</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipAddress">
+    <rdfs:label>ship address</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitsOnOrder">
+    <rdfs:label>units on order</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/lastName">
+    <rdfs:label>last name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/productUnitPrice">
+    <rdfs:label>unit price</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/territoryNotation">
+    <rdfs:label>territory notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the territoryId literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of territory objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeeNotation">
+    <rdfs:label>employee notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeeCity">
+    <rdfs:label>city</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/reorderLevel">
+    <rdfs:label>reorder level</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/notes">
+    <rdfs:label>notes</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierPhone">
+    <rdfs:label>phone</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitsInStock">
+    <rdfs:label>units in stock</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierContactTitle">
+    <rdfs:label>contact title</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipPostalCode">
+    <rdfs:label>ship postal code</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/reportsToNotation">
+    <rdfs:label>reportsTo notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipperCompanyName">
+    <rdfs:label>company name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Shipper"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerFax">
+    <rdfs:label>fax</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeePostalCode">
+    <rdfs:label>postal code</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/categoryNotation">
+    <rdfs:label>category notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the territoryId literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of territory objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/productName">
+    <rdfs:label>product name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/freight">
+    <rdfs:label>freight</rdfs:label>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeeAddress">
+    <rdfs:label>address</rdfs:label>
+    <rdfs:comment>The physical address</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipName">
+    <rdfs:label>ship name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierAddress">
+    <rdfs:label>address</rdfs:label>
+    <rdfs:comment>The physical address</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeeCountry">
+    <rdfs:label>country</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCompanyName">
+    <rdfs:label>company name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/titleOfCourtesy">
+    <rdfs:label>title of courtesy</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipCity">
+    <rdfs:label>ship city</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/stateName">
+    <rdfs:label>state name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/USState"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/homePhone">
+    <rdfs:label>home phone</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerPhone">
+    <rdfs:label>phone</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/picture">
+    <rdfs:label>picture</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Category"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/title">
+    <rdfs:label>title</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierNotation">
+    <rdfs:label>supplier notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the territoryId literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of territory objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/discount">
+    <rdfs:label>discount</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/quantityPerUnit">
+    <rdfs:label>quantity per unit</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipViaNotation">
+    <rdfs:label>shipvia notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/regionNotation">
+    <rdfs:label>region notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the stateregion literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of region objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/USState"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Territory"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/discontinued">
+    <rdfs:label>discontinued</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerContactName">
+    <rdfs:label>contact name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/stateAbbr">
+    <rdfs:label>state abbreviation</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/USState"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/categoryName">
+    <rdfs:label>category name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Category"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerCountry">
+    <rdfs:label>country</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCountry">
+    <rdfs:label>country</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierFax">
+    <rdfs:label>fax</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/orderNotation">
+    <rdfs:label>order notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/quantity">
+    <rdfs:label>quantity</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierContactName">
+    <rdfs:label>contact name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierCity">
+    <rdfs:label>city</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerAddress">
+    <rdfs:label>address</rdfs:label>
+    <rdfs:comment>The physical address</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipperPhone">
+    <rdfs:label>phone</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Shipper"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/photo">
+    <rdfs:label>photo</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerCity">
+    <rdfs:label>city</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerNotation">
+    <rdfs:label>customer notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/customerContactTitle">
+    <rdfs:label>contact title</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Customer"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/description">
+    <rdfs:label>description</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Category"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/supplierHomePage">
+    <rdfs:label>home page</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Supplier"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/shipCountry">
+    <rdfs:label>ship country</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Order"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/firstName">
+    <rdfs:label>first name</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/territoryDescription">
+    <rdfs:label>territory description</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Territory"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/productNotation">
+    <rdfs:label>product notation</rdfs:label>
+    <rdfs:comment>An additional datatypeproperty that holds the literal for the purpose of incremental materialization. This is to avoid deconstructing the object value URI of the objectproperty</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/OrderDetail"/>
+  </owl:DatatypeProperty>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->
