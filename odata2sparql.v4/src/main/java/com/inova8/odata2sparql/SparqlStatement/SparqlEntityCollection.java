@@ -265,7 +265,7 @@ class SparqlEntityCollection extends EntityCollection {
 					RdfProperty rdfProperty = null;
 					if (rdfSubjectEntityType.isOperation()) {
 						// test to make sure a objectproperty first?
-						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
+						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
 							RdfAssociation rdfNavigationProperty = rdfSubjectEntityType
 									.findNavigationProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							if (rdfNavigationProperty != null) {
@@ -285,7 +285,7 @@ class SparqlEntityCollection extends EntityCollection {
 							}
 						}
 					} else {
-						if(!propertyNode.getIRI().equals(RdfConstants.ASSERTEDTYPE) ){
+						if(!propertyNode.getIRI().equals(RdfConstants.ASSERTEDTYPE) && !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE) ){
 							rdfProperty = rdfSubjectEntityType
 									.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							if (rdfProperty != null) {

@@ -118,14 +118,18 @@ public class RdfModelProvider {
 		RdfPrimaryKey resourcePrimaryKey = new RdfPrimaryKey(RdfModel.KEY(rdfsResource), RdfModel.KEY(rdfsResource));
 		rdfsResource.primaryKeys.put(RdfModel.KEY(rdfsResource), resourcePrimaryKey);
 
+		RdfNode rdfsLabelNode = RdfNodeFactory.createURI(RdfConstants.RDFS_LABEL);
+		RdfNode rdfsLabelLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDFS_LABEL_LABEL);
+		model.getOrCreateProperty(rdfsLabelNode, null, rdfsLabelLabelNode,
+				rdfsResourceNode, rdfStringNode, RdfConstants.Cardinality.ZERO_TO_ONE);
+		
 		model.getOrCreateAssociation(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_STATEMENT_LABEL),
 				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
 				RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT), unityNode, unityNode,
 				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.ONE);
 
-		@SuppressWarnings("unused")
-		RdfEntityType owlThing = model.getOrCreateEntityType(owlThingNode, owlThingLabelNode, rdfsResource);
+		model.getOrCreateEntityType(owlThingNode, owlThingLabelNode, rdfsResource);
 		RdfEntityType rdfsClass = model.getOrCreateEntityType(rdfsClassNode, rdfsClassLabelNode, rdfsResource);
 		@SuppressWarnings("unused")
 		RdfEntityType owlClass = model.getOrCreateEntityType(owlClassNode, owlClassLabelNode, rdfsClass);

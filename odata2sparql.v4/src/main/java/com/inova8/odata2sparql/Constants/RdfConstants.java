@@ -124,6 +124,10 @@ public class RdfConstants {
 	public static final String RDFS_SUBCLASSOF_LABEL = "subClassOf";
 	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
 	public static final String RDFS_RANGE_LABEL = "range";
+	
+	
+	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+	public static final String RDFS_LABEL_LABEL = "label";
 
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
