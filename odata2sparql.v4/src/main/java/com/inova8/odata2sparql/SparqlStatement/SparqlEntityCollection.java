@@ -141,7 +141,7 @@ class SparqlEntityCollection extends EntityCollection {
 				}
 				if (objectNode.isIRI() || objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded entity
-					if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+					if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
 						rdfSubjectEntity
 								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode));
 					}
@@ -149,9 +149,9 @@ class SparqlEntityCollection extends EntityCollection {
 							.findNavigationProperty(propertyNode);
 					// RdfAssociation rdfAssociation = navPropertiesMap.get(propertyNode.getIRI().toString());
 					if (rdfAssociation != null) {
-						if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+						//if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
 							//will only get here if rdfs_type in $expand
-						} else {
+						//} else {
 							// Locate which of the $expand this is related to
 							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
 
@@ -160,7 +160,7 @@ class SparqlEntityCollection extends EntityCollection {
 									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
 							// fixes #7 add to the Entity
 							findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
-						}
+						//}
 					} else {
 						// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
 						rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getIRI());

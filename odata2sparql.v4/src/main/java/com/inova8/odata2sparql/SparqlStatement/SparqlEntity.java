@@ -66,8 +66,6 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	public static String URLEncodeEntityKey(String entityKey) {
 		String encodedEntityKey = entityKey;
 		encodedEntityKey = encodedEntityKey.replace("/", "@");
-		//Required by Batch otherwise URIs fail
-		//encodedEntityKey = encodedEntityKey.replace(":", "%3A");
 		return encodedEntityKey;
 	}
 

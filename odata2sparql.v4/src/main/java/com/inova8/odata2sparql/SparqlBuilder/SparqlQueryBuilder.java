@@ -442,7 +442,7 @@ public class SparqlQueryBuilder {
 			throw new ODataApplicationException("Unhandled request type " + this.uriType.toString(),
 					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
-		selectPropertyMap = createSelectPropertyMap(uriInfo.getSelectOption());
+		selectPropertyMap = createSelectPropertyMap(rdfTargetEntityType,uriInfo.getSelectOption());
 	}
 
 	public SparqlStatement prepareConstructSparql()
@@ -526,7 +526,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			constructType.append(indent).append("#constructType\n");
 		String type = rdfEntityType.getIRI();
-		constructType.append(indent).append("?" + key + "_s a <" + type + "> .\n");
+		constructType.append(indent).append("?" + key + "_s <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> .\n");
 		return constructType;
 	}
 
@@ -537,9 +537,9 @@ public class SparqlQueryBuilder {
 		String type = rdfOperationType.getIRI();
 		constructOperation.append(indent + "\t");
 		if(isExpand)
-			constructOperation.append("[ a <" + type + "> ;\n");
+			constructOperation.append("[ <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		else
-			constructOperation.append("[ <http://targetEntity> true ; a <" + type + "> ;\n");
+			constructOperation.append("[ <http://targetEntity> true ; <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
 					.append(" <" + property.getPropertyURI() + "> ?" + property.getVarName() + " ;\n");
@@ -1193,7 +1193,7 @@ public class SparqlQueryBuilder {
 							+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
 				}
 				expandSelectTreeNodeWhere.append(
-						clausesSelect(createSelectPropertyMap(expandItem.getSelectOption()), nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
+						clausesSelect(createSelectPropertyMap(navProperty.getRangeClass(),expandItem.getSelectOption()), nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
 			}
 			if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 				expandSelectTreeNodeWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
@@ -1280,9 +1280,9 @@ public class SparqlQueryBuilder {
 		return defaultLimitClause;
 	}
 
-	private  HashSet<String> createSelectPropertyMap(SelectOption selectOption) throws EdmException {
+	private  HashSet<String> createSelectPropertyMap(RdfEntityType entityType, SelectOption selectOption) throws EdmException {
 		// Align variables
-		RdfEntityType entityType = rdfTargetEntityType;
+		//RdfEntityType entityType = rdfTargetEntityType;
 		String key = entityType.entityTypeName;
 		HashSet<String> valueProperties = new  HashSet<String>();
 		if (selectOption != null) {

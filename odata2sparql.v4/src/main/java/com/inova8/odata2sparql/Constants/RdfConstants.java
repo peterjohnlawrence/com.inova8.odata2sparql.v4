@@ -59,6 +59,7 @@ public class RdfConstants {
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
 	public static final String TARGETENTITY = "http://targetEntity";
+	public static final String ASSERTEDTYPE = "http://assertedType";
 	public static final String PREFIX = "j";
 	public static final String PROPERTY_POSTFIX = "_value";
 
