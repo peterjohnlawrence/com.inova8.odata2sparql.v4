@@ -265,7 +265,7 @@ class SparqlEntityCollection extends EntityCollection {
 					RdfProperty rdfProperty = null;
 					if (rdfSubjectEntityType.isOperation()) {
 						// test to make sure a objectproperty first?
-						if (!propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
 							RdfAssociation rdfNavigationProperty = rdfSubjectEntityType
 									.findNavigationProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							if (rdfNavigationProperty != null) {
@@ -274,7 +274,7 @@ class SparqlEntityCollection extends EntityCollection {
 								rdfProperty = rdfSubjectEntityType
 										.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							}
-							if (rdfProperty != null) {
+							if ((rdfProperty != null)) {
 								// rdfEntity.put(rdfProperty.propertyName,
 								// Cast(value, rdfProperty.propertyTypeName));
 								rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
@@ -285,16 +285,18 @@ class SparqlEntityCollection extends EntityCollection {
 							}
 						}
 					} else {
-						rdfProperty = rdfSubjectEntityType
-								.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
-						if (rdfProperty != null) {
-							// rdfEntity.put(rdfProperty.propertyName,
-							// Cast(value, rdfProperty.propertyTypeName));
-							rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
-									Cast(value, rdfProperty.propertyTypeName)));
-						} else {
-							log.info("Ignoring property statement that is not part of EDM:"
-									+ propertyNode.getLocalName());
+						if(!propertyNode.getIRI().equals(RdfConstants.ASSERTEDTYPE) ){
+							rdfProperty = rdfSubjectEntityType
+									.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
+							if (rdfProperty != null) {
+								// rdfEntity.put(rdfProperty.propertyName,
+								// Cast(value, rdfProperty.propertyTypeName));
+								rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
+										Cast(value, rdfProperty.propertyTypeName)));
+							} else {
+								log.info("Ignoring property statement that is not part of EDM:"
+										+ propertyNode.getLocalName());
+							}
 						}
 					}
 				} else {

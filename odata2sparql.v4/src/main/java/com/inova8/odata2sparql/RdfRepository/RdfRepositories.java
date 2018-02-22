@@ -28,14 +28,7 @@ import org.eclipse.rdf4j.repository.manager.RepositoryManager;
 import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
 import org.eclipse.rdf4j.repository.sparql.config.SPARQLRepositoryConfig;
 import org.eclipse.rdf4j.rio.RDFFormat;
-//import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
-//import org.eclipse.rdf4j.repository.manager.RemoteRepositoryManager;
-//import org.eclipse.rdf4j.repository.manager.RepositoryManager;
-//import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
-//import org.eclipse.rdf4j.repository.sparql.config.SPARQLRepositoryConfig;
 import org.eclipse.rdf4j.rio.RDFParseException;
-//import org.eclipse.rdf4j.sail.config.SailImplConfig;
-//import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
 import org.eclipse.rdf4j.sail.SailReadOnlyException;
 import org.eclipse.rdf4j.sail.config.SailImplConfig;
 import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
@@ -50,7 +43,6 @@ public class RdfRepositories {
 
 	private final Logger log = LoggerFactory.getLogger(RdfRepositories.class);
 	private RepositoryManager repositoryManager = null;
-	private final String configFolder;
 	private final String repositoryFolder;
 	private final String repositoryUrl;
 	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
@@ -58,9 +50,7 @@ public class RdfRepositories {
 	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl) {
 		super();	
 		if(configFolder==null || configFolder.isEmpty()){
-			this.configFolder=RdfConstants.DEFAULTCONFIG;
 		}else{
-			this.configFolder = configFolder;
 		}
 		if(repositoryFolder==null || repositoryFolder.isEmpty()){
 			this.repositoryFolder=RdfConstants.DEFAULTFOLDER;

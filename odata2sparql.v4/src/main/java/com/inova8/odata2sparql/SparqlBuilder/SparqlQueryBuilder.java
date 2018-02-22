@@ -1,6 +1,5 @@
 package com.inova8.odata2sparql.SparqlBuilder;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1283,7 +1282,7 @@ public class SparqlQueryBuilder {
 	private  HashSet<String> createSelectPropertyMap(RdfEntityType entityType, SelectOption selectOption) throws EdmException {
 		// Align variables
 		//RdfEntityType entityType = rdfTargetEntityType;
-		String key = entityType.entityTypeName;
+		//String key = entityType.entityTypeName;
 		HashSet<String> valueProperties = new  HashSet<String>();
 		if (selectOption != null) {
 			for (SelectItem property : selectOption.getSelectItems()) {
