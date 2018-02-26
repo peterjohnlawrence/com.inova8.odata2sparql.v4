@@ -45,9 +45,10 @@ public class RdfRepositories {
 	private RepositoryManager repositoryManager = null;
 	private final String repositoryFolder;
 	private final String repositoryUrl;
+	private final String repositoryDir;
 	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
 
-	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl) {
+	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
 		super();	
 		if(configFolder==null || configFolder.isEmpty()){
 		}else{
@@ -58,6 +59,7 @@ public class RdfRepositories {
 			this.repositoryFolder = repositoryFolder;
 		}
 		this.repositoryUrl = repositoryUrl;
+		this.repositoryDir = repositoryDir;
 		try {
 			loadRepositories();
 		} catch (OData2SparqlException e) {
@@ -336,7 +338,9 @@ public class RdfRepositories {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
 		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
-			localRepositoryManagerDirectory = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder).toString();
+			//TODO Should be local to Tomcat as specific to each running servlet/webapp
+			localRepositoryManagerDirectory = Paths.get(repositoryDir,this.repositoryFolder).toString();
+			//localRepositoryManagerDirectory = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder).toString();
 		}
 		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(new File(localRepositoryManagerDirectory));
 		log.info("Using local repository at " + localRepositoryManagerDirectory);

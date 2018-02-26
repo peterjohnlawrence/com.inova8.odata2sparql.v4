@@ -1,10 +1,12 @@
 package com.inova8.odata2sparql;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,8 +41,11 @@ public class RdfODataServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 			if (rdfEdmProviders == null) {
+				
+				ServletContext servletContext = getServletContext();
+				File repositoryDir = (File)servletContext.getAttribute(ServletContext.TEMPDIR); 
 				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),this.getInitParameter("repositoryFolder"),
-						this.getInitParameter("repositoryUrl"));
+						this.getInitParameter("repositoryUrl"),repositoryDir.getAbsolutePath());
 			}
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];

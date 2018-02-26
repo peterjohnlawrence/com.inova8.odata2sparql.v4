@@ -8,7 +8,7 @@ public enum SPARQLProfile {
 	// 0..1, 1..1, 0..*, 1..*
 	DEFAULT("http://inova8.com/odata4sparql#DEFAULT"), SPARQL10("http://inova8.com/odata4sparql#SPARQL10"), SPARQL11(
 			"http://inova8.com/odata4sparql#SPARQL11"), AG("http://inova8.com/odata4sparql#ALLEGROGRAPH"), TB(
-			"http://inova8.com/odata4sparql#TOPQUADRANT"), JENA("http://inova8.com/odata4sparql#JENA"), VIRT("http://inova8.com/odata4sparql#VIRTUOSO");
+			"http://inova8.com/odata4sparql#TOPQUADRANT"), JENA("http://inova8.com/odata4sparql#JENA"), VIRT("http://inova8.com/odata4sparql#VIRTUOSO"), RDF4J("http://inova8.com/odata4sparql#RDF4J");
 
 	private final String code;
 

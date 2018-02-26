@@ -16,9 +16,9 @@ public class RdfEdmProviders {
 	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
 	private final RdfRepositories rdfRepositories;
 
-	public RdfEdmProviders(String configFolder,String repositoryFolder,String repositoryUrl) {
+	public RdfEdmProviders(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
 		super();
-		rdfRepositories = new RdfRepositories(configFolder, repositoryFolder,repositoryUrl);
+		rdfRepositories = new RdfRepositories(configFolder, repositoryFolder,repositoryUrl,repositoryDir);
 	}
 
 	public  void reset(String rdfRepositoryID) {

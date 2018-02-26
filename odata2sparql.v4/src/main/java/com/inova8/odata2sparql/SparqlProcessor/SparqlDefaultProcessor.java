@@ -100,11 +100,11 @@ public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumen
 				//Only log severe errors, not 404 etc
 				if (serverError.getException() != null) {
 					log.error(request.getMethod() + ": " + request.getRawRequestUri() + " Error: "
-							+ serverError.getException().getMessage() + "\nCause: "
+							+ serverError.getException().toString() + "\nCause: "
 							+ serverError.getException().getCause());
 				} else {
 					log.error(request.getMethod() + ": " + request.getRawRequestUri() + " Error: "
-							+ serverError.getException().getMessage());
+							+ serverError.getException().toString());
 				}
 			}
 

@@ -60,7 +60,7 @@ public class SparqlFilterClausesBuilder {
 		UriResource lastSegment;
 		switch (this.uriType) {
 		case URI1: {
-			filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType,"");
+			filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType, "");
 		}
 			break;
 		case URI2: {
@@ -75,7 +75,7 @@ public class SparqlFilterClausesBuilder {
 		case URI6B: {
 			lastSegment = resourceParts.get(resourceParts.size() - 1);
 			if (lastSegment instanceof UriResourceNavigation) {
-				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType,"");
+				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType, "");
 			}
 		}
 			break;
@@ -92,9 +92,9 @@ public class SparqlFilterClausesBuilder {
 				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
 				edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
 				rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
-				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType,"");
+				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType, "");
 			} else {
-				filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType,"");
+				filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType, "");
 			}
 		}
 			break;
@@ -122,7 +122,7 @@ public class SparqlFilterClausesBuilder {
 	}
 
 	public StringBuilder getClausesExpandFilter(String indent) {
-		return new StringBuilder(clausesExpandFilter.toString().replaceAll("#indent",indent));
+		return new StringBuilder(clausesExpandFilter.toString().replaceAll("#indent", indent));
 	}
 
 	public SparqlExpressionVisitor getFilterClause() {
@@ -167,20 +167,32 @@ public class SparqlFilterClausesBuilder {
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 
 		for (ExpandItem expandItem : expandItems) {
-			List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
-			UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
-			RdfAssociation navProperty = rdfModelToMetadata
-					.getMappedNavigationProperty(new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), //resourceNavigation.getProperty().getType().getNamespace(),//resourceNavigation.getProperty().getType().getNamespace(),
-							resourceNavigation.getProperty().getName()));
-			String nextTargetKey = targetKey + resourceNavigation.getProperty().getName();
-			RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
-			//Now do the work
-			if( expandItem.getFilterOption()!=null){
-				expandItem(targetKey, indent, expandItem, navProperty, nextTargetKey, nextTargetEntityType);
-			}
-			if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
-				expandItems(nextTargetEntityType, nextTargetKey, expandItem.getExpandOption().getExpandItems(),
-						indent + "\t");
+			if (expandItem.isStar()) {
+				//Iterate through all navigation properties of this targetEntityType
+				//However cannot further expand or add filter to an anonymous expand so no need to add anything
+				/*				
+				for (RdfAssociation navigationProperty : targetEntityType.getNavigationProperties()) {
+					expandItem(targetKey, indent, expandItem, navigationProperty,
+							targetKey + navigationProperty.getAssociationName(), navigationProperty.getRangeClass());
+				}
+				*/
+			} else {
+				List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
+				UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
+				RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(
+						new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), //resourceNavigation.getProperty().getType().getNamespace(),//resourceNavigation.getProperty().getType().getNamespace(),
+								resourceNavigation.getProperty().getName()));
+				String nextTargetKey = targetKey + resourceNavigation.getProperty().getName();
+				RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
+				//Now do the work
+				if (expandItem.getFilterOption() != null) {
+					expandItem(targetKey, indent, expandItem, navProperty, nextTargetKey, nextTargetEntityType);
+				}
+				if ((expandItem.getExpandOption() != null)
+						&& (expandItem.getExpandOption().getExpandItems().size() > 0)) {
+					expandItems(nextTargetEntityType, nextTargetKey, expandItem.getExpandOption().getExpandItems(),
+							indent + "\t");
+				}
 			}
 		}
 	}
@@ -188,35 +200,39 @@ public class SparqlFilterClausesBuilder {
 	private void expandItem(String targetKey, String indent, ExpandItem expandItem, RdfAssociation navProperty,
 			String nextTargetKey, RdfEntityType nextTargetEntityType)
 			throws ODataApplicationException, ExpressionVisitException {
-		SparqlExpressionVisitor filterClause = filterClause(expandItem.getFilterOption(), nextTargetEntityType,nextTargetKey);
+		SparqlExpressionVisitor filterClause = filterClause(expandItem.getFilterOption(), nextTargetEntityType,
+				nextTargetKey);
 		filter.append(filterClause.getFilterClause());
 
-		clausesExpandFilter.append(indent).append("{\n");		
-		
+		clausesExpandFilter.append(indent).append("{\n");
+
 		if (navProperty.IsInverse()) {
 			clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"
 					+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
 		} else {
-			clausesExpandFilter.append(indent).append("\t").append("?" + targetKey + "_s <"
-					+ navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+			clausesExpandFilter.append(indent).append("\t").append(
+					"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
 		}
-				
-		HashMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters().get(nextTargetEntityType.entityTypeName).getPropertyFilters();
-		clausesExpandFilter.append(indent).append("\t").append("{\n");
-		// Repeat for each filtered property associated with this navProperty
-		for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
-			PropertyFilter propertyFilter = propertyFilterEntry.getValue();
-			clausesExpandFilter.append(indent).append("\t").append("\t")
-					.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
-							+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
-			for (String filter : propertyFilter.getFilters()) {
-				clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
+		//Check if there are any relevant filters before proceeding
+		if (!filterClause.getNavPropertyPropertyFilters().isEmpty()) {
+			HashMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
+					.get(nextTargetEntityType.entityTypeName).getPropertyFilters();
+			clausesExpandFilter.append(indent).append("\t").append("{\n");
+			// Repeat for each filtered property associated with this navProperty
+			for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
+				PropertyFilter propertyFilter = propertyFilterEntry.getValue();
+				clausesExpandFilter.append(indent).append("\t").append("\t")
+						.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
+								+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
+				for (String filter : propertyFilter.getFilters()) {
+					clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
+				}
 			}
+			clausesExpandFilter.append(indent).append("\t").append("}\n");
 		}
-		clausesExpandFilter.append(indent).append("\t").append("}\n");		
-			
-		clausesExpandFilter.append(indent).append("}\n");			
-		
+
+		clausesExpandFilter.append(indent).append("}\n");
+
 		expandItemVariables.append(" ?" + nextTargetKey + "_s");
 	}
 

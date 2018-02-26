@@ -266,7 +266,7 @@ public class RdfConstants {
 			}
 		
 			String repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
-
+		
 			repositoryManagerDir = new File(workingDirectory );
 			repositoryWorkingDirectory = workingDirectory;	
 			
