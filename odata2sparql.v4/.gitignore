@@ -1,1 +1,2 @@
-/target/
+/target/*
+!/target/odata2sparql.v4.war
