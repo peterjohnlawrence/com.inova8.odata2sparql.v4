@@ -61,7 +61,8 @@ public class RdfRepository  {
 	private Boolean withRdfAnnotations;
 	private Boolean withSapAnnotations;
 	private Boolean useBaseType;
-
+	private Boolean expandOperations = false;
+	
 	RdfRepository(String modelName,Namespace defaultPrefix,Hashtable<String, Namespace> namespaces) {
 		super();
 		this.modelName = modelName;
@@ -124,5 +125,11 @@ public class RdfRepository  {
 	}
 	public void setUseBaseType(boolean useBaseType) {
 		this.useBaseType = useBaseType;	
+	}
+	public Boolean getExpandOperations() {
+		return expandOperations;
+	}
+	public void setExpandOperations(boolean expandOperations) {
+		this.expandOperations = expandOperations;	
 	}
 }

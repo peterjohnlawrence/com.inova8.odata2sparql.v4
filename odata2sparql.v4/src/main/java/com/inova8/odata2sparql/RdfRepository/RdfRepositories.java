@@ -159,6 +159,7 @@ public class RdfRepositories {
 							Literal valueOfWithRdfAnnotations = (Literal) bindingSet.getValue("withRdfAnnotations");
 							Literal valueOfWithSapAnnotations = (Literal) bindingSet.getValue("withSapAnnotations");
 							Literal valueOfUseBaseType = (Literal) bindingSet.getValue("useBaseType");
+							Literal valueOfExpandOperations = (Literal) bindingSet.getValue("expandOperations");
 							//Create and add the corresponding repositories
 							RepositoryConfig dataRepositoryConfig = repositoryManager
 									.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
@@ -285,6 +286,12 @@ public class RdfRepositories {
 							}
 							if (valueOfUseBaseType != null) {
 								repository.setUseBaseType(Boolean.parseBoolean(valueOfUseBaseType
+										.stringValue()));
+							} else {
+								repository.setUseBaseType(true);
+							}
+							if (valueOfExpandOperations != null) {
+								repository.setExpandOperations(Boolean.parseBoolean(valueOfExpandOperations
 										.stringValue()));
 							} else {
 								repository.setUseBaseType(true);
