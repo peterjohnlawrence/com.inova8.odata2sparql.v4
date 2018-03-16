@@ -597,10 +597,12 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesOperationProperties = new StringBuilder();
 		if (DEBUG)
 			clausesOperationProperties.append("\t#clausesOperationProperties\n");
-
-		clausesOperationProperties.append("\t").append(filterOperationQuery(rdfOperationType));
+		clausesOperationProperties.append("\t{");
+		StringBuilder filterOperationQuery = filterOperationQuery(rdfOperationType);
+		clausesOperationProperties.append("\n\t").append(filterOperationQuery(rdfOperationType));
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
 		clausesOperationProperties.append("BIND(UUID()  AS ?" + nextTargetKey + "_s)\n");
+		clausesOperationProperties.append("\t}");
 		return clausesOperationProperties;
 	}
 
@@ -609,8 +611,7 @@ public class SparqlQueryBuilder {
 		StringBuilder filter = new StringBuilder();
 		if (DEBUG)
 			filter.append("#operationFilter\n");
-		if (filterClause != null)
-			filter.append(filterClauses.getFilter()).append("\n");
+		if (!filterClause.getFilterClause().isEmpty())	filter.append(filterClauses.getFilter()).append("\n");
 		return filter;
 	}
 
@@ -654,7 +655,7 @@ public class SparqlQueryBuilder {
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder clausesExpandSelect = new StringBuilder();
 		if (DEBUG)
-			clausesExpandSelect.append("\t#clausesExpandSelect\n");
+			clausesExpandSelect.append("\n\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
 			clausesExpandSelect.append(expandItemsWhere(rdfTargetEntityType, rdfTargetEntityType.entityTypeName,
 					this.expandOption.getExpandItems(), "\t"));
@@ -1196,7 +1197,17 @@ public class SparqlQueryBuilder {
 			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 
 		StringBuilder expandItemWhere = new StringBuilder();
+		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
+		//SparqlExpressionVisitor expandFilterClause;
 
+		//TODO performance fix and to avoid OPTIONAL
+		expandItemWhere.append(indent);
+		expandItemWhere.append("UNION");
+		//		if (expandItem.getFilterOption() == null) {
+		//			expandItemWhere.append("OPTIONAL");
+		//		}
+		expandItemWhere.append("{\n");
+		expandItemWhere.append(indent);
 		if (navProperty.getDomainClass().isOperation()) {
 			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
 				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
@@ -1204,16 +1215,7 @@ public class SparqlQueryBuilder {
 							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 			}
 		}
-		expandItemWhere.append(indent);
-		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
-		//SparqlExpressionVisitor expandFilterClause;
 
-		//TODO performance fix and to avoid OPTIONAL
-		expandItemWhere.append("UNION");
-		//		if (expandItem.getFilterOption() == null) {
-		//			expandItemWhere.append("OPTIONAL");
-		//		}
-		expandItemWhere.append("{\n");
 		if (navProperty.getRangeClass().isOperation()) {
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
 			// BIND(?order as ?Order_s)
