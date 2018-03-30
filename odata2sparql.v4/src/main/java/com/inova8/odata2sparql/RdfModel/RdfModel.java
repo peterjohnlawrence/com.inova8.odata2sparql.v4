@@ -435,7 +435,7 @@ public class RdfModel {
 			return getPrimaryKeys(true);
 		}
 		public Collection<RdfPrimaryKey> getPrimaryKeys(boolean withBaseType) {
-			Collection<RdfPrimaryKey> primaryKeyValues = new ArrayList<RdfPrimaryKey>();;
+			Collection<RdfPrimaryKey> primaryKeyValues = new ArrayList<RdfPrimaryKey>();
 			RdfEntityType currentEntityType = this;
 			do{
 				primaryKeyValues.addAll(currentEntityType.primaryKeys.values());

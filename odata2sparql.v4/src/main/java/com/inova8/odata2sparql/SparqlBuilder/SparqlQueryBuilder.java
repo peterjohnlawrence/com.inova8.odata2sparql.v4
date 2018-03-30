@@ -1357,11 +1357,24 @@ public class SparqlQueryBuilder {
 					if (!property.getResourcePath().equals(RdfConstants.SUBJECT)) {
 						RdfProperty rdfProperty = null;
 						try {
-							rdfProperty = segmentEntityType.findProperty(
-									property.getResourcePath().getUriResourceParts().get(0).getSegmentValue());
+							String segmentName = property.getResourcePath().getUriResourceParts().get(0)
+									.getSegmentValue();
+							rdfProperty = segmentEntityType.findProperty(segmentName);
 							if (rdfProperty == null)
-								throw new EdmException("Failed to locate property:"
-										+ property.getResourcePath().getUriResourceParts().get(0).getSegmentValue());
+								if (segmentEntityType.findNavigationProperty(segmentName) == null) {
+									throw new EdmException("Failed to locate property:" + property.getResourcePath()
+											.getUriResourceParts().get(0).getSegmentValue());
+								} else {
+									// TODO specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be uincluded otehr than link, unless included in subsequent $expand
+									// See http://docs.oasis-open.org/odata/odata/v4.0/os/part2-url-conventions/odata-v4.0-os-part2-url-conventions.html#_Toc372793861 5.1.3 System Query Option $select
+									valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+								}
+							else if (rdfProperty.getIsKey()) {
+								// TODO specifically asked for key so should be added to VALUES
+								valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+							} else {
+								valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
+							}
 						} catch (EdmException e) {
 							log.error("Failed to locate property:"
 									+ property.getResourcePath().getUriResourceParts().get(0).getSegmentValue());
@@ -1369,12 +1382,6 @@ public class SparqlQueryBuilder {
 									+ property.getResourcePath().getUriResourceParts().get(0).getSegmentValue());
 						}
 
-						if (rdfProperty.getIsKey()) {
-							// TODO specifically asked for key so should be added to VALUES
-							valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-						} else {
-							valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
-						}
 					}
 				}
 			}
