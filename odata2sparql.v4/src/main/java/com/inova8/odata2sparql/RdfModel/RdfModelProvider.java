@@ -395,7 +395,9 @@ public class RdfModelProvider {
 				while (propertiesIterator.hasNext()) {
 					RdfProperty property = propertiesIterator.next();
 					if (property.propertyTypeName == null) {
+						log.error("Removing incomplete property declartion for class.property: " + clazz.entityTypeName + "." + property.propertyName);
 						propertiesIterator.remove();
+						
 					}
 				}
 			}

@@ -81,7 +81,7 @@ public class RdfRepositories {
 	}
 
 	public RdfRepository getRdfRepository(String rdfRepositoryID) {
-		return rdfRepositoryList.get(rdfRepositoryID.toUpperCase());
+		return rdfRepositoryList.get(rdfRepositoryID);
 	}
 
 	public HashMap<String, RdfRepository> getRdfRepositories() {
@@ -394,6 +394,7 @@ public class RdfRepositories {
 		try {
 			modelsConnection = systemRepository.getConnection();
 			//Clear any contents to make sure we load a fresh models.ttl
+			//TODO does not seem to be clearing triples
 			modelsConnection.clear();
 			String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
 			if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){

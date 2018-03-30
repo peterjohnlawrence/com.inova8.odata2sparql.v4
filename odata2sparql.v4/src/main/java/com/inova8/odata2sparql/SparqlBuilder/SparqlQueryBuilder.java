@@ -598,7 +598,6 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesOperationProperties.append("\t#clausesOperationProperties\n");
 		clausesOperationProperties.append("\t{");
-		StringBuilder filterOperationQuery = filterOperationQuery(rdfOperationType);
 		clausesOperationProperties.append("\n\t").append(filterOperationQuery(rdfOperationType));
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
 		clausesOperationProperties.append("BIND(UUID()  AS ?" + nextTargetKey + "_s)\n");
@@ -611,7 +610,8 @@ public class SparqlQueryBuilder {
 		StringBuilder filter = new StringBuilder();
 		if (DEBUG)
 			filter.append("#operationFilter\n");
-		if (!filterClause.getFilterClause().isEmpty())	filter.append(filterClauses.getFilter()).append("\n");
+		if (!filterClause.getFilterClause().isEmpty())
+			filter.append(filterClauses.getFilter()).append("\n");
 		return filter;
 	}
 
@@ -1202,7 +1202,11 @@ public class SparqlQueryBuilder {
 
 		//TODO performance fix and to avoid OPTIONAL
 		expandItemWhere.append(indent);
-		expandItemWhere.append("UNION");
+		if (navProperty.getDomainClass().isOperation()) {
+			expandItemWhere.append("OPTIONAL");
+		} else {
+			expandItemWhere.append("UNION");
+		}
 		//		if (expandItem.getFilterOption() == null) {
 		//			expandItemWhere.append("OPTIONAL");
 		//		}

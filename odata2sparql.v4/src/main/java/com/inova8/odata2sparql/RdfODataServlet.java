@@ -87,7 +87,7 @@ public class RdfODataServlet extends HttpServlet {
 				htmlResponse(req, resp, "/index.html");
 			}
 		} catch (RuntimeException | OData2SparqlException e) {
-			log.error("Server Error occurred in ExampleServlet", e);
+			log.error("Server Error occurred in RdfODataServlet", e);
 			throw new ServletException(e);
 		}
 	}

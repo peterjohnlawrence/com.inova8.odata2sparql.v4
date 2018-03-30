@@ -1018,7 +1018,7 @@ public class RdfModel {
 		RdfURI propertyURI = new RdfURI(propertyNode);
 		for (RdfEntityType clazz : classes) {
 			RdfProperty property = Enumerable.create(clazz.getProperties()).firstOrNull(
-					propertyNameEquals(propertyURI.localName));
+					propertyNameEquals(rdfToOdata(propertyURI.localName)));
 			String propertyTypeName = rangeNode.getIRI().toString();
 			property.propertyTypeName = propertyTypeName;
 		}
@@ -1165,7 +1165,7 @@ public class RdfModel {
 	}
 
 	public static String rdfToOdata(String rdfName) {
-		return rdfName.replace("-", "_").replace("/", "_");
+		return rdfName.replace("-", "_").replace("/", "_").replace(".", "_");
 	}
 
 	private static final Predicate1<RdfSchema> graphNameEquals(final String graphName) {
