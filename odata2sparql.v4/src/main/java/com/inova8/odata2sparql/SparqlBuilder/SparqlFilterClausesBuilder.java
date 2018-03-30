@@ -75,6 +75,10 @@ public class SparqlFilterClausesBuilder {
 		case URI6B: {
 			lastSegment = resourceParts.get(resourceParts.size() - 1);
 			if (lastSegment instanceof UriResourceNavigation) {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+				rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
 				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType, "");
 			}
 		}
