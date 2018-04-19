@@ -17,6 +17,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 
 public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	private final HashMap<RdfNode, Object> datatypeProperties = new HashMap<RdfNode, Object>();
+	private final RdfNode subjectNode;
 	private final String subject;
 	private final RdfPrefixes rdfPrefixes;
 	private RdfEntityType rdfEntityType;
@@ -25,6 +26,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 
 	SparqlEntity(RdfNode subjectNode, RdfPrefixes rdfPrefixes) {
 		super();
+		this.subjectNode=subjectNode;
 		this.rdfPrefixes = rdfPrefixes;
 		this.subject = this.rdfPrefixes.toQName(subjectNode,RdfConstants.QNAME_SEPARATOR); 
 		this.addProperty(new Property(null, RdfConstants.SUBJECT, ValueType.PRIMITIVE, SparqlEntity
@@ -72,7 +74,9 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	public String getSubject() {
 		return subject;
 	}
-
+	public RdfNode getSubjectNode() {
+		return subjectNode;
+	}
 	public HashMap<RdfNode, Object> getDatatypeProperties() {
 		return datatypeProperties;
 	}

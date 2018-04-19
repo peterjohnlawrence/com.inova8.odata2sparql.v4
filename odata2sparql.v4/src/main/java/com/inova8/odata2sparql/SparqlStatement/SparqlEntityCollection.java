@@ -45,7 +45,9 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
 	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
+	private final Map<String, Integer> counts = new HashMap<String, Integer>();
 	private RdfEdmProvider sparqlEdmProvider;
+	private final RdfEntityType entityType;
 
 	// Clarification of expanded structure
 	// Entityset dataproperty: List<Map<Subject, Map<Property,Value>>>
@@ -56,6 +58,7 @@ class SparqlEntityCollection extends EntityCollection {
 			ExpandOption expand, SelectOption select) {
 		super();
 		this.sparqlEdmProvider = sparqlEdmProvider;
+		this.entityType = entityType;
 		this.toSparqlEntityCollection(entityType, results, expand, select);
 	}
 
@@ -122,8 +125,8 @@ class SparqlEntityCollection extends EntityCollection {
 		rdfObjectEntity.setExpandedEntity(true);
 	}
 
-
-	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType,RdfTripleSet results, ExpandOption expand, SelectOption select) throws EdmException {
+	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType, RdfTripleSet results,
+			ExpandOption expand, SelectOption select) throws EdmException {
 
 		try {
 			while (results.hasNext()) {
@@ -132,9 +135,7 @@ class SparqlEntityCollection extends EntityCollection {
 				RdfNode propertyNode = triple.getPredicate();
 				RdfNode objectNode = triple.getObject();
 
-				SparqlEntity rdfSubjectEntity = findOrCreateEntity(
-						/* sparqlEdmProvider, rdfEntitiesMap, */ subjectNode, rdfEntityType);
-				// this.getEntities().add(rdfSubjectEntity);
+				SparqlEntity rdfSubjectEntity = findOrCreateEntity(subjectNode, rdfEntityType);
 				if ((expand == null || expand.getExpandItems().isEmpty())
 						&& (select == null || select.getSelectItems().isEmpty())) {
 					rdfSubjectEntity.setEntityType(rdfEntityType);
@@ -150,16 +151,16 @@ class SparqlEntityCollection extends EntityCollection {
 					// RdfAssociation rdfAssociation = navPropertiesMap.get(propertyNode.getIRI().toString());
 					if (rdfAssociation != null) {
 						//if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
-							//will only get here if rdfs_type in $expand
+						//will only get here if rdfs_type in $expand
 						//} else {
-							// Locate which of the $expand this is related to
-							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+						// Locate which of the $expand this is related to
+						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
 
-							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
-							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
-									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
-							// fixes #7 add to the Entity
-							findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
+						rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
+						this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
+								rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
+						// fixes #7 add to the Entity
+						findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
 						//}
 					} else {
 						// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
@@ -172,8 +173,8 @@ class SparqlEntityCollection extends EntityCollection {
 							rdfSubjectEntity.addProperty(new Property(null,
 									rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getLocalName())
 											.getRelatedKey(),
-									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(
-											sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(objectNode,RdfConstants.QNAME_SEPARATOR))));
+									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel()
+											.getRdfPrefixes().toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
 						}
 					}
 
@@ -185,8 +186,14 @@ class SparqlEntityCollection extends EntityCollection {
 					// Mark any targetEntity so that recursive queries can be
 					// executed
 					rdfSubjectEntity.setTargetEntity(true);
+				} else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
+					//Provides counted value hashed by subject/navigationPropertyName
+					counts.put(
+							subjectNode.getIRI().toString()
+									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
+							(Integer) objectNode.getLiteralObject());
 				} else {// Must be a property with a value, so put it into a
-						// hashmap for processing the second time round when we
+							// hashmap for processing the second time round when we
 						// know the property
 					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
 				}
@@ -197,7 +204,7 @@ class SparqlEntityCollection extends EntityCollection {
 		return this.build();
 	}
 
-	private void findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfAssociation rdfAssociation,
+	private Link findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfAssociation rdfAssociation,
 			SparqlEntity rdfObjectEntity) {
 		Link link = null;
 		if (rdfSubjectEntity.getNavigationLinks() == null) {
@@ -232,17 +239,20 @@ class SparqlEntityCollection extends EntityCollection {
 		// Required to make sure rel is not empty
 		if (link.getRel() == null)
 			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
-
+		return link;
 	}
 
 	private SparqlEntity findOrCreateEntity(RdfNode subjectNode, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
-		rdfEntity = entitySetResultsMap.get(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode,RdfConstants.QNAME_SEPARATOR));
+		rdfEntity = entitySetResultsMap.get(
+				sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode, RdfConstants.QNAME_SEPARATOR));
 		if (rdfEntity == null) {
 			rdfEntity = new SparqlEntity(subjectNode, sparqlEdmProvider.getRdfModel().getRdfPrefixes());
 			// Only add at build time
 			// this.getEntities().add(rdfEntity);
-			entitySetResultsMap.put(sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode,RdfConstants.QNAME_SEPARATOR), rdfEntity);
+			entitySetResultsMap.put(
+					sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode, RdfConstants.QNAME_SEPARATOR),
+					rdfEntity);
 		}
 		return rdfEntity;
 	}
@@ -255,8 +265,15 @@ class SparqlEntityCollection extends EntityCollection {
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
 			// only leave target entities in collection, the rest will be
 			// accessed via links
-			if (rdfEntity.isTargetEntity())
+			if (rdfEntity.isTargetEntity()) {
 				this.getEntities().add(rdfEntity);
+			}
+			for (Link navigationLink : rdfEntity.getNavigationLinks()) {
+				Integer count = counts
+						.get(rdfEntity.getSubjectNode().getIRI().toString() + "/" + navigationLink.getTitle());
+				if ((count != null) && (navigationLink.getInlineEntitySet() != null))
+					navigationLink.getInlineEntitySet().setCount(count);
+			}
 			for (Entry<RdfNode, Object> entry : rdfEntity.getDatatypeProperties().entrySet()) {
 				RdfNode propertyNode = entry.getKey();
 				Object value = entry.getValue();
@@ -265,7 +282,8 @@ class SparqlEntityCollection extends EntityCollection {
 					RdfProperty rdfProperty = null;
 					if (rdfSubjectEntityType.isOperation()) {
 						// test to make sure a objectproperty first?
-						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
+						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)
+								&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
 							RdfAssociation rdfNavigationProperty = rdfSubjectEntityType
 									.findNavigationProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							if (rdfNavigationProperty != null) {
@@ -285,7 +303,8 @@ class SparqlEntityCollection extends EntityCollection {
 							}
 						}
 					} else {
-						if(!propertyNode.getIRI().equals(RdfConstants.ASSERTEDTYPE) && !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE) ){
+						if (!propertyNode.getIRI().equals(RdfConstants.ASSERTEDTYPE)
+								&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
 							rdfProperty = rdfSubjectEntityType
 									.findProperty(RdfModel.rdfToOdata(propertyNode.getLocalName()));
 							if (rdfProperty != null) {
@@ -305,7 +324,7 @@ class SparqlEntityCollection extends EntityCollection {
 			}
 			// need to check if the RdfEntity, especially operation types are
 			// complete with keys
-			if (rdfEntity.getEntityType().isOperation()) {
+			if ((rdfEntity.getEntityType() != null) && (rdfEntity.getEntityType().isOperation())) {
 				// Do you have all your keys defined. Olingo will fail otherwise
 				for (RdfPrimaryKey primaryKey : rdfEntity.getEntityType().getPrimaryKeys()) {
 					if (!rdfEntity.containsProperty(primaryKey.getPrimaryKeyName())) {
@@ -316,6 +335,8 @@ class SparqlEntityCollection extends EntityCollection {
 				}
 			}
 		}
+
+		this.setCount(counts.get(this.entityType.getIRI()));
 		return this;
 	}
 
@@ -349,7 +370,7 @@ class SparqlEntityCollection extends EntityCollection {
 				// org.apache.olingo.odata2.api.edm.EdmSimpleTypeKind.DateTime.getClass());
 				return DatatypeConverter.parseDateTime(value.toString());
 			case "DateTimeOffset":
-				return  new Timestamp( DatatypeConverter.parseDateTime(value.toString()).getTimeInMillis());  
+				return new Timestamp(DatatypeConverter.parseDateTime(value.toString()).getTimeInMillis());
 			case "Decimal":
 				return (BigDecimal) value;
 			case "Double":

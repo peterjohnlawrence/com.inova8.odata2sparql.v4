@@ -211,8 +211,15 @@ public class SparqlFilterClausesBuilder {
 		clausesExpandFilter.append(indent).append("{\n");
 
 		if (navProperty.IsInverse()) {
-			clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"
-					+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
+//			clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"	+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
+			
+			clausesExpandFilter.append(indent).append("{\n").append("\t");
+			clausesExpandFilter.append(indent).append("\t").append("\t").append("?" + nextTargetKey + "_s <"
+					+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
+			clausesExpandFilter.append(indent).append("\t").append("}UNION{\n");
+			clausesExpandFilter.append(indent).append("\t").append("\t").append(
+					"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+			clausesExpandFilter.append(indent).append("\t").append("}\n");
 		} else {
 			clausesExpandFilter.append(indent).append("\t").append(
 					"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");

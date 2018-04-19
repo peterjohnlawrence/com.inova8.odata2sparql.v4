@@ -67,7 +67,7 @@ public class RdfModel {
 			for (Map.Entry<String, String> prefixEntry : prefixToURI.entrySet()) {
 				String prefix = prefixEntry.getKey();
 				String url = prefixEntry.getValue();
-				sparqlPrefixes.append("PREFIX ").append(prefix).append(": <").append(url).append("> ");
+				sparqlPrefixes.append("PREFIX ").append(prefix).append(": <").append(url).append(">\n");
 			}
 			return sparqlPrefixes;
 		}

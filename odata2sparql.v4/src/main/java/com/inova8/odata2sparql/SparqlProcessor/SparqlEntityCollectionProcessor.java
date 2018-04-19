@@ -33,6 +33,7 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.apache.olingo.server.api.uri.queryoption.CountOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,15 +44,18 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
+
 public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollectionProcessor.class);
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
+
 	public SparqlEntityCollectionProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
+
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -63,59 +67,74 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0); 
+		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-	    EdmEntityType responseEdmEntityType = null; 
-	    EdmEntitySet responseEdmEntitySet = null;
-	    SelectOption selectOption = uriInfo.getSelectOption();
-	    ExpandOption expandOption = uriInfo.getExpandOption();
+		EdmEntityType responseEdmEntityType = null;
+		EdmEntitySet responseEdmEntitySet = null;
+		SelectOption selectOption = uriInfo.getSelectOption();
+		ExpandOption expandOption = uriInfo.getExpandOption();
+		CountOption countOption = uriInfo.getCountOption();
+
 		// 2nd: fetch the data from backend for this requested EntitySetName
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = null;
-			try {
-				entitySet = SparqlBaseCommand.readEntitySet( this.rdfEdmProvider, uriInfo,(uriInfo.getUriResourceParts().size() > 1)?UriType.URI6B:UriType.URI1);
-			} catch (ODataException | OData2SparqlException e) {
-				log.info("No data found");
-				throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(), Locale.ENGLISH);
-			}
+		try {
+			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo,
+					(uriInfo.getUriResourceParts().size() > 1) ? UriType.URI6B : UriType.URI1);
+		} catch (ODataException | OData2SparqlException e) {
+			log.info("No data found");
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
+		}
 
 		// 3rd: create a serializer based on the requested format (json)
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
 		// Analyze the URI segments
 		int segmentCount = resourceParts.size();
-	    if(segmentCount == 1){  // no navigation
-	        responseEdmEntityType = edmEntitySet.getEntityType();
-	        responseEdmEntitySet = edmEntitySet; // since we have only one segment
-	    } else if (segmentCount == 2){ //navigation
-	        UriResource navSegment = resourceParts.get(1);
-	        if(navSegment instanceof UriResourceNavigation){
-	            UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
-	            EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-	            responseEdmEntityType = edmNavigationProperty.getType(); 
-	            responseEdmEntitySet=Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
-	        }
-	    }else{
-	        // this would be the case for e.g. Products(1)/Category/Products(1)/Category
-	        throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ROOT);
-	    }
+		if (segmentCount == 1) { // no navigation
+			responseEdmEntityType = edmEntitySet.getEntityType();
+			responseEdmEntitySet = edmEntitySet; // since we have only one segment
+		} else if (segmentCount == 2) { //navigation
+			UriResource navSegment = resourceParts.get(1);
+			if (navSegment instanceof UriResourceNavigation) {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				responseEdmEntityType = edmNavigationProperty.getType();
+				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
+			}
+		} else {
+			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
+			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+					Locale.ROOT);
+		}
 		// 4th: Now serialize the content: transform from the EntitySet object to InputStream
 
 		ContextURL contextUrl = null;
 		try {
 			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-			 String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType,
-					 expandOption, selectOption);
-			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList).serviceRoot(new URI(request.getRawBaseUri()+"/")).build();
+			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType, expandOption,
+					selectOption);
+			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList)
+					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Inavlid RawBaseURI "+ request.getRawBaseUri(), HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+			throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
+					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 		}
 
 		final String id = request.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
-		EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id).contextURL(contextUrl)
-				.build();
-		SerializerResult serializerResult = serializer
-				.entityCollection(serviceMetadata, responseEdmEntityType, entitySet, opts);
+		EntityCollectionSerializerOptions opts=null;
+
+		if ((countOption != null) && countOption.getValue()) {
+			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id).count(countOption)
+					.contextURL(contextUrl).build();
+		} else {
+			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
+					.contextURL(contextUrl).build();
+		}
+
+		SerializerResult serializerResult = serializer.entityCollection(serviceMetadata, responseEdmEntityType,
+				entitySet, opts);
 		InputStream serializedContent = serializerResult.getContent();
 
 		// Finally: configure the response object: set the body, headers and status code
@@ -128,7 +147,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 	@Override
 	public void countEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
-	
+
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entity data, for which the property has to be read
 		RdfLiteral count = null;
@@ -144,7 +163,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			FixedFormatSerializer serializer = odata.createFixedFormatSerializer();
 			// 3.2. serialize
 			InputStream countStream = serializer.count(Integer.parseInt(count.getLexicalForm().toString()));
-	
+
 			//4. configure the response object
 			response.setContent(countStream);
 			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
@@ -153,7 +172,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			// in case there's no value for the property, we can skip the serialization
 			response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 		}
-	
+
 	}
 
 }
