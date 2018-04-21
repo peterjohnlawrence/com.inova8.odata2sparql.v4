@@ -540,13 +540,6 @@ public class SparqlQueryBuilder {
 	private StringBuilder where()
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder where = new StringBuilder();
-		if (this.rdfTargetEntityType.isOperation()) {
-			where.append(
-					clausesOperationProperties(this.rdfTargetEntityType.getEntityTypeName(), this.rdfTargetEntityType));
-		} else {
-			where.append(clausesPathProperties());
-		}
-		where.append(clausesExpandSelect());
 		if (this.rdfEntityType.isOperation()) {
 			where.append(selectOperation());
 		} else if (this.rdfTargetEntityType.isOperation()) {
@@ -554,6 +547,20 @@ public class SparqlQueryBuilder {
 		} else {
 			where.append(selectExpand());
 		}
+		if (this.rdfTargetEntityType.isOperation()) {
+			where.append(
+					clausesOperationProperties(this.rdfTargetEntityType.getEntityTypeName(), this.rdfTargetEntityType));
+		} else {
+			where.append(clausesPathProperties());
+		}
+		where.append(clausesExpandSelect());
+//		if (this.rdfEntityType.isOperation()) {
+//			where.append(selectOperation());
+//		} else if (this.rdfTargetEntityType.isOperation()) {
+//			where.append(selectOperation());
+//		} else {
+//			where.append(selectExpand());
+//		}
 		if ((this.uriInfo.getCountOption() != null) && (this.uriInfo.getCountOption().getValue())) {
 			where.append(selectPathCount());
 		}
@@ -564,8 +571,8 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesPathProperties = new StringBuilder();
 		if (DEBUG)
 			clausesPathProperties.append("\t#clausesPathProperties\n");
-		clausesPathProperties.append(clausesSelect(this.selectPropertyMap, edmTargetEntitySet.getEntityType().getName(),
-				edmTargetEntitySet.getEntityType().getName(), rdfTargetEntityType, "\t"));
+		clausesPathProperties.append("\t{\n").append(clausesSelect(this.selectPropertyMap, edmTargetEntitySet.getEntityType().getName(),
+				edmTargetEntitySet.getEntityType().getName(), rdfTargetEntityType, "\t")).append("\t}\n");
 		return clausesPathProperties;
 	}
 
@@ -587,8 +594,10 @@ public class SparqlQueryBuilder {
 		StringBuilder filter = new StringBuilder();
 		if (DEBUG)
 			filter.append("#operationFilter\n");
-		if (!filterClause.getFilterClause().isEmpty())
+		if (filterClause !=null){ 
+				if( !filterClause.getFilterClause().isEmpty())
 			filter.append(filterClauses.getFilter()).append("\n");
+		}
 		return filter;
 	}
 
@@ -785,13 +794,12 @@ public class SparqlQueryBuilder {
 			clausesPath.append(clausesPathNavigation(indent, uriInfo.getUriResourceParts(),
 					((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()));
 		} else {
+			clausesPath.append(indent).append(valuesSubClassOf(rdfEntityType)).append("}\n");
 			clausesPath.append(indent).append("?" + rdfEntityType.entityTypeName
 					+ "_s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class .\n");
 			// clausesPath.append(indent).append(
 			// "?class (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)* <" +
 			// rdfEntityType.getIRI() + "> .\n");
-
-			clausesPath.append(indent).append(valuesSubClassOf(rdfEntityType)).append("}\n");
 		}
 		return clausesPath;
 	}
@@ -828,13 +836,9 @@ public class SparqlQueryBuilder {
 			if (rdfTargetEntityType.isOperation()) {
 				clausesPath.append(indent).append(preprocessOperationQuery(rdfTargetEntityType));
 			} else {
+				clausesPath.append(indent).append(valuesSubClassOf(rdfEntityType)).append("}\n");
 				clausesPath.append(indent).append("?" + rdfEntityType.entityTypeName
 						+ "_s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class .\n");
-				// clausesPath.append(indent).append(
-				// "?class (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)*
-				// <"
-				// + rdfEntityType.getIRI() + "> .\n");
-				clausesPath.append(indent).append(valuesSubClassOf(rdfEntityType)).append("}\n");
 			}
 		}
 		return clausesPath;
@@ -1226,18 +1230,20 @@ public class SparqlQueryBuilder {
 			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
 				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
 					expandItemWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
+				
 			}
 		} else {
+			expandItemWhere.append(indent).append("{\n");
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {
-				expandItemWhere.append(indent).append("{\n");
-				expandItemWhere.append(indent).append("\t").append("\t").append("?" + nextTargetKey + "_s <"
+				expandItemWhere.append(indent).append("\t\t{\n");
+				expandItemWhere.append(indent).append("\t\t\t").append("?" + nextTargetKey + "_s <"
 						+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
-				expandItemWhere.append(indent).append("\t").append("}UNION{\n");
-				expandItemWhere.append(indent).append("\t").append("\t").append(
+				expandItemWhere.append(indent).append("\t\t").append("}UNION{\n");
+				expandItemWhere.append(indent).append("\t\t\t").append(
 						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
-				expandItemWhere.append(indent).append("\t").append("}\n");
+				expandItemWhere.append(indent).append("\t\t").append("}\n");
 
 			} else {
 				expandItemWhere.append(indent).append("\t").append(
@@ -1245,7 +1251,8 @@ public class SparqlQueryBuilder {
 			}
 			expandItemWhere.append(
 					clausesSelect(createSelectPropertyMap(navProperty.getRangeClass(), expandItem.getSelectOption()),
-							nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
+							nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent+"\t"));
+			expandItemWhere.append(indent).append("\t}\n");
 		}
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
@@ -1265,7 +1272,7 @@ public class SparqlQueryBuilder {
 
 		StringBuilder expandItemWhereCount = new StringBuilder();
 		expandItemWhereCount.append(indent).append("\t#expandItemWhereCount\n");
-		expandItemWhereCount.append(indent).append("\t{ SELECT ?").append(targetKey)
+		expandItemWhereCount.append(indent).append("\tUNION{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(?" + nextTargetKey +"_s) as ?"+ nextTargetKey + "_count)\n").append(indent)
 				.append("\tWHERE {\n");
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
@@ -1292,13 +1299,13 @@ public class SparqlQueryBuilder {
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {
-				expandItemWhereCount.append(indent).append("{\n");
-				expandItemWhereCount.append(indent).append("\t").append("\t").append("?" + nextTargetKey + "_s <"
+				expandItemWhereCount.append(indent).append("\t{\n");
+				expandItemWhereCount.append(indent).append("\t\t\t").append("?" + nextTargetKey + "_s <"
 						+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
-				expandItemWhereCount.append(indent).append("\t").append("}UNION{\n");
-				expandItemWhereCount.append(indent).append("\t").append("\t").append(
+				expandItemWhereCount.append(indent).append("\t\t").append("}UNION{\n");
+				expandItemWhereCount.append(indent).append("\t\t\t").append(
 						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
-				expandItemWhereCount.append(indent).append("\t").append("}\n");
+				expandItemWhereCount.append(indent).append("\t\t").append("}\n");
 
 			} else {
 				expandItemWhereCount.append(indent).append("\t").append(
@@ -1314,34 +1321,30 @@ public class SparqlQueryBuilder {
 	private StringBuilder clausesSelect(HashSet<String> selectPropertyMap, String nextTargetKey, String navPath,
 			RdfEntityType targetEntityType, String indent) {
 		StringBuilder clausesSelect = new StringBuilder();
-		clausesSelect.append(indent);
+		//clausesSelect.append(indent);
 		// Case URI5 need to fetch only one property as given in resourceParts
 		if (navPath.equals(nextTargetKey) || this.filterClause.getNavPropertyPropertyFilters().containsKey(navPath)) {
 		} else {
 			clausesSelect.append("OPTIONAL");
 		}
-		clausesSelect.append("{\n");
-		clausesSelect.append(indent).append("\t")
-				.append("?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
-
 		if (selectPropertyMap != null) {
-			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			for (String selectProperty : selectPropertyMap) {
 				clausesSelect.append("(<" + selectProperty + ">)");
 			}
 			clausesSelect.append("}\n");
 		} else if (!this.rdfTargetEntityType.getProperties().isEmpty()) {
-			clausesSelect.append(indent).append("\t").append("VALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			for (RdfModel.RdfProperty selectProperty : targetEntityType.getInheritedProperties()) {
 				clausesSelect.append("(<" + selectProperty.getPropertyURI() + ">)");
 			}
 			clausesSelect.append("}\n");
 		} else {
 			// Assume select=*, and fetch all non object property values
-			clausesSelect.append(indent).append("\t")
+			clausesSelect.append(indent)
 					.append("FILTER(!isIRI(?" + nextTargetKey + "_o) && !isBLANK(?" + nextTargetKey + "_o))\n");
 		}
-		clausesSelect.append(indent).append("}\n");
+		clausesSelect.append(indent).append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
 		return clausesSelect;
 	}
 
@@ -1484,14 +1487,14 @@ public class SparqlQueryBuilder {
 		if (rdfProperty.IsInverse()) {
 			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
 			sparql.append(
-					"WHERE {?" + key + "_o ?" + key + "_p ?" + key + "_s . \nVALUES(?" + key + "_s ?" + key + "_p){(");
+					"WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
 			sparql.append("<" + expandedKey + "> ");
-			sparql.append("<" + expandedInverseProperty + ">)}\n}");
+			sparql.append("<" + expandedInverseProperty + ">)}\n?" + key + "_o ?" + key + "_p ?" + key + "_s .}");
 		} else {
 			sparql.append(
-					"WHERE {?" + key + "_s ?" + key + "_p ?" + key + "_o .\n VALUES(?" + key + "_s ?" + key + "_p){(");
+					"WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
 			sparql.append("<" + expandedKey + "> ");
-			sparql.append("<" + expandedProperty + ">)}\n}");
+			sparql.append("<" + expandedProperty + ">)}\n?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
 		}
 
 		return new SparqlStatement(sparql.toString());
