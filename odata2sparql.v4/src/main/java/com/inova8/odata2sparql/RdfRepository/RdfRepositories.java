@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Namespace;
+import org.eclipse.rdf4j.common.io.FileUtil;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;
@@ -345,12 +346,18 @@ public class RdfRepositories {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
 		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
-			//TODO Should be local to Tomcat as specific to each running servlet/webapp
+			// Should be local to Tomcat as specific to each running servlet/webapp
 			localRepositoryManagerDirectory = Paths.get(repositoryDir,this.repositoryFolder).toString();
-			//localRepositoryManagerDirectory = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder).toString();
+		}
+		try {
+			FileUtil.deleteDir(new File(localRepositoryManagerDirectory));
+		}
+		catch (IOException e) {
+			throw new RepositoryConfigException(e);
 		}
 		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(new File(localRepositoryManagerDirectory));
 		log.info("Using local repository at " + localRepositoryManagerDirectory);
+
 		try {
 			repositoryManager.initialize();
 		} catch (RepositoryException e) {
@@ -360,12 +367,13 @@ public class RdfRepositories {
 
 		//Create a configuration for the system repository implementation which is a native store
 
-		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();
-		//systemRepositoryImplConfig = new ForwardChainingRDFSInferencerConfig(systemRepositoryImplConfig);
-		 
+		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();	 
 		RepositoryImplConfig systemRepositoryTypeSpec = new SailRepositoryConfig(systemRepositoryImplConfig);
 		RepositoryConfig systemRepositoryConfig = new RepositoryConfig(RdfConstants.systemId, systemRepositoryTypeSpec);
 		try {
+			// Remove any existing system repository
+			// Also seems to be necessary to get a 'clean' system that can be SPARQL queried
+			repositoryManager.removeRepository(RdfConstants.systemId);
 			repositoryManager.addRepositoryConfig(systemRepositoryConfig);
 		} catch (SailReadOnlyException e) {
 			log.info("Repository read-only: will clear and reload", e);
@@ -404,7 +412,7 @@ public class RdfRepositories {
 			}
 			log.info("Loading models.ttl from " + localRepositoryManagerModel);
 			try {
-				modelsConnection.add(new File(localRepositoryManagerModel), null, RDFFormat.TURTLE);
+				modelsConnection.add(new File(localRepositoryManagerModel), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("RDFParseException: Cannot parse  " + localRepositoryManagerModel + " Check to ensure valid RDF/XML or TTL", e);
 				System.exit(1);
@@ -434,7 +442,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading rdf from " + RdfConstants.rdfFile);
-				modelsConnection.add(new File(RdfConstants.rdfFile ), null, null);
+				modelsConnection.add(new File(RdfConstants.rdfFile ), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.rdfFile, e);
 				throw new OData2SparqlException();
@@ -446,7 +454,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
-				modelsConnection.add(new File(RdfConstants.rdfsFile ), null, null);
+				modelsConnection.add(new File(RdfConstants.rdfsFile ), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.rdfsFile, e);
 				throw new OData2SparqlException();
@@ -458,7 +466,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading sail from " + RdfConstants.sailFile);
-				modelsConnection.add(new File(RdfConstants.sailFile), null, null);
+				modelsConnection.add(new File(RdfConstants.sailFile), RdfConstants.systemId, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.sailFile, e);
 				throw new OData2SparqlException();
@@ -470,7 +478,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading sp from " + RdfConstants.spFile);
-				modelsConnection.add(new File(RdfConstants.spFile), null, null);
+				modelsConnection.add(new File(RdfConstants.spFile), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.spFile, e);
 				throw new OData2SparqlException();

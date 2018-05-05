@@ -42,6 +42,7 @@ public class SparqlStatement {
 		RdfTripleSet results;
 		try {
 			results = rdfQuery.execConstruct();
+			log.info("Processing results");
 		} catch (OData2SparqlException e) {
 			log.error(e.getMessage());
 			throw new ODataRuntimeException(e.getMessage(), null);

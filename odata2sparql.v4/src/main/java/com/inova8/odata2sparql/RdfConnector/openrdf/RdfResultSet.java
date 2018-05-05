@@ -91,6 +91,10 @@ public class RdfResultSet {
 			log.warn("Failed to close RdfResultSet");
 		}
 	}
+	public boolean isClosed(){
+		return !connection.isOpen();
+		
+	}
 	protected void finalize() throws Throwable {
 		super.finalize();
 		this.close();

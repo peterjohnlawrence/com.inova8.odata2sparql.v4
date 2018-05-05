@@ -320,7 +320,7 @@ public class RdfModelProvider {
 							debug.append(propertyNode.getIRI().toString()).append(";");
 						} else {
 							log.info("Failed to create property ranges:" + propertyNode.getIRI().toString()
-									+ " since no defined range classes");
+									+ " since no corresponding domain classes");
 						}
 					} catch (Exception e) {
 						log.info("Failed to create property ranges:" + propertyNode.getIRI().toString()
@@ -389,15 +389,19 @@ public class RdfModelProvider {
 
 	private void removeIncompleteProperties(HashMap<String, HashSet<RdfEntityType>> propertyClasses) {
 		for (HashSet<RdfEntityType> classes : propertyClasses.values()) {
-			for (RdfEntityType clazz : classes) {
-				Collection<RdfProperty> properties = clazz.getProperties();
-				Iterator<RdfProperty> propertiesIterator = properties.iterator();
-				while (propertiesIterator.hasNext()) {
-					RdfProperty property = propertiesIterator.next();
-					if (property.propertyTypeName == null) {
-						log.error("Removing incomplete property declartion for class.property: " + clazz.entityTypeName + "." + property.propertyName);
-						propertiesIterator.remove();
-						
+			if(!classes.isEmpty()){
+				for (RdfEntityType clazz : classes) {
+					if(clazz!=null){
+						Collection<RdfProperty> properties = clazz.getProperties();
+						Iterator<RdfProperty> propertiesIterator = properties.iterator();
+						while (propertiesIterator.hasNext()) {
+							RdfProperty property = propertiesIterator.next();
+							if (property.propertyTypeName == null) {
+								log.error("Removing incomplete property declaration for class.property: " + clazz.entityTypeName + "." + property.propertyName);
+								propertiesIterator.remove();
+								
+							}
+						}
 					}
 				}
 			}
