@@ -38,10 +38,15 @@ public class RdfTripleSet {
 		return rdfTriple;
 	}
 
-	private void close() {
+	public void close() {
 		try {
-			tripleSet.close();
-			connection.close();
+			if(tripleSet.hasNext()){
+				tripleSet.close();
+			}			
+			if (connection.isOpen() ){
+				connection.close();
+			}
+			
 		} catch (QueryEvaluationException | RepositoryException e) {
 			log.warn("failed to close RdfTripleSet");
 		}

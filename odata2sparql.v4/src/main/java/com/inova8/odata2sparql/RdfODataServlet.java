@@ -41,11 +41,12 @@ public class RdfODataServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 			if (rdfEdmProviders == null) {
-				
+
 				ServletContext servletContext = getServletContext();
-				File repositoryDir = (File)servletContext.getAttribute(ServletContext.TEMPDIR); 
-				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),this.getInitParameter("repositoryFolder"),
-						this.getInitParameter("repositoryUrl"),repositoryDir.getAbsolutePath());
+				File repositoryDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
+				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
+						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
+						repositoryDir.getAbsolutePath());
 			}
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];
@@ -77,8 +78,13 @@ public class RdfODataServlet extends HttpServlet {
 						handler.register(new SparqlBatchProcessor(rdfEdmProvider));
 						//handler.register(new SparqlErrorProcessor());
 						log.info(req.getMethod() + ": " + req.getPathInfo() + " Query: " + req.getQueryString());
-						// let the handler do the work
-						handler.process(req, resp);
+						if (!req.getMethod().equals("OPTIONS")) {
+							//Required to satisfy OpenUI5 V1.54.3 and above
+							resp.addHeader("Access-Control-Expose-Headers", "DataServiceVersion,OData-Version");
+							handler.process(req, resp);
+						} else {
+							optionsResponse( resp);
+						}
 					} else {
 						throw new OData2SparqlException("No service matching " + service + " found");
 					}
@@ -92,6 +98,16 @@ public class RdfODataServlet extends HttpServlet {
 		}
 	}
 
+	private void optionsResponse(final HttpServletResponse resp){
+		resp.addHeader("Access-Control-Allow-Origin", "*");
+		resp.addHeader("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With, X-CSRF-Token, odata-maxversion, odata-version,mime-version");
+		resp.addHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+		resp.addHeader("Access-Control-Expose-Headers", "DataServiceVersion,OData-Version");
+		resp.addHeader("Access-Control-Max-Age", "86400");
+		resp.addHeader("OData-Version", "4.0");
+		resp.addHeader("OData-MaxVersion", "4.0");
+		resp.setStatus(200);
+	}
 	private void htmlResponse(HttpServletRequest req, HttpServletResponse resp, String textResponse)
 			throws IOException {
 		try {

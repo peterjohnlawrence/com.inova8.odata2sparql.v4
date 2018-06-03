@@ -90,9 +90,7 @@ public class RdfModelToMetadata {
 		CsdlSchema instanceSchema = new CsdlSchema().setNamespace(RdfConstants.ENTITYCONTAINERNAMESPACE)
 				.setEntityContainer(entityContainer);
 		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
-
 		HashMap<String, CsdlEntitySet> entitySets = new HashMap<String, CsdlEntitySet>();
-
 		//		HashMap<String, AssociationSet> associationSets = new HashMap<String, AssociationSet>();
 
 		//Custom types langString
@@ -176,7 +174,9 @@ public class RdfModelToMetadata {
 						CsdlProperty property = new CsdlProperty().setName(propertyName)
 								.setType(propertyType.getFullQualifiedName());
 						if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
-							property.setPrecision(3);
+							property.setPrecision(RdfConstants.DATE_PRECISION);
+						if (propertyType == EdmPrimitiveTypeKind.Decimal)
+							property.setScale(RdfConstants.DECIMAL_SCALE);
 
 						List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
 						if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {

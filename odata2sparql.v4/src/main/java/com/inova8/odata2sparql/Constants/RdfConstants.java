@@ -33,6 +33,8 @@ public class RdfConstants {
 		// 0..1, 1..1, 0..*, 1..*
 		ZERO_TO_ONE, ONE, MANY, MULTIPLE
 	}
+	public static final int DATE_PRECISION = 3;
+	public static final int DECIMAL_SCALE = 10;
 	public static final String DEFAULTCONFIG= "/var/opt/inova8/odata2sparql/";
 	public static final String DEFAULTFOLDER = ".default";
 	
@@ -302,6 +304,7 @@ public class RdfConstants {
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#hexBinary"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#base64Binary"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#anyURI"));
+		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#anyType"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#QName"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#NOTATION"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#normalizedString"));

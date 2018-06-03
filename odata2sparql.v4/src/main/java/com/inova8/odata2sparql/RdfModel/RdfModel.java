@@ -1056,7 +1056,7 @@ public class RdfModel {
 		RdfEntityType clazz = this.getOrCreateEntityType(domainNode);
 
 		RdfProperty property = Enumerable.create(clazz.getProperties())
-				.firstOrNull(propertyNameEquals(propertyURI.localName));
+				.firstOrNull(propertyNameEquals(rdfToOdata(propertyURI.localName)));
 		if (property == null) {
 			property = new RdfProperty();
 			property.propertyName = rdfToOdata(propertyURI.localName);
@@ -1094,7 +1094,7 @@ public class RdfModel {
 			for (RdfEntityType clazz : classes) {
 				if (clazz != null) {
 					RdfProperty property = Enumerable.create(clazz.getProperties())
-							.firstOrNull(propertyNameEquals(propertyURI.localName));
+							.firstOrNull(propertyNameEquals(rdfToOdata(propertyURI.localName)));
 					property.cardinality = cardinality;
 				}
 			}

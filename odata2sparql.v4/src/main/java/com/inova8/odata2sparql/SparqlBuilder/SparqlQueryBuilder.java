@@ -1440,13 +1440,13 @@ public class SparqlQueryBuilder {
 									throw new EdmException("Failed to locate property:" + property.getResourcePath()
 											.getUriResourceParts().get(0).getSegmentValue());
 								} else {
-									// TODO specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be uincluded otehr than link, unless included in subsequent $expand
+									// TODO specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be included other than link, unless included in subsequent $expand
 									// See http://docs.oasis-open.org/odata/odata/v4.0/os/part2-url-conventions/odata-v4.0-os-part2-url-conventions.html#_Toc372793861 5.1.3 System Query Option $select
-									valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+									valueProperties.add(RdfConstants.RDF_TYPE);
 								}
 							else if (rdfProperty.getIsKey()) {
 								// TODO specifically asked for key so should be added to VALUES
-								valueProperties.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+								valueProperties.add(RdfConstants.RDF_TYPE );
 							} else {
 								valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
 							}

@@ -9,7 +9,9 @@ package com.inova8.odata2sparql.RdfConnector.openrdf;
 
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
@@ -33,11 +35,10 @@ public class RdfResultSet {
      *
      * @param resultSet the result set
      */
-    RdfResultSet(RepositoryConnection connection, TupleQueryResult resultSet){
-    	this.connection = connection;
-    	this.resultSet= resultSet;
-    }
-	
+	 RdfResultSet(Repository repository, String query) {
+		 this.connection =  repository.getConnection();
+		 this.resultSet =  this.connection.prepareTupleQuery(QueryLanguage.SPARQL, query).evaluate();
+	}
 	/**
 	 * Checks for next.
 	 *
@@ -85,8 +86,9 @@ public class RdfResultSet {
 
 	public void close()  {
 		try {
-			resultSet.close();
-			connection.close();
+			if (connection.isOpen() ){
+				connection.close();
+			}
 		} catch (QueryEvaluationException | RepositoryException e) {
 			log.warn("Failed to close RdfResultSet");
 		}

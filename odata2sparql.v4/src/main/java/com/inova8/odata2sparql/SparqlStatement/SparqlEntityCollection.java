@@ -145,39 +145,43 @@ class SparqlEntityCollection extends EntityCollection {
 					if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
 						rdfSubjectEntity
 								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode));
-					}
-					RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType()
-							.findNavigationProperty(propertyNode);
-					// RdfAssociation rdfAssociation = navPropertiesMap.get(propertyNode.getIRI().toString());
-					if (rdfAssociation != null) {
-						//if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
-						//will only get here if rdfs_type in $expand
-						//} else {
-						// Locate which of the $expand this is related to
-						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
-
-						rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
-						this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
-								rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
-						// fixes #7 add to the Entity
-						findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
-						//}
+					} else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+						//TODO what can we use this for
+						//rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
 					} else {
-						// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
-						rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getIRI());
-					}
-					if (rdfSubjectEntity.getEntityType().isOperation()) {
-						// An operation so need to use these as the primary key of the record.
-						if (rdfSubjectEntity.getEntityType()
-								.findNavigationProperty(propertyNode.getLocalName()) != null) {
-							rdfSubjectEntity.addProperty(new Property(null,
-									rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getLocalName())
-											.getRelatedKey(),
-									ValueType.PRIMITIVE, SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel()
-											.getRdfPrefixes().toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
+						RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType()
+								.findNavigationProperty(propertyNode);
+						// RdfAssociation rdfAssociation = navPropertiesMap.get(propertyNode.getIRI().toString());
+						if (rdfAssociation != null) {
+							//if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+							//will only get here if rdfs_type in $expand
+							//} else {
+							// Locate which of the $expand this is related to
+							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+
+							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
+							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
+									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
+							// fixes #7 add to the Entity
+							findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
+							//}
+						} else {
+							// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
+							rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getIRI());
+						}
+						if (rdfSubjectEntity.getEntityType().isOperation()) {
+							// An operation so need to use these as the primary key of the record.
+							if (rdfSubjectEntity.getEntityType()
+									.findNavigationProperty(propertyNode.getLocalName()) != null) {
+								rdfSubjectEntity.addProperty(new Property(null,
+										rdfSubjectEntity.getEntityType()
+												.findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(),
+										ValueType.PRIMITIVE,
+										SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes()
+												.toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
+							}
 						}
 					}
-
 				} else if (objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded
 					// entity, but they should really be eliminated from the
@@ -200,6 +204,8 @@ class SparqlEntityCollection extends EntityCollection {
 			}
 		} catch (OData2SparqlException e) {
 			e.printStackTrace();
+		} finally{
+			results.close();
 		}
 		return this.build();
 	}
@@ -372,7 +378,11 @@ class SparqlEntityCollection extends EntityCollection {
 			case "DateTimeOffset":
 				return new Timestamp(DatatypeConverter.parseDateTime(value.toString()).getTimeInMillis());
 			case "Decimal":
-				return (BigDecimal) value;
+				if (value instanceof java.math.BigDecimal) {
+						return (BigDecimal) value;
+				}else{
+						return new BigDecimal(value.toString());
+					}
 			case "Double":
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).doubleValue();

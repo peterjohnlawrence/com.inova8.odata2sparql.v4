@@ -179,6 +179,8 @@ public class RdfModelProvider {
 								} else {
 									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
 									if(entityType!=baseType)entityType.setBaseType(baseType);
+									count++;
+									debug.append(classNode.getIRI().toString()).append(";");
 								}
 								entityType.setEntity(true);
 								if (soln.getRdfNode("description") != null) {
@@ -187,11 +189,12 @@ public class RdfModelProvider {
 								}
 							}
 						} else {
-							if (!classNode.isBlank())
-								model.getOrCreateEntityType(classNode, classLabelNode).setEntity(true);
+							if (!classNode.isBlank()){
+								model.getOrCreateEntityType(classNode, classLabelNode).setEntity(true);							
+								count++;
+								debug.append(classNode.getIRI().toString()).append(";");	
+							}							
 						}
-						count++;
-						debug.append(classNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create class:" + classNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
@@ -287,7 +290,8 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count + " DataTypeProperties_Domains found [" + debug + "]");
+				//log.info(count + " DataTypeProperties_Domains found [" + debug + "]");
+				log.info(count + " DataTypeProperties_Domains found");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -328,7 +332,8 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count + " DataTypeProperties_Ranges found [" + debug + "]");
+				log.info(count + " DataTypeProperties_Ranges found");
+				//log.info(count + " DataTypeProperties_Ranges found [" + debug + "]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -376,7 +381,8 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				log.info(count + " DataTypeProperties_Cardinality found [" + debug + "]");
+				//log.info(count + " DataTypeProperties_Cardinality found [" + debug + "]");
+				log.info(count + " DataTypeProperties_Cardinality found");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -397,7 +403,7 @@ public class RdfModelProvider {
 						while (propertiesIterator.hasNext()) {
 							RdfProperty property = propertiesIterator.next();
 							if (property.propertyTypeName == null) {
-								log.error("Removing incomplete property declaration for class.property: " + clazz.entityTypeName + "." + property.propertyName);
+								log.error("Removing incomplete property declaration for class.property: " + clazz.getEntityTypeNode().getIRI().toString() + "." + property.getPropertyURI().toString()); 
 								propertiesIterator.remove();
 								
 							}
@@ -470,7 +476,8 @@ public class RdfModelProvider {
 
 				}
 			} finally {
-				log.info(count + " ObjectProperties found [" + debug + "]");
+				//log.info(count + " ObjectProperties found [" + debug + "]");
+				log.info(count + " ObjectProperties found");
 				associations.close();
 			}
 		} catch (OData2SparqlException e) {
