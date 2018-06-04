@@ -98,14 +98,14 @@ public class RdfRepositories {
 					} catch (OData2SparqlException e) {
 					try {
 						repositoryManager = bootstrapLocalRepository();
-					} catch (OData2SparqlException e1) {
+					} catch (OData2SparqlException | IOException e1) {
 						log.error("Tried everything. Cannot locate a suitable repository", e1);
 					}
 				}
 			} else {
 				try {
 					repositoryManager = bootstrapLocalRepository();
-				} catch (OData2SparqlException e1) {
+				} catch (OData2SparqlException | IOException e1) {
 					log.error("Tried everything. Cannot locate a suitable repository", e1);
 				}
 			}
@@ -342,7 +342,7 @@ public class RdfRepositories {
 		return repositoryManager;
 	}
 
-	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException {
+	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException, IOException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
 		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
@@ -353,7 +353,9 @@ public class RdfRepositories {
 			FileUtil.deleteDir(new File(localRepositoryManagerDirectory));
 		}
 		catch (IOException e) {
-			throw new RepositoryConfigException(e);
+			log.info("Local repository directory does not yet exists at " + localRepositoryManagerDirectory);
+			FileUtil.createDirIfNotExists(new File(localRepositoryManagerDirectory));
+			//throw new RepositoryConfigException(e);
 		}
 		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(new File(localRepositoryManagerDirectory));
 		log.info("Using local repository at " + localRepositoryManagerDirectory);
