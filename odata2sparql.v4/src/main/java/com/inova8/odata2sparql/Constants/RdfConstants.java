@@ -33,30 +33,32 @@ public class RdfConstants {
 		// 0..1, 1..1, 0..*, 1..*
 		ZERO_TO_ONE, ONE, MANY, MULTIPLE
 	}
+
 	public static final int DATE_PRECISION = 3;
 	public static final int DECIMAL_SCALE = 10;
-	public static final String DEFAULTCONFIG= "/var/opt/inova8/odata2sparql/";
+	public static final String DEFAULTCONFIG = "/var/opt/inova8/odata2sparql/";
 	public static final String DEFAULTFOLDER = ".default";
-	
+
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
 	public static final String WILDCARD = "*";
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();
-	static private  Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
-	static private final Hashtable<Value,Hashtable<Value, String>> metaModels = new Hashtable<Value, Hashtable<Value, String>>();
+	static private Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
+	static private final Hashtable<Value, Hashtable<Value, String>> metaModels = new Hashtable<Value, Hashtable<Value, String>>();
 
 	public static final String CONFIG_PROPERTIES = "\\config.properties";
 	public final static String repositoryUrl = "repositoryUrl";
 	public final static String systemId = "ODATA2SPARQL";
 	public final static String bootStrapQuery = "SELECT  ?Metadata ?Query  ?QueryString WHERE { ?Metadata ?Query  ?querys . ?querys <http://spinrdf.org/sp#text> ?QueryString . ?Query  <http://www.w3.org/2000/01/rdf-schema#subPropertyOf>* <http://inova8.com/odata4sparql#metadataQuery> .}";
-	public final static Value URI_DEFAULTMETAMODEL = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
-	public static String repositoryWorkingDirectory; 
-	public static File repositoryManagerDir; 
+	public final static Value URI_DEFAULTMETAMODEL = valueFactoryImpl
+			.createIRI("http://inova8.com/odata4sparql#RDFSModel");
+	public static String repositoryWorkingDirectory;
+	public static File repositoryManagerDir;
 	public static String odata4sparqlFile;
-	public static String rdfFile; 
+	public static String rdfFile;
 	public static String rdfsFile;
-	public static String sailFile; 
-	public static String spFile; 
+	public static String sailFile;
+	public static String spFile;
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
@@ -92,7 +94,7 @@ public class RdfConstants {
 	public static final String XSD_DATE = "http://www.w3.org/2001/XMLSchema#date";
 	public static final String XSD_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 	public static final String RDF_PLAIN_LITERAL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral";
-	public static final String  RDF_LITERAL= "http://www.w3.org/2000/01/rdf-schema#Literal";
+	public static final String RDF_LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
 
 	public static final String RDFS_RESOURCE = "http://www.w3.org/2000/01/rdf-schema#Resource";
 	public static final String RDFS_RESOURCE_LABEL = "Resource";
@@ -127,15 +129,14 @@ public class RdfConstants {
 	public static final String RDFS_SUBCLASSOF_LABEL = "subClassOf";
 	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
 	public static final String RDFS_RANGE_LABEL = "range";
-	
-	
+
 	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 	public static final String RDFS_LABEL_LABEL = "label";
 
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
-	
+
 	public static final String SPARQL_UNDEF = "UNDEF";
 
 	private static final String ONTOLOGY = "Ontology";
@@ -146,7 +147,6 @@ public class RdfConstants {
 	public static final String LANG = "lang";
 	public static final String VALUE = "value";
 
-
 	private static final String INVERSEOF = "inverseOf ";
 	public static final String SPARQL_MODEL = "SparqlModel";
 
@@ -156,7 +156,7 @@ public class RdfConstants {
 	/*
 	 * Modifiers for classes and properties as they appear in $metadata
 	*/
-	
+
 	public static final String PREDICATE_SEPARATOR = "_";
 	public static final String CLASS_SEPARATOR = "_";
 
@@ -164,31 +164,29 @@ public class RdfConstants {
 	public static final String PROPERTY_LABEL_PREFIX = "";
 	public static final String NAVIGATIONPROPERTY_LABEL_PREFIX = "";
 
-	
-	
 	/*	
- 	The following from http://www.ietf.org/ defining what is allowed in a URI
-    Needed to match ':' of qname with embeded key in odata.
-     
-     2.3. Unreserved Characters
-
+	The following from http://www.ietf.org/ defining what is allowed in a URI
+	Needed to match ':' of qname with embeded key in odata.
+	 
+	 2.3. Unreserved Characters
+	
 	   Data characters that are allowed in a URI but do not have a reserved
 	   purpose are called unreserved.  These include upper and lower case
 	   letters, decimal digits, and a limited set of punctuation marks and
 	   symbols.
-
+	
 	      unreserved  = alphanum | mark
-
+	
 	      mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
-
+	
 	   Unreserved characters can be escaped without changing the semantics
 	   of the URI, but this should not be done unless the URI is being used
 	   in a context that does not allow the unescaped character to appear.
 	*/
-	
+
 	public static final String QNAME_SEPARATOR = "~";// ":";
 	public static final String QNAME_SEPARATOR_ENCODED = "~";// "%3A";
-	
+
 	public static final Object RDF_LANG_STRING = RDF + "." + LANGSTRING;
 
 	public static final Value URI_ASSOCIATIONQUERY = valueFactoryImpl
@@ -226,10 +224,11 @@ public class RdfConstants {
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
-	public final static String DATATYPE_FQN =RdfConstants.RDF + "." + RdfConstants.DATATYPE;
-	public final static String INVERSEOF_FQN =RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
-	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "." +RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
-	public final static String ONTOLOGY_FQN = RdfConstants.OWL + "." +RdfConstants.ONTOLOGY;
+	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
+	public final static String INVERSEOF_FQN = RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
+	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "."
+			+ RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
+	public final static String ONTOLOGY_FQN = RdfConstants.OWL + "." + RdfConstants.ONTOLOGY;
 
 	private final static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL);
 	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING);
@@ -248,31 +247,35 @@ public class RdfConstants {
 	public static Hashtable<Value, String> getMetaQueries() {
 		return metaQueries;
 	}
-	public static void  setMetaQueries(Hashtable<Value, String> newMetaQueries) {
-		metaQueries =newMetaQueries;
+
+	public static void setMetaQueries(Hashtable<Value, String> newMetaQueries) {
+		metaQueries = newMetaQueries;
 	}
-	public static  Hashtable<Value, Hashtable<Value, String>> getMetaModels() {
+
+	public static Hashtable<Value, Hashtable<Value, String>> getMetaModels() {
 		return metaModels;
 	}
+
 	static {
 		//Initialize the file dependent constants	
 		try {
 			String workingDirectory = null;
-			if(SystemUtils.IS_OS_WINDOWS){
-				workingDirectory = Paths.get(System.getenv("AppData"),"inova8", "odata2sparql").toString();
-			}else if(SystemUtils.IS_OS_LINUX){
-				//workingDirectory = Paths.get("/etc", "inova8", "odata2sparql").toString();
-				workingDirectory = Paths.get( DEFAULTCONFIG).toString();
-			}else{
+			if (SystemUtils.IS_OS_WINDOWS) {
+				workingDirectory = Paths.get(System.getenv("AppData"), "inova8", "odata2sparql").toString();
+			} else if (SystemUtils.IS_OS_LINUX) {
+				workingDirectory = Paths.get(DEFAULTCONFIG).toString();
+			} else if (SystemUtils.IS_OS_MAC) {
+				workingDirectory = Paths.get("~/Library/Preferences", "inova8", "odata2sparql").toString();
+			} else {
 				log.error("Unsupported OS: " + SystemUtils.OS_NAME);
-				throw new RuntimeException("Unsupported OS: " + SystemUtils.OS_NAME,null);
+				throw new RuntimeException("Unsupported OS: " + SystemUtils.OS_NAME, null);
 			}
-		
+
 			String repositoryManagerDirPath = URLDecoder.decode(RdfConstants.class.getResource("/").getFile(), "UTF-8");
-		
-			repositoryManagerDir = new File(workingDirectory );
-			repositoryWorkingDirectory = workingDirectory;	
-			
+
+			repositoryManagerDir = new File(workingDirectory);
+			repositoryWorkingDirectory = workingDirectory;
+
 			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
@@ -284,7 +287,7 @@ public class RdfConstants {
 		}
 		//Initialize the RDF datatypes
 		RDF_DATATYPES.add((RdfConstants.RDF_PLAIN_LITERAL));
-		RDF_DATATYPES.add(  (RdfConstants.RDF_LITERAL));
+		RDF_DATATYPES.add((RdfConstants.RDF_LITERAL));
 		RDF_DATATYPES.add(("http://www.w3.org/2000/01/rdf-schema#Literal"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#decimal"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#Literal"));
@@ -331,7 +334,7 @@ public class RdfConstants {
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#unsignedShort"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#unsignedByte"));
 		RDF_DATATYPES.add(("http://www.w3.org/2001/XMLSchema#positiveInteger"));
-		
+
 		//Initialize the EDM standard terms
 		TERMS.put(RdfConstants.SAP_LABEL, sapLabelTerm);
 		TERMS.put(RdfConstants.SAP_HEADING, sapheadingTerm);
