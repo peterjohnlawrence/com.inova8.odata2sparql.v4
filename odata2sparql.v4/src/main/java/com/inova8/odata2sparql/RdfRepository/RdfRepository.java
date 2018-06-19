@@ -62,6 +62,7 @@ public class RdfRepository  {
 	private Boolean withSapAnnotations;
 	private Boolean useBaseType;
 	private Boolean expandOperations = false;
+	private boolean supportsLucene;
 	
 	RdfRepository(String modelName,Namespace defaultPrefix,Hashtable<String, Namespace> namespaces) {
 		super();
@@ -131,5 +132,11 @@ public class RdfRepository  {
 	}
 	public void setExpandOperations(boolean expandOperations) {
 		this.expandOperations = expandOperations;	
+	}
+	public Boolean getSupportsLucene() {
+		return this.supportsLucene;		
+	}
+	public void setSupportsLucene(boolean supportsLucene) {
+		this.supportsLucene = supportsLucene;		
 	}
 }

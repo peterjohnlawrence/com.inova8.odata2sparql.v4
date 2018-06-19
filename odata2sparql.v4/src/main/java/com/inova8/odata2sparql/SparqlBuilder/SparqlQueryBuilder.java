@@ -440,6 +440,8 @@ public class SparqlQueryBuilder {
 			throws EdmException, ODataApplicationException, OData2SparqlException, ExpressionVisitException {
 
 		StringBuilder prepareConstruct = new StringBuilder("");
+
+		prepareConstruct.append("PREFIX search: <http://www.openrdf.org/contrib/lucenesail#>\n");
 		prepareConstruct.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareConstruct.append(construct());
 		prepareConstruct.append("WHERE {\n");
@@ -700,6 +702,7 @@ public class SparqlQueryBuilder {
 		}
 		selectExpandWhere.append(clausesFilter(indent + "\t"));
 		selectExpandWhere.append(clausesExpandFilter(indent + "\t"));
+		selectExpandWhere.append(search(indent + "\t"));
 		switch (uriType) {
 		case URI1:
 			selectExpandWhere.append(selectPath());
@@ -1017,29 +1020,69 @@ public class SparqlQueryBuilder {
 		return clausesExpandFilter;
 	}
 
+	private StringBuilder search(String indent) {
+		StringBuilder search = new StringBuilder().append(indent);
+		if (DEBUG)
+			search.append("#search\n");
+		if (this.uriInfo.getSearchOption() != null)
+			switch (uriType) {
+			case URI1:
+			case URI15:
+				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
+					search.append(indent)
+							.append("?" + rdfEntityType.entityTypeName + "_s search:matches [ search:query '"
+									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
+				} else {
+					search.append(indent)
+							.append("?" + rdfEntityType.entityTypeName
+									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
+									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
+				}
+				break;
+			case URI6B:
+				//?Customer_s search:matches [ search:query 'Isabel' ] .
+				//?Customer_s ?p ?searchvalue . FILTER( REGEX(?searchvalue , 'Isabel', "i")) .
+				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
+					search.append(indent)
+							.append("?" + rdfTargetEntityType.entityTypeName + "_s search:matches [ search:query '"
+									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
+				} else {
+					search.append(indent)
+							.append("?" + rdfTargetEntityType.entityTypeName
+									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
+									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
+				}
+				break;
+			default:
+				break;
+			}
+		return search;
+	}
+
 	private StringBuilder selectPath() throws EdmException, OData2SparqlException {
 		StringBuilder selectPath = new StringBuilder();
 		String indent;
 		if (DEBUG)
 			selectPath.append("\t\t\t#selectPath\n");
-		
+
 		if (limitSet()) {
 			selectPath.append("\t\t\t").append("{\tSELECT DISTINCT\n");
 			selectPath.append("\t\t\t\t\t").append("?" + edmTargetEntitySet.getEntityType().getName() + "_s\n");
 			selectPath.append("\t\t\t\t").append("WHERE {\n");
-			indent ="\t\t\t\t";
+			indent = "\t\t\t\t";
 		} else {
 			selectPath.append("\t\t\t").append("{\n");
-			indent ="\t\t\t";
+			indent = "\t\t\t";
 		}
-		selectPath.append(filter(indent+"\t"));
-		selectPath.append(clausesPath(indent+"\t"));
-		selectPath.append(clausesFilter(indent+"\t"));
-		selectPath.append(clausesExpandFilter(indent+"\t"));
+		selectPath.append(filter(indent + "\t"));
+		selectPath.append(clausesPath(indent + "\t"));
+		selectPath.append(clausesFilter(indent + "\t"));
+		selectPath.append(clausesExpandFilter(indent + "\t"));
+		selectPath.append(search(indent + "\t"));
 		if (limitSet()) {
 			selectPath.append(indent).append("} GROUP BY ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 					.append(limitClause()).append("\n");
-		} 
+		}
 		selectPath.append("\t\t\t").append("}\n");
 		return selectPath;
 	}
@@ -1057,6 +1100,7 @@ public class SparqlQueryBuilder {
 		selectPath.append(clausesPath("\t\t\t"));
 		selectPath.append(clausesFilter("\t\t\t"));
 		selectPath.append(clausesExpandFilter("\t\t\t"));
+		selectPath.append(search("\t\t\t"));
 		selectPath.append("\t\t").append("}").append("\n");
 		selectPath.append("\t").append("}\n");
 		return selectPath;
@@ -1446,7 +1490,7 @@ public class SparqlQueryBuilder {
 								}
 							else if (rdfProperty.getIsKey()) {
 								// TODO specifically asked for key so should be added to VALUES
-								valueProperties.add(RdfConstants.RDF_TYPE );
+								valueProperties.add(RdfConstants.RDF_TYPE);
 							} else {
 								valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
 							}

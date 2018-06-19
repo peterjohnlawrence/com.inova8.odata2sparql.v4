@@ -3,15 +3,19 @@ package com.inova8.odata2sparql.SparqlProcessor;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
+import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
+import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -28,13 +32,20 @@ import org.apache.olingo.server.api.serializer.FixedFormatSerializer;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
+import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
+import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
+import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
+import org.apache.olingo.server.api.uri.queryoption.SearchOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.api.uri.queryoption.CountOption;
+import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
+import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +86,6 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 		CountOption countOption = uriInfo.getCountOption();
-
 		// 2nd: fetch the data from backend for this requested EntitySetName
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = null;
@@ -88,7 +98,12 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 					Locale.ENGLISH);
 		}
 
-		// 3rd: create a serializer based on the requested format (json)
+		// 3rd apply $orderby
+	    OrderByOption orderByOption = uriInfo.getOrderByOption();
+	    if (orderByOption != null) {
+	    	sortEntityCollection(entitySet, orderByOption);
+	    }		
+		// 4th: create a serializer based on the requested format (json)
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
 		// Analyze the URI segments
 		int segmentCount = resourceParts.size();
@@ -108,7 +123,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 					Locale.ROOT);
 		}
-		// 4th: Now serialize the content: transform from the EntitySet object to InputStream
+		// 5th: Now serialize the content: transform from the EntitySet object to InputStream
 
 		ContextURL contextUrl = null;
 		try {
@@ -142,6 +157,55 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 
+	}
+
+	private void sortEntityCollection(EntityCollection entitySet, OrderByOption orderByOption) {
+		List<Entity> entityList = entitySet.getEntities();
+		List<OrderByItem> orderItemList = orderByOption.getOrders();
+		final OrderByItem orderByItem = orderItemList.get(0); // we support only one
+		Expression expression = orderByItem.getExpression();
+		if(expression instanceof Member){
+		    UriInfoResource resourcePath = ((Member)expression).getResourcePath();
+		    UriResource uriResource = resourcePath.getUriResourceParts().get(0);
+		    if (uriResource instanceof UriResourcePrimitiveProperty) {
+		        EdmProperty edmProperty = ((UriResourcePrimitiveProperty)uriResource).getProperty();
+		        final String sortPropertyName = edmProperty.getName();
+		        final String sortPropertyType = edmProperty.getType().getName();
+
+		        // do the sorting for the list of entities  
+		        Collections.sort(entityList, new Comparator<Entity>() {
+
+		            // delegate the sorting to native sorter of Integer and String
+		            public int compare(Entity entity1, Entity entity2) {
+		                int compareResult = 0;
+
+		                if(sortPropertyType.equals("Integer")){
+		                    Integer integer1 = (Integer) entity1.getProperty(sortPropertyName).getValue();
+		                    Integer integer2 = (Integer) entity2.getProperty(sortPropertyName).getValue();
+
+		                    compareResult = integer1.compareTo(integer2);
+		                }else if(sortPropertyType.equals("Double")){
+		                	Float float1 = (Float) entity1.getProperty(sortPropertyName).getValue();
+		                	Float float2 = (Float) entity2.getProperty(sortPropertyName).getValue();
+
+		                    compareResult = float1.compareTo(float2);
+		                }else{
+		                    String propertyValue1 = (String) entity1.getProperty(sortPropertyName).getValue();
+		                    String propertyValue2 = (String) entity2.getProperty(sortPropertyName).getValue();
+
+		                    compareResult = propertyValue1.compareTo(propertyValue2);
+		                }
+
+		                // if 'desc' is specified in the URI, change the order
+		                if(orderByItem.isDescending()){
+		                    return - compareResult; // just reverse order
+		                }
+
+		                return compareResult;
+		            }
+		        });
+		    }
+		}
 	}
 
 	@Override
