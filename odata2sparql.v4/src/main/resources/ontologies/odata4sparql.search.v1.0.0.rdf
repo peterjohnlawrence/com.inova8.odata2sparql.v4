@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:search="http://inova8.com/odata4sparql/search/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:odata4sparql="http://inova8.com/odata4sparql#"
+    xmlns:sp="http://spinrdf.org/sp#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:lucenesail="http://www.openrdf.org/contrib/lucenesail#"
+    xmlns:spin="http://spinrdf.org/spin#"
+    xmlns:spl="http://spinrdf.org/spl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://inova8.com/odata4sparql/search/">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://spinrdf.org/spl"/>
+    <owl:imports rdf:resource="http://inova8.com/odata4sparql"/>
+    <owl:imports rdf:resource="http://spinrdf.org/spin"/>
+    <owl:versionIRI rdf:resource="http://inova8.com/odata4sparql/operations/v1.0.0"/>
+    <owl:priorVersion rdf:resource="http://inova8.com/odata4sparql/operations/v0"/>
+    <owl:versionInfo>V1</owl:versionInfo>
+  </owl:Ontology>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Resource">
+    <rdfs:label>luceneSearch_Resource</rdfs:label>
+    <skos:prefLabel>luceneSearch_Resource</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:domain>
+      <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/LuceneSearch">
+        <spin:body>
+          <sp:Select>
+            <sp:where rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>type</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>resource</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#matches"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>resource</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>luceneSearch_String</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#query"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>score</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>value</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#snippet"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:where>
+            <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/luceneSearch_Resource"/>
+                <sp:varName>resource</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>type</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Type"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Property"/>
+                </spl:predicate>
+                <sp:varName>property</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>value</sp:varName>
+                <spl:predicate>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Value"/>
+                </spl:predicate>
+              </rdf:Description>
+            </sp:resultVariables>
+            <sp:text>select ?resource ?type ?property ?value
+where{
+	?resource a ?type .
+	?resource lucenesail:matches   [ 
+			lucenesail:query ?luceneSearch_String ; 
+			lucenesail:property ?property ;
+			lucenesail:score ?score ;
+			lucenesail:snippet ?value ] . 
+}</sp:text>
+          </sp:Select>
+        </spin:body>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_String"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+          </spl:Argument>
+        </spin:constraint>
+        <skos:prefLabel>Lucene Search</skos:prefLabel>
+        <rdfs:label>Lucene Search</rdfs:label>
+      </odata4sparql:Operation>
+    </rdfs:domain>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Resource">
+    <rdfs:domain>
+      <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/RegexSearch">
+        <skos:prefLabel>Regex Search</skos:prefLabel>
+        <rdfs:label>Regex Search</rdfs:label>
+        <spin:body>
+          <sp:Select>
+            <sp:text>select ?resource ?type ?property ?value
+where{
+  ?resource ?property ?value . 
+  OPTIONAL {?resource a ?type }
+FILTER( regex(?value,?regexSearch_String,"i"))
+}</sp:text> <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/regexSearch_Resource"/>
+                <sp:varName>resource</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Type"/>
+                </spl:predicate>
+                <sp:varName>type</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Property"/>
+                </spl:predicate>
+                <sp:varName>property</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Value"/>
+                </spl:predicate>
+                <sp:varName>value</sp:varName>
+              </rdf:Description>
+            </sp:resultVariables>
+            <sp:where rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:predicate rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:predicate>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>resource</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>value</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <sp:Optional>
+                <sp:elements rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>type</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>resource</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                </sp:elements>
+              </sp:Optional>
+              <sp:Filter>
+                <sp:expression>
+                  <sp:regex>
+                    <sp:arg1 rdf:parseType="Resource">
+                      <sp:varName>value</sp:varName>
+                    </sp:arg1>
+                    <sp:arg3>i</sp:arg3>
+                    <sp:arg2 rdf:parseType="Resource">
+                      <sp:varName>regexSearch_String</sp:varName>
+                    </sp:arg2>
+                  </sp:regex>
+                </sp:expression>
+              </sp:Filter>
+            </sp:where>
+          </sp:Select>
+        </spin:body>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_String"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+          </spl:Argument>
+        </spin:constraint>
+      </odata4sparql:Operation>
+    </rdfs:domain>
+    <rdfs:label>regexSearch_Resource</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <skos:prefLabel>regexSearch_Resource</skos:prefLabel>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Property">
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/RegexSearch"/>
+    <rdfs:label>regexSearch_Property</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>regexSearch_Property</skos:prefLabel>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Property">
+    <rdfs:label>luceneSearch_Property</rdfs:label>
+    <skos:prefLabel>luceneSearch_Property</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneSearch"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Type">
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneSearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:label>luceneSearch_Type</rdfs:label>
+    <skos:prefLabel>luceneSearch_Type</skos:prefLabel>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Type">
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/RegexSearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <skos:prefLabel>regexSearch_Type</skos:prefLabel>
+    <rdfs:label>regexSearch_Type</rdfs:label>
+  </owl:ObjectProperty>
+  <rdf:Property rdf:about="http://spinrdf.org/arg#wildcard">
+    <rdfs:subPropertyOf rdf:resource="http://spinrdf.org/sp#arg"/>
+  </rdf:Property>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_Value">
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/RegexSearch"/>
+    <skos:prefLabel>regexSearch_Value</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>regexSearch_Value</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/regexSearch_String">
+    <skos:prefLabel>regexSearch_String</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>regexSearch_String</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_String">
+    <skos:prefLabel>regexSearch_String</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>regexSearch_String</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/luceneSearch_Value">
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneSearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:prefLabel>luceneSearch_Value</skos:prefLabel>
+    <rdfs:label>luceneSearch_Value</rdfs:label>
+  </owl:DatatypeProperty>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

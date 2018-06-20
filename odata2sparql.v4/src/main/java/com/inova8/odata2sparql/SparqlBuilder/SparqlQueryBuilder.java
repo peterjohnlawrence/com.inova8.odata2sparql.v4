@@ -441,7 +441,7 @@ public class SparqlQueryBuilder {
 
 		StringBuilder prepareConstruct = new StringBuilder("");
 
-		prepareConstruct.append("PREFIX search: <http://www.openrdf.org/contrib/lucenesail#>\n");
+		prepareConstruct.append("PREFIX lucenesail: <http://www.openrdf.org/contrib/lucenesail#>\n");
 		prepareConstruct.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareConstruct.append(construct());
 		prepareConstruct.append("WHERE {\n");
@@ -1030,7 +1030,7 @@ public class SparqlQueryBuilder {
 			case URI15:
 				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
 					search.append(indent)
-							.append("?" + rdfEntityType.entityTypeName + "_s search:matches [ search:query '"
+							.append("?" + rdfEntityType.entityTypeName + "_s lucenesail:matches [ lucenesail:query '"
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
 				} else {
 					search.append(indent)
@@ -1044,7 +1044,7 @@ public class SparqlQueryBuilder {
 				//?Customer_s ?p ?searchvalue . FILTER( REGEX(?searchvalue , 'Isabel', "i")) .
 				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
 					search.append(indent)
-							.append("?" + rdfTargetEntityType.entityTypeName + "_s search:matches [ search:query '"
+							.append("?" + rdfTargetEntityType.entityTypeName + "_s lucenesail:matches [ lucenesail:query '"
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
 				} else {
 					search.append(indent)
