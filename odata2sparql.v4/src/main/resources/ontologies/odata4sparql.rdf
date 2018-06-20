@@ -185,8 +185,8 @@
     <rdfs:comment>A query used to return the dataset definitions form the models.ttl file</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:ID="useBaseType">
+    <rdfs:comment>true if the OData metadata to use baseType, false will flatten the classes so every class has its own primary key and full set of properties and associations</rdfs:comment>
     <rdfs:isDefinedBy rdf:resource=""/>
-    <rdfs:comment>true if the OData metadata to use baseType, false will flatten the classes so every class has its own primrary key and full set of properties and associations</rdfs:comment>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
     <rdfs:domain rdf:resource="#Dataset"/>
     <rdfs:label>use BaseType</rdfs:label>

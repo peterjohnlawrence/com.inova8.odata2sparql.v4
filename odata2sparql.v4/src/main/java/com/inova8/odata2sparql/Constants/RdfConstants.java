@@ -265,7 +265,7 @@ public class RdfConstants {
 			} else if (SystemUtils.IS_OS_LINUX) {
 				workingDirectory = Paths.get(DEFAULTCONFIG).toString();
 			} else if (SystemUtils.IS_OS_MAC) {
-				workingDirectory = Paths.get("~/Library/Preferences", "inova8", "odata2sparql").toString();
+				workingDirectory = Paths.get(System.getProperty("user.home") + "/Library/Preferences", "inova8", "odata2sparql").toString();
 			} else {
 				log.error("Unsupported OS: " + SystemUtils.OS_NAME);
 				throw new RuntimeException("Unsupported OS: " + SystemUtils.OS_NAME, null);
