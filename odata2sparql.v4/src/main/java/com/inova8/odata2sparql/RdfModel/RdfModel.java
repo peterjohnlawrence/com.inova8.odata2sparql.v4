@@ -249,16 +249,23 @@ public class RdfModel {
 		private RdfSchema schema;
 		private RdfNode entityTypeNode;
 		private RdfEntityType baseType;
-		boolean rootClass = false;
-		boolean isOperation = false;
+		private boolean rootClass = false;
+		private boolean isOperation = false;
 		private boolean isEntity = false;
 		private boolean functionImport = false;
 		private String description;
 		private Set<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
+		public String queryText;
 		private String deleteText;
 		private String insertText;
 		private String updateText;
 		private String updatePropertyText;
+		private final HashMap<String, FunctionImportParameter> functionImportParameters = new HashMap<String, FunctionImportParameter>();
+		private final HashMap<String, RdfModel.RdfProperty> properties = new HashMap<String, RdfModel.RdfProperty>();
+		private final HashMap<String, RdfModel.RdfAssociation> navigationProperties = new HashMap<String, RdfModel.RdfAssociation>();
+		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
+		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
+
 
 		public String getDeleteText() {
 			return deleteText;
@@ -367,7 +374,6 @@ public class RdfModel {
 			return functionImport;
 		}
 
-		private final HashMap<String, FunctionImportParameter> functionImportParameters = new HashMap<String, FunctionImportParameter>();
 
 		public HashMap<String, FunctionImportParameter> getFunctionImportParameters() {
 			return functionImportParameters;
@@ -391,14 +397,9 @@ public class RdfModel {
 			this.isOperation = !isEntity;
 		}
 
-		public String queryText;
-
 		public String getIRI() {
 			return entityTypeNode.getIRI().toString();
 		}
-
-		private final HashMap<String, RdfModel.RdfProperty> properties = new HashMap<String, RdfModel.RdfProperty>();
-		private final HashMap<String, RdfModel.RdfAssociation> navigationProperties = new HashMap<String, RdfModel.RdfAssociation>();
 
 		public Collection<RdfModel.RdfAssociation> getNavigationProperties() {
 			return navigationProperties.values();
@@ -426,11 +427,6 @@ public class RdfModel {
 			return inheritedProperties;
 
 		}
-
-		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
-
-		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
-
 		public RdfAssociation findNavigationProperty(String navigationPropertyName) {
 			//TODO do we not want to find inherited properties as well?
 			return navigationProperties.get(navigationPropertyName);
@@ -485,6 +481,14 @@ public class RdfModel {
 
 		public void setFunctionImport(boolean b) {
 			this.functionImport = true;
+		}
+
+		public boolean isRootClass() {
+			return rootClass;
+		}
+
+		public void setRootClass(boolean rootClass) {
+			this.rootClass = rootClass;
 		}
 	}
 
@@ -975,12 +979,10 @@ public class RdfModel {
 
 		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (!operationEntityType.isEntity()) {
-			//String associationName = rdfToOdata(operationURI.localName) + RdfConstants.PREDICATE_SEPARATOR	+ rdfToOdata(propertyURI.localName);
 			String associationName = rdfToOdata(propertyURI.localName);
-			//String associationName createAssociationName(null, null, queryNode, propertyURI,	rangeURI);
-			RdfAssociation association = Enumerable.create(propertyURI.graph.associations)
-					.firstOrNull(associationNameEquals(associationName));
+			RdfAssociation association = operationEntityType.findNavigationProperty(propertyNode);// Enumerable.create(propertyURI.graph.associations).firstOrNull(associationNameEquals(associationName));
 			if (association == null) {
+				//TODO should not even get here
 				association = buildAssociation(associationName, propertyNode, propertyURI, queryNode, operationURI,
 						rangeNode, rangeURI);
 			}
@@ -1005,7 +1007,7 @@ public class RdfModel {
 			association.rangeCardinality = RdfConstants.Cardinality.MANY;
 			association.domainCardinality = RdfConstants.Cardinality.ONE;
 
-			//Since this is not a primary entity we need to add the keys of the navigation properties are properties, as well as adding them as primarykeys.
+			//Since this is not a primary entity we need to add the keys of the navigation properties as properties, as well as adding them as primarykeys.
 			RdfProperty property = getOrCreateOperationProperty(queryNode, propertyNode, propertyLabelNode, rangeNode,
 					varName);
 			property.isKey = true;

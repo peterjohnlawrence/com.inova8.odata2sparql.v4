@@ -10,6 +10,8 @@ package com.inova8.odata2sparql.RdfRepository;
 import java.util.Hashtable;
 import org.eclipse.rdf4j.model.Namespace;
 
+import com.inova8.odata2sparql.Constants.TextSearchType;
+
 public class RdfRepository  {
 
 	private RdfConnection dataEndPoint;
@@ -62,7 +64,7 @@ public class RdfRepository  {
 	private Boolean withSapAnnotations;
 	private Boolean useBaseType;
 	private Boolean expandOperations = false;
-	private boolean supportsLucene;
+	private TextSearchType textSearchType;
 	
 	RdfRepository(String modelName,Namespace defaultPrefix,Hashtable<String, Namespace> namespaces) {
 		super();
@@ -133,10 +135,11 @@ public class RdfRepository  {
 	public void setExpandOperations(boolean expandOperations) {
 		this.expandOperations = expandOperations;	
 	}
-	public Boolean getSupportsLucene() {
-		return this.supportsLucene;		
+	public TextSearchType getTextSearchType() {
+		return textSearchType;
 	}
-	public void setSupportsLucene(boolean supportsLucene) {
-		this.supportsLucene = supportsLucene;		
+	public void setTextSearchType(TextSearchType textSearchType) {
+		this.textSearchType = textSearchType;
 	}
+
 }

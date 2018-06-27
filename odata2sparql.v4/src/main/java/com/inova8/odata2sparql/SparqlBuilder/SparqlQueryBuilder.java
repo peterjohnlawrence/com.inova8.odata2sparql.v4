@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
+import com.inova8.odata2sparql.Constants.TextSearchType;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
@@ -1028,29 +1029,48 @@ public class SparqlQueryBuilder {
 			switch (uriType) {
 			case URI1:
 			case URI15:
-				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
+				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
+				case RDF4J_LUCENE:
 					search.append(indent)
 							.append("?" + rdfEntityType.entityTypeName + "_s lucenesail:matches [ lucenesail:query '"
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
-				} else {
+					break;
+				case HALYARD_ES:
+					search.append(indent)
+							.append("?" + rdfEntityType.entityTypeName + "_s ?p '"
+									+ this.uriInfo.getSearchOption().getText() + "'^^<"
+									+ RdfConstants.URI_HALYARD_SEARCH + "> .\n");
+					break;
+				case DEFAULT:
+				default:
 					search.append(indent)
 							.append("?" + rdfEntityType.entityTypeName
 									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
 									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
+
 				}
 				break;
 			case URI6B:
-				//?Customer_s search:matches [ search:query 'Isabel' ] .
-				//?Customer_s ?p ?searchvalue . FILTER( REGEX(?searchvalue , 'Isabel', "i")) .
-				if (this.rdfModel.getRdfRepository().getSupportsLucene()) {
+				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
+				case RDF4J_LUCENE:
 					search.append(indent)
-							.append("?" + rdfTargetEntityType.entityTypeName + "_s lucenesail:matches [ lucenesail:query '"
+							.append("?" + rdfTargetEntityType.entityTypeName
+									+ "_s lucenesail:matches [ lucenesail:query '"
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
-				} else {
+					break;
+				case HALYARD_ES:
+					search.append(indent)
+							.append("?" + rdfTargetEntityType.entityTypeName + "_s ?p '"
+									+ this.uriInfo.getSearchOption().getText() + "'^^<"
+									+ RdfConstants.URI_HALYARD_SEARCH + "> .\n");
+					break;
+				case DEFAULT:
+				default:
 					search.append(indent)
 							.append("?" + rdfTargetEntityType.entityTypeName
 									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
 									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
+
 				}
 				break;
 			default:

@@ -111,7 +111,7 @@ public class RdfModelProvider {
 		RdfNode unityNode = RdfNodeFactory.createLiteral("1");
 
 		RdfEntityType rdfsResource = model.getOrCreateEntityType(rdfsResourceNode, rdfsResourceLabelNode);
-		rdfsResource.rootClass = true;
+		rdfsResource.setRootClass(true);
 		RdfProperty resourceSubjectProperty = model.getOrCreateProperty(rdfSubjectNode, null, rdfSubjectLabelNode,
 				rdfsResourceNode, rdfStringNode, RdfConstants.Cardinality.MANY);
 		resourceSubjectProperty.setIsKey(true);
@@ -737,12 +737,12 @@ public class RdfModelProvider {
 			Iterator<RdfEntityType> clazzIterator = graph.classes.iterator();
 			while (clazzIterator.hasNext()) {
 				RdfEntityType clazz = clazzIterator.next();
-				if (clazz.getBaseType() == null && !clazz.rootClass && !clazz.isOperation) {
+				if (clazz.getBaseType() == null && !clazz.isRootClass() && !clazz.isOperation()) {
 					clazz.setBaseType(rdfsResource);
 				} else {
-					clazz.isOperation = clazz.isOperation;
+					//clazz.isOperation = clazz.isOperation();
 					//Need to define a primary key for an operation
-					if (clazz.primaryKeys.isEmpty() && clazz.isOperation && clazz.getBaseType() == null) {
+					if (clazz.primaryKeys.isEmpty() && clazz.isOperation() && clazz.getBaseType() == null) {
 						log.warn("Class and related associations removed because incomplete definition, possibly no objectproperty results: " + clazz.getIRI());
 						//Remove any association  that uses this class
 						for (RdfSchema associationGraph : model.graphs) {

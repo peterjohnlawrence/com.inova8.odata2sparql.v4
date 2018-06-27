@@ -171,11 +171,11 @@ class SparqlEntityCollection extends EntityCollection {
 						}
 						if (rdfSubjectEntity.getEntityType().isOperation()) {
 							// An operation so need to use these as the primary key of the record.
+							//TODO propertyNode.getLocalName() is not the same as the navigationproperty
 							if (rdfSubjectEntity.getEntityType()
-									.findNavigationProperty(propertyNode.getLocalName()) != null) {
+									.findNavigationProperty(propertyNode) != null) {
 								rdfSubjectEntity.addProperty(new Property(null,
-										rdfSubjectEntity.getEntityType()
-												.findNavigationProperty(propertyNode.getLocalName()).getRelatedKey(),
+										rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode).getRelatedKey(),
 										ValueType.PRIMITIVE,
 										SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes()
 												.toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));

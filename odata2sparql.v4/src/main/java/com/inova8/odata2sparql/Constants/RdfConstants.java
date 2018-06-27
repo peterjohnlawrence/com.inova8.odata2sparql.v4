@@ -218,6 +218,8 @@ public class RdfConstants {
 			.createIRI("http://inova8.com/odata4sparql#propertyQuery_Cardinality");
 	public static final Value URI_REPOSITORYQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#repositoryQuery");
+	public static final Value URI_HALYARD_SEARCH = valueFactoryImpl
+			.createIRI("http://merck.github.io/Halyard/ns#search");
 
 	public final static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;

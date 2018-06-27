@@ -11,6 +11,7 @@ import java.util.Locale;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
+import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -99,10 +100,10 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		}
 
 		// 3rd apply $orderby
-	    OrderByOption orderByOption = uriInfo.getOrderByOption();
-	    if (orderByOption != null) {
-	    	sortEntityCollection(entitySet, orderByOption);
-	    }		
+		OrderByOption orderByOption = uriInfo.getOrderByOption();
+		if (orderByOption != null) {
+			sortEntityCollection(entitySet, orderByOption);
+		}
 		// 4th: create a serializer based on the requested format (json)
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
 		// Analyze the URI segments
@@ -138,11 +139,11 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		}
 
 		final String id = request.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
-		EntityCollectionSerializerOptions opts=null;
+		EntityCollectionSerializerOptions opts = null;
 
 		if ((countOption != null) && countOption.getValue()) {
-			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id).count(countOption)
-					.contextURL(contextUrl).build();
+			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
+					.count(countOption).contextURL(contextUrl).build();
 		} else {
 			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
 					.contextURL(contextUrl).build();
@@ -164,47 +165,51 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		List<OrderByItem> orderItemList = orderByOption.getOrders();
 		final OrderByItem orderByItem = orderItemList.get(0); // we support only one
 		Expression expression = orderByItem.getExpression();
-		if(expression instanceof Member){
-		    UriInfoResource resourcePath = ((Member)expression).getResourcePath();
-		    UriResource uriResource = resourcePath.getUriResourceParts().get(0);
-		    if (uriResource instanceof UriResourcePrimitiveProperty) {
-		        EdmProperty edmProperty = ((UriResourcePrimitiveProperty)uriResource).getProperty();
-		        final String sortPropertyName = edmProperty.getName();
-		        final String sortPropertyType = edmProperty.getType().getName();
+		if (expression instanceof Member) {
+			UriInfoResource resourcePath = ((Member) expression).getResourcePath();
+			UriResource uriResource = resourcePath.getUriResourceParts().get(0);
+			if (uriResource instanceof UriResourcePrimitiveProperty) {
+				EdmProperty edmProperty = ((UriResourcePrimitiveProperty) uriResource).getProperty();
+				final String sortPropertyName = edmProperty.getName();
+				final String sortPropertyType = edmProperty.getType().getName();
 
-		        // do the sorting for the list of entities  
-		        Collections.sort(entityList, new Comparator<Entity>() {
+				// do the sorting for the list of entities  
+				Collections.sort(entityList, new Comparator<Entity>() {
 
-		            // delegate the sorting to native sorter of Integer and String
-		            public int compare(Entity entity1, Entity entity2) {
-		                int compareResult = 0;
+					// delegate the sorting to native sorter of Integer and String
+					public int compare(Entity entity1, Entity entity2) {
+						int compareResult = 0;
+						if (sortPropertyType.equals("Integer")) {
+							Integer integer1 = (Integer) entity1.getProperty(sortPropertyName).getValue();
+							Integer integer2 = (Integer) entity2.getProperty(sortPropertyName).getValue();
 
-		                if(sortPropertyType.equals("Integer")){
-		                    Integer integer1 = (Integer) entity1.getProperty(sortPropertyName).getValue();
-		                    Integer integer2 = (Integer) entity2.getProperty(sortPropertyName).getValue();
+							compareResult = integer1.compareTo(integer2);
+						} else if (sortPropertyType.equals("Double")) {
+							Float float1 = (Float) entity1.getProperty(sortPropertyName).getValue();
+							Float float2 = (Float) entity2.getProperty(sortPropertyName).getValue();
 
-		                    compareResult = integer1.compareTo(integer2);
-		                }else if(sortPropertyType.equals("Double")){
-		                	Float float1 = (Float) entity1.getProperty(sortPropertyName).getValue();
-		                	Float float2 = (Float) entity2.getProperty(sortPropertyName).getValue();
+							compareResult = float1.compareTo(float2);
+						} else {
+							Property property1 = entity1.getProperty(sortPropertyName);
+							Property property2 = entity2.getProperty(sortPropertyName);
+							if ((property1 != null) && (property2 != null)) {
+								compareResult = ((String) property1.getValue())
+										.compareTo((String) property2.getValue());
+							}else{
+								// Invalid comparsion to non-datatype property, so set equal
+								compareResult = 0;														
+							}
 
-		                    compareResult = float1.compareTo(float2);
-		                }else{
-		                    String propertyValue1 = (String) entity1.getProperty(sortPropertyName).getValue();
-		                    String propertyValue2 = (String) entity2.getProperty(sortPropertyName).getValue();
+						}
+						// if 'desc' is specified in the URI, change the order
+						if (orderByItem.isDescending()) {
+							return -compareResult; // just reverse order
+						}
 
-		                    compareResult = propertyValue1.compareTo(propertyValue2);
-		                }
-
-		                // if 'desc' is specified in the URI, change the order
-		                if(orderByItem.isDescending()){
-		                    return - compareResult; // just reverse order
-		                }
-
-		                return compareResult;
-		            }
-		        });
-		    }
+						return compareResult;
+					}
+				});
+			}
 		}
 	}
 

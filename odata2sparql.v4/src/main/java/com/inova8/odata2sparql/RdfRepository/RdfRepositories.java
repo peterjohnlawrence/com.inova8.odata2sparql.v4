@@ -161,7 +161,7 @@ public class RdfRepositories {
 							Literal valueOfWithSapAnnotations = (Literal) bindingSet.getValue("withSapAnnotations");
 							Literal valueOfUseBaseType = (Literal) bindingSet.getValue("useBaseType");
 							Literal valueOfExpandOperations = (Literal) bindingSet.getValue("expandOperations");
-							Literal valueOfSupportsLucene = (Literal) bindingSet.getValue("supportsLucene");
+							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
 							RepositoryConfig dataRepositoryConfig = repositoryManager
 									.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
@@ -298,11 +298,10 @@ public class RdfRepositories {
 							} else {
 								repository.setExpandOperations(true);
 							}
-							if (valueOfSupportsLucene != null) {
-								repository.setSupportsLucene(Boolean.parseBoolean(valueOfSupportsLucene
-										.stringValue()));
+							if (valueOfTextSearchType != null) {
+								repository.setTextSearchType(TextSearchType.get(valueOfTextSearchType.stringValue()));
 							} else {
-								repository.setSupportsLucene(false);
+								repository.setTextSearchType(TextSearchType.DEFAULT);
 							}
 							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
 
