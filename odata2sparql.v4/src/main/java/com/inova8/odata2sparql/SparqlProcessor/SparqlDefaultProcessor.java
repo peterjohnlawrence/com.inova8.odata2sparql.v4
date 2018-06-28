@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumentProcessor, ErrorProcessor {
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
-	private final Logger log = LoggerFactory.getLogger(SparqlErrorProcessor.class);
+	private final Logger log = LoggerFactory.getLogger(SparqlDefaultProcessor.class);
 
 	@Override
 	public void init(final OData odata, final ServiceMetadata serviceMetadata) {

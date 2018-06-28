@@ -20,6 +20,1770 @@
     <owl:imports rdf:resource="http://inova8.com/odata4sparql"/>
     <owl:imports rdf:resource="http://spinrdf.org/spl"/>
   </owl:Ontology>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/typeA">
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <skos:prefLabel>typeA</skos:prefLabel>
+    <rdfs:domain>
+      <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch">
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringA"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringB"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:body>
+          <sp:Select>
+            <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:varName>entityA</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/entityA"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/typeA"/>
+                <sp:varName>typeA</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/formattedValueA"/>
+                <sp:varName>formattedValueA</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property01"/>
+                </spl:predicate>
+                <sp:varName>p01</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property10"/>
+                </spl:predicate>
+                <sp:varName>i10</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node1"/>
+                </spl:predicate>
+                <sp:varName>node1</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property12"/>
+                </spl:predicate>
+                <sp:varName>p12</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>i21</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property21"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>node2</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node2"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property23"/>
+                </spl:predicate>
+                <sp:varName>p23</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>i32</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property32"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node3"/>
+                </spl:predicate>
+                <sp:varName>node3</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>p34</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property34"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>i43</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property43"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>entityB</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/entityB"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>typeB</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/typeB"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/formattedValueB"/>
+                <sp:varName>formattedValueB</sp:varName>
+              </rdf:Description>
+            </sp:resultVariables>
+            <sp:text>
+select ?entityA ?typeA  ?formattedValueA ?p01 ?i10   ?node1  ?p12 ?i21  ?node2 ?p23 ?i32   ?node3 ?p34 ?i43  ?entityB ?typeB ?formattedValueB
+{
+#  VALUES(?entityA){(&lt;http://northwind.com/Customer-ANTON&gt;)}#(&lt;http://northwind.com/Customer-CONSH&gt;)}
+{select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;", ?labelProperty, "&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
+{    
+	{
+	select ?entity ?type ?property ?snippet
+		{
+			?entity a ?type .
+			?entity lucenesail:matches [
+				lucenesail:query ?stringA ; 
+				lucenesail:property ?property ;
+				lucenesail:score ?score;
+				lucenesail:snippet ?snippet] .
+		} 
+	} 
+	?property  rdfs:label ?labelProperty .
+}
+GROUP BY ?entity ?type}
+#  VALUES(?entityB){(&lt;http://northwind.com/OrderDetail-10507-48&gt;)}#(&lt;http://northwind.com/Product-48&gt;)}#(&lt;http://northwind.com/Order-10507&gt;)(&lt;http://northwind.com/OrderDetail-10507-48&gt;)} 
+{select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;", ?labelProperty, "&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
+{    
+	{
+	select ?entity ?type ?property ?snippet
+		{
+			?entity a ?type .
+			?entity lucenesail:matches [
+				lucenesail:query ?stringB; 
+				lucenesail:property ?property ;
+				lucenesail:score ?score;
+				lucenesail:snippet ?snippet] .
+		} 
+	} 
+	?property  rdfs:label ?labelProperty .
+}
+GROUP BY ?entity ?type}
+	{ #distance = 1
+		{?entityA ?p01 ?entityB . }
+		UNION
+		{?entityB ?i10 ?entityA .}
+	}
+	UNION
+	{	?entityA ?p01 ?node1 .  FILTER(isIRI(?node1) &amp;&amp; ?p01 != rdf:type )
+		{ #distance = 2
+			{?node1 ?p12 ?entityB .  } 
+			UNION  
+			{?entityB ?i21 ?node1 .   } 
+		} 
+		UNION
+		{ 
+			{?node1 ?p12 ?node2. FILTER(isIRI(?node2) &amp;&amp; ?p12 != rdf:type)    
+				{ #distance = 3
+					{?node2 ?p23 ?entityB . } 
+					UNION  
+					{?entityB ?i32 ?node2 .  } 
+				}
+				UNION
+				{ 
+					{?node2 ?p23 ?node3. FILTER(isIRI(?node3) &amp;&amp; ?p23 != rdf:type)   
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}	
+					}
+					UNION  
+					{?node3 ?i32 ?node2 .FILTER(isIRI(?node3) &amp;&amp; ?i32 != rdf:type)  
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}
+					} 
+				} 
+			}
+			UNION  
+			{?node2 ?i21 ?node1 . FILTER(isIRI(?node2) &amp;&amp; ?i21 != rdf:type)  
+				{ #distance = 3
+					{?node2 ?p23 ?entityB .   } 
+					UNION  
+					{?entityB ?i32 ?node2 .    } 
+				}
+				UNION
+				{ 
+					{?node2 ?p23 ?node3. FILTER(isIRI(?node3) &amp;&amp; ?p23 != rdf:type )   
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}	
+					}
+					UNION  
+					{?node3 ?i32 ?node2 .FILTER(isIRI(?node3) &amp;&amp; ?i32 != rdf:type)  
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}
+					} 
+				} 
+			} 
+		} 
+	}
+	UNION
+	{	?node1 ?i10 ?entityA . FILTER(isIRI(?node1) &amp;&amp; ?i10 != rdf:type) 
+		{ #distance = 2
+			{?node1 ?p12 ?entityB .    } 
+			UNION  
+			{?entityB ?i21 ?node1 .  } 
+		} 
+		UNION
+		{ 
+			{?node1 ?p12 ?node2. FILTER(isIRI(?node2) &amp;&amp; ?p12 != rdf:type)   
+				{ #distance = 3
+					{?node2 ?p23 ?entityB .   } 
+					UNION  
+					{?entityB ?i32 ?node2 .  } 
+				}
+				UNION
+				{ 
+					{?node2 ?p23 ?node3. FILTER(isIRI(?node3) &amp;&amp; ?p23 != rdf:type)   
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}	
+					}
+					UNION  
+					{?node3 ?i32 ?node2 .FILTER(isIRI(?node3) &amp;&amp; ?i32 != rdf:type)  
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}
+					} 
+				} 				
+			}
+			UNION  
+			{?node2 ?i21 ?node1 .FILTER(isIRI(?node2) &amp;&amp; ?i21 != rdf:type)  
+				{ #distance = 3
+					{?node2 ?p23 ?entityB .   } 
+						UNION  
+					{?entityB ?i32 ?node2 .  } 
+				}
+				UNION
+				{ 
+					{?node2 ?p23 ?node3. FILTER(isIRI(?node3) &amp;&amp; ?p23 != rdf:type)   
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}	
+					}
+					UNION  
+					{?node3 ?i32 ?node2 .FILTER(isIRI(?node3) &amp;&amp; ?i32 != rdf:type)  
+						{ #distance = 4
+							{?node3 ?p34 ?entityB .   } 
+							UNION  
+							{?entityB ?i43 ?node3 .  } 
+						}
+					} 
+				} 
+			} 
+		} 
+	}
+ }</sp:text>
+            <sp:where rdf:parseType="Collection">
+              <sp:SubQuery>
+                <sp:query>
+                  <sp:Select>
+                    <sp:where rdf:parseType="Collection">
+                      <sp:SubQuery>
+                        <sp:query>
+                          <sp:Select>
+                            <sp:resultVariables rdf:parseType="Collection">
+                              <rdf:Description>
+                                <sp:varName>entity</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>type</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>property</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>snippet</sp:varName>
+                              </rdf:Description>
+                            </sp:resultVariables>
+                            <sp:where rdf:parseType="Collection">
+                              <rdf:Description>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>entity</sp:varName>
+                                </sp:subject>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>type</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>?0</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#matches"/>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>entity</sp:varName>
+                                </sp:subject>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>stringA</sp:varName>
+                                </sp:object>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?0</sp:varName>
+                                </sp:subject>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#query"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?0</sp:varName>
+                                </sp:subject>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>property</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>score</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?0</sp:varName>
+                                </sp:subject>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#snippet"/>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>snippet</sp:varName>
+                                </sp:object>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?0</sp:varName>
+                                </sp:subject>
+                              </rdf:Description>
+                            </sp:where>
+                          </sp:Select>
+                        </sp:query>
+                      </sp:SubQuery>
+                      <rdf:Description>
+                        <sp:object rdf:parseType="Resource">
+                          <sp:varName>labelProperty</sp:varName>
+                        </sp:object>
+                        <sp:subject rdf:parseType="Resource">
+                          <sp:varName>property</sp:varName>
+                        </sp:subject>
+                        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                      </rdf:Description>
+                    </sp:where>
+                    <sp:resultVariables rdf:parseType="Collection">
+                      <rdf:Description>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>entity</sp:varName>
+                        </sp:expression>
+                        <sp:varName>entityA</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>type</sp:varName>
+                        </sp:expression>
+                        <sp:varName>typeA</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:expression>
+                          <sp:GroupConcat>
+                            <sp:expression>
+                              <sp:concat>
+                                <sp:arg1>&lt;tr&gt;&lt;td&gt;</sp:arg1>
+                                <sp:arg3>&lt;/td&gt;&lt;td&gt;</sp:arg3>
+                                <sp:arg5>&lt;/td&gt;&lt;/tr&gt;</sp:arg5>
+                                <sp:arg2 rdf:parseType="Resource">
+                                  <sp:varName>labelProperty</sp:varName>
+                                </sp:arg2>
+                                <sp:arg4 rdf:parseType="Resource">
+                                  <sp:varName>snippet</sp:varName>
+                                </sp:arg4>
+                              </sp:concat>
+                            </sp:expression>
+                          </sp:GroupConcat>
+                        </sp:expression>
+                        <sp:varName>formattedValueA</sp:varName>
+                      </rdf:Description>
+                    </sp:resultVariables>
+                    <sp:groupBy rdf:parseType="Collection">
+                      <rdf:Description>
+                        <sp:varName>entity</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:varName>type</sp:varName>
+                      </rdf:Description>
+                    </sp:groupBy>
+                  </sp:Select>
+                </sp:query>
+              </sp:SubQuery>
+              <sp:SubQuery>
+                <sp:query>
+                  <sp:Select>
+                    <sp:resultVariables rdf:parseType="Collection">
+                      <rdf:Description>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>entity</sp:varName>
+                        </sp:expression>
+                        <sp:varName>entityB</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:expression rdf:parseType="Resource">
+                          <sp:varName>type</sp:varName>
+                        </sp:expression>
+                        <sp:varName>typeB</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:expression>
+                          <sp:GroupConcat>
+                            <sp:expression>
+                              <sp:concat>
+                                <sp:arg5>&lt;/td&gt;&lt;/tr&gt;</sp:arg5>
+                                <sp:arg4 rdf:parseType="Resource">
+                                  <sp:varName>snippet</sp:varName>
+                                </sp:arg4>
+                                <sp:arg1>&lt;tr&gt;&lt;td&gt;</sp:arg1>
+                                <sp:arg2 rdf:parseType="Resource">
+                                  <sp:varName>labelProperty</sp:varName>
+                                </sp:arg2>
+                                <sp:arg3>&lt;/td&gt;&lt;td&gt;</sp:arg3>
+                              </sp:concat>
+                            </sp:expression>
+                          </sp:GroupConcat>
+                        </sp:expression>
+                        <sp:varName>formattedValueB</sp:varName>
+                      </rdf:Description>
+                    </sp:resultVariables>
+                    <sp:groupBy rdf:parseType="Collection">
+                      <rdf:Description>
+                        <sp:varName>entity</sp:varName>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <sp:varName>type</sp:varName>
+                      </rdf:Description>
+                    </sp:groupBy>
+                    <sp:where rdf:parseType="Collection">
+                      <sp:SubQuery>
+                        <sp:query>
+                          <sp:Select>
+                            <sp:resultVariables rdf:parseType="Collection">
+                              <rdf:Description>
+                                <sp:varName>entity</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>type</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>property</sp:varName>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:varName>snippet</sp:varName>
+                              </rdf:Description>
+                            </sp:resultVariables>
+                            <sp:where rdf:parseType="Collection">
+                              <rdf:Description>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>type</sp:varName>
+                                </sp:object>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>entity</sp:varName>
+                                </sp:subject>
+                                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>?1</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#matches"/>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>entity</sp:varName>
+                                </sp:subject>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#query"/>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?1</sp:varName>
+                                </sp:subject>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>stringB</sp:varName>
+                                </sp:object>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?1</sp:varName>
+                                </sp:subject>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>property</sp:varName>
+                                </sp:object>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?1</sp:varName>
+                                </sp:subject>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>score</sp:varName>
+                                </sp:object>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <sp:subject rdf:parseType="Resource">
+                                  <sp:varName>?1</sp:varName>
+                                </sp:subject>
+                                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#snippet"/>
+                                <sp:object rdf:parseType="Resource">
+                                  <sp:varName>snippet</sp:varName>
+                                </sp:object>
+                              </rdf:Description>
+                            </sp:where>
+                          </sp:Select>
+                        </sp:query>
+                      </sp:SubQuery>
+                      <rdf:Description>
+                        <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                        <sp:subject rdf:parseType="Resource">
+                          <sp:varName>property</sp:varName>
+                        </sp:subject>
+                        <sp:object rdf:parseType="Resource">
+                          <sp:varName>labelProperty</sp:varName>
+                        </sp:object>
+                      </rdf:Description>
+                    </sp:where>
+                  </sp:Select>
+                </sp:query>
+              </sp:SubQuery>
+              <sp:Union>
+                <sp:elements rdf:parseType="Collection">
+                  <rdf:Description>
+                    <rdf:first>
+                      <sp:Union>
+                        <sp:elements rdf:parseType="Collection">
+                          <rdf:Description>
+                            <rdf:first rdf:parseType="Resource">
+                              <sp:predicate rdf:parseType="Resource">
+                                <sp:varName>p01</sp:varName>
+                              </sp:predicate>
+                              <sp:subject rdf:parseType="Resource">
+                                <sp:varName>entityA</sp:varName>
+                              </sp:subject>
+                              <sp:object rdf:parseType="Resource">
+                                <sp:varName>entityB</sp:varName>
+                              </sp:object>
+                            </rdf:first>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                          </rdf:Description>
+                          <rdf:Description>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            <rdf:first rdf:parseType="Resource">
+                              <sp:predicate rdf:parseType="Resource">
+                                <sp:varName>i10</sp:varName>
+                              </sp:predicate>
+                              <sp:subject rdf:parseType="Resource">
+                                <sp:varName>entityB</sp:varName>
+                              </sp:subject>
+                              <sp:object rdf:parseType="Resource">
+                                <sp:varName>entityA</sp:varName>
+                              </sp:object>
+                            </rdf:first>
+                          </rdf:Description>
+                        </sp:elements>
+                      </sp:Union>
+                    </rdf:first>
+                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <rdf:rest rdf:parseType="Collection">
+                      <sp:Filter>
+                        <sp:expression>
+                          <sp:and>
+                            <sp:arg1>
+                              <sp:isIRI>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>node1</sp:varName>
+                                </sp:arg1>
+                              </sp:isIRI>
+                            </sp:arg1>
+                            <sp:arg2>
+                              <sp:ne>
+                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>p01</sp:varName>
+                                </sp:arg1>
+                              </sp:ne>
+                            </sp:arg2>
+                          </sp:and>
+                        </sp:expression>
+                      </sp:Filter>
+                      <sp:Union>
+                        <sp:elements rdf:parseType="Collection">
+                          <rdf:Description>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            <rdf:first>
+                              <sp:Union>
+                                <sp:elements rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>p12</sp:varName>
+                                      </sp:predicate>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:subject>
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>entityB</sp:varName>
+                                      </sp:object>
+                                    </rdf:first>
+                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:object>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>entityB</sp:varName>
+                                      </sp:subject>
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>i21</sp:varName>
+                                      </sp:predicate>
+                                    </rdf:first>
+                                  </rdf:Description>
+                                </sp:elements>
+                              </sp:Union>
+                            </rdf:first>
+                          </rdf:Description>
+                          <rdf:Description>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            <rdf:first>
+                              <sp:Union>
+                                <sp:elements rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node2</sp:varName>
+                                      </sp:object>
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>p12</sp:varName>
+                                      </sp:predicate>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:subject>
+                                    </rdf:first>
+                                    <rdf:rest rdf:parseType="Collection">
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:and>
+                                            <sp:arg2>
+                                              <sp:ne>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >p12</sp:varName>
+                                                </sp:arg1>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                              </sp:ne>
+                                            </sp:arg2>
+                                            <sp:arg1>
+                                              <sp:isIRI>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >node2</sp:varName>
+                                                </sp:arg1>
+                                              </sp:isIRI>
+                                            </sp:arg1>
+                                          </sp:and>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Union>
+                                        <sp:elements rdf:parseType="Collection">
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:object>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>p23</sp:varName>
+    </sp:arg1>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                                              </sp:ne>
+                                                            </sp:arg2>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>i32</sp:varName>
+    </sp:arg1>                                                </sp:ne>
+                                                            </sp:arg2>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+    </rdf:first>                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+    </rdf:first>                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                          </rdf:Description>
+                                        </sp:elements>
+                                      </sp:Union>
+                                    </rdf:rest>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>i21</sp:varName>
+                                      </sp:predicate>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node2</sp:varName>
+                                      </sp:subject>
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:object>
+                                    </rdf:first>
+                                    <rdf:rest rdf:parseType="Collection">
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:and>
+                                            <sp:arg2>
+                                              <sp:ne>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >i21</sp:varName>
+                                                </sp:arg1>
+                                              </sp:ne>
+                                            </sp:arg2>
+                                            <sp:arg1>
+                                              <sp:isIRI>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >node2</sp:varName>
+                                                </sp:arg1>
+                                              </sp:isIRI>
+                                            </sp:arg1>
+                                          </sp:and>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Union>
+                                        <sp:elements rdf:parseType="Collection">
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:object>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>p23</sp:varName>
+    </sp:arg1>                                                </sp:ne>
+                                                            </sp:arg2>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>i32</sp:varName>
+    </sp:arg1>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                                              </sp:ne>
+                                                            </sp:arg2>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                        </sp:elements>
+                                      </sp:Union>
+                                    </rdf:rest>
+                                  </rdf:Description>
+                                </sp:elements>
+                              </sp:Union>
+                            </rdf:first>
+                          </rdf:Description>
+                        </sp:elements>
+                      </sp:Union>
+                    </rdf:rest>
+                    <rdf:first rdf:parseType="Resource">
+                      <sp:predicate rdf:parseType="Resource">
+                        <sp:varName>p01</sp:varName>
+                      </sp:predicate>
+                      <sp:subject rdf:parseType="Resource">
+                        <sp:varName>entityA</sp:varName>
+                      </sp:subject>
+                      <sp:object rdf:parseType="Resource">
+                        <sp:varName>node1</sp:varName>
+                      </sp:object>
+                    </rdf:first>
+                  </rdf:Description>
+                  <rdf:Description>
+                    <rdf:rest rdf:parseType="Collection">
+                      <sp:Filter>
+                        <sp:expression>
+                          <sp:and>
+                            <sp:arg1>
+                              <sp:isIRI>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>node1</sp:varName>
+                                </sp:arg1>
+                              </sp:isIRI>
+                            </sp:arg1>
+                            <sp:arg2>
+                              <sp:ne>
+                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                <sp:arg1 rdf:parseType="Resource">
+                                  <sp:varName>i10</sp:varName>
+                                </sp:arg1>
+                              </sp:ne>
+                            </sp:arg2>
+                          </sp:and>
+                        </sp:expression>
+                      </sp:Filter>
+                      <sp:Union>
+                        <sp:elements rdf:parseType="Collection">
+                          <rdf:Description>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            <rdf:first>
+                              <sp:Union>
+                                <sp:elements rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:subject>
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>p12</sp:varName>
+                                      </sp:predicate>
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>entityB</sp:varName>
+                                      </sp:object>
+                                    </rdf:first>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:object>
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>i21</sp:varName>
+                                      </sp:predicate>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>entityB</sp:varName>
+                                      </sp:subject>
+                                    </rdf:first>
+                                  </rdf:Description>
+                                </sp:elements>
+                              </sp:Union>
+                            </rdf:first>
+                          </rdf:Description>
+                          <rdf:Description>
+                            <rdf:first>
+                              <sp:Union>
+                                <sp:elements rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:subject>
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>p12</sp:varName>
+                                      </sp:predicate>
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node2</sp:varName>
+                                      </sp:object>
+                                    </rdf:first>
+                                    <rdf:rest rdf:parseType="Collection">
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:and>
+                                            <sp:arg2>
+                                              <sp:ne>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >p12</sp:varName>
+                                                </sp:arg1>
+                                              </sp:ne>
+                                            </sp:arg2>
+                                            <sp:arg1>
+                                              <sp:isIRI>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >node2</sp:varName>
+                                                </sp:arg1>
+                                              </sp:isIRI>
+                                            </sp:arg1>
+                                          </sp:and>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Union>
+                                        <sp:elements rdf:parseType="Collection">
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:object>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>p23</sp:varName>
+    </sp:arg1>                                                </sp:ne>
+                                                            </sp:arg2>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+    </rdf:first>                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>i32</sp:varName>
+    </sp:arg1>                                                </sp:ne>
+                                                            </sp:arg2>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+    </rdf:first>                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                        </sp:elements>
+                                      </sp:Union>
+                                    </rdf:rest>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <rdf:rest rdf:parseType="Collection">
+                                      <sp:Filter>
+                                        <sp:expression>
+                                          <sp:and>
+                                            <sp:arg2>
+                                              <sp:ne>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >i21</sp:varName>
+                                                </sp:arg1>
+                                                <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                              </sp:ne>
+                                            </sp:arg2>
+                                            <sp:arg1>
+                                              <sp:isIRI>
+                                                <sp:arg1 rdf:parseType="Resource">
+                                                  <sp:varName
+                                                  >node2</sp:varName>
+                                                </sp:arg1>
+                                              </sp:isIRI>
+                                            </sp:arg1>
+                                          </sp:and>
+                                        </sp:expression>
+                                      </sp:Filter>
+                                      <sp:Union>
+                                        <sp:elements rdf:parseType="Collection">
+                                          <rdf:Description>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >entityB</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                          </rdf:Description>
+                                          <rdf:Description>
+                                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            <rdf:first>
+                                              <sp:Union>
+                                                <sp:elements rdf:parseType="Collection">
+                                                  <rdf:Description>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >p23</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>p23</sp:varName>
+    </sp:arg1>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                                                              </sp:ne>
+                                                            </sp:arg2>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+    </rdf:first>                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                  </rdf:Description>
+                                                  <rdf:Description>
+                                                    <rdf:rest rdf:parseType="Collection">
+                                                      <sp:Filter>
+                                                        <sp:expression>
+                                                          <sp:and>
+                                                            <sp:arg2>
+                                                              <sp:ne>
+    <sp:arg2 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>i32</sp:varName>
+    </sp:arg1>                                                </sp:ne>
+                                                            </sp:arg2>
+                                                            <sp:arg1>
+                                                              <sp:isIRI>
+    <sp:arg1 rdf:parseType="Resource">
+      <sp:varName>node3</sp:varName>
+    </sp:arg1>                                                </sp:isIRI>
+                                                            </sp:arg1>
+                                                          </sp:and>
+                                                        </sp:expression>
+                                                      </sp:Filter>
+                                                      <rdf:Description>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                        <rdf:first>
+                                                          <sp:Union>
+                                                            <sp:elements rdf:parseType="Collection">
+                                                              <rdf:Description>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first rdf:parseType="Resource">
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:object>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>p34</sp:varName>
+      </sp:predicate>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:subject>
+    </rdf:first>                                              </rdf:Description>
+                                                              <rdf:Description>
+    <rdf:first rdf:parseType="Resource">
+      <sp:object rdf:parseType="Resource">
+        <sp:varName>node3</sp:varName>
+      </sp:object>
+      <sp:subject rdf:parseType="Resource">
+        <sp:varName>entityB</sp:varName>
+      </sp:subject>
+      <sp:predicate rdf:parseType="Resource">
+        <sp:varName>i43</sp:varName>
+      </sp:predicate>
+    </rdf:first>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                              </rdf:Description>
+                                                            </sp:elements>
+                                                          </sp:Union>
+                                                        </rdf:first>
+                                                      </rdf:Description>
+                                                    </rdf:rest>
+                                                    <rdf:first rdf:parseType="Resource">
+                                                      <sp:predicate rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >i32</sp:varName>
+                                                      </sp:predicate>
+                                                      <sp:object rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node2</sp:varName>
+                                                      </sp:object>
+                                                      <sp:subject rdf:parseType="Resource">
+                                                        <sp:varName
+                                                        >node3</sp:varName>
+                                                      </sp:subject>
+                                                    </rdf:first>
+                                                  </rdf:Description>
+                                                </sp:elements>
+                                              </sp:Union>
+                                            </rdf:first>
+                                          </rdf:Description>
+                                        </sp:elements>
+                                      </sp:Union>
+                                    </rdf:rest>
+                                    <rdf:first rdf:parseType="Resource">
+                                      <sp:predicate rdf:parseType="Resource">
+                                        <sp:varName>i21</sp:varName>
+                                      </sp:predicate>
+                                      <sp:subject rdf:parseType="Resource">
+                                        <sp:varName>node2</sp:varName>
+                                      </sp:subject>
+                                      <sp:object rdf:parseType="Resource">
+                                        <sp:varName>node1</sp:varName>
+                                      </sp:object>
+                                    </rdf:first>
+                                  </rdf:Description>
+                                </sp:elements>
+                              </sp:Union>
+                            </rdf:first>
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                          </rdf:Description>
+                        </sp:elements>
+                      </sp:Union>
+                    </rdf:rest>
+                    <rdf:first rdf:parseType="Resource">
+                      <sp:object rdf:parseType="Resource">
+                        <sp:varName>entityA</sp:varName>
+                      </sp:object>
+                      <sp:predicate rdf:parseType="Resource">
+                        <sp:varName>i10</sp:varName>
+                      </sp:predicate>
+                      <sp:subject rdf:parseType="Resource">
+                        <sp:varName>node1</sp:varName>
+                      </sp:subject>
+                    </rdf:first>
+                  </rdf:Description>
+                </sp:elements>
+              </sp:Union>
+            </sp:where>
+          </sp:Select>
+        </spin:body>
+        <rdfs:label>Lucene Linked Entity Search</rdfs:label>
+        <skos:prefLabel>Lucene Linked Entity Search</skos:prefLabel>
+      </odata4sparql:Operation>
+    </rdfs:domain>
+    <rdfs:label>typeA</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/typeB">
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:label>typeB</rdfs:label>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <skos:prefLabel>typeB</skos:prefLabel>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/entityB">
+    <skos:prefLabel>entityB</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:label>entityB</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/entityA">
+    <rdfs:label>entityA</rdfs:label>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <skos:prefLabel>entityA</skos:prefLabel>
+  </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property">
     <rdfs:domain>
       <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/RegexSearch">
@@ -856,6 +2620,30 @@ GROUP BY ?entity ?type</sp:text>
       </odata4sparql:Operation>
     </rdfs:domain>
   </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property21">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property21</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property21</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property43">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property43</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property43</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property32">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property32</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property32</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property10">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property10</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property10</rdfs:label>
+  </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/entity">
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/RegexEntitySearch"/>
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/ElasticEntitySearch"/>
@@ -872,6 +2660,48 @@ GROUP BY ?entity ?type</sp:text>
     <skos:prefLabel>resource</skos:prefLabel>
     <rdfs:label>resource</rdfs:label>
   </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property23">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property23</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property23</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property01">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property01</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property01</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node1">
+    <skos:prefLabel>node1</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:label>node1</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property34">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property34</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property34</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property12">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <skos:prefLabel>property12</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:label>property12</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node3">
+    <skos:prefLabel>node3</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:label>node3</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node2">
+    <skos:prefLabel>node2</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneLinkedEntitySearch"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:label>node2</rdfs:label>
+  </owl:ObjectProperty>
   <rdf:Property rdf:about="http://spinrdf.org/arg#wildcard">
     <rdfs:subPropertyOf rdf:resource="http://spinrdf.org/sp#arg"/>
   </rdf:Property>
@@ -883,12 +2713,22 @@ GROUP BY ?entity ?type</sp:text>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label>value</rdfs:label>
   </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringA">
+    <skos:prefLabel>stringA</skos:prefLabel>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>stringA</rdfs:label>
+  </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/formattedValue">
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/RegexEntitySearch"/>
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LuceneEntitySearch"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <skos:prefLabel>formattedValue</skos:prefLabel>
     <rdfs:label>formattedValue</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringB">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <skos:prefLabel>stringB</skos:prefLabel>
+    <rdfs:label>stringB</rdfs:label>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/string">
     <rdfs:label>string</rdfs:label>

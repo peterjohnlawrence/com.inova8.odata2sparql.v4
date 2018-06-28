@@ -335,8 +335,10 @@ class SparqlEntityCollection extends EntityCollection {
 				for (RdfPrimaryKey primaryKey : rdfEntity.getEntityType().getPrimaryKeys()) {
 					if (!rdfEntity.containsProperty(primaryKey.getPrimaryKeyName())) {
 						// Delete rdfEntity because part of its key is missing
-						entitySetResultsMapIterator.remove();
-						break;
+						//entitySetResultsMapIterator.remove();
+						//break;
+						//Fixes #75
+						rdfEntity.addProperty(new Property(null, primaryKey.getPrimaryKeyName(), ValueType.PRIMITIVE,	RdfConstants.NULLVALUE));					
 					}
 				}
 			}
