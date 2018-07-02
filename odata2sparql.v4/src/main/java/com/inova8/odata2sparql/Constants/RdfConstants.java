@@ -42,7 +42,7 @@ public class RdfConstants {
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
 	public static final String WILDCARD = "*";
-	public static final String NULLVALUE = "null";
+	public static final String UNDEFVALUE = "UNDEF";
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();
 	static private Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
 	static private final Hashtable<Value, Hashtable<Value, String>> metaModels = new Hashtable<Value, Hashtable<Value, String>>();

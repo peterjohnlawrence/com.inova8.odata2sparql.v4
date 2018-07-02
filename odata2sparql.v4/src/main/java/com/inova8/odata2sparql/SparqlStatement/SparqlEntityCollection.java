@@ -45,7 +45,7 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
 	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
-	private final Map<String, Integer> counts = new HashMap<String, Integer>();
+//	private final Map<String, Integer> counts = new HashMap<String, Integer>();
 	private RdfEdmProvider sparqlEdmProvider;
 	private final RdfEntityType entityType;
 
@@ -192,10 +192,12 @@ class SparqlEntityCollection extends EntityCollection {
 					rdfSubjectEntity.setTargetEntity(true);
 				} else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
 					//Provides counted value hashed by subject/navigationPropertyName
-					counts.put(
-							subjectNode.getIRI().toString()
-									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
-							(Integer) objectNode.getLiteralObject());
+					RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()+1));
+//Fixes #77						counts.put(
+//							subjectNode.getIRI().toString()
+//									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
+//							(Integer) objectNode.getLiteralObject());
+					findOrCreateLink(rdfSubjectEntity, rdfAssociation,(Integer) objectNode.getLiteralObject());
 				} else {// Must be a property with a value, so put it into a
 							// hashmap for processing the second time round when we
 						// know the property
@@ -247,7 +249,41 @@ class SparqlEntityCollection extends EntityCollection {
 			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
 		return link;
 	}
-
+	private Link findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfAssociation rdfAssociation, int count) {
+		Link link = null;
+		if (rdfSubjectEntity.getNavigationLinks() == null) {
+			link = new Link();
+			link.setTitle(rdfAssociation.getEDMAssociationName());
+			rdfSubjectEntity.getNavigationLinks().add(link);
+		} else {
+			for (Link searchLink : rdfSubjectEntity.getNavigationLinks()) {
+				if (searchLink.getTitle().equals(rdfAssociation.getEDMAssociationName())) {
+					link = searchLink;
+					break;
+				}
+			}
+			if (link == null) {
+				link = new Link();
+				link.setTitle(rdfAssociation.getEDMAssociationName());
+				rdfSubjectEntity.getNavigationLinks().add(link);
+			}
+		}
+		if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
+			// to MANY, MULTIPLE
+			EntityCollection inlineEntitySet = link.getInlineEntitySet();
+			if (inlineEntitySet == null) {
+				inlineEntitySet = new EntityCollection();
+			}
+			inlineEntitySet.setCount(count);
+			link.setInlineEntitySet(inlineEntitySet);
+		} else {
+			// to ONE, therefore no count 
+		}
+		// Required to make sure rel is not empty
+		if (link.getRel() == null)
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
+		return link;
+	}
 	private SparqlEntity findOrCreateEntity(RdfNode subjectNode, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
 		rdfEntity = entitySetResultsMap.get(
@@ -274,12 +310,12 @@ class SparqlEntityCollection extends EntityCollection {
 			if (rdfEntity.isTargetEntity()) {
 				this.getEntities().add(rdfEntity);
 			}
-			for (Link navigationLink : rdfEntity.getNavigationLinks()) {
-				Integer count = counts
-						.get(rdfEntity.getSubjectNode().getIRI().toString() + "/" + navigationLink.getTitle());
-				if ((count != null) && (navigationLink.getInlineEntitySet() != null))
-					navigationLink.getInlineEntitySet().setCount(count);
-			}
+//Fixes #77				for (Link navigationLink : rdfEntity.getNavigationLinks()) {
+//				Integer count = counts
+//						.get(rdfEntity.getSubjectNode().getIRI().toString() + "/" + navigationLink.getTitle());
+//				if ((count != null) && (navigationLink.getInlineEntitySet() != null))
+//					navigationLink.getInlineEntitySet().setCount(count);
+//			}
 			for (Entry<RdfNode, Object> entry : rdfEntity.getDatatypeProperties().entrySet()) {
 				RdfNode propertyNode = entry.getKey();
 				Object value = entry.getValue();
@@ -338,13 +374,13 @@ class SparqlEntityCollection extends EntityCollection {
 						//entitySetResultsMapIterator.remove();
 						//break;
 						//Fixes #75
-						rdfEntity.addProperty(new Property(null, primaryKey.getPrimaryKeyName(), ValueType.PRIMITIVE,	RdfConstants.NULLVALUE));					
+						rdfEntity.addProperty(new Property(null, primaryKey.getPrimaryKeyName(), ValueType.PRIMITIVE,	RdfConstants.UNDEFVALUE));					
 					}
 				}
 			}
 		}
 
-		this.setCount(counts.get(this.entityType.getIRI()));
+//Fixes #77		this.setCount(counts.get(this.entityType.getIRI()));
 		return this;
 	}
 

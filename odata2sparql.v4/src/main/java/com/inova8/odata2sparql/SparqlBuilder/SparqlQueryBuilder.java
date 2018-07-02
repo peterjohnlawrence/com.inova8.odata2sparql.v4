@@ -945,11 +945,10 @@ public class SparqlQueryBuilder {
 				String expandedKey = rdfModel.getRdfPrefixes()
 						.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 				if (expandedKey.equals(RdfConstants.SPARQL_UNDEF)) {
-					clausesPath_KeyPredicateValues.append(RdfConstants.SPARQL_UNDEF);
+					clausesPath_KeyPredicateValues.append(" " + RdfConstants.SPARQL_UNDEF + " ");
 				} else {
 					clausesPath_KeyPredicateValues.append("<" + expandedKey + ">");
 				}
-
 			}
 			clausesPath_KeyPredicateValues.append(")}\n");
 		}
@@ -1298,7 +1297,7 @@ public class SparqlQueryBuilder {
 							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 			}
 		}
-
+		expandItemWhere.append(indent).append("\t{\n");
 		if (navProperty.getRangeClass().isOperation()) {
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
 			// BIND(?order as ?Order_s)
@@ -1310,27 +1309,36 @@ public class SparqlQueryBuilder {
 
 			}
 		} else {
-			expandItemWhere.append(indent).append("{\n");
+			expandItemWhere.append(indent).append("\t\t\t{").append("SELECT ?" + nextTargetKey + "_s {\n");
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {
-				expandItemWhere.append(indent).append("\t\t{\n");
-				expandItemWhere.append(indent).append("\t\t\t").append("?" + nextTargetKey + "_s <"
+				expandItemWhere.append(indent).append("\t\t\t\t{\n");
+				expandItemWhere.append(indent).append("\t\t\t\t\t").append("?" + nextTargetKey + "_s <"
 						+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
-				expandItemWhere.append(indent).append("\t\t").append("}UNION{\n");
-				expandItemWhere.append(indent).append("\t\t\t").append(
+				expandItemWhere.append(indent).append("\t\t\t\t").append("}UNION{\n");
+				expandItemWhere.append(indent).append("\t\t\t\t\t").append(
 						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
-				expandItemWhere.append(indent).append("\t\t").append("}\n");
+				expandItemWhere.append(indent).append("\t\t\t\t").append("}\n");
 
 			} else {
-				expandItemWhere.append(indent).append("\t\t").append(
+				expandItemWhere.append(indent).append("\t\t\t\t").append(
 						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
 			}
+			expandItemWhere.append(indent).append("\t\t\t}");
+			if ((expandItem.getTopOption() != null) ) {
+				expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
+			}
+			if ((expandItem.getSkipOption() != null) ) {
+				expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
+			}
+			expandItemWhere.append("}\n");
 			expandItemWhere.append(
 					clausesSelect(createSelectPropertyMap(navProperty.getRangeClass(), expandItem.getSelectOption()),
 							nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
 			expandItemWhere.append(indent).append("\t}\n");
 		}
+
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
 					nextTargetKey, nextTargetEntityType));
