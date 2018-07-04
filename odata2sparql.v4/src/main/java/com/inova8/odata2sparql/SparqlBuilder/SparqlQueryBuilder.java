@@ -1328,6 +1328,9 @@ public class SparqlQueryBuilder {
 			expandItemWhere.append(indent).append("\t\t\t}");
 			if ((expandItem.getTopOption() != null) ) {
 				expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
+			}else if((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null) && (expandItem.getCountOption().getValue()) ) {
+				// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
+				expandItemWhere.append(" LIMIT 0");
 			}
 			if ((expandItem.getSkipOption() != null) ) {
 				expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
