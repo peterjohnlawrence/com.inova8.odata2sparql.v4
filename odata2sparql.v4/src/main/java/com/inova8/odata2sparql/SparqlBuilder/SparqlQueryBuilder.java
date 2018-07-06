@@ -673,8 +673,9 @@ public class SparqlQueryBuilder {
 		} else {
 			selectExpand.append("\t").append("{\n");
 		}
-		if (this.expandOption != null)
-			selectExpand.append(filterClauses.getExpandItemVariables());
+		//Fixes #79
+//		if (this.expandOption != null)
+//			selectExpand.append(filterClauses.getExpandItemVariables());
 		selectExpand.append(selectExpandWhere("\t\t"));
 		selectExpand.append("\t").append("}\n");
 		return selectExpand;
@@ -1282,7 +1283,7 @@ public class SparqlQueryBuilder {
 		//SparqlExpressionVisitor expandFilterClause;
 
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
-		expandItemWhere.append(indent);
+		expandItemWhere.append(indent).append("#expandItemWhere\n").append(indent);
 		if (navProperty.getDomainClass().isOperation() || limitSet()) {
 			expandItemWhere.append("OPTIONAL");
 		} else {
@@ -1306,10 +1307,9 @@ public class SparqlQueryBuilder {
 			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
 				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
 					expandItemWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
-
 			}
 		} else {
-			expandItemWhere.append(indent).append("\t\t\t{").append("SELECT ?" + nextTargetKey + "_s {\n");
+			expandItemWhere.append(indent).append("\t\t\t{").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {
