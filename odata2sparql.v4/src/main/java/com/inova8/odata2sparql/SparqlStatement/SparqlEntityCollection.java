@@ -198,6 +198,10 @@ class SparqlEntityCollection extends EntityCollection {
 //									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
 //							(Integer) objectNode.getLiteralObject());
 					findOrCreateLink(rdfSubjectEntity, rdfAssociation,(Integer) objectNode.getLiteralObject());
+				} else if  (rdfSubjectEntity.getEntityType().isOperation() && (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)){
+					//Fixes #81 OK this is an operation that is returning a literal for a primaryKey so  use UNDEF 
+					rdfSubjectEntity.getDatatypeProperties().put(propertyNode,RdfConstants.UNDEFVALUE);
+				
 				} else {// Must be a property with a value, so put it into a
 							// hashmap for processing the second time round when we
 						// know the property
@@ -467,7 +471,7 @@ class SparqlEntityCollection extends EntityCollection {
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).toString();
 				} else {
-					return (String) value;
+					return String.valueOf( value);
 				}
 			case "Time":
 				return DatatypeConverter.parseTime(value.toString());
