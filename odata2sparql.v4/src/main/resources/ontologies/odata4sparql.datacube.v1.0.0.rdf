@@ -17,6 +17,10 @@
     <owl:imports rdf:resource="http://purl.org/linked-data/cube"/>
     <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
   </owl:Ontology>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/isDatasetOf">
+    <rdfs:label>is dataset of</rdfs:label>
+    <skos:prefLabel>is dataset of</skos:prefLabel>
+  </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/predicate">
     <owl:inverseOf>
       <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/isPredicateOf"/>
@@ -36,7 +40,9 @@
 }</sp:text> <sp:resultVariables rdf:parseType="Collection">
               <rdf:Description>
                 <sp:varName>dataset</sp:varName>
-                <spl:predicate rdf:resource="http://inova8.com/odata4sparql/datacube/dataset"/>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/dataset"/>
+                </spl:predicate>
               </rdf:Description>
               <rdf:Description>
                 <spl:predicate>
@@ -144,6 +150,13 @@
     <rdfs:label>object</rdfs:label>
     <skos:prefLabel>object</skos:prefLabel>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/dataset">
+    <owl:inverseOf rdf:resource="http://inova8.com/odata4sparql/datacube/isDatasetOf"/>
+    <rdfs:range rdf:resource="http://purl.org/linked-data/cube#DataSet"/>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/datacube/Graph"/>
+    <rdfs:label>dataset</rdfs:label>
+    <skos:prefLabel>dataset</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/datacube/isSubjectOf">
     <rdfs:label>is subject of</rdfs:label>

@@ -1292,11 +1292,12 @@ public class SparqlQueryBuilder {
 		expandItemWhere.append("{\n");
 		expandItemWhere.append(indent);
 		if (navProperty.getDomainClass().isOperation()) {
-			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
-				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
-					expandItemWhere.append(indent)
-							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
-			}
+			expandItemWhere.append(indent).append("BIND(?" + navProperty.getRelatedKey()+ " AS ?" + nextTargetKey + "_s)\n");		
+//			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
+//				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
+//					expandItemWhere.append(indent)
+//							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
+//			}
 		}
 		expandItemWhere.append(indent).append("\t{\n");
 		if (navProperty.getRangeClass().isOperation()) {
@@ -1304,10 +1305,11 @@ public class SparqlQueryBuilder {
 			// BIND(?order as ?Order_s)
 			// BIND(?prod as ?Orderorder_orderSummaryorderSummary_product_s
 			// )
-			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
-				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
-					expandItemWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
-			}
+//TODO what BINdings do we need to add?
+//			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
+//				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
+//					expandItemWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
+//			}
 		} else {
 			expandItemWhere.append(indent).append("\t\t\t{").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
 			if (navProperty.getDomainClass().isOperation()) {

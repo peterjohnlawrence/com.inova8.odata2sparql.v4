@@ -1145,7 +1145,7 @@ public class RdfModel {
 		RdfAssociation association = getOrCreateAssociation(propertyNode, null, domainNode, rangeNode,
 				multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
 		RdfAssociation inverseAssociation = getOrCreateAssociation(inversePropertyNode, inversePropertyLabelNode,
-				domainNode, rangeNode, multipleDomainNode, multipleRangeNode, rangeCardinality, domainCardinality); // Note cardinality only is reversed
+				 rangeNode, domainNode,multipleRangeNode,  multipleDomainNode,  rangeCardinality, domainCardinality); 
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
 		//Added because inverse is symmetrical

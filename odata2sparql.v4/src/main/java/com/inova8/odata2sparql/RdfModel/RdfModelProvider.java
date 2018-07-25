@@ -536,8 +536,11 @@ public class RdfModelProvider {
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
-								inversePropertyLabelNode, propertyNode, rangeNode, domainNode, multipleDomainNode,
+								inversePropertyLabelNode, propertyNode, domainNode, rangeNode,  multipleDomainNode,
 								multipleRangeNode, domainCardinality, rangeCardinality);
+//						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+//								inversePropertyLabelNode, propertyNode, rangeNode, domainNode, multipleDomainNode,
+//								multipleRangeNode, domainCardinality, rangeCardinality);
 						if (soln.getRdfNode("description") != null) {
 							inverseAssociation
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
