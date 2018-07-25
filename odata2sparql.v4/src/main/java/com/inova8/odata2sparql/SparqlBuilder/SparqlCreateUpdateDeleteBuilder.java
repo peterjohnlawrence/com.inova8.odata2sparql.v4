@@ -153,7 +153,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 						properties.append(castObjectToXsd(prop.getValue()));
 					}
 				} else {
-					RdfAssociation association = entityType.findNavigationProperty(prop.getName());
+					RdfAssociation association = entityType.findNavigationPropertyByEDMAssociationName(prop.getName());
 					properties.append("<" + association.getAssociationIRI() + "> ");
 					properties.append(castObjectToXsd(prop.getValue()));
 				}

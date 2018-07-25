@@ -896,7 +896,7 @@ public class SparqlQueryBuilder {
 							"Too many navigation properties for operation:" + uriInfo.getUriResourceParts().toString());
 				} else {
 					RdfAssociation navProperty = rdfEntityType
-							.findNavigationProperty(uriInfo.getUriResourceParts().get(1).getSegmentValue());
+							.findNavigationPropertyByEDMAssociationName(uriInfo.getUriResourceParts().get(1).getSegmentValue());
 					key = rdfTargetEntityType.entityTypeName;
 					clausesPath_KeyPredicateValues.append(indent).append("VALUES(?" + key + "_s)");
 					// TODO to get key predicates for function import
@@ -923,13 +923,13 @@ public class SparqlQueryBuilder {
 				log.error("Too many navigation properties for operation:" + uriInfo.getUriResourceParts().toString());
 			} else {
 				RdfAssociation navProperty = rdfEntityType
-						.findNavigationProperty(uriInfo.getUriResourceParts().get(1).getSegmentValue());
+						.findNavigationPropertyByEDMAssociationName(uriInfo.getUriResourceParts().get(1).getSegmentValue());
 				if (navProperty != null) {
 					key = "?" + rdfTargetEntityType
-							.findNavigationProperty(navProperty.getInversePropertyOf().getLocalName()).getVarName();
+							.findNavigationPropertyByEDMAssociationName(navProperty.getInversePropertyOf().getLocalName()).getVarName();
 				} else {
 					log.error("Failed to locate operation navigation property:"
-							+ uriInfo.getUriResourceParts().get(0).getSegmentValue());
+							+ uriInfo.getUriResourceParts().get(1).getSegmentValue());
 				}
 			}
 		} else {
@@ -1513,7 +1513,7 @@ public class SparqlQueryBuilder {
 									.getSegmentValue();
 							rdfProperty = segmentEntityType.findProperty(segmentName);
 							if (rdfProperty == null)
-								if (segmentEntityType.findNavigationProperty(segmentName) == null) {
+								if (segmentEntityType.findNavigationPropertyByEDMAssociationName(segmentName) == null) {
 									throw new EdmException("Failed to locate property:" + property.getResourcePath()
 											.getUriResourceParts().get(0).getSegmentValue());
 								} else {
@@ -1574,7 +1574,7 @@ public class SparqlQueryBuilder {
 					"Invalid key: " + ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText(),
 					null);
 		}
-		RdfAssociation rdfProperty = rdfEntityType.findNavigationProperty(edmNavigationProperty.getName());
+		RdfAssociation rdfProperty = rdfEntityType.findNavigationPropertyByEDMAssociationName(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getAssociationIRI();
 		StringBuilder sparql = new StringBuilder(
 				//			"CONSTRUCT {?" + key + "_s <" + expandedProperty + "> ?" + key + "_o . ?"+ key +"_o <http://targetEntity> true . }\n");

@@ -181,7 +181,7 @@ public class RdfModel {
 			while (true) {
 				sprefix = RdfConstants.PREFIX + i;
 				if (this.getNsPrefixURI(sprefix) == null) {
-					log.info("New prefix added: " + sprefix + "~ for URI " +  uri);
+					log.info("New prefix added: " + sprefix + "~ for URI " + uri);
 					this.set(sprefix, uri);
 					return sprefix;
 				}
@@ -265,7 +265,6 @@ public class RdfModel {
 		private final HashMap<String, RdfModel.RdfAssociation> navigationProperties = new HashMap<String, RdfModel.RdfAssociation>();
 		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
 		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
-
 
 		public String getDeleteText() {
 			return deleteText;
@@ -374,7 +373,6 @@ public class RdfModel {
 			return functionImport;
 		}
 
-
 		public HashMap<String, FunctionImportParameter> getFunctionImportParameters() {
 			return functionImportParameters;
 		}
@@ -427,9 +425,22 @@ public class RdfModel {
 			return inheritedProperties;
 
 		}
+
 		public RdfAssociation findNavigationProperty(String navigationPropertyName) {
 			//TODO do we not want to find inherited properties as well?
 			return navigationProperties.get(navigationPropertyName);
+		}
+
+		public RdfAssociation findNavigationPropertyByEDMAssociationName(String edmAssociationName) {
+			//TODO do we not want to find inherited properties as well?
+			String navigationPropertyName = null;
+			if (this.schema.isDefault) {
+				navigationPropertyName = edmAssociationName;
+			} else {
+				navigationPropertyName = edmAssociationName
+						.replace(this.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR, "");
+			}
+			return findNavigationProperty(navigationPropertyName);
 		}
 
 		public RdfAssociation findNavigationProperty(RdfNode navigationPropertyNode) {
@@ -762,6 +773,15 @@ public class RdfModel {
 				return this.associationName;
 			} else {
 				return this.domainClass.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR + this.associationName;
+			}
+		}
+
+		public String getAssociationNameFromEDM(String edmAssociationName) {
+			if (this.domainClass.schema.isDefault) {
+				return edmAssociationName;
+			} else {
+				return edmAssociationName.replace(this.domainClass.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR,
+						"");
 			}
 		}
 
@@ -1145,7 +1165,7 @@ public class RdfModel {
 		RdfAssociation association = getOrCreateAssociation(propertyNode, null, domainNode, rangeNode,
 				multipleDomainNode, multipleRangeNode, domainCardinality, rangeCardinality);
 		RdfAssociation inverseAssociation = getOrCreateAssociation(inversePropertyNode, inversePropertyLabelNode,
-				 rangeNode, domainNode,multipleRangeNode,  multipleDomainNode,  rangeCardinality, domainCardinality); 
+				rangeNode, domainNode, multipleRangeNode, multipleDomainNode, rangeCardinality, domainCardinality);
 		inverseAssociation.setIsInverse(true);
 		inverseAssociation.inversePropertyOf = propertyNode;
 		//Added because inverse is symmetrical

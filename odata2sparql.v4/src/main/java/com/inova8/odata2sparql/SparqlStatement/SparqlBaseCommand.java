@@ -318,7 +318,7 @@ public class SparqlBaseCommand {
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
 		RdfAssociation navigationProperty = entityType
-				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+				.findNavigationPropertyByEDMAssociationName(uriResourceNavigation.getProperty().getName());
 
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
@@ -347,7 +347,7 @@ public class SparqlBaseCommand {
 		List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
 		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
 		RdfAssociation navigationProperty = entityType
-				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+				.findNavigationPropertyByEDMAssociationName(uriResourceNavigation.getProperty().getName());
 		List<UriParameter> navigationKeyPredicates = uriResourceNavigation.getKeyPredicates();
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
@@ -374,7 +374,7 @@ public class SparqlBaseCommand {
 		List<UriParameter> entityKeyPredicates = uriResourceEntitySet.getKeyPredicates();
 		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
 		RdfAssociation navigationProperty = entityType
-				.findNavigationProperty(uriResourceNavigation.getProperty().getName());
+				.findNavigationPropertyByEDMAssociationName(uriResourceNavigation.getProperty().getName());
 		List<UriParameter> navigationKeyPredicates = uriResourceNavigation.getKeyPredicates();
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
