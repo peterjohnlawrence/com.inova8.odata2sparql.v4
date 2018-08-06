@@ -1,0 +1,1902 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:data="http://inova8.northwind/datacube/data/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:qb="http://purl.org/linked-data/cube#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:sp="http://spinrdf.org/sp#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://inova8.northwind/datacube/data/">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://inova8.com/odata4sparql/datacube/"/>
+  </owl:Ontology>
+  <qb:Observation>
+    <qb:dataSet>
+      <qb:DataSet rdf:about="http://northwind.com/DataSet_1">
+        <skos:prefLabel>Data set 1</skos:prefLabel>
+        <rdfs:label>Data set 1</rdfs:label>
+        <qb:structure rdf:resource="http://inova8.com/odata4sparql/datacube/GraphDataStructure"/>
+        <sp:query>
+          <sp:Construct>
+            <sp:text>PREFIX lucenesail: &lt;http://www.openrdf.org/contrib/lucenesail#&gt;&#xD;
+PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;&#xD;
+PREFIX search: &lt;http://inova8.com/odata4sparql/search/&gt;&#xD;
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&#xD;
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;&#xD;
+PREFIX j0: &lt;urn:uuid:&gt;&#xD;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;&#xD;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;&#xD;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;&#xD;
+PREFIX NWD: &lt;http://northwind.com/&gt;&#xD;
+PREFIX northwind: &lt;http://northwind.com/model/&gt;&#xD;
+PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;&#xD;
+PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;&#xD;
+CONSTRUCT {&#xD;
+	#targetEntityIdentifier&#xD;
+	?Employee_s &lt;http://targetEntity&gt; true .&#xD;
+	#constructType&#xD;
+	?Employee_s &lt;http://assertedType&gt; &lt;http://northwind.com/model/Employee&gt; .&#xD;
+	#constructPath&#xD;
+	?Employee_s ?Employee_p ?Employee_o .&#xD;
+	#constructExpandSelect&#xD;
+		?Employee_s &lt;http://northwind.com/model/managesEmployee&gt; ?EmployeemanagesEmployee_s .&#xD;
+		#constructType&#xD;
+		?EmployeemanagesEmployee_s &lt;http://assertedType&gt; &lt;http://northwind.com/model/Employee&gt; .&#xD;
+		#entityNavigationSetCount&#xD;
+		?Employee_s &lt;http://count/managesEmployee&gt; ?EmployeemanagesEmployee_count.&#xD;
+		?EmployeemanagesEmployee_s ?EmployeemanagesEmployee_p ?EmployeemanagesEmployee_o .&#xD;
+		?Employee_s &lt;http://northwind.com/model/managesOrder&gt; ?EmployeemanagesOrder_s .&#xD;
+		#constructType&#xD;
+		?EmployeemanagesOrder_s &lt;http://assertedType&gt; &lt;http://northwind.com/model/Order&gt; .&#xD;
+		#entityNavigationSetCount&#xD;
+		?Employee_s &lt;http://count/managesOrder&gt; ?EmployeemanagesOrder_count.&#xD;
+		?EmployeemanagesOrder_s ?EmployeemanagesOrder_p ?EmployeemanagesOrder_o .&#xD;
+}&#xD;
+WHERE {&#xD;
+	#selectExpand&#xD;
+	{&#xD;
+		#selectExpandWhere&#xD;
+		{&#xD;
+			#filter&#xD;
+			#clausesFilter&#xD;
+			#clausesExpandFilter&#xD;
+			#search&#xD;
+			#selectPath&#xD;
+			{	SELECT DISTINCT&#xD;
+					?Employee_s&#xD;
+				WHERE {&#xD;
+					#filter&#xD;
+					#clausesPath&#xD;
+					VALUES(?class){(&lt;http://northwind.com/model/Employee&gt;)}&#xD;
+					?Employee_s &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?class .&#xD;
+					#clausesFilter&#xD;
+					#clausesExpandFilter&#xD;
+					#search&#xD;
+				} GROUP BY ?Employee_s LIMIT 20&#xD;
+			}&#xD;
+		}&#xD;
+	}&#xD;
+	#clausesPathProperties&#xD;
+	{&#xD;
+		VALUES(?Employee_p){(&lt;http://northwind.com/model/homePhone&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat_long&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat&gt;)(&lt;http://northwind.com/model/titleOfCourtesy&gt;)(&lt;http://northwind.com/model/employeeAddress&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#long&gt;)(&lt;http://northwind.com/model/hireDate&gt;)(&lt;http://northwind.com/model/employeeCountry&gt;)(&lt;http://northwind.com/model/employeeCity&gt;)(&lt;http://northwind.com/model/title&gt;)(&lt;http://northwind.com/model/extension&gt;)(&lt;http://northwind.com/model/employeeLinkedIn&gt;)(&lt;http://northwind.com/model/firstName&gt;)(&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;)(&lt;http://northwind.com/model/employeePostalCode&gt;)(&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;)}&#xD;
+		?Employee_s ?Employee_p ?Employee_o .&#xD;
+	}&#xD;
+	#clausesExpandSelect&#xD;
+	#expandItemWhere&#xD;
+	OPTIONAL{&#xD;
+			{&#xD;
+				{SELECT ?Employee_s ?EmployeemanagesEmployee_s {&#xD;
+					{&#xD;
+						?EmployeemanagesEmployee_s &lt;http://northwind.com/model/reportsTo&gt; ?Employee_s .&#xD;
+					}UNION{&#xD;
+						?Employee_s &lt;http://northwind.com/model/managesEmployee&gt; ?EmployeemanagesEmployee_s .&#xD;
+					}&#xD;
+				} LIMIT 0}&#xD;
+			VALUES(?EmployeemanagesEmployee_p){(&lt;http://northwind.com/model/lastName&gt;)(&lt;http://northwind.com/model/employeeCountry&gt;)(&lt;http://northwind.com/model/extension&gt;)(&lt;http://northwind.com/model/hireDate&gt;)(&lt;http://northwind.com/model/notes&gt;)(&lt;http://northwind.com/model/territoryNotation&gt;)(&lt;http://northwind.com/model/homePhone&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat_long&gt;)(&lt;http://northwind.com/model/photo&gt;)(&lt;http://northwind.com/model/employeeCity&gt;)(&lt;http://northwind.com/model/title&gt;)(&lt;http://northwind.com/model/titleOfCourtesy&gt;)(&lt;http://northwind.com/model/employeeAddress&gt;)(&lt;http://northwind.com/model/birthDate&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#long&gt;)(&lt;http://northwind.com/model/firstName&gt;)(&lt;http://northwind.com/model/employeePostalCode&gt;)(&lt;http://northwind.com/model/employeeLinkedIn&gt;)(&lt;http://northwind.com/model/regionDescription&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat&gt;)(&lt;http://northwind.com/model/reportsToNotation&gt;)(&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;)(&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId&gt;)}&#xD;
+			?EmployeemanagesEmployee_s ?EmployeemanagesEmployee_p ?EmployeemanagesEmployee_o .&#xD;
+		}&#xD;
+		#expandItemWhereCount&#xD;
+		UNION{ SELECT ?Employee_s (COUNT(?EmployeemanagesEmployee_s) as ?EmployeemanagesEmployee_count)&#xD;
+		WHERE {&#xD;
+			{&#xD;
+				?EmployeemanagesEmployee_s &lt;http://northwind.com/model/reportsTo&gt; ?Employee_s .&#xD;
+			}UNION{&#xD;
+				?Employee_s &lt;http://northwind.com/model/managesEmployee&gt; ?EmployeemanagesEmployee_s .&#xD;
+			}&#xD;
+		} GROUP BY ?Employee_s&#xD;
+	}&#xD;
+	}&#xD;
+	#expandItemWhere&#xD;
+	OPTIONAL{&#xD;
+			{&#xD;
+				{SELECT ?Employee_s ?EmployeemanagesOrder_s {&#xD;
+					{&#xD;
+						?EmployeemanagesOrder_s &lt;http://northwind.com/model/employee&gt; ?Employee_s .&#xD;
+					}UNION{&#xD;
+						?Employee_s &lt;http://northwind.com/model/managesOrder&gt; ?EmployeemanagesOrder_s .&#xD;
+					}&#xD;
+				} LIMIT 0}&#xD;
+			VALUES(?EmployeemanagesOrder_p){(&lt;http://northwind.com/model/shipCity&gt;)(&lt;http://northwind.com/model/shipViaNotation&gt;)(&lt;http://northwind.com/model/freight&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat_long&gt;)(&lt;http://northwind.com/model/requiredDate&gt;)(&lt;http://northwind.com/model/shipName&gt;)(&lt;http://northwind.com/model/shipPostalCode&gt;)(&lt;http://northwind.com/model/shipCountry&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#long&gt;)(&lt;http://northwind.com/model/shipAddress&gt;)(&lt;http://northwind.com/model/customerNotation&gt;)(&lt;http://northwind.com/model/regionDescription&gt;)(&lt;http://northwind.com/model/orderDate&gt;)(&lt;http://northwind.com/model/shippedDate&gt;)(&lt;http://www.w3.org/2003/01/geo/wgs84_pos#lat&gt;)(&lt;http://northwind.com/model/employeeNotation&gt;)(&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;)(&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId&gt;)}&#xD;
+			?EmployeemanagesOrder_s ?EmployeemanagesOrder_p ?EmployeemanagesOrder_o .&#xD;
+		}&#xD;
+		#expandItemWhereCount&#xD;
+		UNION{ SELECT ?Employee_s (COUNT(?EmployeemanagesOrder_s) as ?EmployeemanagesOrder_count)&#xD;
+		WHERE {&#xD;
+			{&#xD;
+				?EmployeemanagesOrder_s &lt;http://northwind.com/model/employee&gt; ?Employee_s .&#xD;
+			}UNION{&#xD;
+				?Employee_s &lt;http://northwind.com/model/managesOrder&gt; ?EmployeemanagesOrder_s .&#xD;
+			}&#xD;
+		} GROUP BY ?Employee_s&#xD;
+	}&#xD;
+	}&#xD;
+} LIMIT 100000</sp:text>
+            <sp:limit rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+            >100000</sp:limit>
+            <sp:templates rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+                >true</sp:object>
+                <sp:predicate rdf:resource="http://targetEntity"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://northwind.com/model/Employee"/>
+                <sp:predicate rdf:resource="http://assertedType"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>Employee_o</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:parseType="Resource">
+                  <sp:varName>Employee_p</sp:varName>
+                </sp:predicate>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://northwind.com/model/managesEmployee"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://northwind.com/model/Employee"/>
+                <sp:predicate rdf:resource="http://assertedType"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_count</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://count/managesEmployee"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_o</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_p</sp:varName>
+                </sp:predicate>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://northwind.com/model/managesOrder"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://northwind.com/model/Order"/>
+                <sp:predicate rdf:resource="http://assertedType"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_count</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://count/managesOrder"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>Employee_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_o</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_p</sp:varName>
+                </sp:predicate>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:templates>
+            <sp:where rdf:parseType="Collection">
+              <rdf:Description>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <rdf:first rdf:parseType="Collection">
+                  <sp:SubQuery>
+                    <sp:query>
+                      <sp:Select>
+                        <sp:groupBy rdf:parseType="Collection">
+                          <rdf:Description>
+                            <sp:varName>Employee_s</sp:varName>
+                          </rdf:Description>
+                        </sp:groupBy>
+                        <sp:limit rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+                        >20</sp:limit>
+                        <sp:resultVariables rdf:parseType="Collection">
+                          <rdf:Description>
+                            <sp:varName>Employee_s</sp:varName>
+                          </rdf:Description>
+                        </sp:resultVariables>
+                        <sp:distinct rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+                        >true</sp:distinct>
+                        <sp:where rdf:parseType="Collection">
+                          <sp:Values>
+                            <sp:bindings rdf:parseType="Collection">
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/Employee"/>
+                              </rdf:Description>
+                            </sp:bindings>
+                            <sp:varNames rdf:parseType="Resource">
+                              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                              <rdf:first>class</rdf:first>
+                            </sp:varNames>
+                          </sp:Values>
+                          <rdf:Description>
+                            <sp:object rdf:parseType="Resource">
+                              <sp:varName>class</sp:varName>
+                            </sp:object>
+                            <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                            <sp:subject rdf:parseType="Resource">
+                              <sp:varName>Employee_s</sp:varName>
+                            </sp:subject>
+                          </rdf:Description>
+                        </sp:where>
+                      </sp:Select>
+                    </sp:query>
+                  </sp:SubQuery>
+                </rdf:first>
+              </rdf:Description>
+              <rdf:Description>
+                <rdf:rest rdf:parseType="Collection">
+                  <rdf:Description>
+                    <sp:object rdf:parseType="Resource">
+                      <sp:varName>Employee_o</sp:varName>
+                    </sp:object>
+                    <sp:predicate rdf:parseType="Resource">
+                      <sp:varName>Employee_p</sp:varName>
+                    </sp:predicate>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>Employee_s</sp:varName>
+                    </sp:subject>
+                  </rdf:Description>
+                </rdf:rest>
+                <rdf:first>
+                  <sp:Values>
+                    <sp:bindings rdf:parseType="Collection">
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/homePhone"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat_long"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/employeeAddress"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#long"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/hireDate"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/employeeCountry"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/employeeCity"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/title"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/extension"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/employeeLinkedIn"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/firstName"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://northwind.com/model/employeePostalCode"/>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                      </rdf:Description>
+                    </sp:bindings>
+                    <sp:varNames rdf:parseType="Resource">
+                      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                      <rdf:first>Employee_p</rdf:first>
+                    </sp:varNames>
+                  </sp:Values>
+                </rdf:first>
+              </rdf:Description>
+              <sp:Optional>
+                <sp:elements rdf:parseType="Collection">
+                  <sp:Union>
+                    <sp:elements rdf:parseType="Collection">
+                      <rdf:Description>
+                        <rdf:rest rdf:parseType="Collection">
+                          <sp:Values>
+                            <sp:bindings rdf:parseType="Collection">
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/lastName"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeeCountry"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/extension"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/hireDate"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/notes"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/territoryNotation"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/homePhone"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat_long"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/photo"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeeCity"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/title"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeeAddress"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/birthDate"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#long"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/firstName"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeePostalCode"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeeLinkedIn"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/regionDescription"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/reportsToNotation"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId"/>
+                              </rdf:Description>
+                            </sp:bindings>
+                            <sp:varNames rdf:parseType="Resource">
+                              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                              <rdf:first>EmployeemanagesEmployee_p</rdf:first>
+                            </sp:varNames>
+                          </sp:Values>
+                          <rdf:Description>
+                            <sp:object rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesEmployee_o</sp:varName>
+                            </sp:object>
+                            <sp:predicate rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesEmployee_p</sp:varName>
+                            </sp:predicate>
+                            <sp:subject rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                            </sp:subject>
+                          </rdf:Description>
+                        </rdf:rest>
+                        <rdf:first>
+                          <sp:SubQuery>
+                            <sp:query>
+                              <sp:Select>
+                                <sp:limit rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+                                >0</sp:limit>
+                                <sp:resultVariables rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                  </rdf:Description>
+                                </sp:resultVariables>
+                                <sp:where rdf:parseType="Collection">
+                                  <sp:Union>
+                                    <sp:elements rdf:parseType="Collection">
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/reportsTo"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/managesEmployee"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                    </sp:elements>
+                                  </sp:Union>
+                                </sp:where>
+                              </sp:Select>
+                            </sp:query>
+                          </sp:SubQuery>
+                        </rdf:first>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first>
+                          <sp:SubQuery>
+                            <sp:query>
+                              <sp:Select>
+                                <sp:groupBy rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                </sp:groupBy>
+                                <sp:resultVariables rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <sp:expression>
+                                      <sp:Count>
+                                        <sp:expression rdf:parseType="Resource">
+                                          <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                        </sp:expression>
+                                      </sp:Count>
+                                    </sp:expression>
+                                    <sp:varName>EmployeemanagesEmployee_count</sp:varName>
+                                  </rdf:Description>
+                                </sp:resultVariables>
+                                <sp:where rdf:parseType="Collection">
+                                  <sp:Union>
+                                    <sp:elements rdf:parseType="Collection">
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/reportsTo"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesEmployee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/managesEmployee"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                    </sp:elements>
+                                  </sp:Union>
+                                </sp:where>
+                              </sp:Select>
+                            </sp:query>
+                          </sp:SubQuery>
+                        </rdf:first>
+                      </rdf:Description>
+                    </sp:elements>
+                  </sp:Union>
+                </sp:elements>
+              </sp:Optional>
+              <sp:Optional>
+                <sp:elements rdf:parseType="Collection">
+                  <sp:Union>
+                    <sp:elements rdf:parseType="Collection">
+                      <rdf:Description>
+                        <rdf:rest rdf:parseType="Collection">
+                          <sp:Values>
+                            <sp:bindings rdf:parseType="Collection">
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipCity"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipViaNotation"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/freight"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat_long"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/requiredDate"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipName"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipPostalCode"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipCountry"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#long"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shipAddress"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/customerNotation"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/regionDescription"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/orderDate"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/shippedDate"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#lat"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://northwind.com/model/employeeNotation"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+                              </rdf:Description>
+                              <rdf:Description>
+                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                <rdf:first rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId"/>
+                              </rdf:Description>
+                            </sp:bindings>
+                            <sp:varNames rdf:parseType="Resource">
+                              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                              <rdf:first>EmployeemanagesOrder_p</rdf:first>
+                            </sp:varNames>
+                          </sp:Values>
+                          <rdf:Description>
+                            <sp:object rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesOrder_o</sp:varName>
+                            </sp:object>
+                            <sp:predicate rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesOrder_p</sp:varName>
+                            </sp:predicate>
+                            <sp:subject rdf:parseType="Resource">
+                              <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                            </sp:subject>
+                          </rdf:Description>
+                        </rdf:rest>
+                        <rdf:first>
+                          <sp:SubQuery>
+                            <sp:query>
+                              <sp:Select>
+                                <sp:limit rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+                                >0</sp:limit>
+                                <sp:resultVariables rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                  </rdf:Description>
+                                </sp:resultVariables>
+                                <sp:where rdf:parseType="Collection">
+                                  <sp:Union>
+                                    <sp:elements rdf:parseType="Collection">
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/employee"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/managesOrder"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                    </sp:elements>
+                                  </sp:Union>
+                                </sp:where>
+                              </sp:Select>
+                            </sp:query>
+                          </sp:SubQuery>
+                        </rdf:first>
+                      </rdf:Description>
+                      <rdf:Description>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                        <rdf:first>
+                          <sp:SubQuery>
+                            <sp:query>
+                              <sp:Select>
+                                <sp:groupBy rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                </sp:groupBy>
+                                <sp:resultVariables rdf:parseType="Collection">
+                                  <rdf:Description>
+                                    <sp:varName>Employee_s</sp:varName>
+                                  </rdf:Description>
+                                  <rdf:Description>
+                                    <sp:expression>
+                                      <sp:Count>
+                                        <sp:expression rdf:parseType="Resource">
+                                          <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                        </sp:expression>
+                                      </sp:Count>
+                                    </sp:expression>
+                                    <sp:varName>EmployeemanagesOrder_count</sp:varName>
+                                  </rdf:Description>
+                                </sp:resultVariables>
+                                <sp:where rdf:parseType="Collection">
+                                  <sp:Union>
+                                    <sp:elements rdf:parseType="Collection">
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/employee"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                      <rdf:Description>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                        <rdf:first rdf:parseType="Resource">
+                                          <sp:object rdf:parseType="Resource">
+                                            <sp:varName>EmployeemanagesOrder_s</sp:varName>
+                                          </sp:object>
+                                          <sp:predicate rdf:resource="http://northwind.com/model/managesOrder"/>
+                                          <sp:subject rdf:parseType="Resource">
+                                            <sp:varName>Employee_s</sp:varName>
+                                          </sp:subject>
+                                        </rdf:first>
+                                      </rdf:Description>
+                                    </sp:elements>
+                                  </sp:Union>
+                                </sp:where>
+                              </sp:Select>
+                            </sp:query>
+                          </sp:SubQuery>
+                        </rdf:first>
+                      </rdf:Description>
+                    </sp:elements>
+                  </sp:Union>
+                </sp:elements>
+              </sp:Optional>
+            </sp:where>
+          </sp:Construct>
+        </sp:query>
+        <rdfs:comment>Employee?$expand=managesEmployee($count=true),managesOrder($count=true)&amp;$orderby=label&amp;$select=employeeAddress,employeeCity,employeeCountry,employeeLinkedIn,employeePostalCode,extension,firstName,hireDate,homePhone,label,lat,lat_long,long,subjectId,title,titleOfCourtesy&amp;$skip=0&amp;$top=20</rdfs:comment>
+      </qb:DataSet>
+    </qb:dataSet>
+    <rdf:object>Mr.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>Mr.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(71) 555-4444</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>(71) 555-4444</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>RG1 9SP</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>RG1 9SP</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Mrs.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>Mrs.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>98033</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>98033</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>4726 - 11th Ave. N.E.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>4726 - 11th Ave. N.E.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>USA</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>USA</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>3453</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>3453</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>98401</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>98401</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >156</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >156</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2344</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>2344</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Steven</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>Steven</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>5176</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>5176</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Dr.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>Dr.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>UK</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>UK</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Coventry House\nMiner Rd.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>Coventry House\nMiner Rd.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-4</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>Employee-4</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-3</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>Employee-3</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >5</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >5</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>London</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>London</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >42</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >42</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2013-05-03</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>2013-05-03</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2012-04-01</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>2012-04-01</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >72</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >72</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>908 W. Capital Way</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>908 W. Capital Way</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-1</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>Employee-1</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Michael</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>Michael</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>98122</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>98122</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2013-10-17</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>2013-10-17</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Vice President, Sales</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>Vice President, Sales</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Robert</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>Robert</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>UK</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>UK</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Ms.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>Ms.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Ms.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>Ms.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >67</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >67</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>USA</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>USA</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>98105</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>98105</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>465</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>465</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Redmond</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>Redmond</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2014-11-15</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>2014-11-15</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Inside Sales Coordinator</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>Inside Sales Coordinator</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Ms.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>Ms.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >123</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >123</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2013-10-17</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>2013-10-17</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>98052</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>98052</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Kirkland</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>Kirkland</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>EC2 7JR</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>EC2 7JR</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(206) 555-8122</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>(206) 555-8122</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Seattle</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>Seattle</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2014-03-05</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>2014-03-05</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >104</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >104</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Nancy</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>Nancy</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>London</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>London</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-8</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>Employee-8</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>USA</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>USA</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>USA</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>USA</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2012-08-14</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>2012-08-14</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Laura</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>Laura</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(206) 555-9857</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>(206) 555-9857</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(206) 555-3412</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>(206) 555-3412</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(206) 555-1189</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value>(206) 555-1189</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>London</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>London</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Anne</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>Anne</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Tacoma</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>Tacoma</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>7 Houndstooth Rd.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>7 Houndstooth Rd.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-2</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>Employee-2</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-8"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(206) 555-9482</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>(206) 555-9482</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>722 Moss Bay Blvd.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>722 Moss Bay Blvd.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Janet</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>Janet</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-7</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>Employee-7</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2014-01-02</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>2014-01-02</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>452</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>452</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(71) 555-4848</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>(71) 555-4848</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Andrew</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>Andrew</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>WG2 7LT</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>WG2 7LT</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>USA</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>USA</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>UK</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>UK</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-5</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>Employee-5</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>3457</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value>3457</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Margaret</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/firstName"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>Margaret</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>SW1 8JR</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeePostalCode"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>SW1 8JR</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-9</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>Employee-9</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >96</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-2"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >96</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >43</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >43</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >3</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >3</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>UK</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCountry"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>UK</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>428</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>428</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://inova8.northwind/datacube/"/>
+    <rdf:value rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(71) 555-7773</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>(71) 555-7773</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>4110 Old Redmond Rd.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value>4110 Old Redmond Rd.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://inova8.com/odata4sparql/datacube/"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/2002/07/owl#imports"/>
+    <rdf:subject rdf:resource="http://inova8.northwind/datacube/"/>
+    <rdf:value rdf:resource="http://inova8.com/odata4sparql/datacube/"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Mr.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>Mr.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesEmployee"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>London</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-9"/>
+    <rdf:value>London</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Employee-6</rdf:object>
+    <rdf:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value>Employee-6</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Seattle</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeCity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>Seattle</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Mr.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>Mr.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-4"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>5467</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>5467</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>507 - 20th Ave. E.\nApt. 2A</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>507 - 20th Ave. E.\nApt. 2A</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>3355</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/extension"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>3355</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:resource="http://northwind.com/model/Employee"/>
+    <rdf:predicate rdf:resource="http://assertedType"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value rdf:resource="http://northwind.com/model/Employee"/>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>2012-05-01</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/hireDate"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>2012-05-01</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-6"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Manager</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>Sales Manager</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >127</rdf:object>
+    <rdf:predicate rdf:resource="http://count/managesOrder"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >127</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>14 Garrett Hill</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value>14 Garrett Hill</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Edgeham Hollow\nWinchester Way</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/employeeAddress"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>Edgeham Hollow\nWinchester Way</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Sales Representative</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/title"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-1"/>
+    <rdf:value>Sales Representative</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>Ms.</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/titleOfCourtesy"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-3"/>
+    <rdf:value>Ms.</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object>(71) 555-5598</rdf:object>
+    <rdf:predicate rdf:resource="http://northwind.com/model/homePhone"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-7"/>
+    <rdf:value>(71) 555-5598</rdf:value>
+  </qb:Observation>
+  <qb:Observation>
+    <qb:dataSet rdf:resource="http://northwind.com/DataSet_1"/>
+    <rdf:object rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:object>
+    <rdf:predicate rdf:resource="http://targetEntity"/>
+    <rdf:subject rdf:resource="http://northwind.com/Employee-5"/>
+    <rdf:value rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</rdf:value>
+  </qb:Observation>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

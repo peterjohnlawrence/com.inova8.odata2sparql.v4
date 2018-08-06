@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:model="http://northwind.com/model/"
+    xmlns:website="http://inova8.northwind/website#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:northwind.com="http://northwind.com/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://inova8.northwind/website/">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://northwind.com/data/"/>
+    <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
+  </owl:Ontology>
+  <rdf:Description rdf:about="http://northwind.com/Customer-ALFKI">
+    <model:customerWebsite rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI"
+    >http://www.inova8.com</model:customerWebsite>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://northwind.com/Employee-2">
+    <model:employeeLinkedIn rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI"
+    >https://www.linkedin.com/in/peterjohnlawrence/</model:employeeLinkedIn>
+  </rdf:Description>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

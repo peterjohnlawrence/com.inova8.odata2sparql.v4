@@ -47,7 +47,7 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
 //	private final Map<String, Integer> counts = new HashMap<String, Integer>();
 	private RdfEdmProvider sparqlEdmProvider;
-	private final RdfEntityType entityType;
+	
 
 	// Clarification of expanded structure
 	// Entityset dataproperty: List<Map<Subject, Map<Property,Value>>>
@@ -58,7 +58,6 @@ class SparqlEntityCollection extends EntityCollection {
 			ExpandOption expand, SelectOption select) {
 		super();
 		this.sparqlEdmProvider = sparqlEdmProvider;
-		this.entityType = entityType;
 		this.toSparqlEntityCollection(entityType, results, expand, select);
 	}
 

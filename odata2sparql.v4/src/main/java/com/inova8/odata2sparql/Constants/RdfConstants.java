@@ -187,7 +187,7 @@ public class RdfConstants {
 
 	public static final String QNAME_SEPARATOR = "~";// ":";
 	public static final String QNAME_SEPARATOR_ENCODED = "~";// "%3A";
-
+	public static final String QNAME_SEPARATOR_RDF = ":";
 	public static final Object RDF_LANG_STRING = RDF + "." + LANGSTRING;
 
 	public static final Value URI_ASSOCIATIONQUERY = valueFactoryImpl

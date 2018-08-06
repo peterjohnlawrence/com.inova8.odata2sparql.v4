@@ -27,10 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
-import com.inova8.odata2sparql.Constants.TextSearchType;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
+import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
@@ -607,14 +607,20 @@ public class SparqlQueryBuilder {
 		return filter;
 	}
 
-	private String getQueryOptionText(List<CustomQueryOption> queryOptions, String parameter) {
+	private String getQueryOptionText(List<CustomQueryOption> queryOptions, FunctionImportParameter functionImportParameter) {
 
 		for (CustomQueryOption queryOption : queryOptions) {
-			if (queryOption.getName().equals(parameter))
-				return queryOption.getText();
+			if (queryOption.getName().equals(functionImportParameter.getName()))
+				switch (functionImportParameter.getType()) {
+				//Fixes #86
+				case "http://www.w3.org/2000/01/rdf-schema#Resource":
+					String resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
+					return resource;
+				default:
+					return queryOption.getText();
+				}
 		}
 		return null;
-
 	}
 
 	private String preprocessOperationQuery(RdfEntityType rdfOperationType) throws EdmException, OData2SparqlException {
@@ -627,7 +633,7 @@ public class SparqlQueryBuilder {
 				.getFunctionImportParameters().entrySet()) {
 			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 					.getValue();
-			String parameterValue = getQueryOptionText(queryOptions, functionImportParameter.getName());
+			String parameterValue = getQueryOptionText(queryOptions, functionImportParameter);
 
 			if (parameterValue != null) {
 				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
@@ -925,8 +931,11 @@ public class SparqlQueryBuilder {
 				RdfAssociation navProperty = rdfEntityType
 						.findNavigationPropertyByEDMAssociationName(uriInfo.getUriResourceParts().get(1).getSegmentValue());
 				if (navProperty != null) {
+					//key = "?" + rdfTargetEntityType
+					//		.findNavigationPropertyByEDMAssociationName(navProperty.getInversePropertyOf().getLocalName()).getVarName();
+					//Fixes #85
 					key = "?" + rdfTargetEntityType
-							.findNavigationPropertyByEDMAssociationName(navProperty.getInversePropertyOf().getLocalName()).getVarName();
+							.findNavigationPropertyByEDMAssociationName(navProperty.getInverseAssociation().getAssociationName()).getVarName();
 				} else {
 					log.error("Failed to locate operation navigation property:"
 							+ uriInfo.getUriResourceParts().get(1).getSegmentValue());
@@ -1187,7 +1196,7 @@ public class SparqlQueryBuilder {
 						com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 								.getValue();
 						String parameterValue = getQueryOptionText(uriInfo.getCustomQueryOptions(),
-								functionImportParameter.getName());
+								functionImportParameter);
 						// null value so not set
 						if (parameterValue == null)
 							return false;
@@ -1506,7 +1515,7 @@ public class SparqlQueryBuilder {
 					}
 
 				} else if (property.getResourcePath() != null) {
-					if (!property.getResourcePath().equals(RdfConstants.SUBJECT)) {
+					if (!property.getResourcePath().toString().equals(RdfConstants.SUBJECT)) {
 						RdfProperty rdfProperty = null;
 						try {
 							String segmentName = property.getResourcePath().getUriResourceParts().get(0)
