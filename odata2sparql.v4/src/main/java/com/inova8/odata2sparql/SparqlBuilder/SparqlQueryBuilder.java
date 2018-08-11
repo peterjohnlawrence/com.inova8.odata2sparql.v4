@@ -442,7 +442,6 @@ public class SparqlQueryBuilder {
 
 		StringBuilder prepareConstruct = new StringBuilder("");
 
-		prepareConstruct.append("PREFIX lucenesail: <http://www.openrdf.org/contrib/lucenesail#>\n");
 		prepareConstruct.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareConstruct.append(construct());
 		prepareConstruct.append("WHERE {\n");
@@ -708,9 +707,9 @@ public class SparqlQueryBuilder {
 		default:
 			selectExpandWhere.append("#Unhandled URIType: " + this.uriType + "\n");
 		}
+		selectExpandWhere.append(search(indent + "\t"));
 		selectExpandWhere.append(clausesFilter(indent + "\t"));
 		selectExpandWhere.append(clausesExpandFilter(indent + "\t"));
-		selectExpandWhere.append(search(indent + "\t"));
 		switch (uriType) {
 		case URI1:
 			selectExpandWhere.append(selectPath());
@@ -1041,7 +1040,7 @@ public class SparqlQueryBuilder {
 				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
 				case RDF4J_LUCENE:
 					search.append(indent)
-							.append("?" + rdfEntityType.entityTypeName + "_s lucenesail:matches [ lucenesail:query '"
+							.append("?" + rdfEntityType.entityTypeName + "_s <" + RdfConstants.URI_LUCENE_MATCHES + "> [ <" + RdfConstants.URI_LUCENE_QUERY +  "> '" 
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
 					break;
 				case HALYARD_ES:
@@ -1061,10 +1060,10 @@ public class SparqlQueryBuilder {
 				break;
 			case URI6B:
 				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
-				case RDF4J_LUCENE:
+				case RDF4J_LUCENE: 
 					search.append(indent)
 							.append("?" + rdfTargetEntityType.entityTypeName
-									+ "_s lucenesail:matches [ lucenesail:query '"
+									+ "_s <" + RdfConstants.URI_LUCENE_MATCHES + "> [ <" + RdfConstants.URI_LUCENE_QUERY +  "> '"
 									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
 					break;
 				case HALYARD_ES:
@@ -1104,10 +1103,10 @@ public class SparqlQueryBuilder {
 			indent = "\t\t\t";
 		}
 		selectPath.append(filter(indent + "\t"));
+		selectPath.append(search(indent + "\t"));
 		selectPath.append(clausesPath(indent + "\t"));
 		selectPath.append(clausesFilter(indent + "\t"));
 		selectPath.append(clausesExpandFilter(indent + "\t"));
-		selectPath.append(search(indent + "\t"));
 		if (limitSet()) {
 			selectPath.append(indent).append("}") // GROUP BY   ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 					.append(limitClause()).append("\n");
@@ -1126,10 +1125,10 @@ public class SparqlQueryBuilder {
 				+ edmTargetEntitySet.getEntityType().getName() + "_count)\n");
 		selectPath.append("\t\t").append("WHERE {\n");
 		selectPath.append(filter("\t\t\t"));
+		selectPath.append(search("\t\t\t"));
 		selectPath.append(clausesPath("\t\t\t"));
 		selectPath.append(clausesFilter("\t\t\t"));
 		selectPath.append(clausesExpandFilter("\t\t\t"));
-		selectPath.append(search("\t\t\t"));
 		selectPath.append("\t\t").append("}").append("\n");
 		selectPath.append("\t").append("}\n");
 		return selectPath;
