@@ -1109,7 +1109,7 @@ public class SparqlQueryBuilder {
 		selectPath.append(clausesExpandFilter(indent + "\t"));
 		selectPath.append(search(indent + "\t"));
 		if (limitSet()) {
-			selectPath.append(indent).append("} GROUP BY ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
+			selectPath.append(indent).append("}") // GROUP BY   ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 					.append(limitClause()).append("\n");
 		}
 		selectPath.append("\t\t\t").append("}\n");
