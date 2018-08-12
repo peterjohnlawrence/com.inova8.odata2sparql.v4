@@ -677,7 +677,7 @@ public class SparqlQueryBuilder {
 			selectExpand.append("?" + edmTargetEntitySet.getEntityType().getName() + "_s\n");
 		} else {
 			//selectExpand.append("\t").append("{\n");
-			//Fixes #89 ... we hope by forcing a projection, and thus execution first
+			//Fixes #89 ... by forcing a projection, and thus execution first
 			selectExpand.append("\t").append("{\tSELECT *\n");
 		}
 		//Fixes #79
