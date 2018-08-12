@@ -350,7 +350,11 @@ public class RdfModel {
 		}
 
 		public String getEntityTypeLabel() {
-			return entityTypeLabel;
+			if (entityTypeLabel == null) {
+				return this.entityTypeName;
+			} else {
+				return this.entityTypeLabel;
+			}
 		}
 
 		public void setEntityTypeLabel(String entityTypeLabel) {
@@ -884,13 +888,13 @@ public class RdfModel {
 			clazz = new RdfEntityType();
 			clazz.schema = classURI.graph;
 			clazz.entityTypeName = rdfToOdata(classURI.localName);
-			if (entityTypeLabelNode == null) {
-				clazz.entityTypeLabel = RdfConstants.CLASS_LABEL_PREFIX + clazz.entityTypeName;
-			} else {
-				clazz.entityTypeLabel = entityTypeLabelNode.getLiteralObject().toString();
-			}
+
 			clazz.entityTypeNode = entityTypeNode;
 			classURI.graph.classes.add(clazz);
+		}
+		//Fixes #90
+		if (entityTypeLabelNode != null) {
+			clazz.entityTypeLabel = entityTypeLabelNode.getLiteralObject().toString();
 		}
 		return clazz;
 	}
