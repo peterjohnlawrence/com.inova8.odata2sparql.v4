@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:model="http://northwind.com/model/"
+    xmlns:subclasses="http://inova8.northwind/subclasses/"
+    xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://inova8.northwind/subclasses/">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://northwind.com/"/>
+    <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
+  </owl:Ontology>
+  <owl:Class rdf:about="http://northwind.com/model/ParttimeEmployee">
+    <rdfs:label>Parttime employee</rdfs:label>
+    <skos:prefLabel>Parttime employee</skos:prefLabel>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/ContractEmployee">
+    <rdfs:label>Contract employee</rdfs:label>
+    <skos:prefLabel>Contract employee</skos:prefLabel>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="http://northwind.com/model/contractCustomer">
+    <rdfs:range rdf:resource="http://northwind.com/model/Customer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/ContractEmployee"/>
+    <rdfs:label>contract customer</rdfs:label>
+    <skos:prefLabel>contract customer</skos:prefLabel>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/parttimeHours">
+    <rdfs:domain rdf:resource="http://northwind.com/model/ParttimeEmployee"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:label>parttime hours</rdfs:label>
+    <skos:prefLabel>parttime hours</skos:prefLabel>
+  </owl:DatatypeProperty>
+  <model:ContractEmployee rdf:about="http://northwind.com/ContractEmployee-1">
+    <model:territory rdf:resource="http://northwind.com/Territory-02116"/>
+    <model:employeeAddress>908 W. Capital Way</model:employeeAddress>
+    <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >38.9720570</geo:lat>
+    <model:territory rdf:resource="http://northwind.com/Territory-40222"/>
+    <model:notes>Andrew received his BTS commercial in 1974 and a Ph.D. in international marketing from the University of Dallas in 1981.  He is fluent in French and Italian and reads German.  He joined the company as a sales representative, was promoted to sales manager in January 1992 and to vice president of sales in March 1993.  Andrew is a member of the Sales Management Roundtable, the Seattle Chamber of Commerce, and the Pacific Rim Importers Association.</model:notes>
+    <model:employeeCountry>USA</model:employeeCountry>
+    <model:extension>3457</model:extension>
+    <model:homePhone>(206) 555-9482</model:homePhone>
+    <model:hireDate>2012-08-14</model:hireDate>
+    <model:employeeCity>Tacoma</model:employeeCity>
+    <model:territory rdf:resource="http://northwind.com/Territory-01833"/>
+    <model:birthDate>1972-02-19</model:birthDate>
+    <model:lastName>Fuller</model:lastName>
+    <model:contractCustomer rdf:resource="http://northwind.com/Customer-ALFKI"/>
+    <rdfs:label>ContractEmployee-1</rdfs:label>
+    <model:employeePostalCode>98401</model:employeePostalCode>
+    <model:photo>http://accweb/emmployees/fuller.bmp</model:photo>
+    <model:territory rdf:resource="http://northwind.com/Territory-01581"/>
+    <model:territory rdf:resource="http://northwind.com/Territory-02139"/>
+    <geo:lat_long>38.9720570,-77.0268860</geo:lat_long>
+    <model:employeeLinkedIn rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI"
+    >https://www.linkedin.com/in/peterjohnlawrence/</model:employeeLinkedIn>
+    <model:territory rdf:resource="http://northwind.com/Territory-01730"/>
+    <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >-77.0268860</geo:long>
+    <model:title>Vice President, Sales</model:title>
+    <model:employeeRegion rdf:resource="http://northwind.com/Region-4306a04670067b5b27e766335d3d40fa"/>
+    <model:firstName>Andrew</model:firstName>
+    <model:titleOfCourtesy>Dr.</model:titleOfCourtesy>
+    <model:territory rdf:resource="http://northwind.com/Territory-02184"/>
+  </model:ContractEmployee>
+  <model:ParttimeEmployee rdf:about="http://northwind.com/ParttimeEmployee-1">
+    <model:parttimeHours rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+    >32</model:parttimeHours>
+    <rdfs:label>Parttime employee-1</rdfs:label>
+    <skos:prefLabel>Parttime employee-1</skos:prefLabel>
+  </model:ParttimeEmployee>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->
