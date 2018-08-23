@@ -74,6 +74,9 @@ public class RdfConstants {
 	private static final String SAP_LABEL = "label";
 	private static final String SAP_HEADING = "heading";
 	private static final String SAP_QUICKINFO = "quickinfo";
+	
+	private static final String  ODATA_NS ="odata";
+	private static final String  ODATA_BASETYPE ="baseType";
 
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -229,6 +232,7 @@ public class RdfConstants {
 	public final static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
+	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
@@ -237,19 +241,25 @@ public class RdfConstants {
 			+ RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
 	public final static String ONTOLOGY_FQN = RdfConstants.OWL + "." + RdfConstants.ONTOLOGY;
 
-	private final static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL);
-	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING);
-	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO);
-	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL);
-	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY);
-	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE);
-	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF);
-
-	private final static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY);
+	private final static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL).setType("Edm.String");
+	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING).setType("Edm.String");
+	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO).setType("Edm.String");
+	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
+	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL).setType("Edm.String");
+	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY).setType("Edm.String");
+	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
+	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF).setType("Edm.String");
+	private final static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY).setType("Edm.String");
 
 	public final static List<String> RDF_DATATYPES = new ArrayList<String>();
 
 	public static final HashMap<String, CsdlTerm> TERMS = new HashMap<String, CsdlTerm>();
+	
+	public static final ArrayList< CsdlTerm> SAPTERMS = new ArrayList<CsdlTerm>();
+	public static final ArrayList< CsdlTerm> ODATATERMS = new ArrayList<CsdlTerm>();
+	public static final ArrayList< CsdlTerm> RDFTERMS = new ArrayList<CsdlTerm>();
+	public static final ArrayList< CsdlTerm> RDFSTERMS = new ArrayList<CsdlTerm>();
+	public static final ArrayList< CsdlTerm> OWLTERMS = new ArrayList<CsdlTerm>();
 
 	public static Hashtable<Value, String> getMetaQueries() {
 		return metaQueries;
@@ -346,11 +356,24 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.SAP_LABEL, sapLabelTerm);
 		TERMS.put(RdfConstants.SAP_HEADING, sapheadingTerm);
 		TERMS.put(RdfConstants.SAP_QUICKINFO, sapquickinfoTerm);
+		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.RDFS_CLASS_LABEL, rdfsClassTerm);
 		TERMS.put(RdfConstants.PROPERTY, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
 		TERMS.put(RdfConstants.INVERSEOF, owlInverseOfTerm);
 		TERMS.put(RdfConstants.ONTOLOGY, owlOntologyTerm);
+		
+		SAPTERMS.add(sapLabelTerm);
+		SAPTERMS.add(sapheadingTerm);
+		SAPTERMS.add(sapquickinfoTerm);
+		ODATATERMS.add(odatabaseType);
+		RDFTERMS.add(rdfPropertyTerm);
+		RDFSTERMS.add(rdfsClassTerm);
+		RDFSTERMS.add(rdfsDatatypeTerm);
+		OWLTERMS.add(owlInverseOfTerm);
+		OWLTERMS.add(owlOntologyTerm);
+		
+		
 
 	}
 }

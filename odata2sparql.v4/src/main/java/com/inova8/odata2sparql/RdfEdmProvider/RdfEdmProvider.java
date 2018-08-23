@@ -172,7 +172,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 			try {
 				for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
 					CsdlEntityContainer schemaEntityContainer = schema.getEntityContainer();
-					if (entityContainer.equals(schemaEntityContainer.getName())) {
+					if (entityContainer.toString().equals(schemaEntityContainer.getName())) {
 						return new CsdlEntityContainerInfo().setContainerName(entityContainer);
 					}
 				}

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 
@@ -27,6 +25,7 @@ import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlReturnType;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
+import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
 
 import com.inova8.odata2sparql.RdfModel.RdfModel;
@@ -61,7 +60,11 @@ public class RdfModelToMetadata {
 	public CsdlSchema getSchema(String nameSpace) {
 		return rdfEdm.get(nameSpace);
 	}
-
+	
+	public CsdlTerm getTerm(FullQualifiedName termName) {
+		return null;
+	}
+	
 	private final Map<FullQualifiedName, RdfEntityType> entitySetMapping = new HashMap<FullQualifiedName, RdfEntityType>();
 	private final Map<FullQualifiedName, RdfProperty> propertyMapping = new HashMap<FullQualifiedName, RdfProperty>();
 	private final Map<FullQualifiedName, RdfAssociation> navigationPropertyMapping = new HashMap<FullQualifiedName, RdfAssociation>();
@@ -76,7 +79,6 @@ public class RdfModelToMetadata {
 		Map<String, CsdlEntityType> globalEntityTypes = new HashMap<String, CsdlEntityType>();
 
 		Map<String, RdfAssociation> navigationPropertyLookup = new HashMap<String, RdfAssociation>();
-		//Map<String, RdfAssociation> associationLookup = new HashMap<String, RdfAssociation>();
 		Map<String, CsdlEntitySet> entitySetsMapping = new HashMap<String, CsdlEntitySet>();
 
 		ArrayList<PrefixedNamespace> nameSpaces = new ArrayList<PrefixedNamespace>();
@@ -90,9 +92,9 @@ public class RdfModelToMetadata {
 
 		CsdlSchema instanceSchema = new CsdlSchema().setNamespace(RdfConstants.ENTITYCONTAINERNAMESPACE)
 				.setEntityContainer(entityContainer);
+
 		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
 		HashMap<String, CsdlEntitySet> entitySets = new HashMap<String, CsdlEntitySet>();
-		//		HashMap<String, AssociationSet> associationSets = new HashMap<String, AssociationSet>();
 
 		//Custom types langString
 
@@ -128,9 +130,13 @@ public class RdfModelToMetadata {
 				List<CsdlAnnotation> entityTypeAnnotations = new ArrayList<CsdlAnnotation>();
 				if (withRdfAnnotations)
 					entityTypeAnnotations.add(buildCsdlAnnotation(RdfConstants.RDFS_CLASS_FQN, rdfClass.getIRI()));
-				if (withSapAnnotations)
+				if (withSapAnnotations) {
 					entityTypeAnnotations
 							.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel()));
+					if (rdfClass.getBaseType() != null)
+						entityTypeAnnotations
+								.add(buildCsdlAnnotation(RdfConstants.ODATA_BASETYPE_FQN, rdfClass.getBaseType().getEntityTypeName()));
+				}
 				entityType.setAnnotations(entityTypeAnnotations);
 			}
 		}
@@ -138,7 +144,6 @@ public class RdfModelToMetadata {
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Second pass to add properties, navigation properties, and entitysets, and create the schema
 			Map<String, CsdlEntityType> entityTypes = new HashMap<String, CsdlEntityType>();
-			//			HashMap<String, Association> associations = new HashMap<String, Association>();
 			Map<String, CsdlEntityType> entityTypeMapping = new HashMap<String, CsdlEntityType>();
 
 			String modelNamespace = rdfModel.getModelNamespace(rdfGraph);
@@ -408,27 +413,67 @@ public class RdfModelToMetadata {
 			}
 		}
 		entityContainer.setFunctionImports(functionImports);
-		entityContainer.setEntitySets(new ArrayList<CsdlEntitySet>(entitySets.values()));//.setAssociationSets(new ArrayList<AssociationSet>(associationSets.values()));
-		//addCoreFunctionImports(entityContainer, globalEntityTypes, entitySetsMapping);
+		entityContainer.setEntitySets(new ArrayList<CsdlEntitySet>(entitySets.values()));
+		
+		//Finally, add terms and schemas to which they belong if they do not exist that have been used	
+		addTermsToSchemas();
+	}
+
+	private void addTermsToSchemas() {
+		CsdlSchema sapSchema = rdfEdm.get("sap");
+		if(sapSchema==null) {
+			rdfEdm.put("sap", new CsdlSchema().setNamespace("sap"));
+		}
+		rdfEdm.get("sap").setTerms(RdfConstants.SAPTERMS);
+		
+		CsdlSchema odataSchema = rdfEdm.get("odata");
+		if(odataSchema==null) {
+			rdfEdm.put("odata", new CsdlSchema().setNamespace("odata"));
+		}
+		rdfEdm.get("odata").setTerms(RdfConstants.ODATATERMS);
+				
+		CsdlSchema rdfSchema = rdfEdm.get("rdf");
+		if(rdfSchema==null) {
+			rdfEdm.put("rdf", new CsdlSchema().setNamespace("rdf"));
+		}
+		rdfEdm.get("rdf").setTerms(RdfConstants.RDFTERMS);
+		
+		CsdlSchema rdfsSchema = rdfEdm.get("rdfs");
+		if(rdfsSchema==null) {
+			rdfEdm.put("rdfs", new CsdlSchema().setNamespace("rdfs"));
+		}
+		rdfEdm.get("rdfs").setTerms(RdfConstants.RDFSTERMS);
+	
+		CsdlSchema owlSchema = rdfEdm.get("owl");
+		if(owlSchema==null) {
+			rdfEdm.put("owl", new CsdlSchema().setNamespace("owl"));
+		}
+		rdfEdm.get("owl").setTerms(RdfConstants.OWLTERMS);
 	}
 
 	private void inheritBasetypeNavigationProperties(Map<String, CsdlEntityType> globalEntityTypes,
 			HashMap<String, CsdlEntitySet> entitySets, RdfEntityType rdfClass) {
 		RdfEntityType baseType = rdfClass.getBaseType();
 		if (baseType != null) {
-			 List<CsdlNavigationPropertyBinding> inheritedNavigationPropertyBindings = entitySets.get(baseType.getEDMEntitySetName()).getNavigationPropertyBindings();
-			 for(CsdlNavigationPropertyBinding inheritedNavigationPropertyBinding: inheritedNavigationPropertyBindings) {	
-				 List<CsdlNavigationPropertyBinding> navigationPropertyBindings = entitySets.get(rdfClass.getEDMEntitySetName()).getNavigationPropertyBindings();
-				 if( ! navigationPropertyBindings.contains(inheritedNavigationPropertyBinding))   navigationPropertyBindings.add(inheritedNavigationPropertyBinding);
-			 }
-			 for(CsdlNavigationProperty inheritedNavigationProperty: globalEntityTypes.get(baseType.getIRI()).getNavigationProperties()) {	
-				 List<CsdlNavigationProperty> navigationProperties = globalEntityTypes.get(rdfClass.getIRI()).getNavigationProperties();
-				 if(!navigationProperties.contains(inheritedNavigationProperty)) navigationProperties.add(inheritedNavigationProperty);
-				 //TODO do these need to be added?
-					//navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
-					//navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(), rdfAssociation);
-			 }	
-			 inheritBasetypeNavigationProperties(globalEntityTypes, entitySets,baseType );
+			List<CsdlNavigationPropertyBinding> inheritedNavigationPropertyBindings = entitySets
+					.get(baseType.getEDMEntitySetName()).getNavigationPropertyBindings();
+			for (CsdlNavigationPropertyBinding inheritedNavigationPropertyBinding : inheritedNavigationPropertyBindings) {
+				List<CsdlNavigationPropertyBinding> navigationPropertyBindings = entitySets
+						.get(rdfClass.getEDMEntitySetName()).getNavigationPropertyBindings();
+				if (!navigationPropertyBindings.contains(inheritedNavigationPropertyBinding))
+					navigationPropertyBindings.add(inheritedNavigationPropertyBinding);
+			}
+			for (CsdlNavigationProperty inheritedNavigationProperty : globalEntityTypes.get(baseType.getIRI())
+					.getNavigationProperties()) {
+				List<CsdlNavigationProperty> navigationProperties = globalEntityTypes.get(rdfClass.getIRI())
+						.getNavigationProperties();
+				if (!navigationProperties.contains(inheritedNavigationProperty))
+					navigationProperties.add(inheritedNavigationProperty);
+				//TODO do these need to be added?
+				//navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
+				//navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(), rdfAssociation);
+			}
+			inheritBasetypeNavigationProperties(globalEntityTypes, entitySets, baseType);
 		}
 	}
 
