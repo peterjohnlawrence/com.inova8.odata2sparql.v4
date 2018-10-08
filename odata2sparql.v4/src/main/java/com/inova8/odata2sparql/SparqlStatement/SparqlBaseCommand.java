@@ -18,6 +18,7 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
@@ -57,9 +58,17 @@ public class SparqlBaseCommand {
 			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 			break;
 		case URI6B:
-			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
-			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
-			rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+			if(resourcePaths.size()==3) {
+				//This is when we have a complexType at part-2
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(2);
+				FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+				rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);			
+			}else {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+				FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
+				rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+			}
+
 			break;
 		default:
 			throw new ODataApplicationException("Unhandled URIType " + uriType,
@@ -87,6 +96,8 @@ public class SparqlBaseCommand {
 		SparqlStatement sparqlStatement = null;
 		UriResourceEntitySet uriResourceEntitySet = null;
 		switch (uriType) {
+		case URI3:
+		case URI4:
 		case URI5:
 			UriResource lastResourcePart = resourcePaths.get(resourcePaths.size() - 1);
 			int minSize = 2;
@@ -94,10 +105,19 @@ public class SparqlBaseCommand {
 				minSize++;
 			}
 			if (resourcePaths.size() > minSize) {
-				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
-				FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType()
-						.getFullQualifiedName();
-				rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+				UriResource penultimateSegment = resourcePaths.get(1);
+				 if( penultimateSegment.getKind().equals(UriResourceKind.complexProperty)) {
+					 //Complextype
+						uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+						edmEntitySet = uriResourceEntitySet.getEntitySet();
+						rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+				
+				 }else {
+						UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+						FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType()
+								.getFullQualifiedName();
+						rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
+				 }
 			} else {
 				uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
 				edmEntitySet = uriResourceEntitySet.getEntitySet();

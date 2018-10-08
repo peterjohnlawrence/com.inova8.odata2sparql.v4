@@ -7,11 +7,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
@@ -34,12 +36,16 @@ import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceKind;
+import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
+import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.UriType;
 
@@ -78,6 +84,8 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
 		UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
 		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
+		UriType uriType = null;
+		UriResourceComplexProperty complexProperty =null;
 
 		// 1.2. retrieve the requested (Edm) property
 		// the second to last segment is the Property, if the last is $value
@@ -85,29 +93,50 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		int minSize = 1;
 		if (lastResourcePart.getSegmentValue().equals("$value")) {
 			minSize++;
-		}
+		}		
+		lastResourcePart = resourceParts.get(resourceParts.size() - minSize);	
 		UriResourceProperty uriProperty = (UriResourceProperty) resourceParts.get(resourceParts.size() - minSize);
 		EdmProperty edmProperty = uriProperty.getProperty();
 		String edmPropertyName = edmProperty.getName();
 		EdmPrimitiveType edmPropertyType = (EdmPrimitiveType) edmProperty.getType();
-
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entity data, for which the property has to be read
 		Entity entity = null;
 		try {
-			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, UriType.URI5);
+			if( resourceParts.get(1).getKind().equals(UriResourceKind.complexProperty)) {
+				complexProperty = (UriResourceComplexProperty) resourceParts.get(1);
+				if(resourceParts.size() == 3) {
+					uriType =  UriType.URI4;
+				}else {
+					uriType =  UriType.URI3;				}
+			}else {
+				uriType =  UriType.URI5;
+			}
+			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, uriType);
 		} catch (EdmException | OData2SparqlException | ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		}
 		if (entity == null) {
-			throw new ODataApplicationException("Property not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
+			throw new ODataApplicationException("Entity not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
 		// 2.2. retrieve the property data from the entity
-		Property property = entity.getProperty(edmPropertyName);
+		Property property = null;
+		if(uriType.equals(UriType.URI3) || uriType.equals(UriType.URI4)) {
+			ComplexValue complexValue = (ComplexValue )(entity.getProperty(complexProperty.getComplexType().getName()).getValue());
+			for( Property propertyValue: complexValue.getValue()) {
+				if(propertyValue.getName().equals(edmPropertyName)) {
+					property = propertyValue;
+					break;
+				}
+			}	
+		}else {
+			property = entity.getProperty(edmPropertyName);
+		}
+		
 		if (property == null) {
-			throw new ODataApplicationException("Property not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
+			throw new ODataApplicationException("Property " + edmPropertyName + " not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
 

@@ -3,6 +3,7 @@ package com.inova8.odata2sparql;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -25,6 +26,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
+import com.inova8.odata2sparql.SparqlProcessor.SparqlComplexProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
@@ -72,6 +74,7 @@ public class RdfODataServlet extends HttpServlet {
 						handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
 						handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 						handler.register(new SparqlPrimitiveValueProcessor(rdfEdmProvider));
+						handler.register(new SparqlComplexProcessor(rdfEdmProvider));
 						handler.register(new SparqlDefaultProcessor());
 						handler.register(new SparqlReferenceCollectionProcessor(rdfEdmProvider));
 						handler.register(new SparqlReferenceProcessor(rdfEdmProvider));
@@ -112,7 +115,7 @@ public class RdfODataServlet extends HttpServlet {
 			throws IOException {
 		try {
 			InputStream in = getServletContext().getResourceAsStream(textResponse);
-			String contents = IOUtils.toString(in);
+			String contents = IOUtils.toString(in,Charset.defaultCharset());
 			simpleResponse(req, resp, contents);
 		} catch (Exception e) {
 			simpleResponse(req, resp, "odata2sparql.v4");

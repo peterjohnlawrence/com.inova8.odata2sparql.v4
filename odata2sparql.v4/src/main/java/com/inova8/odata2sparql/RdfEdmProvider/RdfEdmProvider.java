@@ -186,7 +186,6 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 
 	@Override
 	public List<CsdlFunction> getFunctions(FullQualifiedName functionName) throws ODataException {
-		// TODO Auto-generated method stub
 		return super.getFunctions(functionName);
 	}
 

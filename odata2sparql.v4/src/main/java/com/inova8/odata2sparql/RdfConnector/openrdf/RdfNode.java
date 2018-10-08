@@ -57,21 +57,6 @@ public class RdfNode {
 		}
 	}
 
-//	public String toQName(RdfPrefixes rdfPrefixes) {
-//		String qname = null;
-//		if (this.isBlank()) {
-//			return ((BNode) node).toString();
-//		} else {
-//			try {
-//				qname = rdfPrefixes.getOrCreatePrefix(null, ((URI) node).getNamespace()) + ":"
-//						+ ((URI) node).getLocalName();
-//			} catch (OData2SparqlException e) {
-//				log.error("RdfNode toQName failure. Node:" + this.node.toString() + " with exception " + e.toString());
-//			}
-//		}
-//		return qname;
-//	}
-
 	public IRI getLiteralDatatype() {
 		return ((Literal) node).getDatatype();
 	}

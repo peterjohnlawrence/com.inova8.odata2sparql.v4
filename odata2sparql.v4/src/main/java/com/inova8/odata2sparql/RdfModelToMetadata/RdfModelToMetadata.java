@@ -30,6 +30,7 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpress
 
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
@@ -138,12 +139,15 @@ public class RdfModelToMetadata {
 								.add(buildCsdlAnnotation(RdfConstants.ODATA_BASETYPE_FQN, rdfClass.getBaseType().getEntityTypeName()));
 				}
 				entityType.setAnnotations(entityTypeAnnotations);
+				//TODO testing openTypes
+				entityType.setOpenType(true);
 			}
 		}
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Second pass to add properties, navigation properties, and entitysets, and create the schema
 			Map<String, CsdlEntityType> entityTypes = new HashMap<String, CsdlEntityType>();
+			Map<String, CsdlComplexType> complexTypes = new HashMap<String, CsdlComplexType>();
 			Map<String, CsdlEntityType> entityTypeMapping = new HashMap<String, CsdlEntityType>();
 
 			String modelNamespace = rdfModel.getModelNamespace(rdfGraph);
@@ -167,94 +171,40 @@ public class RdfModelToMetadata {
 						keys.add(new CsdlPropertyRef().setName(propertyName));
 						entityType.setKey(keys);
 					}
-
 					for (RdfProperty rdfProperty : currentRdfClass.getProperties()) {
 						String propertyName = rdfProperty.getEDMPropertyName();
-						EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
-
-						//TODO langString
-						//					if (propertyType.equals(EdmPrimitiveTypeKind.String)
-						//							&& !rdfProperty.propertyName
-						//									.equals(RdfConstants.ID))
-						//						propertyType = langLiteralType;
-						CsdlProperty property = new CsdlProperty().setName(propertyName)
-								.setType(propertyType.getFullQualifiedName());
-						if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
-							property.setPrecision(RdfConstants.DATE_PRECISION);
-						if (propertyType == EdmPrimitiveTypeKind.Decimal)
-							property.setScale(RdfConstants.DECIMAL_SCALE);
-
-						List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
-						if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {
-
-							if (withRdfAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,
-										rdfProperty.getPropertyURI().toString()));
-
-							if (withRdfAnnotations)
-								propertyAnnotations.add(
-										buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, rdfProperty.propertyTypeName));
-							if (rdfProperty.getEquivalentProperty() != null) {
-								if (withRdfAnnotations)
-									propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.OWL_EQUIVALENTPROPERTY_FQN,
-											rdfProperty.getEquivalentProperty()));
-							}
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
-										rdfProperty.getPropertyLabel()));
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
-										rdfProperty.getPropertyLabel()));
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
-										rdfProperty.getDescription()));
-							property.setAnnotations(propertyAnnotations);
-
-							if (rdfProperty.getIsKey()) {
-								property.setNullable(false);
-							} else if (rdfProperty.getCardinality() == RdfConstants.Cardinality.ZERO_TO_ONE
-									|| rdfProperty.getCardinality() == RdfConstants.Cardinality.MANY) {
-								property.setNullable(true);
-							} else {
-								//TODO need to handle case when data violates nullablility, in the meantime allow all to be nullable
-								property.setNullable(true);
-							}
-
-							if (rdfProperty.getCardinality() == RdfConstants.Cardinality.MANY
-									|| rdfProperty.getCardinality() == RdfConstants.Cardinality.MULTIPLE) {
-								//TODO property.setCollectionKind(CollectionKind.List);
-							} else {
-								//TODO property.setCollectionKind(CollectionKind.NONE);
-							}
-
-						} else {
-
-							property.setNullable(false);
-							if (withRdfAnnotations)
-								propertyAnnotations.add(
-										buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, RdfConstants.RDFS_RESOURCE));
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
-										rdfProperty.getPropertyLabel()));
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
-										rdfProperty.getPropertyLabel()));
-							if (withSapAnnotations)
-								propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
-										rdfProperty.getDescription()));
-							property.setAnnotations(propertyAnnotations);
+						CsdlProperty property =null;
+						if (rdfProperty.getIsComplex() ) {
+							if(currentRdfClass == rdfClass) {
+								//use complexType but do not inherit down
+								property = new CsdlProperty().setName(propertyName)
+										.setType(rdfProperty.getComplexType().getFullQualifiedName());
+							}	
+						}
+						else {
+							EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
+							property = new CsdlProperty().setName(propertyName)
+									.setType(propertyType.getFullQualifiedName());
+							if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
+								property.setPrecision(RdfConstants.DATE_PRECISION);
+							if (propertyType == EdmPrimitiveTypeKind.Decimal)
+								property.setScale(RdfConstants.DECIMAL_SCALE);
 
 						}
-						entityTypeProperties.put(property.getName(), property);
-						propertyMapping.put(
-								new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), property.getName()),
-								rdfProperty);
+						if(property != null) {
+							//Only build if not null
+							buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
+							entityTypeProperties.put(property.getName(), property);
+							propertyMapping.put(
+									new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), property.getName()),
+									rdfProperty);
+						}
 
 					}
 					entityType.setProperties(new ArrayList<CsdlProperty>(entityTypeProperties.values()));
 					entityType.setNavigationProperties(
 							new ArrayList<CsdlNavigationProperty>(navigationProperties.values()));
-
+					
 					String entitySetName = rdfClass.getEDMEntitySetName();
 
 					CsdlEntitySet entitySet = new CsdlEntitySet().setName(entitySetName)
@@ -312,11 +262,22 @@ public class RdfModelToMetadata {
 					}
 					navigationProperty.setAnnotations(navigationPropertyAnnotations);
 					//TODO should not add duplicates to the same entity, even though Olingo accepts them							
-					globalEntityTypes.get(rdfAssociation.getDomainNodeURI()).getNavigationProperties()
-							.add(navigationProperty);
+					globalEntityTypes.get(rdfAssociation.getDomainNodeURI()).getNavigationProperties().add(navigationProperty);
 					navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
 					navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(), rdfAssociation);
 				}
+			}
+			for (RdfComplexType rdfComplexType : rdfGraph.getComplexTypes()) {
+				CsdlComplexType csdlComplexType = new CsdlComplexType().setName(rdfComplexType.getComplexTypeName());
+				for (RdfProperty rdfProperty : rdfComplexType.getProperties().values()) {
+					csdlComplexType.getProperties().add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName()).setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName()));
+				}
+				for (RdfAssociation rdfNavigationProperty : rdfComplexType.getNavigationProperties().values()) {
+					csdlComplexType.getNavigationProperties().add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName()).setType(new FullQualifiedName(rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
+							rdfNavigationProperty.getRangeName())).setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
+									|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE)));
+				}
+				complexTypes.put(rdfComplexType.getComplexTypeName(),csdlComplexType );
 			}
 			//Only add if  schema is not empty of entityTypes
 			if (!entityTypes.isEmpty()) {
@@ -325,7 +286,7 @@ public class RdfModelToMetadata {
 
 				CsdlSchema modelSchema = new CsdlSchema().setNamespace(modelNamespace)
 						.setEntityTypes(new ArrayList<CsdlEntityType>(entityTypes.values()))
-						.setComplexTypes(new ArrayList<CsdlComplexType>());
+						.setComplexTypes(new ArrayList<CsdlComplexType>(complexTypes.values()));
 				//TODO MS does not support annotations to the schema
 				//	modelSchema.setAnnotations(schemaAnnotations);
 				if (modelNamespace.equals(RdfConstants.RDF)) {
@@ -417,6 +378,71 @@ public class RdfModelToMetadata {
 		
 		//Finally, add terms and schemas to which they belong if they do not exist that have been used	
 		addTermsToSchemas();
+	}
+
+	private void buildProperty(boolean withRdfAnnotations, boolean withSapAnnotations, RdfProperty rdfProperty,
+			CsdlProperty property) {
+		List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
+		if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {
+
+			if (withRdfAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,
+						rdfProperty.getPropertyURI().toString()));
+
+			if (withRdfAnnotations)
+				propertyAnnotations.add(
+						buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, rdfProperty.propertyTypeName));
+			if (rdfProperty.getEquivalentProperty() != null) {
+				if (withRdfAnnotations)
+					propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.OWL_EQUIVALENTPROPERTY_FQN,
+							rdfProperty.getEquivalentProperty()));
+			}
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
+						rdfProperty.getPropertyLabel()));
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
+						rdfProperty.getPropertyLabel()));
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
+						rdfProperty.getDescription()));
+			property.setAnnotations(propertyAnnotations);
+
+			if (rdfProperty.getIsKey()) {
+				property.setNullable(false);
+			} else if (rdfProperty.getCardinality() == RdfConstants.Cardinality.ZERO_TO_ONE
+					|| rdfProperty.getCardinality() == RdfConstants.Cardinality.MANY) {
+				property.setNullable(true);
+			} else {
+				//TODO need to handle case when data violates nullablility, in the meantime allow all to be nullable
+				property.setNullable(true);
+			}
+
+			if (rdfProperty.getCardinality() == RdfConstants.Cardinality.MANY
+					|| rdfProperty.getCardinality() == RdfConstants.Cardinality.MULTIPLE) {
+				//TODO property.setCollectionKind(CollectionKind.List);
+			} else {
+				//TODO property.setCollectionKind(CollectionKind.NONE);
+			}
+
+		} else {
+
+			property.setNullable(false);
+			if (withRdfAnnotations)
+				propertyAnnotations.add(
+						buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, RdfConstants.RDFS_RESOURCE));
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
+						rdfProperty.getPropertyLabel()));
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
+						rdfProperty.getPropertyLabel()));
+			if (withSapAnnotations)
+				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
+						rdfProperty.getDescription()));
+			property.setAnnotations(propertyAnnotations);
+
+		}
 	}
 
 	private void addTermsToSchemas() {

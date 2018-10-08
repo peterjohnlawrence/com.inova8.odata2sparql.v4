@@ -7,11 +7,14 @@ import java.util.Map.Entry;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
+import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
@@ -57,6 +60,7 @@ public class SparqlFilterClausesBuilder {
 		// By default
 		this.edmTargetEntitySet = edmEntitySet;
 		this.rdfTargetEntityType = rdfEntityType;
+		
 		UriResource lastSegment;
 		switch (this.uriType) {
 		case URI1: {
@@ -74,10 +78,23 @@ public class SparqlFilterClausesBuilder {
 			break;
 		case URI6B: {
 			lastSegment = resourceParts.get(resourceParts.size() - 1);
+			
 			if (lastSegment instanceof UriResourceNavigation) {
 				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
-				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-				edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();			
+				if(resourceParts.size()>2 ) {
+					//could be a complexType
+					 UriResource penultimateSegment = resourceParts.get(resourceParts.size() - 2);
+					 if( penultimateSegment.getKind().equals(UriResourceKind.complexProperty)) {
+						 //Complextype with navigation property
+						 UriResourceComplexProperty complexProperty = ((UriResourceComplexProperty) penultimateSegment);
+						 edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, complexProperty.getComplexType(), edmNavigationProperty);
+					 }else {
+						edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+					 }
+				}else {
+					edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+				}
 				rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
 				filterClause = filterClause(uriInfo.getFilterOption(), rdfTargetEntityType, "");
 			}
@@ -182,9 +199,16 @@ public class SparqlFilterClausesBuilder {
 				*/
 			} else {
 				List<UriResource> resourceParts = expandItem.getResourcePath().getUriResourceParts();
-				UriResourceNavigation resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
+				//Only navigation supported in RDFS+ is one level of complexProperty, hence code is not generic
+				UriResource firstResourcePart = resourceParts.get(0);
+				UriResourceNavigation resourceNavigation = null;
+				if (firstResourcePart instanceof UriResourceNavigation) {
+					 resourceNavigation = (UriResourceNavigation) resourceParts.get(0);
+				}else if (firstResourcePart instanceof UriResourceComplexProperty ) {
+					resourceNavigation = (UriResourceNavigation) resourceParts.get(1);
+				}
 				RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(
-						new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), //resourceNavigation.getProperty().getType().getNamespace(),//resourceNavigation.getProperty().getType().getNamespace(),
+						new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), 
 								resourceNavigation.getProperty().getName()));
 				String nextTargetKey = targetKey + resourceNavigation.getProperty().getName();
 				RdfEntityType nextTargetEntityType = navProperty.getRangeClass();

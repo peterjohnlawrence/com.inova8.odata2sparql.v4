@@ -35,6 +35,7 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
@@ -118,7 +119,17 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 				responseEdmEntityType = edmNavigationProperty.getType();
 				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
 			}
-		} else {
+		}else if (segmentCount == 3) { //navigation via complextype
+			UriResource navSegment = resourceParts.get(2);
+			if (navSegment instanceof UriResourceNavigation) {
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				responseEdmEntityType = edmNavigationProperty.getType();
+				UriResource penultimateSegment = resourceParts.get(resourceParts.size() - 2);
+				UriResourceComplexProperty complexProperty = ((UriResourceComplexProperty) penultimateSegment);
+				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet,complexProperty.getComplexType(), edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
+			}						
+		}else {
 			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
 			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 					Locale.ROOT);

@@ -1,5 +1,7 @@
 package com.inova8.odata2sparql.RdfModel;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -203,12 +205,30 @@ public class RdfModel {
 			}
 			return qname;
 		}
+
+		public String toQName(String uri, String qNameSeparator) {
+			String qname = null;
+			try {
+				URI URI = new URI(uri);
+				String path = URI.getPath();
+				String lname = path.substring(1, path.length());
+				//uri.substring(0,uri.length()-lname.length());
+				qname = rdfPrefixes.getOrCreatePrefix(null, uri.substring(0,uri.length()-lname.length())) + qNameSeparator + lname;
+			} catch (OData2SparqlException | URISyntaxException e) {
+				log.error("RdfNode toQName failure. Node:" + uri + " with exception " + e.toString());
+			}
+			return qname;
+		}
 	}
 
 	public static class RdfSchema {
 		private String schemaName;
 		private String schemaPrefix;
 		boolean isDefault = false;
+		public final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
+		public final List<RdfModel.RdfAssociation> associations = new ArrayList<RdfModel.RdfAssociation>();
+		private final List<RdfModel.RdfDatatype> datatypes = new ArrayList<RdfModel.RdfDatatype>();
+		private final HashSet<RdfModel.RdfComplexType> complexTypes = new HashSet<RdfModel.RdfComplexType>();
 
 		public RdfSchema() {
 			super();
@@ -237,9 +257,9 @@ public class RdfModel {
 			this.schemaPrefix = schemaPrefix;
 		}
 
-		public final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
-		public final List<RdfModel.RdfAssociation> associations = new ArrayList<RdfModel.RdfAssociation>();
-		private final List<RdfModel.RdfDatatype> datatypes = new ArrayList<RdfModel.RdfDatatype>();
+		public HashSet<RdfModel.RdfComplexType> getComplexTypes() {
+			return complexTypes;
+		}
 	}
 
 	public static class RdfEntityType {
@@ -263,6 +283,7 @@ public class RdfModel {
 		private final HashMap<String, FunctionImportParameter> functionImportParameters = new HashMap<String, FunctionImportParameter>();
 		private final HashMap<String, RdfModel.RdfProperty> properties = new HashMap<String, RdfModel.RdfProperty>();
 		private final HashMap<String, RdfModel.RdfAssociation> navigationProperties = new HashMap<String, RdfModel.RdfAssociation>();
+		private final HashMap<String, RdfModel.RdfComplexType> complexTypes = new HashMap<String, RdfModel.RdfComplexType>();
 		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
 		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
 
@@ -381,6 +402,10 @@ public class RdfModel {
 			return functionImportParameters;
 		}
 
+		public HashMap<String, RdfModel.RdfComplexType> getComplexTypes() {
+			return complexTypes;
+		}
+
 		public boolean isOperation() {
 			return isOperation;
 		}
@@ -464,6 +489,40 @@ public class RdfModel {
 			} else {
 				return null;
 			}
+		}
+		public RdfComplexTypePropertyPair findComplexProperty(RdfNode propertyNode) {
+			//Only IRI available not EDM property name so need to search on that
+			for (RdfProperty property : properties.values()) {
+				if (property.getIsComplex()) {
+					for( RdfProperty complexProperty : property.getComplexType().getProperties().values()) {
+						if(complexProperty.getPropertyURI().toString().equals(propertyNode.getIRI().toString())) {				
+							return new RdfComplexTypePropertyPair(property.getComplexType(),complexProperty,null);
+						}
+					}
+					for( RdfAssociation complexNavigationProperty : property.getComplexType().getNavigationProperties().values()) {
+						if(complexNavigationProperty.getAssociationIRI().toString().equals(propertyNode.getIRI().toString())) {				
+							return new RdfComplexTypePropertyPair(property.getComplexType(),null,complexNavigationProperty);
+						}
+					}
+				}
+			}
+			return null;
+
+		}
+		public RdfComplexTypePropertyPair findComplexProperty(String propertyName) {
+			//EDM property name available so can use HashMap
+			for (RdfProperty property : properties.values()) {
+				if (property.getIsComplex()) {
+					if (property.getComplexType().getProperties().containsKey(propertyName)) {
+						return new RdfComplexTypePropertyPair(property.getComplexType(),
+								property.getComplexType().getProperties().get(propertyName), null);
+					} else if (property.getComplexType().getNavigationProperties().containsKey(propertyName)) {
+						return new RdfComplexTypePropertyPair(property.getComplexType(), null,
+								property.getComplexType().getNavigationProperties().get(propertyName));
+					}
+				}
+			}
+			return null;
 		}
 
 		public String getEDMEntityTypeName() {
@@ -580,7 +639,10 @@ public class RdfModel {
 		public String propertyTypeName;
 		private String varName;
 		public RdfNode propertyNode;
+		private RdfProperty superProperty;
 		private Boolean isKey = false;
+		private Boolean isComplex = false;
+		private RdfComplexType complexType;
 		private RdfConstants.Cardinality cardinality = RdfConstants.Cardinality.MANY;
 		private String equivalentProperty;
 
@@ -636,12 +698,28 @@ public class RdfModel {
 			return propertyTypeName;
 		}
 
+		public RdfProperty getSuperProperty() {
+			return superProperty;
+		}
+
+		public void setSuperProperty(RdfProperty superProperty) {
+			this.superProperty = superProperty;
+		}
+
 		public Boolean getIsKey() {
 			return isKey;
 		}
 
 		public void setIsKey(Boolean isKey) {
 			this.isKey = isKey;
+		}
+
+		public Boolean getIsComplex() {
+			return isComplex;
+		}
+
+		public void setIsComplex(Boolean isComplex) {
+			this.isComplex = isComplex;
 		}
 
 		public String getVarName() {
@@ -651,6 +729,116 @@ public class RdfModel {
 		public void setVarName(String varName) {
 			this.varName = varName;
 		}
+
+		public RdfComplexType getComplexType() {
+			return this.complexType;
+		}
+
+		public void setComplexType(RdfComplexType complexType) {
+			this.complexType = complexType;
+		}
+	}
+
+	public static class RdfComplexTypePropertyPair {
+		private RdfComplexType rdfComplexType;
+		private RdfProperty rdfProperty;
+		private RdfAssociation rdfNavigationProperty;
+
+		public RdfComplexTypePropertyPair(RdfComplexType rdfComplexType, RdfProperty rdfProperty,
+				RdfAssociation rdfNavigationProperty) {
+			super();
+			this.rdfComplexType = rdfComplexType;
+			this.rdfProperty = rdfProperty;
+			this.setRdfNavigationProperty(rdfNavigationProperty);
+		}
+
+		public RdfComplexType getRdfComplexType() {
+			return rdfComplexType;
+		}
+
+		public RdfProperty getRdfProperty() {
+			return rdfProperty;
+		}
+
+		public RdfAssociation getRdfNavigationProperty() {
+			return rdfNavigationProperty;
+		}
+
+		public void setRdfNavigationProperty(RdfAssociation rdfNavigationProperty) {
+			this.rdfNavigationProperty = rdfNavigationProperty;
+		}
+	}
+
+	public static class RdfComplexTypeNavigationPropertyPair {
+		private RdfComplexType rdfComplexType;
+		private RdfAssociation rdfNavigationProperty;
+
+		public RdfComplexTypeNavigationPropertyPair(RdfComplexType rdfComplexType,
+				RdfAssociation rdfNavigationProperty) {
+			super();
+			this.rdfComplexType = rdfComplexType;
+			this.rdfNavigationProperty = rdfNavigationProperty;
+		}
+
+		public RdfComplexType getRdfComplexType() {
+			return rdfComplexType;
+		}
+
+		public RdfAssociation getRdfNavigationProperty() {
+			return rdfNavigationProperty;
+		}
+	}
+
+	public static class RdfComplexType {
+		private RdfNode complexTypeNode;
+		private String complexTypeName;
+		private String complexTypeLabel;
+		private RdfNode domainNode;
+		private String domainName;
+		private HashMap<String, RdfProperty> properties = new HashMap<String, RdfProperty>();
+		private HashMap<String, RdfAssociation> navigationProperties = new HashMap<String, RdfAssociation>();
+		public RdfEntityType domainClass;
+
+		public void addProperty(RdfProperty rdfProperty) {
+			properties.put(RdfModel.rdfToOdata(rdfProperty.propertyName), rdfProperty);
+		}
+
+		public void addNavigationProperty(RdfAssociation rdfNavigationProperty) {
+			navigationProperties.put(RdfModel.rdfToOdata(rdfNavigationProperty.associationName), rdfNavigationProperty);
+		}
+
+		public RdfNode getComplexTypeNode() {
+			return complexTypeNode;
+		}
+
+		public RdfNode getDomainNode() {
+			return domainNode;
+		}
+
+		public String getComplexTypeName() {
+			return complexTypeName;
+		}
+
+		public String getComplexTypeLabel() {
+			return complexTypeLabel;
+		}
+
+		public String getDomainName() {
+			return domainName;
+		}
+
+		public HashMap<String, RdfProperty> getProperties() {
+			return properties;
+		}
+
+		public HashMap<String, RdfAssociation> getNavigationProperties() {
+			return navigationProperties;
+		}
+
+		public FullQualifiedName getFullQualifiedName() {
+			return new FullQualifiedName(domainClass.schema.schemaPrefix, this.getComplexTypeName());
+		}
+
 	}
 
 	public static class RdfAssociation {
@@ -660,6 +848,8 @@ public class RdfModel {
 		private String relatedKey;
 		private RdfNode domainNode;
 		private String domainName;
+		public RdfEntityType domainClass;
+		private RdfProperty superProperty;
 		@SuppressWarnings("unused")
 		private RdfNode rangeNode;
 		private String rangeName;
@@ -732,8 +922,6 @@ public class RdfModel {
 		public String getInversePropertyOfURI() {
 			return inversePropertyOf.getIRI().toString();
 		}
-
-		public RdfEntityType domainClass;
 
 		public RdfEntityType getDomainClass() {
 			return domainClass;
@@ -838,12 +1026,21 @@ public class RdfModel {
 		public void setInverseAssociation(RdfAssociation inverseAssociation) {
 			this.inverseAssociation = inverseAssociation;
 		}
+
+		public void setSuperProperty(RdfProperty superProperty) {
+			this.superProperty = superProperty;
+
+		}
+
+		public RdfProperty getSuperProperty() {
+			return superProperty;
+		}
 	}
 
 	private class RdfURI {
 		@SuppressWarnings("unused")
 		@Deprecated
-		public RdfNode node;
+		private RdfNode node;
 		public String localName;
 		private String graphName;
 		private String graphPrefix;
@@ -1098,6 +1295,30 @@ public class RdfModel {
 		return property;
 	}
 
+	public RdfComplexType getOrCreateComplexType(RdfNode complexTypeNode, RdfNode complexTypeLabelNode,
+			RdfNode superdomainNode) throws OData2SparqlException {
+		RdfURI complexTypeURI = new RdfURI(complexTypeNode);
+
+		RdfEntityType clazz = this.getOrCreateEntityType(superdomainNode);
+
+		RdfComplexType complexType = Enumerable.create(clazz.getSchema().getComplexTypes())
+				.firstOrNull(complexTypeNameEquals(rdfToOdata(complexTypeURI.localName)));
+		if (complexType == null) {
+			complexType = new RdfComplexType();
+			complexType.complexTypeName = rdfToOdata(complexTypeURI.localName);
+			if (complexTypeLabelNode == null) {
+				complexType.complexTypeLabel = RdfConstants.PROPERTY_LABEL_PREFIX + complexType.complexTypeName;
+			} else {
+				complexType.complexTypeLabel = complexTypeLabelNode.getLiteralObject().toString();
+			}
+			complexType.complexTypeNode = complexTypeNode;
+			complexType.domainClass = this.getOrCreateEntityType(superdomainNode);
+			clazz.complexTypes.put(complexType.complexTypeName, complexType);
+			clazz.getSchema().getComplexTypes().add(complexType);
+		}
+		return complexType;
+	}
+
 	void setPropertyRange(RdfNode propertyNode, HashSet<RdfEntityType> classes, RdfNode rangeNode)
 			throws OData2SparqlException {
 		if (classes.size() > 0) {
@@ -1137,9 +1358,6 @@ public class RdfModel {
 		String associationName = createAssociationName(multipleDomainNode, multipleRangeNode, domainURI, propertyURI,
 				rangeURI);
 
-		// TODO Incorrectly assigning to property graph instead of domain graph
-		//		RdfAssociation association = Enumerable.create(propertyURI.graph.associations).firstOrNull(
-		//				associationNameEquals(associationName));
 		RdfAssociation association = Enumerable.create(domainURI.graph.associations)
 				.firstOrNull(associationNameEquals(associationName));
 		if (association == null) {
@@ -1282,6 +1500,14 @@ public class RdfModel {
 		return new Predicate1<RdfProperty>() {
 			public boolean apply(RdfProperty property) {
 				return property.propertyName.equals(propertyName);
+			}
+		};
+	}
+
+	private static final Predicate1<RdfComplexType> complexTypeNameEquals(final String complexTypeName) {
+		return new Predicate1<RdfComplexType>() {
+			public boolean apply(RdfComplexType complexType) {
+				return complexType.complexTypeName.equals(complexTypeName);
 			}
 		};
 	}

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNodeFactory;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfQuerySolution;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfDatatype;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
@@ -28,7 +30,7 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfModelProvider {
 	private final Logger log = LoggerFactory.getLogger(RdfModelProvider.class);
 	private final RdfModel model;
-
+	private Set<RdfComplexType> complexTypes = new HashSet<RdfComplexType>();
 	private final RdfMetamodelProvider rdfMetamodelProvider;
 
 	public RdfModelProvider(RdfRepository rdfRepository) {
@@ -38,8 +40,9 @@ public class RdfModelProvider {
 	}
 
 	public RdfModel getRdfModel() throws Exception {
-		log.info("Loading model " + model.getRdfRepository().getModelName() + " from endpoint: " + model.getRdfRepository().getModelRepository().getRepository().toString());
-		RdfEntityType rdfsResource = initializeCore(); 
+		log.info("Loading model " + model.getRdfRepository().getModelName() + " from endpoint: "
+				+ model.getRdfRepository().getModelRepository().getRepository().toString());
+		RdfEntityType rdfsResource = initializeCore();
 		getClasses();
 		getDatatypes();
 		getDataTypeProperties();
@@ -120,9 +123,9 @@ public class RdfModelProvider {
 
 		RdfNode rdfsLabelNode = RdfNodeFactory.createURI(RdfConstants.RDFS_LABEL);
 		RdfNode rdfsLabelLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDFS_LABEL_LABEL);
-		model.getOrCreateProperty(rdfsLabelNode, null, rdfsLabelLabelNode,
-				rdfsResourceNode, rdfStringNode, RdfConstants.Cardinality.ZERO_TO_ONE);
-		
+		model.getOrCreateProperty(rdfsLabelNode, null, rdfsLabelLabelNode, rdfsResourceNode, rdfStringNode,
+				RdfConstants.Cardinality.ZERO_TO_ONE);
+
 		model.getOrCreateAssociation(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_STATEMENT_LABEL),
 				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
@@ -178,7 +181,8 @@ public class RdfModelProvider {
 									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
 								} else {
 									entityType = model.getOrCreateEntityType(classNode, classLabelNode);
-									if(entityType!=baseType)entityType.setBaseType(baseType);
+									if (entityType != baseType)
+										entityType.setBaseType(baseType);
 									count++;
 									debug.append(classNode.getIRI().toString()).append(";");
 								}
@@ -189,11 +193,11 @@ public class RdfModelProvider {
 								}
 							}
 						} else {
-							if (!classNode.isBlank()){
-								model.getOrCreateEntityType(classNode, classLabelNode).setEntity(true);							
+							if (!classNode.isBlank()) {
+								model.getOrCreateEntityType(classNode, classLabelNode).setEntity(true);
 								count++;
-								debug.append(classNode.getIRI().toString()).append(";");	
-							}							
+								debug.append(classNode.getIRI().toString()).append(";");
+							}
 						}
 					} catch (Exception e) {
 						log.info("Failed to create class:" + classNode.getIRI().toString() + " with exception "
@@ -268,11 +272,32 @@ public class RdfModelProvider {
 						}
 
 						RdfNode domainNode = soln.getRdfNode("domain");
+
 						RdfProperty datatypeProperty = model.getOrCreateProperty(propertyNode, propertyLabelNode,
 								domainNode);
 						if (soln.getRdfNode("description") != null) {
 							datatypeProperty
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+						}
+						RdfNode superPropertyNode = soln.getRdfNode("superProperty");
+						if (superPropertyNode != null) {
+							RdfNode superdomainNode = soln.getRdfNode("superDomain");
+							if (superdomainNode != null) {
+								RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
+										null, superdomainNode);
+								datatypeProperty.setSuperProperty(superProperty);
+								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+									RdfComplexType complexType = model.getOrCreateComplexType(
+											soln.getRdfNode("superProperty"), null, superdomainNode);
+									complexType.addProperty(datatypeProperty);
+									complexTypes.add(complexType);
+									superProperty.setIsComplex(true);
+									superProperty.setComplexType(complexType);
+								}
+							} else {
+								log.error("Superproperty:" + superPropertyNode.getIRI().toString()
+										+ " declared without specific domain");
+							}
 						}
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						if (classes == null) {
@@ -387,7 +412,7 @@ public class RdfModelProvider {
 			}
 		} catch (OData2SparqlException e) {
 			log.error(
-					"Failed to execute Datatype property cardinality query. Check availability of triple store. Exception "
+					"Failed to execute datatype property cardinality query. Check availability of triple store. Exception "
 							+ e.getMessage());
 			throw new OData2SparqlException("DataTypeProperties_Cardinality query exception ", e);
 		}
@@ -395,17 +420,19 @@ public class RdfModelProvider {
 
 	private void removeIncompleteProperties(HashMap<String, HashSet<RdfEntityType>> propertyClasses) {
 		for (HashSet<RdfEntityType> classes : propertyClasses.values()) {
-			if(!classes.isEmpty()){
+			if (!classes.isEmpty()) {
 				for (RdfEntityType clazz : classes) {
-					if(clazz!=null){
+					if (clazz != null) {
 						Collection<RdfProperty> properties = clazz.getProperties();
 						Iterator<RdfProperty> propertiesIterator = properties.iterator();
 						while (propertiesIterator.hasNext()) {
 							RdfProperty property = propertiesIterator.next();
 							if (property.propertyTypeName == null) {
-								log.error("Removing incomplete property declaration for class.property: " + clazz.getEntityTypeNode().getIRI().toString() + "." + property.getPropertyURI().toString()); 
+								log.error("Removing incomplete datatype property declaration for class.property: "
+										+ clazz.getEntityTypeNode().getIRI().toString() + "."
+										+ property.getPropertyURI().toString());
 								propertiesIterator.remove();
-								
+
 							}
 						}
 					}
@@ -459,10 +486,24 @@ public class RdfModelProvider {
 							domainCardinalityNode = soln.getRdfNode("domainCardinality");
 						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-
 						RdfAssociation association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
 								domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
 								rangeCardinality);
+
+						if (soln.getRdfNode("superProperty") != null) {
+							RdfNode superdomainNode = soln.getRdfNode("superDomain");
+							RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
+									null, superdomainNode);
+							association.setSuperProperty(superProperty);
+							if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+								RdfComplexType complexType = model.getOrCreateComplexType(
+										soln.getRdfNode("superProperty"), null, superdomainNode);
+								complexType.addNavigationProperty(association);
+								complexTypes.add(complexType);
+								superProperty.setIsComplex(true);
+								superProperty.setComplexType(complexType);
+							}
+						}
 
 						if (soln.getRdfNode("description") != null) {
 							association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
@@ -536,11 +577,30 @@ public class RdfModelProvider {
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
-								inversePropertyLabelNode, propertyNode, domainNode, rangeNode,  multipleDomainNode,
+								inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
 								multipleRangeNode, domainCardinality, rangeCardinality);
-//						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
-//								inversePropertyLabelNode, propertyNode, rangeNode, domainNode, multipleDomainNode,
-//								multipleRangeNode, domainCardinality, rangeCardinality);
+
+						RdfNode superPropertyNode = soln.getRdfNode("superProperty");
+						if (superPropertyNode != null) {
+							RdfNode superdomainNode = soln.getRdfNode("superDomain");
+							if (superdomainNode != null) {
+								RdfProperty superProperty = model.getOrCreateProperty(superPropertyNode, null,
+										superdomainNode);
+								inverseAssociation.setSuperProperty(superProperty);
+								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+									RdfComplexType complexType = model.getOrCreateComplexType(
+											soln.getRdfNode("superProperty"), null, superdomainNode);
+									complexType.addNavigationProperty(inverseAssociation);
+									complexTypes.add(complexType);
+									superProperty.setIsComplex(true);
+									superProperty.setComplexType(complexType);
+								}
+							} else {
+								log.error("Superproperty:" + superPropertyNode.getIRI().toString()
+										+ " declared without specific domain");
+							}
+						}
+
 						if (soln.getRdfNode("description") != null) {
 							inverseAssociation
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
@@ -577,12 +637,12 @@ public class RdfModelProvider {
 						queryNode = soln.getRdfNode("query");
 						RdfNode queryText = soln.getRdfNode("queryText");
 						RdfNode queryLabel = soln.getRdfNode("queryLabel");
-						RdfNode deleteText = soln.getRdfNode("deleteText"); 
+						RdfNode deleteText = soln.getRdfNode("deleteText");
 						RdfNode insertText = soln.getRdfNode("insertText");
 						RdfNode updateText = soln.getRdfNode("updateText");
 						RdfNode updatePropertyText = soln.getRdfNode("updatePropertyText");
 						RdfEntityType operationEntityType = model.getOrCreateOperationEntityType(queryNode, queryLabel,
-								queryText,deleteText,insertText,updateText,updatePropertyText );
+								queryText, deleteText, insertText, updateText, updatePropertyText);
 						if (soln.getRdfNode("description") != null) {
 							operationEntityType
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
@@ -746,17 +806,19 @@ public class RdfModelProvider {
 					//clazz.isOperation = clazz.isOperation();
 					//Need to define a primary key for an operation
 					if (clazz.primaryKeys.isEmpty() && clazz.isOperation() && clazz.getBaseType() == null) {
-						log.warn("Class and related associations removed because incomplete definition, possibly no objectproperty results: " + clazz.getIRI());
+						log.warn(
+								"Class and related associations removed because incomplete definition, possibly no objectproperty results: "
+										+ clazz.getIRI());
 						//Remove any association  that uses this class
 						for (RdfSchema associationGraph : model.graphs) {
-							 Iterator<RdfAssociation> associationsIterator = associationGraph.associations.iterator();
-							 while (associationsIterator.hasNext()) {
-								  RdfAssociation association = associationsIterator.next();
-								  if((association.getDomainClass()==clazz)||(association.getRangeClass()==clazz)){
-									  associationsIterator.remove();
-								  }			 
-							 }		
-						}	
+							Iterator<RdfAssociation> associationsIterator = associationGraph.associations.iterator();
+							while (associationsIterator.hasNext()) {
+								RdfAssociation association = associationsIterator.next();
+								if ((association.getDomainClass() == clazz) || (association.getRangeClass() == clazz)) {
+									associationsIterator.remove();
+								}
+							}
+						}
 						//Now remove this class
 						clazzIterator.remove();
 					}
