@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
-
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
@@ -27,7 +26,6 @@ import org.apache.olingo.commons.api.edm.provider.CsdlReturnType;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
-
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
@@ -76,7 +74,7 @@ public class RdfModelToMetadata {
 	}
 
 	public RdfModelToMetadata(RdfModel rdfModel, boolean withRdfAnnotations, boolean withSapAnnotations,
-			boolean useBaseType) {
+			boolean useBaseType, boolean withFKProperties) {
 		Map<String, CsdlEntityType> globalEntityTypes = new HashMap<String, CsdlEntityType>();
 
 		Map<String, RdfAssociation> navigationPropertyLookup = new HashMap<String, RdfAssociation>();
@@ -140,7 +138,7 @@ public class RdfModelToMetadata {
 				}
 				entityType.setAnnotations(entityTypeAnnotations);
 				//TODO testing openTypes
-				entityType.setOpenType(true);
+				//entityType.setOpenType(true);
 			}
 		}
 
@@ -172,32 +170,34 @@ public class RdfModelToMetadata {
 						entityType.setKey(keys);
 					}
 					for (RdfProperty rdfProperty : currentRdfClass.getProperties()) {
-						String propertyName = rdfProperty.getEDMPropertyName();
-						CsdlProperty property =null;
-						if (rdfProperty.getIsComplex() ) {
-							if(currentRdfClass == rdfClass) {
-								//use complexType but do not inherit down
+						if ((withFKProperties &&  rdfProperty.isFK()) || !rdfProperty.isFK() || rdfProperty.getIsKey()) {
+							String propertyName = rdfProperty.getEDMPropertyName();
+							CsdlProperty property =null;
+							if (rdfProperty.getIsComplex() ) {
+								if(currentRdfClass == rdfClass) {
+									//use complexType but do not inherit down
+									property = new CsdlProperty().setName(propertyName)
+											.setType(rdfProperty.getComplexType().getFullQualifiedName());
+								}	
+							}
+							else {
+								EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
 								property = new CsdlProperty().setName(propertyName)
-										.setType(rdfProperty.getComplexType().getFullQualifiedName());
-							}	
-						}
-						else {
-							EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
-							property = new CsdlProperty().setName(propertyName)
-									.setType(propertyType.getFullQualifiedName());
-							if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
-								property.setPrecision(RdfConstants.DATE_PRECISION);
-							if (propertyType == EdmPrimitiveTypeKind.Decimal)
-								property.setScale(RdfConstants.DECIMAL_SCALE);
-
-						}
-						if(property != null) {
-							//Only build if not null
-							buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
-							entityTypeProperties.put(property.getName(), property);
-							propertyMapping.put(
-									new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), property.getName()),
-									rdfProperty);
+										.setType(propertyType.getFullQualifiedName());
+								if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
+									property.setPrecision(RdfConstants.DATE_PRECISION);
+								if (propertyType == EdmPrimitiveTypeKind.Decimal)
+									property.setScale(RdfConstants.DECIMAL_SCALE);
+	
+							}
+							if(property != null) {
+								//Only build if not null
+								buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
+								entityTypeProperties.put(property.getName(), property);
+								propertyMapping.put(
+										new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), property.getName()),
+										rdfProperty);
+							}
 						}
 
 					}
@@ -337,6 +337,7 @@ public class RdfModelToMetadata {
 				}
 			}
 		}
+
 		List<CsdlFunctionImport> functionImports = new ArrayList<CsdlFunctionImport>();
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Final pass to add any functionImports
@@ -380,32 +381,33 @@ public class RdfModelToMetadata {
 		addTermsToSchemas();
 	}
 
+
 	private void buildProperty(boolean withRdfAnnotations, boolean withSapAnnotations, RdfProperty rdfProperty,
 			CsdlProperty property) {
 		List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
 		if (!rdfProperty.propertyName.equals(RdfConstants.SUBJECT)) {
-
-			if (withRdfAnnotations)
+			if(rdfProperty.isFK() ) {			
+				propertyAnnotations
+				.add(buildCsdlAnnotation(RdfConstants.ODATA_FK_FQN, rdfProperty.getFkProperty().getAssociationName()));
+			}
+			if (withRdfAnnotations) {
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,
 						rdfProperty.getPropertyURI().toString()));
-
-			if (withRdfAnnotations)
 				propertyAnnotations.add(
 						buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, rdfProperty.propertyTypeName));
-			if (rdfProperty.getEquivalentProperty() != null) {
-				if (withRdfAnnotations)
+				if (rdfProperty.getEquivalentProperty() != null) {
 					propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.OWL_EQUIVALENTPROPERTY_FQN,
 							rdfProperty.getEquivalentProperty()));
+				}
 			}
-			if (withSapAnnotations)
+			if (withSapAnnotations) {
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
 						rdfProperty.getPropertyLabel()));
-			if (withSapAnnotations)
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
 						rdfProperty.getPropertyLabel()));
-			if (withSapAnnotations)
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
 						rdfProperty.getDescription()));
+			}
 			property.setAnnotations(propertyAnnotations);
 
 			if (rdfProperty.getIsKey()) {
@@ -426,20 +428,18 @@ public class RdfModelToMetadata {
 			}
 
 		} else {
-
 			property.setNullable(false);
 			if (withRdfAnnotations)
 				propertyAnnotations.add(
 						buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, RdfConstants.RDFS_RESOURCE));
-			if (withSapAnnotations)
+			if (withSapAnnotations) {
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,
 						rdfProperty.getPropertyLabel()));
-			if (withSapAnnotations)
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
 						rdfProperty.getPropertyLabel()));
-			if (withSapAnnotations)
 				propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
 						rdfProperty.getDescription()));
+			}
 			property.setAnnotations(propertyAnnotations);
 
 		}

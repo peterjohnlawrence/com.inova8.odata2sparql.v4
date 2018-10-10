@@ -160,6 +160,7 @@ public class RdfRepositories {
 							Literal valueOfWithRdfAnnotations = (Literal) bindingSet.getValue("withRdfAnnotations");
 							Literal valueOfWithSapAnnotations = (Literal) bindingSet.getValue("withSapAnnotations");
 							Literal valueOfUseBaseType = (Literal) bindingSet.getValue("useBaseType");
+							Literal valueOfWithFKProperties = (Literal) bindingSet.getValue("withFKProperties");
 							Literal valueOfExpandOperations = (Literal) bindingSet.getValue("expandOperations");
 							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
@@ -291,6 +292,12 @@ public class RdfRepositories {
 										.stringValue()));
 							} else {
 								repository.setUseBaseType(true);
+							}
+							if (valueOfWithFKProperties != null) {
+								repository.setWithFKProperties(Boolean.parseBoolean(valueOfWithFKProperties
+										.stringValue()));
+							} else {
+								repository.setWithFKProperties(false);
 							}
 							if (valueOfExpandOperations != null) {
 								repository.setExpandOperations(Boolean.parseBoolean(valueOfExpandOperations

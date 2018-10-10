@@ -53,6 +53,8 @@ public class RdfModelProvider {
 		getOperationPropertyResults();
 		getOperationArguments();
 		cleanupOrphanClasses(rdfsResource);
+		if (rdfMetamodelProvider.getRdfRepository().getWithFKProperties())
+			createFKProperties();
 		model.getRdfPrefixes().log();
 		return model;
 	}
@@ -821,6 +823,21 @@ public class RdfModelProvider {
 						}
 						//Now remove this class
 						clazzIterator.remove();
+					}
+				}
+			}
+		}
+	}
+
+	private void createFKProperties() throws OData2SparqlException {
+		for (RdfSchema rdfGraph : model.graphs) {
+			for (RdfEntityType rdfEntityType : rdfGraph.classes) {
+				if (!rdfEntityType.isOperation()) {
+					for (RdfAssociation rdfNavigationProperty : rdfEntityType.getNavigationProperties()) {
+						if (!((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
+								|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE))) {
+							model.getOrCreateFKProperty(rdfNavigationProperty);
+						}
 					}
 				}
 			}

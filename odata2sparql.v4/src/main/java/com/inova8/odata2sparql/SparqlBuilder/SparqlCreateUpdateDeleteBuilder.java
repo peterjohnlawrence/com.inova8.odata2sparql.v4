@@ -149,7 +149,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 								"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getIRI() + ">");
 						entityKey = prop.getValue().toString();
 					} else {
-						properties.append("<" + property.propertyNode.getIRI() + "> ");
+						properties.append("<" + property.getPropertyURI() + "> ");
 						properties.append(castObjectToXsd(prop.getValue()));
 					}
 				} else {
@@ -280,7 +280,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				if (property.getIsKey()) {
 					entityKey = prop.getValue().toString();
 				} else {
-					updatePropertyValues.append("(<" + property.propertyNode.getIRI() + ">) ");
+					updatePropertyValues.append("(<" + property.getPropertyURI() + ">) ");
 				}
 			}
 		}
@@ -303,7 +303,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			String entityKey = entityKeys.get(0).getText();
 			String key = entityType.entityTypeName;
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);
-			String expandedProperty = entityType.findProperty(property).propertyNode.getIRI().toString();
+			String expandedProperty = entityType.findProperty(property).getPropertyURI();
 			String value = entry.toString();
 			//
 			//			if (urlValidator.isValid(expandedProperty)) {
@@ -348,7 +348,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 					+ key + "_s ?" + key + "_p ?" + key + "_o . VALUES(?" + key + "_s ?" + key + "_p){(");
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);
 			sparql.append("<" + expandedKey + "> ");
-			String expandedProperty = entityType.findProperty(property).propertyNode.getIRI().toString();
+			String expandedProperty = entityType.findProperty(property).getPropertyURI();
 			//			UrlValidator urlValidator = new UrlValidator();
 			//			if (urlValidator.isValid(expandedProperty)) {
 			sparql.append("<" + expandedProperty + ">)}}");

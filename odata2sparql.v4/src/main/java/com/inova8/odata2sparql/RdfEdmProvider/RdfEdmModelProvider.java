@@ -28,7 +28,7 @@ class RdfEdmModelProvider {
 		} catch (Exception e) {
 			throw new OData2SparqlException(e.getMessage()); 
 		}
-		this.setEdmMetadata(new RdfModelToMetadata(rdfModel,this.rdfRepository.getWithRdfAnnotations() ,this.rdfRepository.getWithSapAnnotations(),this.rdfRepository.getUseBaseType()));
+		this.setEdmMetadata(new RdfModelToMetadata(rdfModel,this.rdfRepository.getWithRdfAnnotations() ,this.rdfRepository.getWithSapAnnotations(),this.rdfRepository.getUseBaseType(),this.rdfRepository.getWithFKProperties()));
 		
 	}
 	

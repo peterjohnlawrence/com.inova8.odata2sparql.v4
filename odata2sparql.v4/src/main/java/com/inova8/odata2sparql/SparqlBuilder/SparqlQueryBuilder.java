@@ -37,7 +37,6 @@ import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
@@ -1648,8 +1647,8 @@ public class SparqlQueryBuilder {
 					// TODO Does/should segmentEntityType.getProperties get inherited properties as well?
 					// TODO Why not get all
 					for (RdfProperty rdfProperty : segmentEntityType.getProperties()) {
-						if (rdfProperty.propertyNode != null) {
-							valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
+						if (rdfProperty.getPropertyURI() != null) {
+							valueProperties.add(rdfProperty.getPropertyURI());
 							// emptyClause = false;
 						}
 					}
@@ -1677,7 +1676,7 @@ public class SparqlQueryBuilder {
 								valueProperties.addAll(complexPropertiesSet(rdfProperty));
 
 							} else {
-								valueProperties.add(rdfProperty.propertyNode.getIRI().toString());
+								valueProperties.add(rdfProperty.getPropertyURI());
 							}
 						} catch (EdmException e) {
 							log.error("Failed to locate property:"

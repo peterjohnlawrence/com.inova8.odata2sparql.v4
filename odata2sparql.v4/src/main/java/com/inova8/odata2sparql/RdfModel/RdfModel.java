@@ -638,8 +638,9 @@ public class RdfModel {
 		private String propertyLabel;
 		public String propertyTypeName;
 		private String varName;
-		public RdfNode propertyNode;
+		protected RdfNode propertyNode;
 		private RdfProperty superProperty;
+		private String propertyUri ;
 		private Boolean isKey = false;
 		private Boolean isComplex = false;
 		private RdfComplexType complexType;
@@ -648,6 +649,7 @@ public class RdfModel {
 
 		RdfEntityType ofClass;
 		private String description;
+		private RdfAssociation fkProperty = null;
 
 		public RdfConstants.Cardinality getCardinality() {
 			return cardinality;
@@ -690,8 +692,18 @@ public class RdfModel {
 			return this.propertyName;
 		}
 
+		public void setPropertyUri(String propertyUri) {
+			this.propertyUri = propertyUri;
+		}
+
 		public String getPropertyURI() {
-			return propertyNode.getIRI().toString();
+			if(propertyNode!=null ) {
+				return propertyNode.getIRI().toString();
+			}else if (propertyUri != null ){
+				return propertyUri;
+			}else {
+				return null;
+			}
 		}
 
 		public String getPropertyTypeName() {
@@ -736,6 +748,19 @@ public class RdfModel {
 
 		public void setComplexType(RdfComplexType complexType) {
 			this.complexType = complexType;
+		}
+
+		public boolean isFK() {
+			return !(fkProperty == null);
+		}
+
+
+		public RdfAssociation getFkProperty() {
+			return fkProperty;
+		}
+
+		public void setFkProperty(RdfAssociation fkProperty) {
+			this.fkProperty = fkProperty;
 		}
 	}
 
@@ -847,6 +872,8 @@ public class RdfModel {
 		private String varName;
 		private String relatedKey;
 		private RdfNode domainNode;
+
+
 		private String domainName;
 		public RdfEntityType domainClass;
 		private RdfProperty superProperty;
@@ -862,6 +889,7 @@ public class RdfModel {
 		private RdfEntityType rangeClass;
 		private Cardinality rangeCardinality;
 		private Cardinality domainCardinality;
+		private RdfProperty fkProperty = null;
 
 		public String getAssociationName() {
 			return associationName;
@@ -922,7 +950,9 @@ public class RdfModel {
 		public String getInversePropertyOfURI() {
 			return inversePropertyOf.getIRI().toString();
 		}
-
+		public RdfNode getDomainNode() {
+			return domainNode;
+		}
 		public RdfEntityType getDomainClass() {
 			return domainClass;
 		}
@@ -1034,6 +1064,17 @@ public class RdfModel {
 
 		public RdfProperty getSuperProperty() {
 			return superProperty;
+		}
+
+		public RdfProperty getFkProperty() {
+			return fkProperty;
+		}
+
+		public void setFkProperty(RdfProperty property) {
+			this.fkProperty = property;
+		}
+		public Boolean hasFkProperty(){
+			return !(fkProperty == null);
 		}
 	}
 
@@ -1270,7 +1311,7 @@ public class RdfModel {
 		}
 		return property;
 	}
-
+	
 	RdfProperty getOrCreateProperty(RdfNode propertyNode, RdfNode propertyLabelNode, RdfNode domainNode)
 			throws OData2SparqlException {
 
@@ -1294,7 +1335,18 @@ public class RdfModel {
 		}
 		return property;
 	}
-
+	RdfProperty getOrCreateFKProperty(RdfAssociation rdfNavigationProperty)
+			throws OData2SparqlException {
+		RdfNode propertyNode= rdfNavigationProperty.getAssociationNode();
+		RdfNode domainNode = rdfNavigationProperty.getDomainNode();
+		RdfEntityType clazz = this.getOrCreateEntityType(domainNode);
+		RdfProperty property =  getOrCreateProperty(propertyNode,null,domainNode);
+		property.propertyName = property.propertyName + "Id";
+		property.setFkProperty(rdfNavigationProperty);
+		rdfNavigationProperty.setFkProperty(property );
+		clazz.properties.put(property.propertyName, property);
+		return property;
+	}
 	public RdfComplexType getOrCreateComplexType(RdfNode complexTypeNode, RdfNode complexTypeLabelNode,
 			RdfNode superdomainNode) throws OData2SparqlException {
 		RdfURI complexTypeURI = new RdfURI(complexTypeNode);

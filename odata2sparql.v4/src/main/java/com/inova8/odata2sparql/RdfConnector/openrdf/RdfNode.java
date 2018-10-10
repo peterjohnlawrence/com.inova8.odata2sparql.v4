@@ -33,7 +33,7 @@ public class RdfNode {
 		return this.node.stringValue().hashCode();
 	}
 
-	RdfNode(Value node) {
+	public RdfNode(Value node) {
 		this.node = node;
 	}
 

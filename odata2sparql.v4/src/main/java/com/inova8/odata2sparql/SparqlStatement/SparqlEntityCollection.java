@@ -192,6 +192,13 @@ class SparqlEntityCollection extends EntityCollection {
 												.toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
 							}
 						}
+						if (rdfAssociation.hasFkProperty()) {
+							//Add QName of FK URI as literal property so that dumb BI tools can thing in relational table terms
+							rdfSubjectEntity.addProperty((new Property(null,
+									rdfAssociation.getFkProperty().getEDMPropertyName(), ValueType.PRIMITIVE,
+									SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes()
+											.toQName(objectNode, RdfConstants.QNAME_SEPARATOR)))));
+						}
 					}
 				} else if (objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded
@@ -251,18 +258,18 @@ class SparqlEntityCollection extends EntityCollection {
 		} else if (rdfComplexTypeProperty.getRdfNavigationProperty() != null) {
 
 			RdfAssociation complexNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
-						Link navigationLink = complexValue.getNavigationLink(complexNavigationProperty.getAssociationName());
-						if(navigationLink == null ) {
-							navigationLink = new Link();
-							navigationLink.setTitle(complexNavigationProperty.getAssociationName());
-							if (navigationLink.getRel() == null)
-								navigationLink.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
-							complexValue.getNavigationLinks().add(navigationLink);
-						}
+			Link navigationLink = complexValue.getNavigationLink(complexNavigationProperty.getAssociationName());
+			if (navigationLink == null) {
+				navigationLink = new Link();
+				navigationLink.setTitle(complexNavigationProperty.getAssociationName());
+				if (navigationLink.getRel() == null)
+					navigationLink.setRel(
+							"http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
+				complexValue.getNavigationLinks().add(navigationLink);
+			}
 
 			navigationLink.setHref(rdfObjectEntity.getId().toString());
 
-						
 			if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
 				// to MANY, MULTIPLE
 				EntityCollection inlineEntitySet = navigationLink.getInlineEntitySet();

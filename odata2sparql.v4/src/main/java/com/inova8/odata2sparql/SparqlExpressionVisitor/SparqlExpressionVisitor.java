@@ -143,86 +143,6 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return "";
 	}
 
-	//	@Override
-//	public Object visitProperty(PropertyExpression propertyExpression, String uriLiteral, EdmTyped edmProperty) {
-//		RdfProperty rdfProperty;
-//		try {
-//			if (entityType.isOperation()) {
-//				return "?" + entityType.findProperty(edmProperty.getName()).getVarName();
-//
-//			} else {
-//				if (edmProperty instanceof EdmNavigationProperty) {
-//					if (sPath.isEmpty()) {
-//						sPath = entityType.entityTypeName;
-//					}
-//					//Need to create path
-//					currentNavigationProperty = (EdmNavigationProperty) edmProperty;
-//					sPath += edmProperty.getName();
-//					putNavPropertyPropertyFilter(sPath, null, null, null);
-//
-//					return sPath;
-//				} else if (RdfConstants.SUBJECT.equals(edmProperty.getName())) {
-//					//TODO still need to add full path to disambiguate
-//					//rdfProperty = entityType.findProperty(edmProperty.getName());
-//					//properties.add(rdfProperty);
-//					if (!sPath.isEmpty()) {
-//						rdfProperty = entityType.findProperty(edmProperty.getName());
-//						if (navigationProperties.containsKey(sPath)) {
-//							navigationProperties.get(sPath).add(rdfProperty);
-//						} else {
-//							HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
-//							properties.add(rdfProperty);
-//							navigationProperties.put(sPath, properties);
-//						}
-//						//putNavPropertyPropertyFilter(sPath,null,rdfProperty,null); 
-//						String visitProperty = "?" + sPath + SUBJECT_POSTFIX;
-//						sPath = "";
-//						return visitProperty;
-//					} else {
-//						sPath = "";
-//						return "?" + entityType.entityTypeName + SUBJECT_POSTFIX;
-//					}
-//				} else {
-//
-//					if (!sPath.isEmpty()) {
-//						//						rdfProperty = this.rdfModelToMetadata.getMappedProperty(new FullQualifiedName(currentNavigationProperty.getRelationship().getNamespace(), edmProperty.getName()));   					
-//						//						rdfProperty = this.rdfModelToMetadata.getMappedProperty(currentNavigationProperty.getRelationship(), edmProperty);
-//
-//						EdmEntityType endEntityType = currentNavigationProperty.getRelationship().getEnd2()
-//								.getEntityType();
-//						FullQualifiedName endEntityTypeFQN = new FullQualifiedName(endEntityType.getNamespace(),
-//								endEntityType.getName());
-//						RdfEntityType endRdfEntityType = this.rdfModelToMetadata.getMappedEntityType(endEntityTypeFQN);
-//						rdfProperty = endRdfEntityType.findProperty(edmProperty.getName());
-//						if (navigationProperties.containsKey(sPath)) {
-//							navigationProperties.get(sPath).add(rdfProperty);
-//						} else {
-//							HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
-//							properties.add(rdfProperty);
-//							navigationProperties.put(sPath, properties);
-//						}
-//						putNavPropertyPropertyFilter(sPath, null, rdfProperty, null);
-//					} else {
-//						properties.add(entityType.findProperty(edmProperty.getName()));
-//						putNavPropertyPropertyFilter(entityType.entityTypeName, null,
-//								entityType.findProperty(edmProperty.getName()), null);
-//					}
-//					//If sPath="" then the root path so should use entityTypeName instead
-//					String visitProperty;
-//					if (sPath.equals("")) {
-//						visitProperty = "?" + entityType.getEDMEntityTypeName() + RdfConstants.PROPERTY_POSTFIX; //uriLiteral +
-//					} else {
-//						visitProperty = "?" + sPath + RdfConstants.PROPERTY_POSTFIX;//uriLiteral + 
-//					}
-//					sPath = "";
-//					return visitProperty;
-//				}
-//			}
-//		} catch (EdmException e) {
-//			throw new UnsupportedOperationException("Unrecognized property" + uriLiteral);
-//		}
-//	}
-
 	private void putNavPropertyPropertyFilter(String sPath, RdfAssociation navProperty, RdfProperty property,
 			String filter) {
 		NavPropertyPropertyFilter navPropertyPropertyFilter;
@@ -416,8 +336,9 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		RdfProperty rdfProperty = null;
 		String memberProperty = member.getResourcePath().getUriResourceParts().get(0).toString();
 		try {
+			rdfProperty = entityType.findProperty(memberProperty);
 			if (entityType.isOperation()) {
-				return "?" + entityType.findProperty(memberProperty).getVarName();
+				return "?" + rdfProperty.getVarName();
 			} else {
 				if (member instanceof UriResourceNavigation) {
 					if (sPath.isEmpty()) {
@@ -434,7 +355,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 					//rdfProperty = entityType.findProperty(edmProperty.getName());
 					//properties.add(rdfProperty);
 					if (!sPath.isEmpty()) {
-						rdfProperty = entityType.findProperty(memberProperty);
+						//rdfProperty = entityType.findProperty(memberProperty);
 						if (navigationProperties.containsKey(sPath)) {
 							navigationProperties.get(sPath).add(rdfProperty);
 						} else {
@@ -450,8 +371,20 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 						sPath = "";
 						return "?" + entityType.entityTypeName + SUBJECT_POSTFIX;
 					}
-				} else {
-					rdfProperty = entityType.findProperty(memberProperty);
+				} else if (rdfProperty.isFK()) {
+					properties.add(rdfProperty);
+					putNavPropertyPropertyFilter(entityType.entityTypeName, null, rdfProperty, null);
+ 					String visitProperty = null;
+					if (sPath.equals("")) {
+						visitProperty = "?" + entityType.getEDMEntityTypeName() + memberProperty
+								+ RdfConstants.PROPERTY_POSTFIX;
+					} else {
+						visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
+					}
+					return visitProperty;
+					
+				}else {
+					//rdfProperty = entityType.findProperty(memberProperty);
 					properties.add(rdfProperty);
 					putNavPropertyPropertyFilter(entityType.entityTypeName, null, rdfProperty, null);
 					String visitProperty = null;

@@ -12,31 +12,31 @@ import org.eclipse.rdf4j.model.Namespace;
 
 import com.inova8.odata2sparql.Constants.TextSearchType;
 
-public class RdfRepository  {
+public class RdfRepository {
 
 	private RdfConnection dataEndPoint;
 	private RdfConnection modelEndPoint;
 	private RdfConnection operationEndPoint;
-	
+
 	/**
-	 * @param dataRepository the dataRepository to set
+	 * @param dataRepository
+	 *            the dataRepository to set
 	 */
 	public void setDataRepository(RdfRoleRepository dataRepository) {
 		this.dataRepository = dataRepository;
-		this.dataEndPoint =new RdfConnection(dataRepository);
+		this.dataEndPoint = new RdfConnection(dataRepository);
 	}
 
-
 	/**
-	 * @param modelRepository the modelRepository to set
+	 * @param modelRepository
+	 *            the modelRepository to set
 	 */
 	public void setModelRepository(RdfRoleRepository modelRepository) {
 		this.modelRepository = modelRepository;
 
-		this.modelEndPoint =new RdfConnection(modelRepository);
+		this.modelEndPoint = new RdfConnection(modelRepository);
 		this.operationEndPoint = this.modelEndPoint;
 	}
-
 
 	/**
 	 * @return the dataRepository
@@ -44,7 +44,6 @@ public class RdfRepository  {
 	public RdfRoleRepository getDataRepository() {
 		return dataRepository;
 	}
-
 
 	/**
 	 * @return the modelRepository
@@ -55,7 +54,7 @@ public class RdfRepository  {
 
 	private RdfRoleRepository dataRepository;
 	private RdfRoleRepository modelRepository;
-	
+
 	private final Namespace defaultPrefix;
 	private final Hashtable<String, Namespace> namespaces;
 	private int defaultQueryLimit;
@@ -65,25 +64,29 @@ public class RdfRepository  {
 	private Boolean useBaseType;
 	private Boolean expandOperations = false;
 	private TextSearchType textSearchType;
-	
-	RdfRepository(String modelName,Namespace defaultPrefix,Hashtable<String, Namespace> namespaces) {
+	private boolean withFKProperties;
+
+	RdfRepository(String modelName, Namespace defaultPrefix, Hashtable<String, Namespace> namespaces) {
 		super();
 		this.modelName = modelName;
-		this.defaultPrefix = defaultPrefix;		
-		this.namespaces =  namespaces; 	
+		this.defaultPrefix = defaultPrefix;
+		this.namespaces = namespaces;
 	}
+
 	public String getModelName() {
 		return modelName;
 	}
 
 	public String defaultNamespace() {
-		
+
 		return defaultPrefix.getName();
 	}
+
 	public Hashtable<String, Namespace> getNamespaces() {
-		
+
 		return namespaces;
 	}
+
 	public RdfConnection getDataEndpoint() {
 		return dataEndPoint;
 	}
@@ -123,23 +126,36 @@ public class RdfRepository  {
 	public void setWithSapAnnotations(Boolean withSapAnnotations) {
 		this.withSapAnnotations = withSapAnnotations;
 	}
+
 	public Boolean getUseBaseType() {
 		return useBaseType;
 	}
+
 	public void setUseBaseType(boolean useBaseType) {
-		this.useBaseType = useBaseType;	
+		this.useBaseType = useBaseType;
 	}
+
 	public Boolean getExpandOperations() {
 		return expandOperations;
 	}
+
 	public void setExpandOperations(boolean expandOperations) {
-		this.expandOperations = expandOperations;	
+		this.expandOperations = expandOperations;
 	}
+
 	public TextSearchType getTextSearchType() {
 		return textSearchType;
 	}
+
 	public void setTextSearchType(TextSearchType textSearchType) {
 		this.textSearchType = textSearchType;
 	}
 
+	public void setWithFKProperties(boolean withFKProperties) {
+		this.withFKProperties = withFKProperties;
+	}
+
+	public boolean getWithFKProperties() {
+		return withFKProperties;
+	}
 }
