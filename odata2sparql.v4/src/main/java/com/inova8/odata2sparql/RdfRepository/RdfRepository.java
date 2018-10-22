@@ -65,6 +65,8 @@ public class RdfRepository {
 	private Boolean expandOperations = false;
 	private TextSearchType textSearchType;
 	private boolean withFKProperties;
+	private boolean withMatching = true;
+	private String match;
 
 	RdfRepository(String modelName, Namespace defaultPrefix, Hashtable<String, Namespace> namespaces) {
 		super();
@@ -157,5 +159,21 @@ public class RdfRepository {
 
 	public boolean getWithFKProperties() {
 		return withFKProperties;
+	}
+
+	public boolean isWithMatching() {
+		return withMatching;
+	}
+
+	public void setWithMatching(boolean withMatching) {
+		this.withMatching = withMatching;
+	}
+
+	public String getMatch() {
+		return match;
+	}
+
+	public void setMatch(String match) {
+		this.match = match;
 	}
 }

@@ -65,6 +65,7 @@ public class RdfConstants {
 
 	public static final String TARGETENTITY = "http://targetEntity";
 	public static final String ASSERTEDTYPE = "http://assertedType";
+	public static final String MATCHING = "http://matching";
 	public static final String COUNT = "http://count";
 	public static final String PREFIX = "j";
 	public static final String PROPERTY_POSTFIX = "_value";
@@ -78,6 +79,8 @@ public class RdfConstants {
 	private static final String  ODATA_NS ="odata";
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
+	
+	public static final String  MATCH ="{ ??key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* ??key2 }";
 
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";

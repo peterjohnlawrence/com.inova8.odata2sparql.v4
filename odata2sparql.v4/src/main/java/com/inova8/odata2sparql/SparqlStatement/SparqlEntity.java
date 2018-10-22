@@ -3,6 +3,7 @@ package com.inova8.odata2sparql.SparqlStatement;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
@@ -17,6 +18,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 
 public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	private final HashMap<RdfNode, Object> datatypeProperties = new HashMap<RdfNode, Object>();
+	private  HashSet<SparqlEntity> matching = new HashSet<SparqlEntity>();
 	private final RdfNode subjectNode;
 	private final String subject;
 	private final RdfPrefixes rdfPrefixes;
@@ -115,4 +117,12 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 		}
 		return result;
 	}
+	public void addMatching( SparqlEntity matchingEntity) {
+		if (!this.equals(matchingEntity)) matching.add(matchingEntity);
+	}
+
+	public HashSet<SparqlEntity> getMatching() {
+		return matching;
+	}
+	
 }

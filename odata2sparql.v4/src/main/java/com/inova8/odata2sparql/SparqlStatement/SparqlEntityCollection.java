@@ -72,13 +72,23 @@ class SparqlEntityCollection extends EntityCollection {
 	}
 
 	public Entity getFirstEntity() throws ODataException {
-		if (!this.getEntities().isEmpty()) {
+		if (!this.getEntities().isEmpty()) {			
 			return this.iterator().next();
 		} else {
 			return null;
 		}
 	}
-
+	public Entity findEntity(String key) {
+		if (!this.getEntities().isEmpty()) {
+			for (Entity entity : this.getEntities()) {
+				//TODO could be more efficient?
+				if (entity.getProperty(RdfConstants.SUBJECT).getValue().toString().equals(key)) return entity;
+			}
+		} else {
+			return null;
+		}
+		return null; 
+ }
 	public Map<String, Map<String, List<Object>>> getNavPropertyResults() {
 		return navPropertyResults;
 	}
@@ -148,6 +158,14 @@ class SparqlEntityCollection extends EntityCollection {
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
 						//TODO what can we use this for
 						//rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
+				
+					} else if (propertyNode.getIRI().toString().equals(RdfConstants.MATCHING)) {
+						//TODO add to local linkset
+						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+						if(!rdfObjectEntity.equals(rdfSubjectEntity)) {
+								rdfSubjectEntity.addMatching(rdfObjectEntity);
+								rdfObjectEntity.addMatching(rdfSubjectEntity);
+						}							
 					} else {
 						RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType()
 								.findNavigationProperty(propertyNode);
@@ -233,6 +251,8 @@ class SparqlEntityCollection extends EntityCollection {
 		} finally {
 			results.close();
 		}
+		//This should only be if matching is enabled
+		this.mergeMatching();
 		return this.build();
 	}
 
@@ -391,13 +411,36 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		return rdfEntity;
 	}
-
+	private void  mergeMatching() {
+		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
+				.iterator();
+		while (entitySetResultsMapIterator.hasNext()) {
+			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
+			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();	
+			HashMap<RdfNode, Object> mergedDatatypeProperties = new  HashMap<RdfNode, Object>();
+			ArrayList<Property> mergedProperties = new  ArrayList<Property>();
+			ArrayList<Link> mergedNavigationLinks = new  ArrayList<Link>();
+			for( SparqlEntity matchingEntity: rdfEntity.getMatching()) {			
+				mergedDatatypeProperties.putAll(matchingEntity.getDatatypeProperties());
+				mergedProperties.addAll(matchingEntity.getProperties());
+				mergedNavigationLinks.addAll(matchingEntity.getNavigationLinks());
+			}	
+			mergedDatatypeProperties.putAll(rdfEntity.getDatatypeProperties());
+			mergedProperties.addAll(rdfEntity.getProperties());
+			mergedNavigationLinks.addAll(rdfEntity.getNavigationLinks());
+			rdfEntity.getDatatypeProperties().putAll(mergedDatatypeProperties);
+			rdfEntity.getProperties().addAll(mergedProperties);
+			rdfEntity.getNavigationLinks().addAll(mergedNavigationLinks);
+		}
+	}
 	private SparqlEntityCollection build() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
+			
+			
 			// only leave target entities in collection, the rest will be
 			// accessed via links
 			if (rdfEntity.isTargetEntity()) {
