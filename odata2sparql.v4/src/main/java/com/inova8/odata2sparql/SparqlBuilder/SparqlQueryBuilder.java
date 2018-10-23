@@ -882,9 +882,6 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
 			clausesMatch.append(indent).append("#clausesMatch\n");
-//		clausesMatch.append(indent).append("{ " + key1
-//				+ " (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* "
-//				+ key2 + " }\n");
 		clausesMatch.append(indent).append( createMatchFromTemplate(key1, key2) + "\n");
 		return clausesMatch;
 	}
@@ -892,9 +889,6 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
 			clausesMatch.append(indent).append("#clausesMatch\n");
-//		clausesMatch.append(indent).append("{ " + key
-//				+ " (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* "
-//				+ key + "m }\n");
 		clausesMatch.append(indent).append( createMatchFromTemplate(key, key + "m") + "\n");
 		return clausesMatch;
 	}
@@ -902,9 +896,6 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
 			clausesMatch.append(indent).append("#clausesMatchNavigationKey\n");
-//		clausesMatch.append(indent).append("FILTER EXISTS{  " + key1
-//				+ " (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* "
-//				+ key2 + " }\n");
 		clausesMatch.append(indent).append("FILTER EXISTS{" + createMatchFromTemplate(key1, key2) + "}\n");
 		return clausesMatch;
 	}
@@ -1583,7 +1574,7 @@ public class SparqlQueryBuilder {
 				.append("\tWHERE {\n");
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
-		expandItemWhereCount.append(indent);
+		
 		if (navProperty.getDomainClass().isOperation()) {
 			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
 				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
@@ -1603,22 +1594,27 @@ public class SparqlQueryBuilder {
 			}
 		} else {
 			String nextKeyVar = "?" + nextTargetKey + "_s";
-			if(this.rdfModel.getRdfRepository().isWithMatching()) nextKeyVar = nextKeyVar+ "m";
-			//TODO Issue #93
+			String keyvar ="?" + targetKey + "_s";
+			if(this.rdfModel.getRdfRepository().isWithMatching()) {
+				nextKeyVar = nextKeyVar+ "m";
+				keyvar = keyvar+ "m1";
+				expandItemWhereCount.append(clausesMatch("?" + targetKey + "_s" ,keyvar,indent +"\t\t"));
+			}
+			//Fixes Issue #93
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {			
-				expandItemWhereCount.append(indent).append("\t{\n");
+				expandItemWhereCount.append(indent).append("\t\t{\n");
 				expandItemWhereCount.append(indent).append("\t\t\t").append(nextKeyVar + " <"
-						+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
+						+ navProperty.getInversePropertyOf().getIRI() + "> " + keyvar + " .\n");
 				expandItemWhereCount.append(indent).append("\t\t").append("}UNION{\n");
 				expandItemWhereCount.append(indent).append("\t\t\t").append(
-						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> " + nextKeyVar + " .\n");
+						keyvar + " <" + navProperty.getAssociationIRI() + "> " + nextKeyVar + " .\n");
 				expandItemWhereCount.append(indent).append("\t\t").append("}\n");
 
 			} else {
 				expandItemWhereCount.append(indent).append("\t").append(
-						"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> " + nextKeyVar + " .\n");
+						keyvar + " <" + navProperty.getAssociationIRI() + "> " + nextKeyVar + " .\n");
 			}
 			if(this.rdfModel.getRdfRepository().isWithMatching()) expandItemWhereCount.append(clausesMatch("?" + nextTargetKey + "_s" ,nextKeyVar,indent +"\t\t"));
 		}
