@@ -762,6 +762,10 @@ public class RdfModel {
 		public void setFkProperty(RdfAssociation fkProperty) {
 			this.fkProperty = fkProperty;
 		}
+
+		public RdfEntityType getOfClass() {
+			return ofClass;
+		}
 	}
 
 	public static class RdfComplexTypePropertyPair {

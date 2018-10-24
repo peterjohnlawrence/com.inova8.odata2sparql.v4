@@ -270,10 +270,14 @@ public class RdfModelToMetadata {
 			for (RdfComplexType rdfComplexType : rdfGraph.getComplexTypes()) {
 				CsdlComplexType csdlComplexType = new CsdlComplexType().setName(rdfComplexType.getComplexTypeName());
 				for (RdfProperty rdfProperty : rdfComplexType.getProperties().values()) {
-					csdlComplexType.getProperties().add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName()).setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName()));
+					List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();		
+					propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.ODATA_SUBTYPE_FQN, rdfProperty.getOfClass().getEntityTypeName()));
+					csdlComplexType.getProperties().add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName()).setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName()).setAnnotations(propertyAnnotations));
 				}
 				for (RdfAssociation rdfNavigationProperty : rdfComplexType.getNavigationProperties().values()) {
-					csdlComplexType.getNavigationProperties().add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName()).setType(new FullQualifiedName(rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
+					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();		
+					navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.ODATA_SUBTYPE_FQN, rdfNavigationProperty.getDomainName()));
+					csdlComplexType.getNavigationProperties().add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName()).setAnnotations(navigationPropertyAnnotations).setType(new FullQualifiedName(rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
 							rdfNavigationProperty.getRangeName())).setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
 									|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE)));
 				}

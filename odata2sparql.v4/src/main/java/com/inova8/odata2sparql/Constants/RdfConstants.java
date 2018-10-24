@@ -79,6 +79,7 @@ public class RdfConstants {
 	private static final String  ODATA_NS ="odata";
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
+	private static final String  ODATA_SUBTYPE ="subType";
 	
 	public static final String  MATCH ="{ ??key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* ??key2 }";
 
@@ -238,6 +239,7 @@ public class RdfConstants {
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
 	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public static final String ODATA_FK_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_FK;
+	public static final String ODATA_SUBTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_SUBTYPE;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
@@ -251,6 +253,7 @@ public class RdfConstants {
 	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO).setType("Edm.String");
 	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
 	private final static CsdlTerm odataFK = new CsdlTerm().setName(RdfConstants.ODATA_FK).setType("Edm.String");
+	private final static CsdlTerm odataSubType = new CsdlTerm().setName(RdfConstants.ODATA_SUBTYPE).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
@@ -364,6 +367,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.SAP_QUICKINFO, sapquickinfoTerm);
 		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.ODATA_FK, odataFK);
+		TERMS.put(RdfConstants.ODATA_SUBTYPE, odataSubType);
 		TERMS.put(RdfConstants.RDFS_CLASS_LABEL, rdfsClassTerm);
 		TERMS.put(RdfConstants.PROPERTY, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
@@ -375,6 +379,7 @@ public class RdfConstants {
 		SAPTERMS.add(sapquickinfoTerm);
 		ODATATERMS.add(odatabaseType);
 		ODATATERMS.add(odataFK);
+		ODATATERMS.add(odataSubType);
 		RDFTERMS.add(rdfPropertyTerm);
 		RDFSTERMS.add(rdfsClassTerm);
 		RDFSTERMS.add(rdfsDatatypeTerm);
