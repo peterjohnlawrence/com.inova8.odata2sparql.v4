@@ -1499,14 +1499,6 @@ public class SparqlQueryBuilder {
 		expandItemWhere.append(indent).append("\t{\n");
 		if (navProperty.getRangeClass().isOperation()) {
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
-			// BIND(?order as ?Order_s)
-			// BIND(?prod as ?Orderorder_orderSummaryorderSummary_product_s
-			// )
-			//TODO what BINdings do we need to add?
-			//			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
-			//				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
-			//					expandItemWhere.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
-			//			}
 		} else {
 			expandItemWhere.append(indent).append("\t\t\t{")
 					.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
@@ -1547,10 +1539,9 @@ public class SparqlQueryBuilder {
 			expandItemWhere.append("}\n");
 			expandItemWhere.append(
 					clausesSelect(createSelectPropertyMap(navProperty.getRangeClass(), expandItem.getSelectOption()),
-							nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));
-			expandItemWhere.append(indent).append("\t}\n");
+							nextTargetKey, nextTargetKey, navProperty.getRangeClass(), indent + "\t"));		
 		}
-
+		expandItemWhere.append(indent).append("\t}\n");
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
 					nextTargetKey, nextTargetEntityType));
