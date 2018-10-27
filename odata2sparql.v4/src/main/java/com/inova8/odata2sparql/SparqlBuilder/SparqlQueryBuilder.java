@@ -1492,7 +1492,7 @@ public class SparqlQueryBuilder {
 
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandItemWhere.append(indent).append("#expandItemWhere\n").append(indent);
-		if (navProperty.getDomainClass().isOperation() || limitSet()) {
+		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
 			expandItemWhere.append("OPTIONAL");
 		} else {
 			expandItemWhere.append("UNION");
