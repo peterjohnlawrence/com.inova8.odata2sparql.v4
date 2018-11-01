@@ -33,6 +33,10 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
+import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
+import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
+import org.apache.olingo.server.core.uri.queryoption.ExpandOptionImpl;
+import org.apache.olingo.server.core.uri.queryoption.apply.ExpandImpl;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
@@ -105,8 +109,8 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 		if (isValue) {
 			writeComplexValue(response, property);
 		} else {
-			writeProperty(request, response, responseFormat, edmEntitySet, edmPropertyName, edmComplexType, property);
-		}
+			writeProperty(request, response, responseFormat, edmEntitySet, edmPropertyName, edmComplexType, property, uriInfo);
+	}
 
 	}
 
@@ -129,7 +133,7 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 	}
 
 	private void writeProperty(ODataRequest request, ODataResponse response, ContentType responseFormat,
-			EdmEntitySet edmEntitySet, String edmPropertyName, EdmComplexType edmComplexType, Property property)
+			EdmEntitySet edmEntitySet, String edmPropertyName, EdmComplexType edmComplexType, Property property, UriInfo uriInfo)
 			throws SerializerException, ODataApplicationException {
 		Object value = property.getValue();
 		if (value != null) {
@@ -138,15 +142,17 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 			ODataSerializer serializer = odata.createSerializer(responseFormat);
 			ContextURL contextUrl = null;
 			try {
-				//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
+				//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients)
 				contextUrl = ContextURL.with().entitySet(edmEntitySet).navOrPropertyPath(edmPropertyName)
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 			} catch (URISyntaxException e) {
 				throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
 						HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 			}
-
-			ComplexSerializerOptions options = ComplexSerializerOptions.with().contextURL(contextUrl).build();
+	ExpandOption expandoption = uriInfo.getExpandOption();
+    ExpandOptionImpl expandOption = new ExpandOptionImpl();
+    expandOption.setText("*");
+			ComplexSerializerOptions options = ComplexSerializerOptions.with().select(uriInfo.getSelectOption()).expand(uriInfo.getExpandOption()).contextURL(contextUrl).build();
 			// 3.2. serialize
 			SerializerResult serializerResult = serializer.complex(serviceMetadata, edmComplexType, property,
 					options);

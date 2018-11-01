@@ -91,8 +91,19 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = null;
 		try {
-			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo,
-					(uriInfo.getUriResourceParts().size() > 1) ? UriType.URI6B : UriType.URI1);
+		
+			List<UriResource> uriResourceParts = uriInfo.getUriResourceParts();
+			if(uriResourceParts.size()==1) {
+				entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, UriType.URI1);
+			}else {
+				if(uriResourceParts.size()==3 ) {
+					entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, UriType.URI4);
+				}else {
+					entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, UriType.URI6B );
+				}
+				
+			}
+
 		} catch (ODataException | OData2SparqlException e) {
 			log.info("No data found");
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),

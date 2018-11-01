@@ -145,11 +145,12 @@ class SparqlEntityCollection extends EntityCollection {
 				RdfNode propertyNode = triple.getPredicate();
 				RdfNode objectNode = triple.getObject();
 
-				SparqlEntity rdfSubjectEntity = findOrCreateEntity(subjectNode, rdfEntityType);
-				if ((expand == null || expand.getExpandItems().isEmpty())
-						&& (select == null || select.getSelectItems().isEmpty())) {
-					rdfSubjectEntity.setEntityType(rdfEntityType);
-				}
+				SparqlEntity rdfSubjectEntity = findOrCreateEntity(subjectNode);
+// TODO maybe not required
+//				if ((expand == null || expand.getExpandItems().isEmpty())
+//						&& (select == null || select.getSelectItems().isEmpty())) {
+//					rdfSubjectEntity.setEntityType(rdfEntityType);
+//				}
 				if (objectNode.isIRI() || objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded entity
 					if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
@@ -161,7 +162,7 @@ class SparqlEntityCollection extends EntityCollection {
 				
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.MATCHING)) {
 						//TODO add to local linkset
-						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
 						if(!rdfObjectEntity.equals(rdfSubjectEntity)) {
 								rdfSubjectEntity.addMatching(rdfObjectEntity);
 								rdfObjectEntity.addMatching(rdfSubjectEntity);
@@ -175,7 +176,7 @@ class SparqlEntityCollection extends EntityCollection {
 							//will only get here if rdfs_type in $expand
 							//} else {
 							// Locate which of the $expand this is related to
-							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
 
 							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
 							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
@@ -187,7 +188,7 @@ class SparqlEntityCollection extends EntityCollection {
 								.findComplexProperty(propertyNode)) != null) {
 							rdfAssociation = rdfComplexTypeProperty.getRdfNavigationProperty();
 							//Could be associated with a complexType's navigation property
-							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode, rdfEntityType);
+							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
 							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
 							//							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
 							//									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
@@ -287,7 +288,7 @@ class SparqlEntityCollection extends EntityCollection {
 							"http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
 				complexValue.getNavigationLinks().add(navigationLink);
 			}
-
+//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
 			navigationLink.setHref(rdfObjectEntity.getId().toString());
 
 			if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
@@ -397,7 +398,7 @@ class SparqlEntityCollection extends EntityCollection {
 		return link;
 	}
 
-	private SparqlEntity findOrCreateEntity(RdfNode subjectNode, RdfEntityType rdfEntityType) {
+	private SparqlEntity findOrCreateEntity(RdfNode subjectNode) {//, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
 		rdfEntity = entitySetResultsMap.get(
 				sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(subjectNode, RdfConstants.QNAME_SEPARATOR));
