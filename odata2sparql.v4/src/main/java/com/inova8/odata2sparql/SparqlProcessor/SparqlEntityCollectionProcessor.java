@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
@@ -56,6 +57,7 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
+import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
 public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollectionProcessor.class);
@@ -139,14 +141,36 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 				UriResource penultimateSegment = resourceParts.get(resourceParts.size() - 2);
 				UriResourceComplexProperty complexProperty = ((UriResourceComplexProperty) penultimateSegment);
 				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet,complexProperty.getComplexType(), edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
+				//TODO ***********************************************************
+				//Need to get the actual value of the complex property
+				//First find the entity, then its complexproperty value which will be a collection of entities
+				String entityString = resourceParts.get(0).getSegmentValue() + "(" + ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText() +")";
+				Entity resultsEntity = null;
+				for(Entity entity: entitySet.getEntities()) {
+					if(entity.getId().toString().equals(entityString))
+					 {
+						resultsEntity = entity;
+						break;				 
+					 }
+				}
+				//Now its complexproperty value
+				ComplexValue result = (ComplexValue)resultsEntity.getProperty(complexProperty.getComplexType().getName()).getValue();
+				entitySet = new EntityCollection();
+				//Now its property value 
+				for(Property property : result.getValue()) {
+					if(property.getName().equals(edmNavigationProperty.getName())) {
+						entitySet = (EntityCollection) property.getValue();
+					}
+				}
+				//TODO ***********************************************************
 			}						
 		}else {
 			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
 			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 					Locale.ROOT);
 		}
-		// 5th: Now serialize the content: transform from the EntitySet object to InputStream
-
+	
+		// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
 		ContextURL contextUrl = null;
 		try {
 			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)

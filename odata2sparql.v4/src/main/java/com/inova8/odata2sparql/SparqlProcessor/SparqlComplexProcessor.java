@@ -149,9 +149,6 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 				throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
 						HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 			}
-	ExpandOption expandoption = uriInfo.getExpandOption();
-    ExpandOptionImpl expandOption = new ExpandOptionImpl();
-    expandOption.setText("*");
 			ComplexSerializerOptions options = ComplexSerializerOptions.with().select(uriInfo.getSelectOption()).expand(uriInfo.getExpandOption()).contextURL(contextUrl).build();
 			// 3.2. serialize
 			SerializerResult serializerResult = serializer.complex(serviceMetadata, edmComplexType, property,

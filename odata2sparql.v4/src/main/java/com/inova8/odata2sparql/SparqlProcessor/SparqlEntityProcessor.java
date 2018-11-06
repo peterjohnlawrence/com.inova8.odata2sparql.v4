@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -31,6 +32,7 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
@@ -94,7 +96,16 @@ public class SparqlEntityProcessor implements EntityProcessor {
 				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
 				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
 				responseEdmEntityType = edmNavigationProperty.getType();
-				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);//SparqlBaseCommand.getNavigationTargetEntitySet(uriInfo);
+				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+			}
+		} else if (segmentCount == 3) { //complex/navigation
+			UriResource navSegment = resourceParts.get(2);
+			if (navSegment instanceof UriResourceNavigation) {
+				EdmComplexType complexType = ((UriResourceComplexProperty)resourceParts.get(1)).getComplexType();
+				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
+				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+				responseEdmEntityType = edmNavigationProperty.getType();
+				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, complexType,edmNavigationProperty);
 			}
 		} else {
 			// this would be the case for e.g. Products(1)/Category/Products(1)/Category

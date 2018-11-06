@@ -7,6 +7,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.ex.ODataException;
@@ -17,6 +18,7 @@ import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
@@ -145,7 +147,21 @@ public class SparqlBaseCommand {
 			knownKey = true;
 			break;
 		case URI6A:
-			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+			UriResource lastSegment = resourcePaths.get(resourcePaths.size() - 1);
+//			if (lastSegment instanceof UriResourceNavigation) {
+//				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
+//				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
+//				if(resourcePaths.size()>2) {
+//					UriResourceComplexProperty penultimateSegment = (UriResourceComplexProperty)resourcePaths.get(resourcePaths.size() - 2);
+//					 EdmNavigationProperty navigationProperty = penultimateSegment.getComplexType().getNavigationProperty(edmNavigationProperty.getName());
+//					 edmTargetEntitySet =  Util.getNavigationTargetEntitySet(edmEntitySet,penultimateSegment.getComplexType(),navigationProperty);
+//					 rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
+//				}else {
+//					edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
+//					rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
+//				}
+//			}
+			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;//resourcePaths.get(1);
 			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
 			rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
 			if (!uriResourceNavigation.getKeyPredicates().isEmpty()) {
@@ -156,6 +172,12 @@ public class SparqlBaseCommand {
 				knownKey = false;
 			}
 
+
+			
+			
+			
+			
+			
 			break;
 		default:
 			throw new ODataApplicationException("Unhandled URIType " + uriType,
