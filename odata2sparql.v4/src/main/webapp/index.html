@@ -1,6 +1,64 @@
-<blockquote>OData2sparql.v4</blockquote>
-<a href="http://inova8.com/bg_inova8.com/odata2sparql-consuming-sparqlrdf-with-odata-restful-interface/">Full documentation here </a>
-Usage:  /{repositoryId}/{odatapath}
-Example 
-/NW retrieves published classes
-/NW/$metadata retrieves classes together with properties and navigation properties
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import
+	url(https://db.onlinewebfonts.com/c/89d11a443c316da80dcb8f5e1f63c86e?family=Bauhaus+93)
+	;
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+</style>
+</head>
+<body>
+			<h1>
+				<span style="font-family: 'Bauhaus 93'">
+					<span style="color: blue">inova</span>
+					<span style="color: red">8</span> 
+				</span>
+			</h1>
+			<h2>
+				<span style="font-family: 'Bauhaus 93'; color: black">/OData2SPARQL.v4</span>
+			</h2>
+<a href="http://inova8.com/bg_inova8.com/odata2sparql-consuming-sparqlrdf-with-odata-restful-interface/">Full documentation here </a><br/>
+Usage:  ./{repositoryId}/{resourcepath} where {resourcepath} described here: <a href="http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_ResourcePath">odata/v4.01/cs01/part2-url-conventions</a><br/><br/>
+<table style="width:100%">
+  <tr>
+    <th>Repository</th>
+    <th>Published Classes/EntitySets</th> 
+    <th>Metadata</th>
+    <th>Reset</th>
+	<th>Edit</th>
+  </tr>
+  <tr>
+    <td>ODATA2SPARQL</td>
+    <td><a href="./odata2sparql/ODATA2SPARQL">./odata2sparql/ODATA2SPARQL</a></td> 
+    <td><a href="./odata2sparql/ODATA2SPARQL/$metadata">./odata2sparql/ODATA2SPARQL/$metadata</a></td>
+    <td><a href="./odata2sparql/ODATA2SPARQL/$reset">./odata2sparql/ODATA2SPARQL/$reset</a</td>
+	<td><a href="./odata2sparql/ODATA2SPARQL/$edit">./odata2sparql/ODATA2SPARQL/$edit</a</td>
+  </tr>
+  <tr>
+    <td>northwind</td>
+    <td><a href="./odata2sparql/northwind">./odata2sparql/northwind</a></td> 
+    <td><a href="./odata2sparql/northwind/$metadata">./odata2sparql/northwind/$metadata</a></td>
+    <td><a href="./odata2sparql/northwind/$reset">./odata2sparql/northwind/$reset</a</td>
+	<td><a href="./odata2sparql/northwind/$edit">./odata2sparql/northwind/$edit</a</td>
+  </tr>
+  <tr>
+    <td>NHS</td>
+    <td><a href="./odata2sparql/NHS">./odata2sparql/NHS</a></td> 
+    <td><a href="./odata2sparql/NHS/$metadata">./odata2sparql/NHS/$metadata</a></td>
+    <td><a href="./odata2sparql/NHS/$reset">./odata2sparql/NHS/$reset</a</td>
+	<td><a href="./odata2sparql/NHS/$edit">./odata2sparql/NHS/$edit</a</td>
+  </tr>
+  <tr>
+    <td>Cust360</td>
+    <td><a href="./odata2sparql/Cust360">./odata2sparql/Cust360</a></td> 
+    <td><a href="./odata2sparql/Cust360/$metadata">./odata2sparql/Cust360/$metadata</a></td>
+    <td><a href="./odata2sparql/Cust360/$reset">./odata2sparql/Cust360/$reset</a</td>
+	<td><a href="./odata2sparql/Cust360/$edit">./odata2sparql/Cust360/$edit</a</td>
+  </tr>
+</table>
+</body>
+</html>

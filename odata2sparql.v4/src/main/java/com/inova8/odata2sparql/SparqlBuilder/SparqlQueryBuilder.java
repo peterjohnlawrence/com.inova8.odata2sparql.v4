@@ -501,20 +501,21 @@ public class SparqlQueryBuilder {
 				List<SelectItem> selectItems = this.uriInfo.getSelectOption().getSelectItems();
 				selectItems.add(selectItem);*/
 		//TODO Workaround to select everything  when complexType in expand
-		if (this.uriInfo.getExpandOption() != null) {
-			for (ExpandItem expandItem : this.uriInfo.getExpandOption().getExpandItems()) {
-				if (!expandItem.isStar()) {
-					UriInfoResource resourcePath = expandItem.getResourcePath();
-					if (resourcePath.getUriResourceParts().get(0).getKind().equals(UriResourceKind.complexProperty)
-							&& this.uriInfo.getSelectOption() != null) {
-						((SelectItemImpl) (this.uriInfo.getSelectOption().getSelectItems().get(0))).setStar(true);
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-		}
+		//Fixes #97
+//		if (this.uriInfo.getExpandOption() != null) {
+//			for (ExpandItem expandItem : this.uriInfo.getExpandOption().getExpandItems()) {
+//				if (!expandItem.isStar()) {
+//					UriInfoResource resourcePath = expandItem.getResourcePath();
+//					if (resourcePath.getUriResourceParts().get(0).getKind().equals(UriResourceKind.complexProperty)
+//							&& this.uriInfo.getSelectOption() != null) {
+//						((SelectItemImpl) (this.uriInfo.getSelectOption().getSelectItems().get(0))).setStar(true);
+//						break;
+//					}
+//				} else {
+//					break;
+//				}
+//			}
+//		}
 		selectPropertyMap = createSelectPropertyMap(rdfTargetEntityType, this.uriInfo.getSelectOption());
 
 	}
