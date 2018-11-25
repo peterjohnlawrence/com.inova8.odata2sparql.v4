@@ -4,11 +4,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
@@ -53,8 +53,8 @@ public class RdfModel {
 	}
 
 	public class RdfPrefixes {
-		private final Map<String, String> prefixToURI = new HashMap<String, String>();
-		private final Map<String, String> URItoPrefix = new HashMap<String, String>();
+		private final Map<String, String> prefixToURI = new TreeMap<String, String>();
+		private final Map<String, String> URItoPrefix = new TreeMap<String, String>();
 
 		private void setStandardNsPrefixes() {
 			set(RdfConstants.RDF, RdfConstants.RDF_NS);
@@ -280,12 +280,12 @@ public class RdfModel {
 		private String insertText;
 		private String updateText;
 		private String updatePropertyText;
-		private final HashMap<String, FunctionImportParameter> functionImportParameters = new HashMap<String, FunctionImportParameter>();
-		private final HashMap<String, RdfModel.RdfProperty> properties = new HashMap<String, RdfModel.RdfProperty>();
-		private final HashMap<String, RdfModel.RdfAssociation> navigationProperties = new HashMap<String, RdfModel.RdfAssociation>();
-		private final HashMap<String, RdfModel.RdfComplexType> complexTypes = new HashMap<String, RdfModel.RdfComplexType>();
-		private final HashMap<String, RdfModel.RdfAssociation> incomingAssociations = new HashMap<String, RdfModel.RdfAssociation>();
-		final HashMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new HashMap<String, RdfModel.RdfPrimaryKey>();
+		private final TreeMap<String, FunctionImportParameter> functionImportParameters = new TreeMap<String, FunctionImportParameter>();
+		private final TreeMap<String, RdfModel.RdfProperty> properties = new TreeMap<String, RdfModel.RdfProperty>();
+		private final TreeMap<String, RdfModel.RdfAssociation> navigationProperties = new TreeMap<String, RdfModel.RdfAssociation>();
+		private final TreeMap<String, RdfModel.RdfComplexType> complexTypes = new TreeMap<String, RdfModel.RdfComplexType>();
+		private final TreeMap<String, RdfModel.RdfAssociation> incomingAssociations = new TreeMap<String, RdfModel.RdfAssociation>();
+		final TreeMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new TreeMap<String, RdfModel.RdfPrimaryKey>();
 
 		public String getDeleteText() {
 			return deleteText;
@@ -398,11 +398,11 @@ public class RdfModel {
 			return functionImport;
 		}
 
-		public HashMap<String, FunctionImportParameter> getFunctionImportParameters() {
+		public TreeMap<String, FunctionImportParameter> getFunctionImportParameters() {
 			return functionImportParameters;
 		}
 
-		public HashMap<String, RdfModel.RdfComplexType> getComplexTypes() {
+		public TreeMap<String, RdfModel.RdfComplexType> getComplexTypes() {
 			return complexTypes;
 		}
 
@@ -510,7 +510,7 @@ public class RdfModel {
 
 		}
 		public RdfComplexTypePropertyPair findComplexProperty(String propertyName) {
-			//EDM property name available so can use HashMap
+			//EDM property name available so can use TreeMap
 			for (RdfProperty property : properties.values()) {
 				if (property.getIsComplex()) {
 					if (property.getComplexType().getProperties().containsKey(propertyName)) {
@@ -824,8 +824,8 @@ public class RdfModel {
 		private String complexTypeLabel;
 		private RdfNode domainNode;
 		private String domainName;
-		private HashMap<String, RdfProperty> properties = new HashMap<String, RdfProperty>();
-		private HashMap<String, RdfAssociation> navigationProperties = new HashMap<String, RdfAssociation>();
+		private TreeMap<String, RdfProperty> properties = new TreeMap<String, RdfProperty>();
+		private TreeMap<String, RdfAssociation> navigationProperties = new TreeMap<String, RdfAssociation>();
 		public RdfEntityType domainClass;
 
 		public void addProperty(RdfProperty rdfProperty) {
@@ -856,11 +856,11 @@ public class RdfModel {
 			return domainName;
 		}
 
-		public HashMap<String, RdfProperty> getProperties() {
+		public TreeMap<String, RdfProperty> getProperties() {
 			return properties;
 		}
 
-		public HashMap<String, RdfAssociation> getNavigationProperties() {
+		public TreeMap<String, RdfAssociation> getNavigationProperties() {
 			return navigationProperties;
 		}
 
@@ -974,7 +974,10 @@ public class RdfModel {
 		}
 
 		public void setRangeCardinality(Cardinality rangeCardinality) {
-			this.rangeCardinality = rangeCardinality;
+			//TODO #95 this.rangeCardinality = rangeCardinality;
+			if( this.rangeCardinality == null || this.rangeCardinality.equals(Cardinality.MANY) || this.rangeCardinality.equals(Cardinality.MULTIPLE) ) {
+				this.rangeCardinality = rangeCardinality;
+			}		
 		}
 
 		public Cardinality getDomainCardinality() {
@@ -982,7 +985,11 @@ public class RdfModel {
 		}
 
 		public void setDomainCardinality(Cardinality domainCardinality) {
-			this.domainCardinality = domainCardinality;
+			//TODO #95 this.domainCardinality = domainCardinality;
+			if( this.domainCardinality == null || this.domainCardinality.equals(Cardinality.MANY) || this.domainCardinality.equals(Cardinality.MULTIPLE) ) {
+				this.domainCardinality = domainCardinality;
+			}
+
 		}
 
 		public String getAssociationIRI() {
@@ -1429,9 +1436,9 @@ public class RdfModel {
 			association.associationLabel = propertyLabelNode.getLiteralObject().toString();
 		}
 		association.setIsInverse(false);
-		association.domainCardinality = domainCardinality;
-		association.rangeCardinality = rangeCardinality;
-
+		// #95 Only use the supplied cardinality if existing is undefined or MANY/MULTIPLE
+		association.setDomainCardinality(domainCardinality);
+		association.setRangeCardinality(rangeCardinality);
 		return association;
 	}
 

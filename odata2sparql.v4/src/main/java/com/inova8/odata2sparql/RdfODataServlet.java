@@ -69,6 +69,7 @@ public class RdfODataServlet extends HttpServlet {
 					rdfEdmProviders.reload();
 					simpleResponse(req, resp, RdfConstants.RELOAD + " complete");
 				} else if (service.equals(RdfConstants.LOGS)) {
+					//TODO #106
 					htmlResponse(req, resp, "/WEB-INF/classes/logs/odata2sparql.v4.log.html");
 				} else {
 					//Find provider matching service name			
@@ -103,7 +104,6 @@ public class RdfODataServlet extends HttpServlet {
 					}
 				}
 			} else {
-				///htmlResponse(req, resp, "/index.vm");
 				htmlTemplateResponse(req, resp, "/templates/index.vm");
 			}
 		} catch (RuntimeException | OData2SparqlException e) {

@@ -2,8 +2,9 @@ package com.inova8.odata2sparql.SparqlStatement;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.TreeMap;
 
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
@@ -16,8 +17,15 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrefixes;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 
-public class SparqlEntity extends Entity {//HashMap<String, Object>{
-	private final HashMap<RdfNode, Object> datatypeProperties = new HashMap<RdfNode, Object>();
+public class SparqlEntity extends Entity {//TreeMap<String, Object>{
+	private final TreeMap<RdfNode, Object> datatypeProperties = new TreeMap<RdfNode, Object>(		
+			new Comparator<RdfNode>() {
+				@Override
+				public int compare(RdfNode o1, RdfNode o2) {
+					return o1.toString().compareTo(o2.toString());
+				}
+			}		
+			);
 	private  HashSet<SparqlEntity> matching = new HashSet<SparqlEntity>();
 	private final RdfNode subjectNode;
 	private final String subject;
@@ -79,7 +87,7 @@ public class SparqlEntity extends Entity {//HashMap<String, Object>{
 	public RdfNode getSubjectNode() {
 		return subjectNode;
 	}
-	public HashMap<RdfNode, Object> getDatatypeProperties() {
+	public TreeMap<RdfNode, Object> getDatatypeProperties() {
 		return datatypeProperties;
 	}
 

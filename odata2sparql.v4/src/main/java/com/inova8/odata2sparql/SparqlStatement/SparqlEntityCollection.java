@@ -4,12 +4,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.Comparator;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -45,9 +46,9 @@ import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
 
 class SparqlEntityCollection extends EntityCollection {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
-	private final Map<String, SparqlEntity> entitySetResultsMap = new HashMap<String, SparqlEntity>();
-	private final Map<String, Map<String, List<Object>>> navPropertyResults = new HashMap<String, Map<String, List<Object>>>();
-	//	private final Map<String, Integer> counts = new HashMap<String, Integer>();
+	private final Map<String, SparqlEntity> entitySetResultsMap = new TreeMap<String, SparqlEntity>();
+	private final Map<String, Map<String, List<Object>>> navPropertyResults = new TreeMap<String, Map<String, List<Object>>>();
+	//	private final Map<String, Integer> counts = new TreeMap<String, Integer>();
 	private RdfEdmProvider sparqlEdmProvider;
 
 	// Clarification of expanded structure
@@ -99,7 +100,7 @@ class SparqlEntityCollection extends EntityCollection {
 		if (navPropertyResults.containsKey(entityKey) && navPropertyResults.get(entityKey).containsKey(navProperty)) {
 			for (int index = 0; index < navPropertyResults.get(entityKey).get(navProperty).size(); index++) {
 				SparqlEntity navLink = (SparqlEntity) (navPropertyResults.get(entityKey).get(navProperty).get(index));
-				HashMap<String, Object> link = new HashMap<String, Object>();
+				TreeMap<String, Object> link = new TreeMap<String, Object>();
 				// No point looking up Id property as we know it is the same as the subject
 				link.put(RdfConstants.SUBJECT, SparqlEntity.URLEncodeEntityKey(navLink.getSubject().toString()));
 				links.add(link);
@@ -115,7 +116,7 @@ class SparqlEntityCollection extends EntityCollection {
 		Map<String, List<Object>> navProperties;
 
 		if (!navPropertyResults.containsKey(subject)) {
-			navProperties = new HashMap<String, List<Object>>();
+			navProperties = new TreeMap<String, List<Object>>();
 			navPropertyObjectValues = new ArrayList<Object>();
 		} else {
 			navProperties = navPropertyResults.get(subject);
@@ -242,7 +243,7 @@ class SparqlEntityCollection extends EntityCollection {
 					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, RdfConstants.UNDEFVALUE);
 
 				} else {// Must be a property with a value, so put it into a
-						// hashmap for processing the second time round when we
+						// TreeMap for processing the second time round when we
 						// know the property
 					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
 				}
@@ -418,7 +419,14 @@ class SparqlEntityCollection extends EntityCollection {
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();	
-			HashMap<RdfNode, Object> mergedDatatypeProperties = new  HashMap<RdfNode, Object>();
+			TreeMap<RdfNode, Object> mergedDatatypeProperties = new  TreeMap<RdfNode, Object>(
+					new Comparator<RdfNode>() {
+						@Override
+						public int compare(RdfNode o1, RdfNode o2) {
+							return o1.toString().compareTo(o2.toString());
+						}
+					}				
+					);
 			ArrayList<Property> mergedProperties = new  ArrayList<Property>();
 			ArrayList<Link> mergedNavigationLinks = new  ArrayList<Link>();
 			for( SparqlEntity matchingEntity: rdfEntity.getMatching()) {			

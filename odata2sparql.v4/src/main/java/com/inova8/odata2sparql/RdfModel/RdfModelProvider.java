@@ -1,11 +1,11 @@
 package com.inova8.odata2sparql.RdfModel;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
@@ -249,14 +249,14 @@ public class RdfModelProvider {
 	}
 
 	private void getDataTypeProperties() throws OData2SparqlException {
-		HashMap<String, HashSet<RdfEntityType>> propertyClasses = new HashMap<>();
+		TreeMap<String, HashSet<RdfEntityType>> propertyClasses = new TreeMap<>();
 		getDataTypeProperties_Domains(propertyClasses);
 		getDataTypeProperties_Ranges(propertyClasses);
 		getDataTypeProperties_Cardinality(propertyClasses);
 		removeIncompleteProperties(propertyClasses);
 	}
 
-	private void getDataTypeProperties_Domains(HashMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Domains(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -328,7 +328,7 @@ public class RdfModelProvider {
 		}
 	}
 
-	private void getDataTypeProperties_Ranges(HashMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Ranges(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
@@ -370,7 +370,7 @@ public class RdfModelProvider {
 		}
 	}
 
-	private void getDataTypeProperties_Cardinality(HashMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Cardinality(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
@@ -420,7 +420,7 @@ public class RdfModelProvider {
 		}
 	}
 
-	private void removeIncompleteProperties(HashMap<String, HashSet<RdfEntityType>> propertyClasses) {
+	private void removeIncompleteProperties(TreeMap<String, HashSet<RdfEntityType>> propertyClasses) {
 		for (HashSet<RdfEntityType> classes : propertyClasses.values()) {
 			if (!classes.isEmpty()) {
 				for (RdfEntityType clazz : classes) {

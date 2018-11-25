@@ -1,14 +1,14 @@
 package com.inova8.odata2sparql.RdfModelToMetadata;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 
 public class RdfEdmType {
-	private static final Map<String, EdmPrimitiveTypeKind> SIMPLE_TYPE_MAPPING = new HashMap<String, EdmPrimitiveTypeKind>();
+	private static final Map<String, EdmPrimitiveTypeKind> SIMPLE_TYPE_MAPPING = new TreeMap<String, EdmPrimitiveTypeKind>();
 
 	static {
 		SIMPLE_TYPE_MAPPING.put(RdfConstants.RDF_PLAIN_LITERAL, EdmPrimitiveTypeKind.String);
@@ -60,7 +60,7 @@ public class RdfEdmType {
 
 	};
 	public static EdmPrimitiveTypeKind getEdmType(String propertyTypeName) {
-		if (!SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
+		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
 			//throw new UnsupportedOperationException("TODO implement edmtype conversion for rdf type: " + rdfType);
 		return EdmPrimitiveTypeKind.String;
 		return SIMPLE_TYPE_MAPPING.get(propertyTypeName);

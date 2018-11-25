@@ -1,6 +1,5 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,7 +23,7 @@ public class RdfEdmProviders {
 
 	public  void reset(String rdfRepositoryID) {
 		if (rdfRepositoryID.equals(RdfConstants.WILDCARD)) {
-			rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
+			rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 		} else {
 			rdfEdmProviders.remove(rdfRepositoryID.toUpperCase());
 		}

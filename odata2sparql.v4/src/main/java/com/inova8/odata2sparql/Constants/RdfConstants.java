@@ -12,9 +12,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
@@ -263,7 +263,7 @@ public class RdfConstants {
 
 	public final static List<String> RDF_DATATYPES = new ArrayList<String>();
 
-	public static final HashMap<String, CsdlTerm> TERMS = new HashMap<String, CsdlTerm>();
+	public static final TreeMap<String, CsdlTerm> TERMS = new TreeMap<String, CsdlTerm>();
 	
 	public static final ArrayList< CsdlTerm> SAPTERMS = new ArrayList<CsdlTerm>();
 	public static final ArrayList< CsdlTerm> ODATATERMS = new ArrayList<CsdlTerm>();

@@ -7,10 +7,10 @@
  */
 package com.inova8.odata2sparql.SparqlExpressionVisitor;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -38,9 +38,9 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private final String SUBJECT_POSTFIX = "_s";
 	private String sPath = "";
 	private final HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
-	private final HashMap<String, HashSet<RdfProperty>> navigationProperties = new HashMap<String, HashSet<RdfProperty>>();
+	private final TreeMap<String, HashSet<RdfProperty>> navigationProperties = new TreeMap<String, HashSet<RdfProperty>>();
 
-	private final HashMap<String, NavPropertyPropertyFilter> navPropertyPropertyFilters = new HashMap<String, NavPropertyPropertyFilter>();
+	private final TreeMap<String, NavPropertyPropertyFilter> navPropertyPropertyFilters = new TreeMap<String, NavPropertyPropertyFilter>();
 	private final RdfModel rdfModel;
 	private final RdfEntityType entityType;
 	private String conditionString = "";
@@ -72,11 +72,11 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return this.isAllStatus() ? conditionString : "";
 	}
 
-	public HashMap<String, NavPropertyPropertyFilter> getNavPropertyPropertyFilters() {
+	public TreeMap<String, NavPropertyPropertyFilter> getNavPropertyPropertyFilters() {
 		return navPropertyPropertyFilters;
 	}
 
-	public HashMap<String, HashSet<RdfProperty>> getNavigationProperties() {
+	public TreeMap<String, HashSet<RdfProperty>> getNavigationProperties() {
 		return navigationProperties;
 	}
 
@@ -152,7 +152,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		} else {
 			navPropertyPropertyFilter = navPropertyPropertyFilters.get(sPath);
 		}
-		HashMap<String, PropertyFilter> propertyFilters = navPropertyPropertyFilter.getPropertyFilters();
+		TreeMap<String, PropertyFilter> propertyFilters = navPropertyPropertyFilter.getPropertyFilters();
 		PropertyFilter propertyFilter;
 		if (property != null) {
 			if (!propertyFilters.containsKey(property.propertyName)) {

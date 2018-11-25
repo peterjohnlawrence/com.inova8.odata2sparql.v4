@@ -1,8 +1,8 @@
 package com.inova8.odata2sparql.SparqlBuilder;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
@@ -165,7 +165,7 @@ public class SparqlFilterClausesBuilder {
 	}
 
 	private StringBuilder clausesFilter(Entry<String, ExpandOption> expandSelectTreeNodeLinksEntry,
-			String nextTargetKey, String indent, HashMap<String, PropertyFilter> propertyFilters) {
+			String nextTargetKey, String indent, TreeMap<String, PropertyFilter> propertyFilters) {
 		StringBuilder clausesFilter = new StringBuilder();
 		clausesFilter.append(indent).append("{\n");
 		// Repeat for each filtered property associated with this navProperty
@@ -249,7 +249,7 @@ public class SparqlFilterClausesBuilder {
 		}
 		//Check if there are any relevant filters before proceeding
 		if (!filterClause.getNavPropertyPropertyFilters().isEmpty()) {
-			HashMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
+			TreeMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
 					.get(nextTargetEntityType.entityTypeName).getPropertyFilters();
 			clausesExpandFilter.append(indent).append("\t").append("{\n");
 			// Repeat for each filtered property associated with this navProperty

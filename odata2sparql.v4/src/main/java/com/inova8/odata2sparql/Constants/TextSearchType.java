@@ -2,10 +2,8 @@ package com.inova8.odata2sparql.Constants;
 
 import com.inova8.odata2sparql.Constants.TextSearchType;
 
-
 public enum TextSearchType {
-	// Cardinality corresponding to
-	// 0..1, 1..1, 0..*, 1..*
+
 	DEFAULT("http://inova8.com/odata4sparql#DEFAULT"), HALYARD_ES("http://inova8.com/odata4sparql#Halyard_ElasticSearch"), RDF4J_LUCENE(
 			"http://inova8.com/odata4sparql#RDF4J_Lucene");
 

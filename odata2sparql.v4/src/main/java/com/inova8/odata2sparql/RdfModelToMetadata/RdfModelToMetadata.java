@@ -1,9 +1,11 @@
 package com.inova8.odata2sparql.RdfModelToMetadata;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Comparator;
+
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -50,7 +52,7 @@ public class RdfModelToMetadata {
 		}
 	}
 
-	private final HashMap<String, CsdlSchema> rdfEdm = new HashMap<String, CsdlSchema>();
+	private final TreeMap<String, CsdlSchema> rdfEdm = new TreeMap<String, CsdlSchema>();
 
 	public List<CsdlSchema> getSchemas() {
 		return new ArrayList<CsdlSchema>(rdfEdm.values());
@@ -64,9 +66,27 @@ public class RdfModelToMetadata {
 		return null;
 	}
 
-	private final Map<FullQualifiedName, RdfEntityType> entitySetMapping = new HashMap<FullQualifiedName, RdfEntityType>();
-	private final Map<FullQualifiedName, RdfProperty> propertyMapping = new HashMap<FullQualifiedName, RdfProperty>();
-	private final Map<FullQualifiedName, RdfAssociation> navigationPropertyMapping = new HashMap<FullQualifiedName, RdfAssociation>();
+	private final Map<FullQualifiedName, RdfEntityType> entitySetMapping = new TreeMap<FullQualifiedName, RdfEntityType>(
+			new Comparator<FullQualifiedName>() {
+				@Override
+				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+	private final Map<FullQualifiedName, RdfProperty> propertyMapping = new TreeMap<FullQualifiedName, RdfProperty>(
+			new Comparator<FullQualifiedName>() {
+				@Override
+				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+	private final Map<FullQualifiedName, RdfAssociation> navigationPropertyMapping = new TreeMap<FullQualifiedName, RdfAssociation>(
+			new Comparator<FullQualifiedName>() {
+				@Override
+				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
 
 	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, String text) {
 		if (text == null || text.isEmpty()) {
@@ -78,10 +98,10 @@ public class RdfModelToMetadata {
 
 	public RdfModelToMetadata(RdfModel rdfModel, boolean withRdfAnnotations, boolean withSapAnnotations,
 			boolean useBaseType, boolean withFKProperties) {
-		Map<String, CsdlEntityType> globalEntityTypes = new HashMap<String, CsdlEntityType>();
+		Map<String, CsdlEntityType> globalEntityTypes = new TreeMap<String, CsdlEntityType>();
 
-		Map<String, RdfAssociation> navigationPropertyLookup = new HashMap<String, RdfAssociation>();
-		Map<String, CsdlEntitySet> entitySetsMapping = new HashMap<String, CsdlEntitySet>();
+		Map<String, RdfAssociation> navigationPropertyLookup = new TreeMap<String, RdfAssociation>();
+		Map<String, CsdlEntitySet> entitySetsMapping = new TreeMap<String, CsdlEntitySet>();
 
 		ArrayList<PrefixedNamespace> nameSpaces = new ArrayList<PrefixedNamespace>();
 		nameSpaces.add(new PrefixedNamespace(RdfConstants.RDF_SCHEMA, RdfConstants.RDF));
@@ -96,7 +116,7 @@ public class RdfModelToMetadata {
 				.setEntityContainer(entityContainer);
 
 		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
-		HashMap<String, CsdlEntitySet> entitySets = new HashMap<String, CsdlEntitySet>();
+		TreeMap<String, CsdlEntitySet> entitySets = new TreeMap<String, CsdlEntitySet>();
 
 		//Custom types langString
 
@@ -149,9 +169,9 @@ public class RdfModelToMetadata {
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Second pass to add properties, navigation properties, and entitysets, and create the schema
-			Map<String, CsdlEntityType> entityTypes = new HashMap<String, CsdlEntityType>();
-			Map<String, CsdlComplexType> complexTypes = new HashMap<String, CsdlComplexType>();
-			Map<String, CsdlEntityType> entityTypeMapping = new HashMap<String, CsdlEntityType>();
+			Map<String, CsdlEntityType> entityTypes = new TreeMap<String, CsdlEntityType>();
+			Map<String, CsdlComplexType> complexTypes = new TreeMap<String, CsdlComplexType>();
+			Map<String, CsdlEntityType> entityTypeMapping = new TreeMap<String, CsdlEntityType>();
 
 			String modelNamespace = rdfModel.getModelNamespace(rdfGraph);
 
@@ -161,8 +181,8 @@ public class RdfModelToMetadata {
 				entityTypes.put(entityTypeName, entityType);
 				entityType.setAbstract(false);
 				entityTypeMapping.put(entityTypeName, entityType);
-				HashMap<String, CsdlNavigationProperty> navigationProperties = new HashMap<String, CsdlNavigationProperty>();
-				HashMap<String, CsdlProperty> entityTypeProperties = new HashMap<String, CsdlProperty>();
+				TreeMap<String, CsdlNavigationProperty> navigationProperties = new TreeMap<String, CsdlNavigationProperty>();
+				TreeMap<String, CsdlProperty> entityTypeProperties = new TreeMap<String, CsdlProperty>();
 
 				//Iterate through baseType if flattened metadata required
 				RdfEntityType currentRdfClass = rdfClass;
@@ -507,7 +527,7 @@ public class RdfModelToMetadata {
 	}
 
 	private void inheritBasetypeNavigationProperties(Map<String, CsdlEntityType> globalEntityTypes,
-			HashMap<String, CsdlEntitySet> entitySets, RdfEntityType rdfClass) {
+			TreeMap<String, CsdlEntitySet> entitySets, RdfEntityType rdfClass) {
 		RdfEntityType baseType = rdfClass.getBaseType();
 		if (baseType != null) {
 			List<CsdlNavigationPropertyBinding> inheritedNavigationPropertyBindings = entitySets

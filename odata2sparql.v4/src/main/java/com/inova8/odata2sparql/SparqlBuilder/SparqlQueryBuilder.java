@@ -1906,19 +1906,19 @@ public class SparqlQueryBuilder {
 		return complexProperties;
 	}
 
-	private HashSet<String> complexNavigationPropertiesSet(RdfModel.RdfProperty selectProperty) {
-		HashSet<String> complexProperties = new HashSet<String>();
-		for (RdfProperty complexProperty : selectProperty.getComplexType().getProperties().values()) {
-			if (complexProperty.getIsComplex()) {
-				complexProperties.addAll(complexNavigationPropertiesSet(complexProperty));
-			}
-		}
-		for (RdfAssociation complexNavigationProperty : selectProperty.getComplexType().getNavigationProperties()
-				.values()) {
-			complexProperties.add(complexNavigationProperty.getAssociationIRI());
-		}
-		return complexProperties;
-	}
+//	private HashSet<String> complexNavigationPropertiesSet(RdfModel.RdfProperty selectProperty) {
+//		HashSet<String> complexProperties = new HashSet<String>();
+//		for (RdfProperty complexProperty : selectProperty.getComplexType().getProperties().values()) {
+//			if (complexProperty.getIsComplex()) {
+//				complexProperties.addAll(complexNavigationPropertiesSet(complexProperty));
+//			}
+//		}
+//		for (RdfAssociation complexNavigationProperty : selectProperty.getComplexType().getNavigationProperties()
+//				.values()) {
+//			complexProperties.add(complexNavigationProperty.getAssociationIRI());
+//		}
+//		return complexProperties;
+//	}
 
 	private StringBuilder limitClause() {
 		StringBuilder limitClause = new StringBuilder();
@@ -1982,8 +1982,8 @@ public class SparqlQueryBuilder {
 			return valueProperties;
 		case URI4:
 			UriResource complexProperty4 = resourceParts.get(resourceParts.size() - 2);
-			RdfProperty rdfSegmentComplexProperty4 = entityType.findProperty(complexProperty4.getSegmentValue());
-			UriResource complexPropertyProperty4 = resourceParts.get(resourceParts.size() - 1);
+			@SuppressWarnings("unused") RdfProperty rdfSegmentComplexProperty4 = entityType.findProperty(complexProperty4.getSegmentValue());
+			@SuppressWarnings("unused") UriResource complexPropertyProperty4 = resourceParts.get(resourceParts.size() - 1);
 			return valueProperties;
 		case URI5:
 			UriResource primitiveProperty = resourceParts.get(resourceParts.size() - 1);
