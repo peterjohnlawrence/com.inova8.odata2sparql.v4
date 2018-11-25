@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	<property name="HTMLLogs" value="../" />
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
@@ -9,18 +11,42 @@
 	<appender name="LOGFILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${catalina.base}/logs/odata2sparql.v4.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern>${catalina.base}/logs/odata2sparql.v4.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${catalina.base}/logs/odata2sparql.v4.%d{yyyy-MM-dd}.log
+			</fileNamePattern>
 			<!-- keep 30 days' worth of history capped at 3GB total size -->
 			<maxHistory>30</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="htmlAppender"
+		class="ch.qos.logback.core.FileAppender">
+		<file>${catalina.base}/wtpwebapps/odata2sparql.v4/WEB-INF/classes/logs/odata2sparql.v4.log.html</file>
+<!-- 		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			daily rollover
+			<fileNamePattern>odata2sparql.v4.%d{yyyy-MM-dd}.log.html
+			</fileNamePattern>
+			keep 30 days' worth of history capped at 3GB total size
+			<maxHistory>30</maxHistory>
+		</rollingPolicy> -->
+		<param name="Append" value="false" />
+		<encoder
+			class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+			<layout class="ch.qos.logback.classic.html.HTMLLayout">
+				<pattern>%d{HH:mm:ss.SSS}%-5level%logger{36}%msg</pattern>
+			</layout>
 		</encoder>
 	</appender>
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="LOGFILE" />
+		<appender-ref ref="htmlAppender" />
 	</root>
 </configuration>

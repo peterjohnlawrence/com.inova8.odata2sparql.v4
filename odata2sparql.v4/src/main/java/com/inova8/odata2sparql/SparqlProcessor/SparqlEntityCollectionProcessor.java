@@ -57,7 +57,6 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
-import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
 public class SparqlEntityCollectionProcessor implements CountEntityCollectionProcessor {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollectionProcessor.class);

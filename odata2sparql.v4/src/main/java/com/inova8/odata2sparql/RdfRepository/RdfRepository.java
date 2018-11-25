@@ -7,7 +7,8 @@
  */
 package com.inova8.odata2sparql.RdfRepository;
 
-import java.util.Hashtable;
+import java.util.TreeMap;
+
 import org.eclipse.rdf4j.model.Namespace;
 
 import com.inova8.odata2sparql.Constants.TextSearchType;
@@ -17,7 +18,27 @@ public class RdfRepository {
 	private RdfConnection dataEndPoint;
 	private RdfConnection modelEndPoint;
 	private RdfConnection operationEndPoint;
+	private RdfRoleRepository dataRepository;
+	private RdfRoleRepository modelRepository;
+	private final Namespace defaultPrefix;
+	private final TreeMap<String, Namespace> namespaces;
+	private int defaultQueryLimit;
+	private final String modelName;
+	private Boolean withRdfAnnotations;
+	private Boolean withSapAnnotations;
+	private Boolean useBaseType;
+	private Boolean expandOperations = false;
+	private TextSearchType textSearchType;
+	private boolean withFKProperties;
+	private boolean withMatching = true;
+	private String match;
 
+	RdfRepository(String modelName, Namespace defaultPrefix, TreeMap<String, Namespace> namespaces) {
+		super();
+		this.modelName = modelName;
+		this.defaultPrefix = defaultPrefix;
+		this.namespaces = namespaces;
+	}
 	/**
 	 * @param dataRepository
 	 *            the dataRepository to set
@@ -51,30 +72,6 @@ public class RdfRepository {
 	public RdfRoleRepository getModelRepository() {
 		return modelRepository;
 	}
-
-	private RdfRoleRepository dataRepository;
-	private RdfRoleRepository modelRepository;
-
-	private final Namespace defaultPrefix;
-	private final Hashtable<String, Namespace> namespaces;
-	private int defaultQueryLimit;
-	private final String modelName;
-	private Boolean withRdfAnnotations;
-	private Boolean withSapAnnotations;
-	private Boolean useBaseType;
-	private Boolean expandOperations = false;
-	private TextSearchType textSearchType;
-	private boolean withFKProperties;
-	private boolean withMatching = true;
-	private String match;
-
-	RdfRepository(String modelName, Namespace defaultPrefix, Hashtable<String, Namespace> namespaces) {
-		super();
-		this.modelName = modelName;
-		this.defaultPrefix = defaultPrefix;
-		this.namespaces = namespaces;
-	}
-
 	public String getModelName() {
 		return modelName;
 	}
@@ -84,7 +81,7 @@ public class RdfRepository {
 		return defaultPrefix.getName();
 	}
 
-	public Hashtable<String, Namespace> getNamespaces() {
+	public TreeMap<String, Namespace> getNamespaces() {
 
 		return namespaces;
 	}

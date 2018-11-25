@@ -3,8 +3,10 @@ package com.inova8.odata2sparql.RdfRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.common.io.FileUtil;
@@ -47,7 +49,9 @@ public class RdfRepositories {
 	private final String repositoryFolder;
 	private final String repositoryUrl;
 	private final String repositoryDir;
-	private HashMap<String, RdfRepository> rdfRepositoryList = new HashMap<String, RdfRepository>();
+	private Map<String, RdfRepository> rdfRepositoryList = new TreeMap<String, RdfRepository>();
+	String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
+	String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
 
 	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
 		super();	
@@ -70,6 +74,14 @@ public class RdfRepositories {
 		}
 	}
 
+	public String getLocalRepositoryManagerModel() {
+		return localRepositoryManagerModel;
+	}
+
+	public String getLocalRepositoryManagerDirectory() {
+		return localRepositoryManagerDirectory;
+	}
+
 	public void reload() {
 		repositoryManager.shutDown();
 		try {
@@ -85,7 +97,7 @@ public class RdfRepositories {
 		return rdfRepositoryList.get(rdfRepositoryID);
 	}
 
-	public HashMap<String, RdfRepository> getRdfRepositories() {
+	public Map<String, RdfRepository> getRdfRepositories() {
 		return rdfRepositoryList;
 	}
 
@@ -234,7 +246,7 @@ public class RdfRepositories {
 									break;
 								}
 							}
-							Hashtable<String, Namespace> namespaces = readPrefixes(modelsConnection, valueOfDataset);
+							TreeMap<String, Namespace> namespaces = readPrefixes(modelsConnection, valueOfDataset);
 							Namespace defaultPrefix = null;
 							try {
 								if ((valueOfDefaultPrefix == null) || (valueOfDefaultNamespace == null)) {
@@ -260,22 +272,28 @@ public class RdfRepositories {
 								repository.setDataRepository(new RdfRoleRepository(repositoryManager
 										.getRepository("ODATA2SPARQL"), Integer
 										.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()), SPARQLProfile
-										.get(valueOfDataRepositoryImplProfile.stringValue())));
+										.get(valueOfDataRepositoryImplProfile.stringValue()),"",""
+										
+										));
 								repository.setModelRepository(new RdfRoleRepository(repositoryManager
 										.getRepository("ODATA2SPARQL"), Integer
 										.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
-										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue())));
+										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),"",""));
 
 							} else {
 
 								repository.setDataRepository(new RdfRoleRepository(repositoryManager
 										.getRepository(valueOfDataRepositoryID.stringValue()), Integer
 										.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()), SPARQLProfile
-										.get(valueOfDataRepositoryImplProfile.stringValue())));
+										.get(valueOfDataRepositoryImplProfile.stringValue()),valueOfDataRepositoryImplQueryEndpoint
+										.stringValue(),valueOfDataRepositoryImplUpdateEndpoint
+										.stringValue()));
 								repository.setModelRepository(new RdfRoleRepository(repositoryManager
 										.getRepository(valueOfVocabularyRepositoryID.stringValue()), Integer
 										.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
-										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue())));
+										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),valueOfVocabularyRepositoryImplQueryEndpoint
+										.stringValue(),valueOfVocabularyRepositoryImplUpdateEndpoint
+										.stringValue()));
 							}
 							if (valueOfWithRdfAnnotations != null) {
 								repository.setWithRdfAnnotations(Boolean.parseBoolean(valueOfWithRdfAnnotations
@@ -370,7 +388,7 @@ public class RdfRepositories {
 
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException, IOException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
-		String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
+		//String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
 		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
 			// Should be local to Tomcat as specific to each running servlet/webapp
 			localRepositoryManagerDirectory = Paths.get(repositoryDir,this.repositoryFolder).toString();
@@ -432,7 +450,7 @@ public class RdfRepositories {
 			//Clear any contents to make sure we load a fresh models.ttl
 			//TODO does not seem to be clearing triples
 			modelsConnection.clear();
-			String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
+			//String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
 			if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
 				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder,"models.ttl").toString();
 			}else{
@@ -524,9 +542,9 @@ public class RdfRepositories {
 
 	}
 
-	private Hashtable<String, Namespace> readPrefixes(RepositoryConnection modelsConnection, Value valueOfDataset)
+	private TreeMap<String, Namespace> readPrefixes(RepositoryConnection modelsConnection, Value valueOfDataset)
 			throws OData2SparqlException {
-		Hashtable<String, Namespace> namespaces = new Hashtable<String, Namespace>();
+		TreeMap<String, Namespace> namespaces = new TreeMap<String, Namespace>();
 		try {
 			//Identify prefixes for the provided dataset:
 			String queryString = RdfConstants.getMetaQueries().get(RdfConstants.URI_PREFIXQUERY);

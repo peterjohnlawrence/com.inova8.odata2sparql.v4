@@ -33,11 +33,6 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
-import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
-import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
-import org.apache.olingo.server.core.uri.queryoption.ExpandOptionImpl;
-import org.apache.olingo.server.core.uri.queryoption.apply.ExpandImpl;
-
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;

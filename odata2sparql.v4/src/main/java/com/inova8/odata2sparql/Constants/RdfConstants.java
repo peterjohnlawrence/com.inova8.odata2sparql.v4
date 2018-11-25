@@ -41,6 +41,7 @@ public class RdfConstants {
 
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
+	public static final String LOGS = "$logs";
 	public static final String WILDCARD = "*";
 	public static final String UNDEFVALUE = "UNDEF";
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();

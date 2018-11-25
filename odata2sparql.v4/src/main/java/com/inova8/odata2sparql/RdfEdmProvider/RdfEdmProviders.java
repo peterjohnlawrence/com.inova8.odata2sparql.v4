@@ -2,6 +2,7 @@ package com.inova8.odata2sparql.RdfEdmProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
 public class RdfEdmProviders {
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProviders.class);
-	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new HashMap<String, RdfEdmProvider>();
+	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 	private final RdfRepositories rdfRepositories;
 
 	public RdfEdmProviders(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
@@ -46,5 +47,9 @@ public class RdfEdmProviders {
 			rdfEdmProviders.put(rdfRepositoryID, rdfEdmProvider);
 		}
 		return rdfEdmProvider;
+	}
+	public RdfRepositories getRepositories() {
+		
+		return rdfRepositories;
 	}
 }

@@ -3,10 +3,13 @@ package com.inova8.odata2sparql;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
-
+import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +21,10 @@ import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.tools.generic.EscapeTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +32,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
+import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlComplexProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
@@ -59,7 +67,9 @@ public class RdfODataServlet extends HttpServlet {
 				} else if (service.equals(RdfConstants.RELOAD)) {
 					log.info(RdfConstants.RELOAD + " requested");
 					rdfEdmProviders.reload();
-					simpleResponse(req, resp, RdfConstants.RELOAD);
+					simpleResponse(req, resp, RdfConstants.RELOAD + " complete");
+				} else if (service.equals(RdfConstants.LOGS)) {
+					htmlResponse(req, resp, "/WEB-INF/classes/logs/odata2sparql.v4.log.html");
 				} else {
 					//Find provider matching service name			
 					RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider(service);
@@ -86,14 +96,15 @@ public class RdfODataServlet extends HttpServlet {
 							resp.addHeader("Access-Control-Expose-Headers", "DataServiceVersion,OData-Version");
 							handler.process(req, resp);
 						} else {
-							optionsResponse( resp);
+							optionsResponse(resp);
 						}
 					} else {
 						throw new OData2SparqlException("No service matching " + service + " found");
 					}
 				}
 			} else {
-				htmlResponse(req, resp, "/index.html");
+				///htmlResponse(req, resp, "/index.vm");
+				htmlTemplateResponse(req, resp, "/templates/index.vm");
 			}
 		} catch (RuntimeException | OData2SparqlException e) {
 			log.error("Server Error occurred in RdfODataServlet", e);
@@ -101,9 +112,10 @@ public class RdfODataServlet extends HttpServlet {
 		}
 	}
 
-	private void optionsResponse(final HttpServletResponse resp){
+	private void optionsResponse(final HttpServletResponse resp) {
 		resp.addHeader("Access-Control-Allow-Origin", "*");
-		resp.addHeader("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With, X-CSRF-Token, odata-maxversion, odata-version,mime-version");
+		resp.addHeader("Access-Control-Allow-Headers",
+				"Content-Type, Content-Length, Authorization, Accept, X-Requested-With, X-CSRF-Token, odata-maxversion, odata-version,mime-version");
 		resp.addHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
 		resp.addHeader("Access-Control-Expose-Headers", "DataServiceVersion,OData-Version");
 		resp.addHeader("Access-Control-Max-Age", "86400");
@@ -111,25 +123,60 @@ public class RdfODataServlet extends HttpServlet {
 		resp.addHeader("OData-MaxVersion", "4.0");
 		resp.setStatus(200);
 	}
+
 	private void htmlResponse(HttpServletRequest req, HttpServletResponse resp, String textResponse)
 			throws IOException {
 		try {
 			InputStream in = getServletContext().getResourceAsStream(textResponse);
-			String contents = IOUtils.toString(in,Charset.defaultCharset());
+			String contents = IOUtils.toString(in, Charset.defaultCharset());
 			simpleResponse(req, resp, contents);
+			in.close();
 		} catch (Exception e) {
 			simpleResponse(req, resp, "odata2sparql.v4");
 		}
 	}
 
+	private void htmlTemplateResponse(HttpServletRequest req, HttpServletResponse resp, String textTemplate)
+			throws IOException {
+		try {
+			Properties props = setTemplateLocation();
+			Velocity.init(props);		
+			
+			Template uiTemplate = null;
+
+			uiTemplate = Velocity.getTemplate(textTemplate, Charset.defaultCharset().displayName());
+			StringWriter uiWriter = new StringWriter();
+			VelocityContext uiContext = new VelocityContext();
+			uiContext.put("esc", new EscapeTool());
+			uiContext.put("repositories", new ArrayList<RdfRepository>(rdfEdmProviders.getRepositories().getRdfRepositories().values()));
+			uiContext.put("repositoryLocation",rdfEdmProviders.getRepositories().getLocalRepositoryManagerDirectory());
+			uiContext.put("modelsLocation",rdfEdmProviders.getRepositories().getLocalRepositoryManagerModel());
+			
+			uiTemplate.merge(uiContext, uiWriter);
+
+			simpleResponse(req, resp, uiWriter.toString());
+
+
+		} catch (Exception e) {
+			simpleResponse(req, resp, "odata2sparql.v4");
+		}
+	}
+	private static Properties setTemplateLocation() {
+		Properties props = new Properties();
+		String sPath = getWorkingPath();
+		props.put("file.resource.loader.path", sPath);
+		props.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
+		return props;
+	}
+	private static String getWorkingPath() {
+		URL main = RdfODataServlet.class.getResource("RdfODataServlet.class");
+		File file = new File(main.getPath());
+		Path path = Paths.get(file.getPath());
+		String sPath = path.getParent().getParent().getParent().getParent().toString();
+		return sPath;
+	}
 	private void simpleResponse(final HttpServletRequest req, final HttpServletResponse resp, String textResponse)
 			throws IOException {
-		Scanner scanner = new Scanner(req.getInputStream());
-		StringBuilder sb = new StringBuilder();
-		while (scanner.hasNextLine()) {
-			sb.append(scanner.nextLine());
-		}
 		resp.getOutputStream().println(textResponse);
-		scanner.close();
 	}
 }
