@@ -1,0 +1,220 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+select ?entityA ?typeA  ?formattedValueA ?p01 ?i10
+	?node1 ?type1 ?p12 ?i21
+	?node2 ?type2 ?p23 ?i32
+	?node3 ?type3 ?p34 ?i43
+	?node4 ?type4 ?p45 ?i54
+	?node5 ?type5 ?p56 ?i65
+	?entityB ?typeB ?formattedValueB
+{
+	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("<tr><td>", ?labelProperty, "</td><td>" ,?snippet,"</td></tr>") ) as ?formattedValueB)
+		{
+			?entity a ?type .
+			?entity <http://www.openrdf.org/contrib/lucenesail#matches> [
+				<http://www.openrdf.org/contrib/lucenesail#query> ?stringB; #"scones";# 
+				<http://www.openrdf.org/contrib/lucenesail#property> ?property ;
+				<http://www.openrdf.org/contrib/lucenesail#score> ?score;
+				<http://www.openrdf.org/contrib/lucenesail#snippet> ?snippet] .
+			?property  rdfs:label ?labelProperty .
+		}
+		GROUP BY ?entity ?type
+	}
+	BIND (?subjectA as ?entityA)
+	#VALUES( ?entityA){(<http://northwind.com/Order-10397>)}
+	#VALUES( ?entityA ?entityB){(<http://northwind.com/Order-10397> <http://northwind.com/Order-10491>)} #	<http://northwind.com/Shipper-1>)}
+	{ #distance = 1
+		{?entityA ?p01 ?entityB . }
+		UNION 
+		{?entityB ?i10 ?entityA . }
+	}
+	UNION
+	{ #distance = 2
+		{
+			{?entityA ?p01 ?node1 . }
+			UNION
+			{?node1 ?i10 ?entityA .}# ?node1 a ?type1 . }
+		}
+		{
+			{
+				{?node1 ?p12 ?entityB . } 
+				UNION 
+				{?entityB ?i21 ?node1 . }
+			}
+		}
+		FILTER (?node1 NOT IN (?entityA)) 
+		FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))  
+		FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type)) 
+	}
+	UNION
+	{ #distance = 3
+		{
+			{?entityA ?p01 ?node1 . ?node1 a ?type1 .}
+			UNION
+			{?node1 ?i10 ?entityA . ?node1 a ?type1 .}
+		}
+		{
+			{
+				{
+					{?node1 ?p12 ?node2 . ?node2 a ?type2 . }
+					UNION	
+					{?node2 ?i21 ?node1 . ?node2 a ?type2 . }
+				}
+				{
+					{
+						{?node2 ?p23 ?entityB . }
+						UNION	
+						{?entityB ?i32 ?node2 . }
+					}
+				}
+			}
+		}
+		FILTER (?node1 NOT IN (?entityA))  FILTER(?node2 NOT IN (?node1,?entityA))
+		FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type)) 
+		FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type)) 
+		FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type)) 
+	}
+	UNION
+	{ #distance = 4
+		{
+			{?entityA ?p01 ?node1 . ?node1 a ?type1 .}
+			UNION
+			{?node1 ?i10 ?entityA . ?node1 a ?type1 .}
+		}
+		{
+			{
+				{
+					{?node1 ?p12 ?node2 . ?node2 a ?type2 .}
+					UNION	
+					{?node2 ?i21 ?node1 . ?node2 a ?type2 .}
+				}
+				{
+					{
+						{
+							{?node2 ?p23 ?node3	. ?node3 a ?type3 .}
+							UNION 
+							{?node3 ?i32 ?node2	. ?node3 a ?type3 .}
+						}
+						{
+							{
+								{?node3 ?p34 ?entityB .	} 
+								UNION 
+								{?entityB ?i43 ?node3 .	}
+							}
+						}
+					}
+				}
+			}
+		}
+		FILTER (?node1 NOT IN (?entityA))  FILTER(?node2 NOT IN (?node1,?entityA)) FILTER(?node3 NOT IN (?node2, ?node1,?entityA))
+		FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))  
+		FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type))  
+		FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type)) 
+		FILTER (!BOUND(?i43) || (?i43 != rdf:type)) FILTER (!BOUND(?p34) || (?p34 != rdf:type)) 
+	}
+	UNION
+	{ #distance = 5
+		{
+			{?entityA ?p01 ?node1 . ?node1 a ?type1 }
+			UNION
+			{?node1 ?i10 ?entityA . ?node1 a ?type1 }
+		}
+		{
+			{
+				{
+					{?node1 ?p12 ?node2 . ?node2 a ?type2 }
+					UNION	
+					{?node2 ?i21 ?node1 . ?node2 a ?type2 }
+				}
+				{
+					{
+						{
+							{?node2 ?p23 ?node3	. ?node3 a ?type3 }
+							UNION 
+							{?node3 ?i32 ?node2	. ?node3 a ?type3 }
+						}
+						{
+							{
+								{
+									{?node3 ?p34 ?node4 . ?node4 a ?type4 }
+									UNION 
+									{?node4 ?i43 ?node3	. ?node4 a ?type4 }
+								}
+								{
+									{
+										{?node4 ?p45 ?entityB . } 
+										UNION 
+										{?entityB ?i54 ?node4 .	}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		FILTER (?node1 NOT IN (?entityA))  FILTER(?node2 NOT IN (?node1,?entityA)) FILTER(?node3 NOT IN (?node2, ?node1,?entityA)) FILTER(?node4 NOT IN (?node3, ?node2, ?node1,?entityA))
+		FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))  
+		FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type))  
+		FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type))  
+		FILTER (!BOUND(?i43) || (?i43 != rdf:type)) FILTER (!BOUND(?p34) || (?p34 != rdf:type)) 
+		FILTER (!BOUND(?i54) || (?i54 != rdf:type)) FILTER (!BOUND(?p45) || (?p45 != rdf:type)) 
+	}
+	UNION
+	{ #distance = 6
+		{
+			{?entityA ?p01 ?node1 . ?node1 a ?type1 }
+			UNION
+			{?node1 ?i10 ?entityA . ?node1 a ?type1 }
+		}
+		{
+			{
+				{
+					{?node1 ?p12 ?node2 . ?node2 a ?type2 }
+					UNION	
+					{?node2 ?i21 ?node1 . ?node2 a ?type2 }
+				}
+				{
+					{
+						{
+							{?node2 ?p23 ?node3	. ?node3 a ?type3 }
+							UNION 
+							{?node3 ?i32 ?node2	. ?node3 a ?type3 }
+						}
+						{
+							{
+								{
+									{?node3 ?p34 ?node4 . ?node4 a ?type4 }
+									UNION 
+									{?node4 ?i43 ?node3	. ?node4 a ?type4 }
+								}
+								{
+									{
+										{
+											{?node4 ?p45 ?node5 . ?node5 a ?type5 }
+											UNION
+											{?node5 ?i54 ?node4	. ?node5 a ?type5 }
+										}
+										{
+											{
+												{?node5 ?p56 ?entityB .	}
+												UNION	
+												{?entityB ?i65 ?node5 .	}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		FILTER (?node1 NOT IN (?entityA))  FILTER(?node2 NOT IN (?node1,?entityA)) FILTER(?node3 NOT IN (?node2, ?node1,?entityA)) FILTER(?node4 NOT IN (?node3, ?node2, ?node1,?entityA)) FILTER( ?node5 NOT IN (?node4, ?node3, ?node2, ?node1,?entityA))  
+		FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))  
+		FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type))  
+		FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type))  
+		FILTER (!BOUND(?i43) || (?i43 != rdf:type)) FILTER (!BOUND(?p34) || (?p34 != rdf:type)) 
+		FILTER (!BOUND(?i54) || (?i54 != rdf:type)) FILTER (!BOUND(?p45) || (?p45 != rdf:type)) 
+		FILTER (!BOUND(?i54) || (?i65 != rdf:type)) FILTER (!BOUND(?p56) || (?p45 != rdf:type)) 
+	}
+} limit 2

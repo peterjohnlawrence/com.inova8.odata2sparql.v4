@@ -46,7 +46,6 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return this.getMappedEntityType(new FullQualifiedName(edmEntitySet.getEntityType().getNamespace(), edmEntitySet
 				.getEntityType().getName()));
 	}
-
 	public RdfProperty getMappedProperty(FullQualifiedName fqnProperty) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedProperty(fqnProperty);
 	}
@@ -205,5 +204,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		}	
 		return null;
 	}
+
+
 	
 }

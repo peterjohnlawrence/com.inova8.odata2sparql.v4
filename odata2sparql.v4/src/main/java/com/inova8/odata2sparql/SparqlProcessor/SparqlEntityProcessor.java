@@ -8,11 +8,9 @@ import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
-import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -32,16 +30,14 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
-import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
-import com.inova8.odata2sparql.uri.UriType;
+import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 
 public class SparqlEntityProcessor implements EntityProcessor {
@@ -64,19 +60,15 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. retrieve the Entity Type
-		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
-		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-
-		EdmEntityType responseEdmEntityType = null;
-		EdmEntitySet responseEdmEntitySet = null;
+		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider, uriInfo);		
+		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();;
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 		// 2. retrieve the data from backend
 		Entity entity = null;
 		try {
 			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo,
-					(uriInfo.getUriResourceParts().size() > 1) ? UriType.URI6A : UriType.URI2);
+					rdfResourceParts.getUriType());
 			if (entity == null)
 				throw new OData2SparqlException("No data found");
 		} catch (EdmException | OData2SparqlException | ODataException e) {
@@ -84,41 +76,12 @@ public class SparqlEntityProcessor implements EntityProcessor {
 					Locale.ENGLISH);
 		}
 		// 3. serialize
-
-		// Analyze the URI segments
-		int segmentCount = resourceParts.size();
-		if (segmentCount == 1) { // no navigation
-			responseEdmEntityType = edmEntitySet.getEntityType();
-			responseEdmEntitySet = edmEntitySet; // since we have only one segment
-		} else if (segmentCount == 2) { //navigation
-			UriResource navSegment = resourceParts.get(1);
-			if (navSegment instanceof UriResourceNavigation) {
-				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
-				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-				responseEdmEntityType = edmNavigationProperty.getType();
-				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
-			}
-		} else if (segmentCount == 3) { //complex/navigation
-			UriResource navSegment = resourceParts.get(2);
-			if (navSegment instanceof UriResourceNavigation) {
-				EdmComplexType complexType = ((UriResourceComplexProperty)resourceParts.get(1)).getComplexType();
-				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) navSegment;
-				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-				responseEdmEntityType = edmNavigationProperty.getType();
-				responseEdmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, complexType,edmNavigationProperty);
-			}
-		} else {
-			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
-			throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
-					Locale.ROOT);
-		}
-
 		ContextURL contextUrl = null;
 		try {
 			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients)
-			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntityType, expandOption,
+			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(), expandOption,
 					selectOption);
-			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).selectList(selectList)
+			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).keyPath(rdfResourceParts.getLocalKey()).navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
 					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
 			throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
@@ -129,9 +92,8 @@ public class SparqlEntityProcessor implements EntityProcessor {
 				.contextURL(contextUrl).build();
 
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
-		SerializerResult serializerResult = serializer.entity(serviceMetadata, responseEdmEntityType, entity, options);
+		SerializerResult serializerResult = serializer.entity(serviceMetadata, responseEdmEntitySet.getEntityType(), entity, options);
 		InputStream entityStream = serializerResult.getContent();
-
 		//4. configure the response object
 		response.setContent(entityStream);
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());

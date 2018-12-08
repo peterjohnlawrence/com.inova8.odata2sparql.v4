@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Comparator;
-
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -35,6 +33,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfSchema;
+import com.inova8.odata2sparql.Utils.FullQualifiedNameComparator;
 
 public class RdfModelToMetadata {
 	private class PrefixedNamespace {
@@ -61,32 +60,16 @@ public class RdfModelToMetadata {
 	public CsdlSchema getSchema(String nameSpace) {
 		return rdfEdm.get(nameSpace);
 	}
-
 	public CsdlTerm getTerm(FullQualifiedName termName) {
 		return null;
 	}
 
 	private final Map<FullQualifiedName, RdfEntityType> entitySetMapping = new TreeMap<FullQualifiedName, RdfEntityType>(
-			new Comparator<FullQualifiedName>() {
-				@Override
-				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+			new FullQualifiedNameComparator());
 	private final Map<FullQualifiedName, RdfProperty> propertyMapping = new TreeMap<FullQualifiedName, RdfProperty>(
-			new Comparator<FullQualifiedName>() {
-				@Override
-				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+			new FullQualifiedNameComparator());
 	private final Map<FullQualifiedName, RdfAssociation> navigationPropertyMapping = new TreeMap<FullQualifiedName, RdfAssociation>(
-			new Comparator<FullQualifiedName>() {
-				@Override
-				public int compare(FullQualifiedName o1, FullQualifiedName o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+			new FullQualifiedNameComparator());
 
 	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, String text) {
 		if (text == null || text.isEmpty()) {
@@ -240,7 +223,7 @@ public class RdfModelToMetadata {
 					//entitySetAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel()));
 					entitySet.setAnnotations(entitySetAnnotations);
 
-					entitySets.put(entitySet.getName(), entitySet);//.add(entitySet);
+					entitySets.put(entitySet.getName(), entitySet);
 
 					entitySetMapping.put(entitySet.getTypeFQN(), rdfClass);
 					entitySetsMapping.put(entitySetName, entitySet);

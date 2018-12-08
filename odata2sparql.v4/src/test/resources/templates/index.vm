@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <style>
+@import
+        url(https://db.onlinewebfonts.com/c/89d11a443c316da80dcb8f5e1f63c86e?family=Bauhaus+93)
+        ;
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+</style>
+    <script>
+function toggleRow(e){
+    var subRow = e.parentNode.parentNode.nextElementSibling;
+    subRow.style.display = subRow.style.display === 'none' ? 'table-row' : 'none';  
+}
+</script>
+    <title></title>
+  </head>
+  <body>
+  <h1 style="display: inline">
+    <span style="font-family: &#39;Bauhaus 93&#39;">
+    <span style="color: blue">inova</span> 
+    <span style="color: red">8</span></span>
+  </h1>
+  <h2 style="display: inline">
+    <span style="font-family: &#39;Bauhaus 93&#39;; color: black">/OData2SPARQL.v4</span>
+  </h2>
+  <br />
+Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here: 
+  <a href="http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_ResourcePath">
+  odata/v4.01/cs01/part2-url-conventions</a>
+    <br />
+     <a href="http://inova8.com/bg_inova8.com/odata2sparql-consuming-sparqlrdf-with-odata-restful-interface/">Full documentation
+  here</a> 
+  <br />
+  <a href="./$logs">View Log (experimental)</a>
+  <br /><br />
+          <table style="width:100%">
+          <tr>
+            <th colspan="3">Server Properties</th>
+          </tr>
+          <tr>
+            <th>Server Property</th>
+            <th>Description</th>
+            <th>Value</th>
+          </tr>
+           <tr>
+            <td>OData2SPARQL.v4 version</td>
+            <td>designated version of OData2SPARQL.v4</td>
+            <td>$version</td>
+          </tr>
+           <tr>
+            <td>Build Date</td>
+            <td>Date of code build</td>
+            <td>$buildDate</td>
+          </tr>
+          <tr>
+            <td>Repository location</td>
+            <td>RDF4J store containing server configuration derived from models.ttl</td>
+            <td>$repositoryLocation</td>
+          </tr>
+          <tr>
+            <td>Models.ttl location</td>
+            <td>Location of the models.ttl file</td>
+            <td>$modelsLocation</td>
+          </tr>
+        </table>
+  <br /><br />
+  <table style="width:100%">
+  	<tr><th colspan="6">Repositories</th>
+  	</tr>
+      <tr>
+      <th>Repository</th>
+      <th>Published Classes/EntitySets</th>
+      <th>Metadata</th>
+      <th>Reset</th> 
+<!--       <th>Edit</th> -->
+      <th>Show/Hide Configuration</th>
+    </tr>
+  #foreach($repository in $repositories)
+    <tr>
+      <td>$repository.modelName</td>
+      <td>
+        <a href="./$repository.modelName">./$repository.modelName</a>
+      </td>
+      <td>
+        <a href="./$repository.modelName/$metadata">./$repository.modelName/$metadata</a>
+      </td>
+      <td>
+        <a href="./$reset/$repository.modelName/">./$reset/$repository.modelName</a>
+      </td>
+<!--       <td> -->
+<!--         <a href="./$edit/$repository.modelName">./$edit/$repository.modelName</a> -->
+<!--       </td> -->
+      <td>
+        <a href="#" onclick="toggleRow(this);">Toggle <b>$repository.modelName</b> repository configuration details</a>
+      </td>
+    </tr>
+    <tr style="display: none">
+      <td></td>
+      <td colspan="4">
+        <table style="width:100%">
+           <tr> <th colspan="3">$repository.modelName Repository Configuration Properties</th></tr>
+          <tr>
+            <th>Property</th>
+            <th>Description</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+      		<td>Data query-endpoint</td>
+            <td>SPARQL endpoint from where the data will be queried to satisfy OData queries</td>
+            <td><a href="$repository.dataRepository.queryEndpointUrl">$repository.dataRepository.queryEndpointUrl</a></td>
+          </tr>
+          <tr>
+      		<td>Data update-endpoint</td>
+            <td>SPARQL endpoint to where updates will be applied</td>
+            <td><a href="$repository.dataRepository.updateEndpointUrl">$repository.dataRepository.updateEndpointUrl</a></td>
+          </tr>
+          <tr>
+      		<td>Data endpoint sparqlProfile</td>
+            <td>Profile of the SPARQL supported by the data endpoint.</td>
+            <td>$repository.dataRepository.profile.code</td>
+          </tr>
+          <tr>
+      		<td>Data endpoint defaultQueryLimit</td>
+            <td>An integer value used to limit the queries. It can be overridden by a $top OData query option defines an instance of a prefix that will be used by the service of the dataset as the default prefix.</td>
+            <td>$repository.dataRepository.defaultQueryLimit</td>
+          </tr>
+          <tr>
+      		<td>Model query-endpoint</td>
+            <td>SPARQL endpoint from where the model metadata will be queried</td>
+      		<td><a href="$repository.modelRepository.queryEndpointUrl">$repository.modelRepository.queryEndpointUrl</a></td>
+          </tr>
+          <tr>
+      		<td>Model endpoint SPARQL profile</td>
+            <td>Profile of the SPARQL supported by the model endpoint.</td>
+            <td>$repository.modelRepository.profile.code</td>
+          </tr>
+          <tr>
+            <td>withRdfAnnotations</td>
+            <td>Set to true if the OData metadata to be annotated with the RDF descriptions</td>
+            <td>$repository.withRdfAnnotations</td>
+          </tr>
+          <tr>
+            <td>withSapAnnotations</td>
+            <td>Set to true if the OData metadata to be annotated with the SAP descriptions (see <a href="https://wiki.scn.sap.com/wiki/display/EmTech/SAP+Annotations+for+OData+Version+2.0">SAP Annotations</a> )</td>
+            <td>$repository.withSapAnnotations</td>
+          </tr>
+          <tr>
+            <td>withFKProperties</td>
+            <td>Set to true if property key fields should be created for navigation properties. This enables some reporting applications to more easily consume OData without relying on navigationProperty joins</td>
+            <td>$repository.withFKProperties</td>
+          </tr>
+          <tr>
+            <td>withMatching</td>
+            <td>Set to true if it is intended that matching entities be merged together. The expression used for matching linksets is contained in the property odata4sparql:match</td>
+            <td>$repository.withMatching</td>
+          </tr>
+          <tr>
+            <td>match</td>
+            <td>Defines the match expression to be used within the generated SPARQL queries. The default pattern is  { key1 (&lt;http://www.w3.org/2004/02/skos/core#exactMatch&gt; | ^ &lt;http://www.w3.org/2004/02/skos/core#exactMatch&gt;)* key2 }</td>
+            <td>$esc.html($repository.match)</td>
+          </tr>
+          <tr>
+            <td>useBaseType</td>
+            <td>Set to true if the OData metadata to use baseType, false will flatten the classes so every class has its own primary key and full set of properties and associations.</td>
+            <td>$repository.useBaseType</td>
+          </tr>
+          <tr>
+            <td>expandOperations</td>
+            <td>Set to true if operations to be implicitly included in a $expand=* query request. It does not inhibit the explicit expansion of an operation.</td>
+            <td>$repository.expandOperations</td>
+          </tr>
+           <tr>
+            <td>namespaces</td>
+            <td>The predefined namespaces used for this Repository.<br/>If a query identifies a new namespace then a prefix will be autogenerated, since all data is returned in odata-QName form (prefix~name).<br/>If the new namespace is of the form existingNamespace/extension, then the new prefix will be created of the form existingPrefix_extension, otherwise jn will be assigned, where n is any integer.</td>
+            <td><table style="width:100%">
+                 <tr>
+                 	<th>Prefix</th>
+                 	<th>Namespace</th>
+                 </tr>
+             #foreach($namespace in $repository.namespaces)
+                 <tr>
+                 	<td>$namespace.prefix</td>
+                 	<td>$namespace.name</td>
+                 </tr>  
+             #end
+             </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+   #end
+   </table>
+  <br />
+  <a href="./$reload">Click to reload Models.ttl to clear all cached metadata and relaod models from endpoints</a></body>
+</html>

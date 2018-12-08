@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.Comparator;
-
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -43,6 +41,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
+import com.inova8.odata2sparql.Utils.RdfNodeComparator;
 
 class SparqlEntityCollection extends EntityCollection {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
@@ -73,23 +72,26 @@ class SparqlEntityCollection extends EntityCollection {
 	}
 
 	public Entity getFirstEntity() throws ODataException {
-		if (!this.getEntities().isEmpty()) {			
+		if (!this.getEntities().isEmpty()) {
 			return this.iterator().next();
 		} else {
 			return null;
 		}
 	}
+
 	public Entity findEntity(String key) {
 		if (!this.getEntities().isEmpty()) {
 			for (Entity entity : this.getEntities()) {
 				//TODO could be more efficient?
-				if (entity.getProperty(RdfConstants.SUBJECT).getValue().toString().equals(key)) return entity;
+				if (entity.getProperty(RdfConstants.SUBJECT).getValue().toString().equals(key))
+					return entity;
 			}
 		} else {
 			return null;
 		}
-		return null; 
- }
+		return null;
+	}
+
 	public Map<String, Map<String, List<Object>>> getNavPropertyResults() {
 		return navPropertyResults;
 	}
@@ -147,11 +149,11 @@ class SparqlEntityCollection extends EntityCollection {
 				RdfNode objectNode = triple.getObject();
 
 				SparqlEntity rdfSubjectEntity = findOrCreateEntity(subjectNode);
-// TODO maybe not required
-//				if ((expand == null || expand.getExpandItems().isEmpty())
-//						&& (select == null || select.getSelectItems().isEmpty())) {
-//					rdfSubjectEntity.setEntityType(rdfEntityType);
-//				}
+				// TODO maybe not required
+				//				if ((expand == null || expand.getExpandItems().isEmpty())
+				//						&& (select == null || select.getSelectItems().isEmpty())) {
+				//					rdfSubjectEntity.setEntityType(rdfEntityType);
+				//				}
 				if (objectNode.isIRI() || objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded entity
 					if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
@@ -160,14 +162,14 @@ class SparqlEntityCollection extends EntityCollection {
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
 						//TODO what can we use this for
 						//rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
-				
+
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.MATCHING)) {
 						//TODO add to local linkset
 						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-						if(!rdfObjectEntity.equals(rdfSubjectEntity)) {
-								rdfSubjectEntity.addMatching(rdfObjectEntity);
-								rdfObjectEntity.addMatching(rdfSubjectEntity);
-						}							
+						if (!rdfObjectEntity.equals(rdfSubjectEntity)) {
+							rdfSubjectEntity.addMatching(rdfObjectEntity);
+							rdfObjectEntity.addMatching(rdfSubjectEntity);
+						}
 					} else {
 						RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType()
 								.findNavigationProperty(propertyNode);
@@ -289,7 +291,7 @@ class SparqlEntityCollection extends EntityCollection {
 							"http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
 				complexValue.getNavigationLinks().add(navigationLink);
 			}
-//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
+			//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
 			navigationLink.setHref(rdfObjectEntity.getId().toString());
 
 			if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
@@ -413,27 +415,21 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		return rdfEntity;
 	}
-	private void  mergeMatching() {
+
+	private void mergeMatching() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
-			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();	
-			TreeMap<RdfNode, Object> mergedDatatypeProperties = new  TreeMap<RdfNode, Object>(
-					new Comparator<RdfNode>() {
-						@Override
-						public int compare(RdfNode o1, RdfNode o2) {
-							return o1.toString().compareTo(o2.toString());
-						}
-					}				
-					);
-			ArrayList<Property> mergedProperties = new  ArrayList<Property>();
-			ArrayList<Link> mergedNavigationLinks = new  ArrayList<Link>();
-			for( SparqlEntity matchingEntity: rdfEntity.getMatching()) {			
+			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
+			TreeMap<RdfNode, Object> mergedDatatypeProperties = new TreeMap<RdfNode, Object>(new RdfNodeComparator());
+			ArrayList<Property> mergedProperties = new ArrayList<Property>();
+			ArrayList<Link> mergedNavigationLinks = new ArrayList<Link>();
+			for (SparqlEntity matchingEntity : rdfEntity.getMatching()) {
 				mergedDatatypeProperties.putAll(matchingEntity.getDatatypeProperties());
 				mergedProperties.addAll(matchingEntity.getProperties());
 				mergedNavigationLinks.addAll(matchingEntity.getNavigationLinks());
-			}	
+			}
 			mergedDatatypeProperties.putAll(rdfEntity.getDatatypeProperties());
 			mergedProperties.addAll(rdfEntity.getProperties());
 			mergedNavigationLinks.addAll(rdfEntity.getNavigationLinks());
@@ -442,14 +438,14 @@ class SparqlEntityCollection extends EntityCollection {
 			rdfEntity.getNavigationLinks().addAll(mergedNavigationLinks);
 		}
 	}
+
 	private SparqlEntityCollection build() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
-			
-			
+
 			// only leave target entities in collection, the rest will be
 			// accessed via links
 			if (rdfEntity.isTargetEntity()) {

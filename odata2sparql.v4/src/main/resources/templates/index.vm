@@ -48,6 +48,16 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
             <th>Description</th>
             <th>Value</th>
           </tr>
+           <tr>
+            <td>OData2SPARQL.v4 version</td>
+            <td>Designated version of OData2SPARQL.v4</td>
+            <td>$version</td>
+          </tr>
+           <tr>
+            <td>Build Date</td>
+            <td>Date of code build</td>
+            <td>$buildDate</td>
+          </tr>
           <tr>
             <td>Repository location</td>
             <td>RDF4J store containing server configuration derived from models.ttl</td>

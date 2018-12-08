@@ -1,0 +1,764 @@
+# baseURI: http://inova8.com/odata4sparql/validation
+# imports: http://spinrdf.org/spl
+
+@prefix : <http://inova8.com/odata4sparql/validation#> .
+@prefix arg: <http://spinrdf.org/arg#> .
+@prefix def: <http://rdf.data.intra/formulation/def/> .
+@prefix model: <http://northwind.com/model/> .
+@prefix models: <http://inova8.com/odata4sparql/models#> .
+@prefix odata4sparql: <http://inova8.com/odata4sparql#> .
+@prefix operations: <http://northwind.com/operations/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+odata4sparql:Dataset
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b32103 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b32103 ;
+          ]
+          [
+            sp:object odata4sparql:vocabularyRepository ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b32103 ;
+          ]
+          [
+            sp:object "dataset missing vocabularyRepository" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b32103 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath odata4sparql:vocabularyRepository .
+    _:b0 rdfs:label \"dataset missing vocabularyRepository\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a odata4sparql:Dataset  . 
+ FILTER NOT EXISTS{ ?this odata4sparql:vocabularyRepository ?vocabularyRepository  } . 
+ }""" ;
+      sp:where (
+          [
+            sp:object odata4sparql:Dataset ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "vocabularyRepository" ;
+                        ] ;
+                      sp:predicate odata4sparql:vocabularyRepository ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b45185 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b45185 ;
+          ]
+          [
+            sp:object odata4sparql:dataRepository ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b45185 ;
+          ]
+          [
+            sp:object "dataset missing dataRepository" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b45185 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath odata4sparql:dataRepository .
+    _:b0 rdfs:label \"dataset missing dataRepository\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a odata4sparql:Dataset  . 
+ FILTER NOT EXISTS{ ?this odata4sparql:dataRepository ?vocabularyRepository  } . 
+ }""" ;
+      sp:where (
+          [
+            sp:object odata4sparql:Dataset ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "vocabularyRepository" ;
+                        ] ;
+                      sp:predicate odata4sparql:dataRepository ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
+odata4sparql:Operation
+  spin:constraint [
+      rdf:type sp:Ask ;
+      sp:text """# query must be declared
+ASK WHERE {
+    ?this spin:body ?query .
+   FILTER(!BOUND(?query)) 
+}""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "query" ;
+              ] ;
+            sp:predicate spin:body ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:not ;
+                sp:arg1 [
+                    rdf:type sp:bound ;
+                    sp:arg1 [
+                        sp:varName "query" ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "query must be declared" ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b19888 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b19888 ;
+          ]
+          [
+            sp:object spin:body ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b19888 ;
+          ]
+          [
+            sp:object "Operation query body missing" ;
+            sp:predicate spin:violationValue ;
+            sp:subject _:b19888 ;
+          ]
+          [
+            sp:object "Operation must have a spin:body" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b19888 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot ?this .
+    _:b0 spin:violationPath spin:body .
+    _:b0 spin:violationValue \"Operation query body missing\" .
+    _:b0 rdfs:label \"Operation must have a spin:body\" .
+}
+#SELECT * 
+WHERE {
+    ?this a odata4sparql:Operation .
+  FILTER NOT EXISTS{?this spin:body ?query } .
+}""" ;
+      sp:where (
+          [
+            sp:object odata4sparql:Operation ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "query" ;
+                        ] ;
+                      sp:predicate spin:body ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b25880 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b25880 ;
+          ]
+          [
+            sp:object sp:text ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b25880 ;
+          ]
+          [
+            sp:object "Operation query body text missing" ;
+            sp:predicate spin:violationValue ;
+            sp:subject _:b25880 ;
+          ]
+          [
+            sp:object "Operation must have a spin:body/sp:text" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b25880 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot ?this .
+    _:b0 spin:violationPath sp:text .
+    _:b0 spin:violationValue \"Operation query body text missing\" .
+    _:b0 rdfs:label \"Operation must have a spin:body/sp:text\" .
+}
+#SELECT * 
+WHERE {
+    ?this a odata4sparql:Operation . 
+    ?this spin:body ?query 
+  FILTER NOT EXISTS{?query sp:text ?text } .
+}""" ;
+      sp:where (
+          [
+            sp:object odata4sparql:Operation ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "query" ;
+              ] ;
+            sp:predicate spin:body ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "text" ;
+                        ] ;
+                      sp:predicate sp:text ;
+                      sp:subject [
+                          sp:varName "query" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b99776 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b99776 ;
+          ]
+          [
+            sp:object spl:predicate ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b99776 ;
+          ]
+          [
+            sp:object [
+                sp:varName "varName" ;
+              ] ;
+            sp:predicate spin:violationValue ;
+            sp:subject _:b99776 ;
+          ]
+          [
+            sp:object [
+                sp:varName "label" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b99776 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath spl:predicate .
+    _:b0 spin:violationValue ?varName .
+    _:b0 rdfs:label ?label .
+}
+#SELECT * 
+WHERE { 
+ ?this  a odata4sparql:Operation  . 
+?this spin:body ?body . 
+ ?body sp:resultVariables ?resultVariables .
+ ?resultVariables rdf:rest*/rdf:first  ?resultVariable .
+ ?resultVariable sp:varName ?varName . 
+ FILTER NOT EXISTS{ ?resultVariable spl:predicate ?property  } . 
+BIND ( CONCAT( \"Operation result variable missing predicate for variable ?\", ?varName)   as ?label)
+ }""" ;
+      sp:where (
+          [
+            sp:object odata4sparql:Operation ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "body" ;
+              ] ;
+            sp:predicate spin:body ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "resultVariables" ;
+              ] ;
+            sp:predicate sp:resultVariables ;
+            sp:subject [
+                sp:varName "body" ;
+              ] ;
+          ]
+          [
+            rdf:type sp:TriplePath ;
+            sp:object [
+                sp:varName "resultVariable" ;
+              ] ;
+            sp:path [
+                rdf:type sp:SeqPath ;
+                sp:path1 [
+                    rdf:type sp:ModPath ;
+                    sp:modMax -2 ;
+                    sp:modMin 0 ;
+                    sp:subPath rdf:rest ;
+                  ] ;
+                sp:path2 rdf:first ;
+              ] ;
+            sp:subject [
+                sp:varName "resultVariables" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "varName" ;
+              ] ;
+            sp:predicate sp:varName ;
+            sp:subject [
+                sp:varName "resultVariable" ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "property" ;
+                        ] ;
+                      sp:predicate spl:predicate ;
+                      sp:subject [
+                          sp:varName "resultVariable" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            rdf:type sp:Bind ;
+            sp:expression [
+                rdf:type sp:concat ;
+                sp:arg1 "Operation result variable missing predicate for variable ?" ;
+                sp:arg2 [
+                    sp:varName "varName" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "label" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
+<http://inova8.com/odata4sparql/validation>
+  rdf:type owl:Ontology ;
+  owl:imports <http://spinrdf.org/spl> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+<http://www.openrdf.org#SPARQLRepository>
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b45522 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b45522 ;
+          ]
+          [
+            sp:object <http://www.openrdf.org/config/repository#repositoryImpl> ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b45522 ;
+          ]
+          [
+            sp:object [
+                sp:varName "queryEndpoint" ;
+              ] ;
+            sp:predicate spin:violationValue ;
+            sp:subject _:b45522 ;
+          ]
+          [
+            sp:object "queryEndpoint not a valid IRI" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b45522 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath rep:repositoryImpl .
+    _:b0 spin:violationValue ?queryEndpoint  .
+    _:b0 rdfs:label \"queryEndpoint not a valid IRI\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a openrdf:SPARQLRepository . 
+?this <http://www.openrdf.org/config/repository/sparql#query-endpoint> ?queryEndpoint  
+ FILTER (!isIRI( ?queryEndpoint ) ). 
+ }""" ;
+      sp:where (
+          [
+            sp:object <http://www.openrdf.org#SPARQLRepository> ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "queryEndpoint" ;
+              ] ;
+            sp:predicate <http://www.openrdf.org/config/repository/sparql#query-endpoint> ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:not ;
+                sp:arg1 [
+                    rdf:type sp:isIRI ;
+                    sp:arg1 [
+                        sp:varName "queryEndpoint" ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b74915 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b74915 ;
+          ]
+          [
+            sp:object <http://www.openrdf.org/config/repository#repositoryImpl> ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b74915 ;
+          ]
+          [
+            sp:object "SPARQLrepository does not have updateEndpoint" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b74915 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath rep:repositoryImpl .
+    _:b0 rdfs:label \"SPARQLrepository does not have updateEndpoint\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a openrdf:SPARQLRepository . 
+ FILTER NOT EXISTS{ ?this <http://www.openrdf.org/config/repository/sparql#update-endpoint> ?updateEndpoint  } . 
+ }""" ;
+      sp:where (
+          [
+            sp:object <http://www.openrdf.org#SPARQLRepository> ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "updateEndpoint" ;
+                        ] ;
+                      sp:predicate <http://www.openrdf.org/config/repository/sparql#update-endpoint> ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b97905 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b97905 ;
+          ]
+          [
+            sp:object <http://www.openrdf.org/config/repository#repositoryImpl> ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b97905 ;
+          ]
+          [
+            sp:object "SPARQLrepository does not have queryEndpoint" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b97905 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath rep:repositoryImpl .
+    _:b0 rdfs:label \"SPARQLrepository does not have queryEndpoint\" .
+}
+#SELECT *
+WHERE { 
+ ?this  a openrdf:SPARQLRepository . 
+ FILTER NOT EXISTS{ ?this <http://www.openrdf.org/config/repository/sparql#query-endpoint> ?queryEndpoint  } . 
+ }""" ;
+      sp:where (
+          [
+            sp:object <http://www.openrdf.org#SPARQLRepository> ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "queryEndpoint" ;
+                        ] ;
+                      sp:predicate <http://www.openrdf.org/config/repository/sparql#query-endpoint> ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b99874 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b99874 ;
+          ]
+          [
+            sp:object <http://www.openrdf.org/config/repository#repositoryImpl> ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b99874 ;
+          ]
+          [
+            sp:object [
+                sp:varName "updateEndpoint" ;
+              ] ;
+            sp:predicate spin:violationValue ;
+            sp:subject _:b99874 ;
+          ]
+          [
+            sp:object "updateEndpoint not a valid IRI" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b99874 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath rep:repositoryImpl .
+    _:b0 spin:violationValue ?updateEndpoint  .
+    _:b0 rdfs:label \"updateEndpoint not a valid IRI\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a openrdf:SPARQLRepository . 
+?this <http://www.openrdf.org/config/repository/sparql#update-endpoint> ?updateEndpoint  
+ FILTER (!isIRI( ?updateEndpoint ) ). 
+ }""" ;
+      sp:where (
+          [
+            sp:object <http://www.openrdf.org#SPARQLRepository> ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            sp:object [
+                sp:varName "updateEndpoint" ;
+              ] ;
+            sp:predicate <http://www.openrdf.org/config/repository/sparql#update-endpoint> ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:not ;
+                sp:arg1 [
+                    rdf:type sp:isIRI ;
+                    sp:arg1 [
+                        sp:varName "updateEndpoint" ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
+<http://www.openrdf.org/config/repository#Repository>
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:templates (
+          [
+            sp:object spin:ConstraintViolation ;
+            sp:predicate rdf:type ;
+            sp:subject _:b12612 ;
+          ]
+          [
+            sp:object spin:_this ;
+            sp:predicate spin:violationRoot ;
+            sp:subject _:b12612 ;
+          ]
+          [
+            sp:object <http://www.openrdf.org/config/repository#repositoryImpl> ;
+            sp:predicate spin:violationPath ;
+            sp:subject _:b12612 ;
+          ]
+          [
+            sp:object "repository does not have a defined implementation" ;
+            sp:predicate rdfs:label ;
+            sp:subject _:b12612 ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    _:b0 a spin:ConstraintViolation .
+    _:b0 spin:violationRoot  ?this .
+    _:b0 spin:violationPath rep:repositoryImpl .
+    _:b0 rdfs:label \"repository does not have a defined implementation\" .
+}
+#SELECT * 
+WHERE { 
+ ?this  a rep:Repository . 
+ FILTER NOT EXISTS{ ?this rep:repositoryImpl ?repositoryImpl  } . 
+ }""" ;
+      sp:where (
+          [
+            sp:object <http://www.openrdf.org/config/repository#Repository> ;
+            sp:predicate rdf:type ;
+            sp:subject spin:_this ;
+          ]
+          [
+            rdf:type sp:Filter ;
+            sp:expression [
+                rdf:type sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "repositoryImpl" ;
+                        ] ;
+                      sp:predicate <http://www.openrdf.org/config/repository#repositoryImpl> ;
+                      sp:subject spin:_this ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.

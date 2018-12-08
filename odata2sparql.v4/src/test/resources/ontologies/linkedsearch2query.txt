@@ -1,0 +1,123 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+select ?l ?entityA ?typeA  ?formattedValueA ?p01 ?i10
+	?node1 ?type1 ?p12 ?i21
+	?node2 ?type2 ?p23 ?i32
+	?node3 ?type3 ?p34 ?i43
+	?node4 ?type4 ?p45 ?i54
+	?node5 ?type5 ?p56 ?i65
+	?entityB ?typeB ?formattedValueB
+{
+	{select ?entityB ?typeB (GROUP_CONCAT( concat("<tr><td>", ?labelPropertyB, "</td><td>" ,?snippetB,"</td></tr>") ) as ?formattedValueB)
+		{
+			{select ?entityB ?typeB ?snippetB ?labelPropertyB
+				{	 
+					?entityB ?propertyB "NORTH AND OF AND ENGLAND AND COMMISSIONING AND REGION"^^<http://merck.github.io/Halyard/ns#search> ,
+					?snippetB .
+					?entityB a ?typeB .
+					?propertyB rdfs:label ?labelPropertyB .
+				}
+			}
+		}
+		GROUP BY ?entityB ?typeB LIMIT 1
+	} 
+	{select ?entityA ?typeA (GROUP_CONCAT( concat("<tr><td>", ?labelPropertyA, "</td><td>" ,?snippetA,"</td></tr>") ) as ?formattedValueA)
+		{
+			{select ?entityA ?typeA ?snippetA ?labelPropertyA
+				{	 
+					?entityA ?propertyA "123 CEMETERY ROAD"^^<http://merck.github.io/Halyard/ns#search> ,
+					?snippetA .
+					?entityA a ?typeA .
+					?propertyA rdfs:label ?labelPropertyA .
+				}
+			}
+		}
+		GROUP BY ?entityA ?typeA LIMIT 1
+	}
+	#VALUES( ?entityA){(<http://nexifysolutions.com/Customer360/ods/id/G6801362>)}
+	#VALUES( ?entityA ?entityB){(<http://northwind.com/Order-10397> <http://northwind.com/Order-10491>)} #	<http://northwind.com/Shipper-1>)}
+	{ #distance = 1
+		{?entityA ?p01 ?entityB . FILTER (?p01 != rdf:type ) } 
+		UNION 
+		{?entityB ?i10 ?entityA . FILTER (?i01 != rdf:type )	}
+	}
+	UNION
+	{
+		{ #step = 1
+			{?entityA ?p01 ?node1 . FILTER (isIRI(?node1) && ?p01 != rdf:type	&& ?node1 NOT IN (?entityA)) }
+			UNION
+			{?node1 ?i10 ?entityA . FILTER (isIRI(?node1) && ?i01 != rdf:type	&& ?node1 NOT IN (?entityA)) }
+		}
+		?node1 a ?type1 .
+		{
+			{ #distance = 2
+				{?node1 ?p12 ?entityB . } 
+				UNION 
+				{?entityB ?i21 ?node1 . }
+			}
+			UNION
+			{
+				{ #step = 2
+					{?node1 ?p12 ?node2 . FILTER (isIRI(?node2) && ?p12 != rdf:type	&& ?node2 NOT IN (?node1,?entityA) ) } 
+					UNION	
+					{?node2 ?i21 ?node1 . FILTER (isIRI(?node2) && ?i21 != rdf:type && ?node2 NOT IN (?node1,?entityA) )}
+				}
+				?node2 a ?type2 .
+				{
+					{ #distance = 3
+						{?node2 ?p23 ?entityB	.	}	
+						UNION	
+						{?entityB ?i32 ?node2	. }
+					}
+					UNION
+					{
+						{ #step = 3
+							{?node2 ?p23 ?node3	. FILTER (isIRI(?node3) && ?p23 != rdf:type && ?node3 NOT IN (?node2, ?node1,?entityA) ) } 
+							UNION 
+							{?node3 ?i32 ?node2	.	FILTER (isIRI(?node3) && ?i32 != rdf:type && ?node3 NOT IN (?node2, ?node1,?entityA)) }				
+						}
+						?node3 a ?type3 .
+						{
+							{ #distance = 4
+								{?node3 ?p34 ?entityB .	} 
+								UNION 
+								{?entityB ?i43 ?node3 .	}
+							}
+							UNION
+							{
+								{ #step = 4
+									{?node3 ?p34 ?node4 .	FILTER (isIRI(?node4) && ?p34 != rdf:type && ?node4 NOT IN (?node3, ?node2, ?node1,?entityA)) } 
+									UNION 
+									{?node4 ?i43 ?node3	. FILTER (isIRI(?node4) && ?i43 != rdf:type && ?node4 NOT IN (?node3, ?node2, ?node1,?entityA) ) }
+								}
+								?node4 a ?type4 .
+								{	#start template
+									{ #distance = 5
+										{?node4 ?p45 ?entityB .} 
+										UNION 
+										{?entityB ?i54 ?node4 .	}
+									}
+									UNION
+									{
+										{ #step = 5
+											{?node4 ?p45 ?node5 .	FILTER (isIRI(?node5) && ?p45 != rdf:type && ?node5 NOT IN (?node4, ?node3, ?node2, ?node1,?entityA)) } 
+											UNION
+											{?node5 ?i54 ?node4	. FILTER (isIRI(?node5) && ?i54 != rdf:type && ?node5 NOT IN (?node4, ?node3, ?node2, ?node1,?entityA) ) }
+										}
+										?node5 a ?type5 .
+										{
+											{ #distance = 6
+												{?node5 ?p56 ?entityB .	}	
+												UNION	
+												{?entityB ?i65 ?node5 .	}
+											}
+										}
+									}	#end template
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+} limit 2

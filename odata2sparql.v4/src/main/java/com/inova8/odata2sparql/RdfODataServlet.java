@@ -46,13 +46,15 @@ public class RdfODataServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final Logger log = LoggerFactory.getLogger(RdfODataServlet.class);
 	static private RdfEdmProviders rdfEdmProviders = null;
+	static String version = null;
+	static String buildDate = null;
 
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
 			if (rdfEdmProviders == null) {
-
 				ServletContext servletContext = getServletContext();
+				readVersion();
 				File repositoryDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
 				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
 						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
@@ -135,7 +137,22 @@ public class RdfODataServlet extends HttpServlet {
 			simpleResponse(req, resp, "odata2sparql.v4");
 		}
 	}
-
+	private void readVersion()
+			throws IOException {
+		try {
+			InputStream in = getServletContext().getResourceAsStream( "/WEB-INF/classes/version.txt");
+			if( in != null) {
+			String contents = IOUtils.toString(in, Charset.defaultCharset());
+			version = contents.split("\r\n")[0].split("=")[1];
+			buildDate = contents.split("\r\n")[1].split("=")[1];
+			in.close();
+			}else {
+				log.error("Cannot read version information");
+			}
+		} catch (Exception e) {
+			log.error("Cannot read version information", e);
+		}
+	}
 	private void htmlTemplateResponse(HttpServletRequest req, HttpServletResponse resp, String textTemplate)
 			throws IOException {
 		try {
@@ -149,6 +166,8 @@ public class RdfODataServlet extends HttpServlet {
 			VelocityContext uiContext = new VelocityContext();
 			uiContext.put("esc", new EscapeTool());
 			uiContext.put("repositories", new ArrayList<RdfRepository>(rdfEdmProviders.getRepositories().getRdfRepositories().values()));
+			uiContext.put("version",RdfODataServlet.version);
+			uiContext.put("buildDate",RdfODataServlet.buildDate);
 			uiContext.put("repositoryLocation",rdfEdmProviders.getRepositories().getLocalRepositoryManagerDirectory());
 			uiContext.put("modelsLocation",rdfEdmProviders.getRepositories().getLocalRepositoryManagerModel());
 			

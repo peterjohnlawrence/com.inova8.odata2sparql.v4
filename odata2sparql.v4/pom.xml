@@ -5,7 +5,7 @@
 	<groupId>com.inova8.odata2sparql</groupId>
 	<artifactId>odata2sparql.v4</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<name>odata2sparql.v4</name>
 	<dependencies>
 		<dependency>
@@ -21,14 +21,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>4.3.4.RELEASE</version>
-			<scope>test</scope>
+			<version>5.1.2.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>4.3.4.RELEASE</version>
-			<scope>test</scope>
+			<version>5.1.2.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>
@@ -98,8 +96,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
-			<version>4.11</version>
+			<version>${junit.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.restfuse</groupId>
@@ -193,8 +190,15 @@
 						<showDeprecation>true</showDeprecation>
 					</configuration>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
 	<organization>
 		<name>inova8 llc</name>
@@ -209,7 +213,10 @@
 		<javax.version>2.5</javax.version>
 		<slf4j.version>1.7.11</slf4j.version>
 		<rdf4j.version>2.4.1</rdf4j.version>
-		<jetty.version>9.3.15.v20161220</jetty.version>
+		<jetty.version>9.3.24.v20180605</jetty.version>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<junit.version>4.11</junit.version>
 	</properties>
 	<url>http://www.inova8.com</url>
 </project>
