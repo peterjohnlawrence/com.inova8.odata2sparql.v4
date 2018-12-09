@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -19,8 +18,6 @@ import com.inova8.odata2sparql.RdfODataServlet;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
@@ -33,8 +30,11 @@ public class TestServlet {
 	private static MockServletConfig servletConfig;
 	private static MockHttpServletRequest request;
 	private static MockHttpServletResponse response;
+	@SuppressWarnings("unused")
 	private String group;
+	@SuppressWarnings("unused")
 	private String subgroup;
+	@SuppressWarnings("unused")
 	private String test;
 	private String skip;
 	private String repository;
@@ -42,6 +42,7 @@ public class TestServlet {
 	private String query;
 	private String options;
 	private String expected;
+	@SuppressWarnings("unused")
 	private String comments;
 
 	public TestServlet(String group, String subgroup, String test, String skip, String repository, String requestURI,
@@ -139,7 +140,6 @@ public class TestServlet {
 		servletContext.addInitParameter("configFolder", "/var/opt/inova8/odata2sparql");
 		servletContext.addInitParameter("repositoryFolder", "V4");
 		servletContext.addInitParameter("repositoryUrl", "");
-		//response = new MockHttpServletResponse();
 		request.setServerName("localhost:8080/odata2sparql/");
 		request.setMethod("GET");
 		servlet.init(servletConfig);

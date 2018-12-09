@@ -41,11 +41,10 @@ import com.inova8.odata2sparql.uri.UriType;
 public class SparqlBaseCommand {
 	private final static Logger log = LoggerFactory.getLogger(SparqlBaseCommand.class);
 
-	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
-			throws ODataException, OData2SparqlException {
-		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
+	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType,
+			RdfResourceParts rdfResourceParts) throws ODataException, OData2SparqlException {
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
-				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType,rdfResourceParts);
+				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
 
 		//prepareQuery
 		SparqlStatement sparqlStatement = null;
@@ -54,14 +53,7 @@ public class SparqlBaseCommand {
 		case URI1:
 			break;
 		case URI4:
-//			throw new ODataRuntimeException("URI4 not supported in this context");
-			//This is when we have a complexType at part-2
-//			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-//			edmEntitySet = uriResourceEntitySet.getEntitySet();
-//			 rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-//			 uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(2);
-
- 		break;
+			break;
 		case URI6B:
 			break;
 		default:
@@ -73,21 +65,21 @@ public class SparqlBaseCommand {
 		} catch (OData2SparqlException e) {
 			throw new ODataRuntimeException(e.getMessage());
 		}
-		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider, rdfResourceParts.getResponseRdfEntityType(),//rdfEntityType,
+		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider,
+				rdfResourceParts.getResponseRdfEntityType(), //rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
 		return rdfResults.getEntityCollection();
 	}
 
-	static public Entity readEntity(RdfEdmProvider rdfEdmProvider, final UriInfo uriInfo, UriType uriType)
-			throws EdmException, OData2SparqlException, ODataException {
+	static public Entity readEntity(RdfEdmProvider rdfEdmProvider, final UriInfo uriInfo, UriType uriType,
+			RdfResourceParts rdfResourceParts) throws EdmException, OData2SparqlException, ODataException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
 		RdfEntityType rdfEntityType = null;
 		EdmEntitySet edmEntitySet = null;
 		String key = null;
 		Boolean knownKey = false;
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
-				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType,rdfResourceParts);
+				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
 
 		//prepareQuery
 		SparqlStatement sparqlStatement = null;
@@ -120,33 +112,20 @@ public class SparqlBaseCommand {
 				edmEntitySet = uriResourceEntitySet.getEntitySet();
 				rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 			}
-			key=rdfResourceParts.getTargetSubjectId();
+			key = rdfResourceParts.getTargetSubjectId();
 			//key = uriResourceEntitySet.getKeyPredicates().get(0).getText();
 			//key = key.substring(1, key.length() - 1);
-			knownKey = (key!=null);
+			knownKey = (key != null);
 			break;
 		case URI2:
 			uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
 			edmEntitySet = uriResourceEntitySet.getEntitySet();
 			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-			key=rdfResourceParts.getTargetSubjectId();
-			knownKey = (key!=null);
+			key = rdfResourceParts.getTargetSubjectId();
+			knownKey = (key != null);
 			break;
 		case URI6A:
 			UriResource lastSegment = resourcePaths.get(resourcePaths.size() - 1);
-//			if (lastSegment instanceof UriResourceNavigation) {
-//				UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;
-//				EdmNavigationProperty edmNavigationProperty = uriResourceNavigation.getProperty();
-//				if(resourcePaths.size()>2) {
-//					UriResourceComplexProperty penultimateSegment = (UriResourceComplexProperty)resourcePaths.get(resourcePaths.size() - 2);
-//					 EdmNavigationProperty navigationProperty = penultimateSegment.getComplexType().getNavigationProperty(edmNavigationProperty.getName());
-//					 edmTargetEntitySet =  Util.getNavigationTargetEntitySet(edmEntitySet,penultimateSegment.getComplexType(),navigationProperty);
-//					 rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
-//				}else {
-//					edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
-//					rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
-//				}
-//			}
 			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) lastSegment;//resourcePaths.get(1);
 			FullQualifiedName edmEntityTypeFQN = uriResourceNavigation.getProperty().getType().getFullQualifiedName();
 			rdfEntityType = rdfEdmProvider.getMappedEntityType(edmEntityTypeFQN);
@@ -158,12 +137,6 @@ public class SparqlBaseCommand {
 				knownKey = false;
 			}
 
-
-			
-			
-			
-			
-			
 			break;
 		default:
 			throw new ODataApplicationException("Unhandled URIType " + uriType,
@@ -186,7 +159,7 @@ public class SparqlBaseCommand {
 			throws OData2SparqlException, EdmException, ODataApplicationException, ExpressionVisitException {
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
-				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType,rdfResourceParts);
+				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
 
 		//prepareQuery
 		SparqlStatement sparqlStatement = null;
@@ -219,7 +192,7 @@ public class SparqlBaseCommand {
 		edmEntitySet = uriResourceEntitySet.getEntitySet();
 		rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
-				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType,rdfResourceParts);
+				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
 
 		//prepareQuery
 		SparqlStatement sparqlStatement = sparqlBuilder.prepareEntityLinksSparql();

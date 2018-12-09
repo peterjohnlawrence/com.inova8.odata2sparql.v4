@@ -35,7 +35,6 @@ import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
@@ -84,17 +83,14 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
 		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
 		UriType uriType = null;
-		UriResourceComplexProperty complexProperty =null;
 
 		// 1.2. retrieve the requested (Edm) property
 		// the second to last segment is the Property, if the last is $value
-		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);
 		int minSize = 1;
-		if (lastResourcePart.getSegmentValue().equals("$value")) {
+		if (rdfResourceParts.isValueRequest()) {
 			minSize++;
 		}	
 		
-		lastResourcePart = resourceParts.get(resourceParts.size() - minSize);	
 		UriResourceProperty uriProperty = (UriResourceProperty) resourceParts.get(resourceParts.size() - minSize);
 		EdmProperty edmProperty = uriProperty.getProperty();
 		String edmPropertyName = edmProperty.getName();
@@ -104,17 +100,8 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		// 2.1. retrieve the entity data, for which the property has to be read
 		Entity entity = null;
 		try {
-//			if( resourceParts.get(1).getKind().equals(UriResourceKind.complexProperty)) {
-//				complexProperty = (UriResourceComplexProperty) resourceParts.get(1);
-//				if(resourceParts.size() == 3) {
-//					uriType =  UriType.URI4;
-//				}else {
-//					uriType =  UriType.URI3;				}
-//			}else {
-//				uriType =  UriType.URI5;
-//			}
 			uriType = rdfResourceParts.getUriType();
-			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, uriType);
+			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, uriType,rdfResourceParts);
 		} catch (EdmException | OData2SparqlException | ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);

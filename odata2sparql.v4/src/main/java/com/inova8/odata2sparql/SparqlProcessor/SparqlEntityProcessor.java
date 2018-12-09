@@ -64,11 +64,12 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();;
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
+//		rdfResourceParts.getEntitySet().getEdmEntitySet();
 		// 2. retrieve the data from backend
 		Entity entity = null;
 		try {
 			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo,
-					rdfResourceParts.getUriType());
+					rdfResourceParts.getUriType(),rdfResourceParts);
 			if (entity == null)
 				throw new OData2SparqlException("No data found");
 		} catch (EdmException | OData2SparqlException | ODataException e) {
@@ -81,7 +82,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients)
 			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(), expandOption,
 					selectOption);
-			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).keyPath(rdfResourceParts.getLocalKey()).navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
+			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet()).keyPath(rdfResourceParts.getLocalKey()).navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
 					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
 			throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),

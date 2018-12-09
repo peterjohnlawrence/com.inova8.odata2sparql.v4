@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
+import com.inova8.odata2sparql.uri.RdfResourceNavigationProperty;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
@@ -85,8 +86,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = null;
 		try {
-			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo,
-					rdfResourceParts.getUriType());
+			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, rdfResourceParts.getUriType(),rdfResourceParts);
 		} catch (ODataException | OData2SparqlException e) {
 			log.info("No data found");
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
@@ -104,38 +104,41 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		int segmentCount = rdfResourceParts.size();
 		if (segmentCount == 3) { //navigation via complextype
 			if (rdfResourceParts.getResourceKind(2).equals(UriResourceKind.navigationProperty)) {
+				RdfResourceNavigationProperty rdfNavigationProperty = rdfResourceParts.getAsNavigationProperty(2);
+				if (!rdfNavigationProperty.getEdmNavigationProperty().isCollection()) {
 
-				//TODO ***********************************************************
-				//Need to get the actual value of the complex property
-				//First find the entity, then its complexproperty value which will be a collection of entities
-				String entityString = rdfResourceParts.getEntityString();
-				Entity resultsEntity = null;
-				for (Entity entity : entitySet.getEntities()) {
-					if (entity.getId().toString().equals(entityString)) {
-						resultsEntity = entity;
-						break;
+					//TODO ***********************************************************
+					//Need to get the actual value of the complex property
+					//First find the entity, then its complexproperty value which will be a collection of entities
+					String entityString = rdfResourceParts.getEntityString();
+					Entity resultsEntity = null;
+					for (Entity entity : entitySet.getEntities()) {
+						if (entity.getId().toString().equals(entityString)) {
+							resultsEntity = entity;
+							break;
+						}
+					}
+					//Now its complexproperty value
+
+					ComplexValue result = (ComplexValue) resultsEntity
+							.getProperty(rdfResourceParts.getLastComplexType().getName())//rdfResourceParts.getAsComplexProperty(segmentCount - 2).getComplexType().getName())
+							.getValue();
+					entitySet = new EntityCollection();
+					//Now its property value 
+					String navigationPropertyName = rdfResourceParts.getAsNavigationProperty(segmentCount - 1)
+							.getEdmNavigationProperty().getName();
+					for (Property property : result.getValue()) {
+						if (property.getName().equals(navigationPropertyName)) {
+							entitySet = (EntityCollection) property.getValue();
+						}
 					}
 				}
-				//Now its complexproperty value
-				ComplexValue result = (ComplexValue) resultsEntity
-						.getProperty(rdfResourceParts.getAsComplexProperty(segmentCount - 2).getComplexType().getName())
-						.getValue();
-				entitySet = new EntityCollection();
-				//Now its property value 
-				String navigationPropertyName = rdfResourceParts.getAsNavigationProperty(segmentCount - 1)
-						.getEdmNavigationProperty().getName();
-				for (Property property : result.getValue()) {
-					if (property.getName().equals(navigationPropertyName)) {
-						entitySet = (EntityCollection) property.getValue();
-					}
-				}
-				//TODO ***********************************************************
 			}
-		}// else {
+		} // else {
 			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
-		//	throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
-		//			Locale.ROOT);
-		//}
+			//	throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+			//			Locale.ROOT);
+			//}
 
 		// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
 		ContextURL contextUrl = null;

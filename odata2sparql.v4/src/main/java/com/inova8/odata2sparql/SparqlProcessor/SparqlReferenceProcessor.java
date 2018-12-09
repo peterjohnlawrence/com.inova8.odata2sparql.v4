@@ -35,14 +35,16 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.UriType;
 
-public class SparqlReferenceProcessor implements ReferenceProcessor{
+public class SparqlReferenceProcessor implements ReferenceProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
+
 	public SparqlReferenceProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
+
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -60,7 +62,7 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entityCollection data
-	
+
 		EntityCollection entityCollection;
 		try {
 			entityCollection = SparqlBaseCommand.readReferenceCollection(rdfEdmProvider, uriInfo, UriType.URI7B);
@@ -68,7 +70,7 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		}
-		if (entityCollection == null) {
+		if (entityCollection == null || entityCollection.getEntities().isEmpty()) {
 			throw new ODataApplicationException("References not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
@@ -78,19 +80,22 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 		ContextURL contextUrl = null;
 		try {
 			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-			contextUrl = ContextURL.with().serviceRoot(new URI(request.getRawBaseUri()+"/")).build();
+			contextUrl = ContextURL.with().serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Inavlid RawBaseURI "+ request.getRawBaseUri(), HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
+					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 		}
 
 		ReferenceSerializerOptions opts = ReferenceSerializerOptions.with().contextURL(contextUrl).build();
-		SerializerResult serializerResult = serializer.reference(serviceMetadata, edmEntitySet,entityCollection.getEntities().get(0), opts);
-		InputStream serializedContent = serializerResult.getContent();
 
+		SerializerResult serializerResult = serializer.reference(serviceMetadata, edmEntitySet,
+				entityCollection.getEntities().get(0), opts);
+		InputStream serializedContent = serializerResult.getContent();
 		// Finally: configure the response object: set the body, headers and status code
 		response.setContent(serializedContent);
 		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
-		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());	
+		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
+
 	}
 
 	@Override
@@ -118,8 +123,8 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 	public void updateReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity type from the URI
-//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
-//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+		//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
+		//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
 		// 2. create the data in backend
 		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
@@ -143,8 +148,8 @@ public class SparqlReferenceProcessor implements ReferenceProcessor{
 	public void deleteReference(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity type from the URI
-//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
-//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+		//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
+		//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
 		try {
 			SparqlBaseCommand.deleteEntityReference(rdfEdmProvider, uriInfo);

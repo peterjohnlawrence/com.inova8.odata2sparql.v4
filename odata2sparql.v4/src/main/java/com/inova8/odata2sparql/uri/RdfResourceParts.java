@@ -42,6 +42,7 @@ public class RdfResourceParts {
 	private EdmEntitySet responseEntitySet;
 	private UriInfo uriInfo;
 	private UriType uriType;
+	private RdfResourceEntitySet entitySet;
 
 	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataApplicationException {
 		this.rdfEdmProvider = rdfEdmProvider;
@@ -85,6 +86,7 @@ public class RdfResourceParts {
 		localKey= _getLocalKey();
 		subjectId=_getSubjectId();
 		targetSubjectId=_getTargetSubjectId();
+		entitySet = _getEntitySet();
 		entityString=_getEntityString();
 		navPath=_getNavPath();
 		size=_size();
@@ -128,6 +130,9 @@ public class RdfResourceParts {
 	public String getTargetSubjectId() {
 		return targetSubjectId;
 	}
+	public RdfResourceEntitySet getEntitySet() {
+		return entitySet;
+	}
 	public String getEntityString() {
 		return entityString;
 	}
@@ -164,12 +169,22 @@ public class RdfResourceParts {
 	}
 
 	private RdfProperty _getLastComplexProperty() throws EdmException, ODataApplicationException {	
-		EdmComplexType edmComplexProperty = _getLastComplexType();
-		if(edmComplexProperty == null )
+		EdmComplexType edmComplexType = null ;
+		int complexIndex = 0;
+		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
+			if( rdfResourceParts.get(j).getUriResourceKind().equals(UriResourceKind.complexProperty)) {
+				edmComplexType = ((RdfResourceComplexProperty) rdfResourceParts.get(j)).getComplexType();
+				complexIndex = j;
+				break;
+			}
+		}
+		if(edmComplexType == null )
 		{
 			return null;
 		}else {
-			return _getResponseRdfEntityType().findProperty(edmComplexProperty.getName());
+			RdfEntityType rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(getEntitySet(complexIndex-1));
+
+			return rdfEntityType.findProperty(edmComplexType.getName());
 		}
 	}
 	private RdfEntityType _getResponseRdfEntityType() throws EdmException, ODataApplicationException {
@@ -223,7 +238,10 @@ public class RdfResourceParts {
 
 		return getAsEntitySet(0).geEntityString();
 	}
+	private RdfResourceEntitySet _getEntitySet() {
 
+		return getAsEntitySet(0);
+	}
 	private String _getNavPath() {
 		String navPath = "";
 		for (RdfResourcePart rdfResourcePart : rdfResourceParts.subList(1, rdfResourceParts.size())) {
@@ -367,6 +385,7 @@ public class RdfResourceParts {
 		return (RdfResourceComplexProperty) (rdfResourceParts.get(index));
 	}
 
+	@SuppressWarnings("unused")
 	private RdfResourceProperty getAsProperty(int index) {
 		return (RdfResourceProperty) (rdfResourceParts.get(index));
 	}
@@ -402,9 +421,13 @@ public class RdfResourceParts {
 		}
 		return (EdmEntitySet) edmEntitySet;
 	}
-
-
-
-
+	public Boolean isValueRequest() {
+		UriResource lastResourcePart = uriInfo.getUriResourceParts().get(uriInfo.getUriResourceParts().size() - 1);
+		return lastResourcePart.getSegmentValue().equals("$value");
+	}
+	public Boolean isRefRequest() {
+		UriResource lastResourcePart = uriInfo.getUriResourceParts().get(uriInfo.getUriResourceParts().size() - 1);
+		return lastResourcePart.getSegmentValue().equals("$ref");
+	}
 
 }

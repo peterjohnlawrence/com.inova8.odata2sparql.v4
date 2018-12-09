@@ -73,7 +73,7 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 
 		Entity entity = null;
 		try {
-			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, UriType.URI3);
+			entity = SparqlBaseCommand.readEntity(rdfEdmProvider, uriInfo, UriType.URI3,rdfResourceParts);
 		} catch (EdmException | OData2SparqlException | ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
@@ -107,7 +107,7 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 				response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 			} else {
 				String value = String.valueOf(property.getValue());
-				ByteArrayInputStream serializerContent = new ByteArrayInputStream(value.getBytes());//Charset.forName("UTF-8")));
+				ByteArrayInputStream serializerContent = new ByteArrayInputStream(value.getBytes());
 				response.setContent(serializerContent);
 				response.setStatusCode(HttpStatusCode.OK.getStatusCode());
 				response.setHeader(HttpHeader.CONTENT_TYPE, ContentType.TEXT_PLAIN.toContentTypeString());
