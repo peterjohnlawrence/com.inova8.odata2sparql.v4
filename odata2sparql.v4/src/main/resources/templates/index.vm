@@ -81,7 +81,7 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
 <!--       <th>Edit</th> -->
       <th>Show/Hide Configuration</th>
     </tr>
-  #foreach($repository in $repositories)
+  #foreach ($repository in $repositories)
     <tr>
       <td>$repository.modelName</td>
       <td>

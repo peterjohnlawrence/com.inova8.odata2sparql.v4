@@ -24,7 +24,7 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.mock.web.MockServletConfig;
 
 @RunWith(value = Parameterized.class)
-public class TestServlet {
+public class OData2SPARQLTest {
 	private static RdfODataServlet servlet;
 	private static MockServletContext servletContext;
 	private static MockServletConfig servletConfig;
@@ -45,7 +45,7 @@ public class TestServlet {
 	@SuppressWarnings("unused")
 	private String comments;
 
-	public TestServlet(String group, String subgroup, String test, String skip, String repository, String requestURI,
+	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String repository, String requestURI,
 			String query, String options, String expected, String comments) {
 		this.group = group;
 		this.subgroup = subgroup;
