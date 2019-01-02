@@ -60,35 +60,41 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 
 	public String getLocalKey() {
 		if (keyPredicates.size() > 1) {
-			String pathVariable = "";
-			for (UriParameter entityKey : keyPredicates) {
-				pathVariable = entityKey.getReferencedProperty() + "=" + entityKey.getText() + ",";
-			}
-			return pathVariable.substring(0, pathVariable.length() - 1);
+			return null;
+//		} else if (keyPredicates.size() == 1) {
+//			String pathVariable = "";
+//			for (UriParameter entityKey : keyPredicates) {
+//				pathVariable = entityKey.getReferencedProperty() + "=" + entityKey.getText() + ",";
+//			}
+//			return pathVariable.substring(0, pathVariable.length() - 1);
 		} else if (!keyPredicates.isEmpty()) {
 			return keyPredicates.get(0).getText();
 		} else {
 			return null;
 		}
 	}
+
 	public String getSubjectId() {
 		if (keyPredicates.size() > 1) {
-			String pathVariable = "";
-			for (UriParameter entityKey : keyPredicates) {
-				String key = entityKey.getText();
-				pathVariable = key.substring(1, key.length()-1) + ",";
-			}
-			return pathVariable.substring(0, pathVariable.length() - 1);
+			return null;
+//		} else if (keyPredicates.size() == 1) {
+//			String pathVariable = "";
+//			for (UriParameter entityKey : keyPredicates) {
+//				String key = entityKey.getText();
+//				pathVariable = pathVariable + key.substring(1, key.length() - 1) + ",";
+//			}
+//			return pathVariable.substring(0, pathVariable.length() - 1);
 		} else if (!keyPredicates.isEmpty()) {
 			String key = keyPredicates.get(0).getText();
-			return key.substring(1, key.length()-1);
+			return key.substring(1, key.length() - 1);
 		} else {
 			return null;
 		}
 	}
+
 	public String geEntityString() {
 
-		return   getRdfEntityType().getEntityTypeName() + "(" + getLocalKey()  +")";  
+		return getRdfEntityType().getEntityTypeName() + "(" + getLocalKey() + ")";
 	}
 
 	public boolean hasKey() {

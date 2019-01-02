@@ -319,6 +319,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			case "Edm.DateTime":
 				return "\"" + literal.getText() + "\"^^xsd:dateTime";
 			case "Edm.DateTimeOffset":
+				return "\"" + literal.getText() + "\"^^xsd:dateTime";
 			case "Edm.String":
 				return "\"" + literal.getText().substring(1, literal.getText().length() - 1) + "\"";
 			case "Edm.Guid":
@@ -407,10 +408,10 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
 		switch (rdfProperty.getPropertyTypeName()) {
 		case RdfConstants.XSD_DATETIME:
-			visitProperty = "<" + RdfConstants.XSD_DATETIME + ">(" + visitProperty + ")";
+			visitProperty = "STRDT(" + visitProperty + ",<"+ RdfConstants.XSD_DATETIME + ">)";
 			break;
 		case RdfConstants.XSD_DATE:
-			visitProperty = "<" + RdfConstants.XSD_DATE + ">(" + visitProperty + ")";
+			visitProperty = "STRDT(" + visitProperty + ",<" + RdfConstants.XSD_DATE + ">)";
 			break;
 		default:
 			break;

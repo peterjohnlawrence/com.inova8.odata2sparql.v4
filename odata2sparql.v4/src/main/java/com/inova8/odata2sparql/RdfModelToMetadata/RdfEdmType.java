@@ -61,7 +61,6 @@ public class RdfEdmType {
 	};
 	public static EdmPrimitiveTypeKind getEdmType(String propertyTypeName) {
 		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
-			//throw new UnsupportedOperationException("TODO implement edmtype conversion for rdf type: " + rdfType);
 		return EdmPrimitiveTypeKind.String;
 		return SIMPLE_TYPE_MAPPING.get(propertyTypeName);
 	}

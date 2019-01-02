@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
@@ -698,11 +699,22 @@ public class SparqlQueryBuilder {
 		clausesOperationProperties.append("\t{");
 		clausesOperationProperties.append("\n\t").append(filterOperationQuery(rdfOperationType));
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
-		clausesOperationProperties.append("BIND(UUID()  AS ?" + nextTargetKey + "_s)\n");
+		//Ensures that URN of deduced key is repeatable so all results always in same order
+		//clausesOperationProperties.append("BIND(UUID()  AS ?" + nextTargetKey + "_s)\n");
+		clausesOperationProperties.append("BIND(").append(operationUUID(rdfOperationType)).append(" AS ?" + nextTargetKey + "_s)\n");
 		clausesOperationProperties.append("\t}");
 		return clausesOperationProperties;
 	}
-
+ private StringBuilder operationUUID(RdfEntityType rdfOperationType) {
+	 StringBuilder operationUUID = new StringBuilder();
+	// IRI(CONCAT("urn:",MD5(CONCAT(STR(?entity),STR( ?property)))))
+	 operationUUID.append("IRI(CONCAT(\"urn:\",MD5(CONCAT(");
+	 for( RdfPrimaryKey key: rdfOperationType.getPrimaryKeys() ) {
+		 operationUUID.append("STR(?").append( key.getPrimaryKeyName()).append("),");
+	 }
+	 operationUUID.deleteCharAt(operationUUID.length() - 1) ;
+	 return operationUUID.append("))))");
+ }
 	private StringBuilder filterOperationQuery(RdfEntityType rdfOperationType)
 			throws EdmException, OData2SparqlException {
 		StringBuilder filter = new StringBuilder();
@@ -1120,11 +1132,7 @@ public class SparqlQueryBuilder {
 		if (rdfEntityType.isOperation()) {
 			// TODO make sure not a complex or value resourceParts URI5 URI3
 			if (segmentSize == 1) {
-				key = primaryKey_Variables(rdfEntityType).toString();
-				// for (RdfPrimaryKey primaryKey :
-				// rdfEntityType.getPrimaryKeys()) {
-				// key = key + "?" + primaryKey.getPrimaryKeyName() + " ";
-				// }
+				key = primaryKey_Variables(rdfEntityType).toString();			
 			} else {
 				if (segmentSize > 2) {
 					log.error(
@@ -1181,23 +1189,28 @@ public class SparqlQueryBuilder {
 		}
 
 		if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
-			clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key);
-			if (this.rdfModel.getRdfRepository().isWithMatching()) {
-				clausesPath_KeyPredicateValues.append("m) {(");
-			} else {
-				clausesPath_KeyPredicateValues.append(") {(");
+			//need to sort the values into same order as keys (treemap order)
+			if (this.rdfModel.getRdfRepository().isWithMatching() && !rdfEntityType.isOperation()) {
+				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key +"m)");
+			}else {
+				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key +")");
 			}
+			TreeMap<String,String> keyValues = new TreeMap<String,String>();
 			for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 					.getKeyPredicates()) {
 				String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
-				// String leading and trailing single quote from key
+				// Strip leading and trailing single quote from key
 				String expandedKey = rdfModel.getRdfPrefixes()
 						.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 				if (expandedKey.equals(RdfConstants.SPARQL_UNDEF)) {
-					clausesPath_KeyPredicateValues.append(" " + RdfConstants.SPARQL_UNDEF + " ");
+					keyValues.put(entityKey.getName(), " " + RdfConstants.SPARQL_UNDEF + " ");
 				} else {
-					clausesPath_KeyPredicateValues.append("<" + expandedKey + ">");
+					keyValues.put(entityKey.getName(), "<" + expandedKey + ">");
 				}
+			}
+			clausesPath_KeyPredicateValues.append("{(");
+			for(String value: keyValues.values()) {
+				clausesPath_KeyPredicateValues.append(value);
 			}
 			clausesPath_KeyPredicateValues.append(")}\n");
 		}

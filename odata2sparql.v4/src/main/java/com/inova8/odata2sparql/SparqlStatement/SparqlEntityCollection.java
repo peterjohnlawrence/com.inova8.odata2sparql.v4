@@ -62,9 +62,9 @@ class SparqlEntityCollection extends EntityCollection {
 		this.toSparqlEntityCollection(entityType, results, expand, select);
 	}
 
-	public Map<String, SparqlEntity> getEntitySetResultsMap() {
-		return entitySetResultsMap;
-	}
+//	public Map<String, SparqlEntity> getEntitySetResultsMap() {
+//		return entitySetResultsMap;
+//	}
 
 	public EntityCollection getEntityCollection() throws ODataException {
 
@@ -494,8 +494,7 @@ class SparqlEntityCollection extends EntityCollection {
 							rdfProperty = rdfSubjectEntityType.findProperty(rdfPropertyLocalName);
 							RdfComplexTypePropertyPair rdfComplexTypeProperty;
 							if (rdfProperty != null) {
-								// rdfEntity.put(rdfProperty.propertyName,
-								// Cast(value, rdfProperty.propertyTypeName));
+
 								rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
 										Cast(value, rdfProperty.propertyTypeName)));
 							} else if ((rdfComplexTypeProperty = rdfSubjectEntityType

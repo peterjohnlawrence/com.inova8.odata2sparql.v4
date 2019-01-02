@@ -258,32 +258,6 @@ public class RdfResourceParts {
 		return rdfResourceParts.size();
 	}
 	private EdmEntitySet _getResponseEntitySet() throws ODataApplicationException {
-		//		int segmentCount = rdfResourceParts.size();
-		//		if (segmentCount == 1) { // no navigation
-		//			return getAsEntitySet(0).getEdmEntitySet();
-		//		} else if (segmentCount == 2) { //navigation
-		//			EdmEntitySet edmEntitySet = getAsEntitySet(0).getEdmEntitySet();
-		//			if( getResourceKind(1).equals(UriResourceKind.complexProperty)) {
-		//				return edmEntitySet;
-		//			}else {
-		//				EdmNavigationProperty edmNavigationProperty = getAsNavigationProperty(1).getEdmNavigationProperty();
-		//				return Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
-		//			}
-		//		} else if (segmentCount >= 3) { //navigation via complextype or navigation
-		//			if (getResourceKind(segmentCount - 2) == UriResourceKind.complexProperty) {
-		//				EdmEntitySet edmEntitySet = getEntitySet(segmentCount - 3);
-		//				EdmComplexType complexType = getAsComplexProperty(segmentCount - 2).getComplexType();
-		//				EdmNavigationProperty edmNavigationProperty = getAsNavigationProperty(segmentCount - 1)
-		//						.getEdmNavigationProperty();
-		//				return Util.getNavigationTargetEntitySet(edmEntitySet, complexType, edmNavigationProperty);
-		//			} else if (getResourceKind(rdfResourceParts.size() - 2) == UriResourceKind.navigationProperty) {
-		//				EdmEntitySet edmEntitySet = getEntitySet(segmentCount - 2);
-		//				EdmNavigationProperty edmNavigationProperty = getAsNavigationProperty(segmentCount - 2)
-		//						.getEdmNavigationProperty();
-		//				return Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
-		//			}
-		//		}
-		//		return (EdmEntitySet) null;
 
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
