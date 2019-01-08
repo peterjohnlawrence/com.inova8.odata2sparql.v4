@@ -214,8 +214,8 @@ class SparqlEntityCollection extends EntityCollection {
 												.toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
 							}
 						}
-						if (rdfAssociation.hasFkProperty()) {
-							//Add QName of FK URI as literal property so that dumb BI tools can thing in relational table terms
+						if (rdfAssociation != null && rdfAssociation.hasFkProperty()) {
+							//Add QName of FK URI as literal property so that dumb BI tools can think in relational table terms
 							rdfSubjectEntity.addProperty((new Property(null,
 									rdfAssociation.getFkProperty().getEDMPropertyName(), ValueType.PRIMITIVE,
 									SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes()

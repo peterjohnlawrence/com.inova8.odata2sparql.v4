@@ -710,7 +710,7 @@ public class SparqlQueryBuilder {
 	// IRI(CONCAT("urn:",MD5(CONCAT(STR(?entity),STR( ?property)))))
 	 operationUUID.append("IRI(CONCAT(\"urn:\",MD5(CONCAT(");
 	 for( RdfPrimaryKey key: rdfOperationType.getPrimaryKeys() ) {
-		 operationUUID.append("STR(?").append( key.getPrimaryKeyName()).append("),");
+		 operationUUID.append("COALESCE(STR(?").append( key.getPrimaryKeyName()).append("),\"\"),");
 	 }
 	 operationUUID.deleteCharAt(operationUUID.length() - 1) ;
 	 return operationUUID.append("))))");
