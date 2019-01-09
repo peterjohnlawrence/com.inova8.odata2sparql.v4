@@ -1141,7 +1141,7 @@ public class SparqlQueryBuilder {
 					RdfAssociation navProperty = rdfEntityType.findNavigationPropertyByEDMAssociationName(
 							uriInfo.getUriResourceParts().get(1).getSegmentValue());
 					key = "?" + rdfTargetEntityType.entityTypeName;
-					clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key);
+					clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key + "_s");// #116
 					if (this.rdfModel.getRdfRepository().isWithMatching()) {
 						clausesPath_KeyPredicateValues.append("m)");
 					}
@@ -1161,7 +1161,7 @@ public class SparqlQueryBuilder {
 						}
 					}
 					if (this.rdfModel.getRdfRepository().isWithMatching()) {
-						clausesPath_KeyPredicateValues.append(clausesMatch(key, indent));
+						clausesPath_KeyPredicateValues.append(clausesMatch(key+ "_s", indent));// #116
 					}
 					return clausesPath_KeyPredicateValues;
 				}
