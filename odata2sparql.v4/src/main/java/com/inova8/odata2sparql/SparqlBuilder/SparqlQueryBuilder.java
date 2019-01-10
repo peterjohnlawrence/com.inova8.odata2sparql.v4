@@ -701,20 +701,23 @@ public class SparqlQueryBuilder {
 		clausesOperationProperties.append("\t{\n").append(preprocessOperationQuery(rdfOperationType)).append("\t}\n");
 		//Ensures that URN of deduced key is repeatable so all results always in same order
 		//clausesOperationProperties.append("BIND(UUID()  AS ?" + nextTargetKey + "_s)\n");
-		clausesOperationProperties.append("BIND(").append(operationUUID(rdfOperationType)).append(" AS ?" + nextTargetKey + "_s)\n");
+		clausesOperationProperties.append("BIND(").append(operationUUID(rdfOperationType))
+				.append(" AS ?" + nextTargetKey + "_s)\n");
 		clausesOperationProperties.append("\t}");
 		return clausesOperationProperties;
 	}
- private StringBuilder operationUUID(RdfEntityType rdfOperationType) {
-	 StringBuilder operationUUID = new StringBuilder();
-	// IRI(CONCAT("urn:",MD5(CONCAT(STR(?entity),STR( ?property)))))
-	 operationUUID.append("IRI(CONCAT(\"urn:\",MD5(CONCAT(");
-	 for( RdfPrimaryKey key: rdfOperationType.getPrimaryKeys() ) {
-		 operationUUID.append("COALESCE(STR(?").append( key.getPrimaryKeyName()).append("),\"\"),");
-	 }
-	 operationUUID.deleteCharAt(operationUUID.length() - 1) ;
-	 return operationUUID.append("))))");
- }
+
+	private StringBuilder operationUUID(RdfEntityType rdfOperationType) {
+		StringBuilder operationUUID = new StringBuilder();
+		// IRI(CONCAT("urn:",MD5(CONCAT(STR(?entity),STR( ?property)))))
+		operationUUID.append("IRI(CONCAT(\"urn:\",MD5(CONCAT(");
+		for (RdfPrimaryKey key : rdfOperationType.getPrimaryKeys()) {
+			operationUUID.append("COALESCE(STR(?").append(key.getPrimaryKeyName()).append("),\"\"),");
+		}
+		operationUUID.deleteCharAt(operationUUID.length() - 1);
+		return operationUUID.append("))))");
+	}
+
 	private StringBuilder filterOperationQuery(RdfEntityType rdfOperationType)
 			throws EdmException, OData2SparqlException {
 		StringBuilder filter = new StringBuilder();
@@ -1132,7 +1135,7 @@ public class SparqlQueryBuilder {
 		if (rdfEntityType.isOperation()) {
 			// TODO make sure not a complex or value resourceParts URI5 URI3
 			if (segmentSize == 1) {
-				key = primaryKey_Variables(rdfEntityType).toString();			
+				key = primaryKey_Variables(rdfEntityType).toString();
 			} else {
 				if (segmentSize > 2) {
 					log.error(
@@ -1161,7 +1164,7 @@ public class SparqlQueryBuilder {
 						}
 					}
 					if (this.rdfModel.getRdfRepository().isWithMatching()) {
-						clausesPath_KeyPredicateValues.append(clausesMatch(key+ "_s", indent));// #116
+						clausesPath_KeyPredicateValues.append(clausesMatch(key + "_s", indent));// #116
 					}
 					return clausesPath_KeyPredicateValues;
 				}
@@ -1191,11 +1194,11 @@ public class SparqlQueryBuilder {
 		if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
 			//need to sort the values into same order as keys (treemap order)
 			if (this.rdfModel.getRdfRepository().isWithMatching() && !rdfEntityType.isOperation()) {
-				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key +"m)");
-			}else {
-				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key +")");
+				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key + "m)");
+			} else {
+				clausesPath_KeyPredicateValues.append(indent).append("VALUES(" + key + ")");
 			}
-			TreeMap<String,String> keyValues = new TreeMap<String,String>();
+			TreeMap<String, String> keyValues = new TreeMap<String, String>();
 			for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 					.getKeyPredicates()) {
 				String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
@@ -1209,7 +1212,7 @@ public class SparqlQueryBuilder {
 				}
 			}
 			clausesPath_KeyPredicateValues.append("{(");
-			for(String value: keyValues.values()) {
+			for (String value : keyValues.values()) {
 				clausesPath_KeyPredicateValues.append(value);
 			}
 			clausesPath_KeyPredicateValues.append(")}\n");
@@ -1255,8 +1258,8 @@ public class SparqlQueryBuilder {
 						String expandedKey = rdfModel.getRdfPrefixes()
 								.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 						pathVariable = "<" + expandedKey + ">";
-					}			
-					if (this.rdfModel.getRdfRepository().isWithMatching()) {	
+					}
+					if (this.rdfModel.getRdfRepository().isWithMatching()) {
 						keyVariable = "?key_s";
 						clausesPathNavigation.append(clausesMatch(keyVariable, pathVariable, indent));
 						pathVariable = keyVariable;
@@ -1782,7 +1785,11 @@ public class SparqlQueryBuilder {
 		expandItemWhere.append(indent);
 		if (navProperty.getDomainClass().isOperation()) {
 			expandItemWhere.append(indent)
-					.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s)\n");
+					.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
+			if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
+				expandItemWhere.append("m");
+			}
+			expandItemWhere.append(")\n");
 		}
 		expandItemWhere.append(indent).append("{\n");
 		if (navProperty.getRangeClass().isOperation()) {
@@ -2165,16 +2172,16 @@ public class SparqlQueryBuilder {
 		StringBuilder sparql = new StringBuilder(
 				//			"CONSTRUCT {?" + key + "_s <" + expandedProperty + "> ?" + key + "_o . ?"+ key +"_o <http://targetEntity> true . }\n");
 				"CONSTRUCT { ?" + key + "_o <http://targetEntity> true . }\n");
-//		if (rdfProperty.IsInverse()) {
-//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
-//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
-//			sparql.append("<" + expandedKey + "> ");
-//			sparql.append("<" + expandedInverseProperty + ">)}\n?" + key + "_o ?" + key + "_p ?" + key + "_s .}");
-//		} else {
-//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
-//			sparql.append("<" + expandedKey + "> ");
-//			sparql.append("<" + expandedProperty + ">)}\n?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
-//		}
+		//		if (rdfProperty.IsInverse()) {
+		//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
+		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
+		//			sparql.append("<" + expandedKey + "> ");
+		//			sparql.append("<" + expandedInverseProperty + ">)}\n?" + key + "_o ?" + key + "_p ?" + key + "_s .}");
+		//		} else {
+		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
+		//			sparql.append("<" + expandedKey + "> ");
+		//			sparql.append("<" + expandedProperty + ">)}\n?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
+		//		}
 
 		sparql.append("WHERE { { <" + expandedKey + ">  <" + expandedProperty + "> ?" + key + "_o .}");
 		if (rdfProperty.IsInverse()) {
