@@ -70,6 +70,7 @@ public class RdfConstants {
 	public static final String COUNT = "http://count";
 	public static final String PREFIX = "j";
 	public static final String PROPERTY_POSTFIX = "_value";
+	public static final String PLURAL = "s";
 
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";
 	private static final String SAP_ANNOTATION_NS = "sap";

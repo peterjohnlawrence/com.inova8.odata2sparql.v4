@@ -128,21 +128,17 @@ public class RdfModelToMetadata {
 							baseType = new CsdlEntityType().setName(baseTypeName);
 							globalEntityTypes.put(rdfClass.getBaseType().getIRI(), baseType);
 						}
-						//entityType.setBaseType(rdfClass.getBaseType().getFullQualifiedName());
 						entityType.setBaseType(RdfFullQualifiedName.getFullQualifiedName(rdfClass.getBaseType()));
 					}
 				}
 				List<CsdlAnnotation> entityTypeAnnotations = new ArrayList<CsdlAnnotation>();
 				if (withRdfAnnotations)
 					addToAnnotations(entityTypeAnnotations, RdfConstants.RDFS_CLASS_FQN, rdfClass.getIRI());
-				//entityTypeAnnotations.add(buildCsdlAnnotation(RdfConstants.RDFS_CLASS_FQN, rdfClass.getIRI()));
 				if (withSapAnnotations) {
 					addToAnnotations(entityTypeAnnotations, RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel());
-					//entityTypeAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel()));
 					if (rdfClass.getBaseType() != null)
 						addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN,
 								rdfClass.getBaseType().getEntityTypeName());
-					//	entityTypeAnnotations.add(buildCsdlAnnotation(RdfConstants.ODATA_BASETYPE_FQN,	rdfClass.getBaseType().getEntityTypeName()));
 				}
 				entityType.setAnnotations(entityTypeAnnotations);
 				//TODO testing openTypes
@@ -219,8 +215,7 @@ public class RdfModelToMetadata {
 					List<CsdlAnnotation> entitySetAnnotations = new ArrayList<CsdlAnnotation>();
 					if (withSapAnnotations)
 						addToAnnotations(entitySetAnnotations, RdfConstants.SAP_LABEL_FQN,
-								rdfClass.getEntityTypeLabel());
-					//entitySetAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel()));
+								rdfClass.getEntitySetLabel());
 					entitySet.setAnnotations(entitySetAnnotations);
 
 					entitySets.put(entitySet.getName(), entitySet);
@@ -253,24 +248,19 @@ public class RdfModelToMetadata {
 					if (withRdfAnnotations)
 						addToAnnotations(navigationPropertyAnnotations, RdfConstants.PROPERTY_FQN,
 								rdfAssociation.getAssociationIRI().toString());
-					//navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,rdfAssociation.getAssociationIRI().toString()));
 					if (withSapAnnotations)
 						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_LABEL_FQN,
 								rdfAssociation.getAssociationLabel());
-					//navigationPropertyAnnotations.add(	buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfAssociation.getAssociationLabel()));
 					if (withSapAnnotations)
 						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_HEADING_FQN,
 								rdfAssociation.getAssociationLabel());
-					//navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,	rdfAssociation.getAssociationLabel()));
 					if (withSapAnnotations)
 						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN,
 								rdfAssociation.getAssociationLabel());
-					//navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,rdfAssociation.getAssociationLabel()));
 					if (rdfAssociation.IsInverse()) {
 						if (withRdfAnnotations)
 							addToAnnotations(navigationPropertyAnnotations, RdfConstants.INVERSEOF_FQN,
 									rdfAssociation.getInversePropertyOfURI().toString());
-						//navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.INVERSEOF_FQN,	rdfAssociation.getInversePropertyOfURI().toString()));
 					}
 					navigationProperty.setAnnotations(navigationPropertyAnnotations);
 					//TODO should not add duplicates to the same entity, even though Olingo accepts them							
@@ -286,7 +276,6 @@ public class RdfModelToMetadata {
 					List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
 					addToAnnotations(propertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
 							rdfProperty.getOfClass().getEntityTypeName());
-					//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.ODATA_SUBTYPE_FQN,		rdfProperty.getOfClass().getEntityTypeName()));
 					csdlComplexType.getProperties()
 							.add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName())
 									.setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName())
@@ -296,7 +285,6 @@ public class RdfModelToMetadata {
 					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
 					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
 							rdfNavigationProperty.getDomainName());
-					//navigationPropertyAnnotations.add(	buildCsdlAnnotation(RdfConstants.ODATA_SUBTYPE_FQN, rdfNavigationProperty.getDomainName()));
 					csdlComplexType.getNavigationProperties()
 							.add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName())
 									.setAnnotations(navigationPropertyAnnotations)
@@ -312,13 +300,11 @@ public class RdfModelToMetadata {
 			if (!entityTypes.isEmpty()) {
 				List<CsdlAnnotation> schemaAnnotations = new ArrayList<CsdlAnnotation>();
 				addToAnnotations(schemaAnnotations, RdfConstants.ONTOLOGY_FQN, rdfGraph.getSchemaName());
-				//schemaAnnotations.add(buildCsdlAnnotation(RdfConstants.ONTOLOGY_FQN, rdfGraph.getSchemaName()));
 
 				CsdlSchema modelSchema = new CsdlSchema().setNamespace(modelNamespace)
 						.setEntityTypes(new ArrayList<CsdlEntityType>(entityTypes.values()))
 						.setComplexTypes(new ArrayList<CsdlComplexType>(complexTypes.values()));
 				//TODO MS does not support annotations to the schema
-				//	modelSchema.setAnnotations(schemaAnnotations);
 				if (modelNamespace.equals(RdfConstants.RDF)) {
 					modelSchema.getComplexTypes().add(langLiteralType);
 				}

@@ -198,5 +198,5 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
    #end
    </table>
   <br />
-  <a href="./$reload">Click to reload Models.ttl to clear all cached metadata and relaod models from endpoints</a></body>
+  <a href="./$reload">Click to reload Models.ttl to clear all cached metadata and reload models from endpoints</a></body>
 </html>

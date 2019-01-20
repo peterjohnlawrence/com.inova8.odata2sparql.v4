@@ -265,7 +265,7 @@ public class RdfModel {
 	public static class RdfEntityType {
 		public String entityTypeName;
 		private String entityTypeLabel;
-
+		private String entitySetLabel;
 		private RdfSchema schema;
 		private RdfNode entityTypeNode;
 		private RdfEntityType baseType;
@@ -369,7 +369,16 @@ public class RdfModel {
 		public void setSchema(RdfSchema schema) {
 			this.schema = schema;
 		}
-
+		public String getEntitySetLabel() {
+			if (this.entitySetLabel == null) {
+				return this.getEntityTypeLabel() +RdfConstants.PLURAL;
+			} else {
+				return this.entitySetLabel;
+			}
+		}
+		public void setEntitySetLabel(String entitySetLabel) {
+			this.entitySetLabel = entitySetLabel.trim();
+		}
 		public String getEntityTypeLabel() {
 			if (entityTypeLabel == null) {
 				return this.entityTypeName;
@@ -379,7 +388,7 @@ public class RdfModel {
 		}
 
 		public void setEntityTypeLabel(String entityTypeLabel) {
-			this.entityTypeLabel = entityTypeLabel;
+			this.entityTypeLabel = entityTypeLabel.trim();
 		}
 
 		public String getDescription() {
@@ -391,7 +400,7 @@ public class RdfModel {
 		}
 
 		public void setDescription(String description) {
-			this.description = description;
+			this.description = description.trim();
 		}
 
 		public boolean isFunctionImport() {
@@ -664,7 +673,7 @@ public class RdfModel {
 		}
 
 		public void setPropertyLabel(String propertyLabel) {
-			this.propertyLabel = propertyLabel;
+			this.propertyLabel = propertyLabel.trim();
 		}
 
 		public String getEquivalentProperty() {
@@ -685,7 +694,7 @@ public class RdfModel {
 
 		public void setDescription(String description) {
 
-			this.description = description;
+			this.description = description.trim();
 		}
 
 		public String getEDMPropertyName() {
@@ -916,7 +925,7 @@ public class RdfModel {
 		}
 
 		public void setAssociationLabel(String associationLabel) {
-			this.associationLabel = associationLabel;
+			this.associationLabel = associationLabel.trim();
 		}
 
 		public String getDomainName() {
@@ -1143,7 +1152,7 @@ public class RdfModel {
 		}
 		//Fixes #90
 		if (entityTypeLabelNode != null) {
-			clazz.entityTypeLabel = entityTypeLabelNode.getLiteralObject().toString();
+			clazz.entityTypeLabel = entityTypeLabelNode.getLiteralObject().toString().trim();
 		}
 		return clazz;
 	}
