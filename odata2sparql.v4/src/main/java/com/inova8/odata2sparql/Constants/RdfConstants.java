@@ -35,7 +35,7 @@ public class RdfConstants {
 	}
 
 	public static final int DATE_PRECISION = 3;
-	public static final int DECIMAL_SCALE = 10;
+	public static final int DECIMAL_SCALE = 27;//10; Fixes #119
 	public static final String DEFAULTCONFIG = "/var/opt/inova8/odata2sparql/";
 	public static final String DEFAULTFOLDER = ".default";
 
