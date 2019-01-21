@@ -194,34 +194,39 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 
 					// delegate the sorting to native sorter of Integer and String
 					public int compare(Entity entity1, Entity entity2) {
+						Property property1 = entity1.getProperty(sortPropertyName);
+						Property property2 = entity2.getProperty(sortPropertyName);
+						if(property1 == null) {
+							return (property2 == null) ? 0 : -1;
+						}
+					    if (property2 == null) {
+					        return 1;
+					    }
+						Object value1 = property1.getValue();
+						Object value2 = property2.getValue();
+						if(value1 == null) {
+							return (value2 == null) ? 0 : -1;
+						}
+					    if (value2 == null) {
+					        return 1;
+					    }
 						int compareResult = 0;
 						if (sortPropertyType.equals("Integer")) {
-							Integer integer1 = (Integer) entity1.getProperty(sortPropertyName).getValue();
+							Integer integer1 = (Integer) value1;
 							Integer integer2 = (Integer) entity2.getProperty(sortPropertyName).getValue();
 
 							compareResult = integer1.compareTo(integer2);
 						} else if (sortPropertyType.equals("Double")) {
-							Float float1 = (Float) entity1.getProperty(sortPropertyName).getValue();
-							Float float2 = (Float) entity2.getProperty(sortPropertyName).getValue();
+							Double double1 = (Double) value1;
+							Double double2 = (Double) entity2.getProperty(sortPropertyName).getValue();
 
-							compareResult = float1.compareTo(float2);
+							compareResult = double1.compareTo(double2);
 						} else {
-							Property property1 = entity1.getProperty(sortPropertyName);
-							Property property2 = entity2.getProperty(sortPropertyName);
-							if ((property1 != null) && (property2 != null)) {
-								compareResult = ((String) property1.getValue())
-										.compareTo((String) property2.getValue());
-							} else {
-								// Invalid comparsion to non-datatype property, so set equal
-								compareResult = 0;
-							}
-
+							compareResult = ((String) value1).compareTo((String) value2);
 						}
-						// if 'desc' is specified in the URI, change the order
 						if (orderByItem.isDescending()) {
 							return -compareResult; // just reverse order
 						}
-
 						return compareResult;
 					}
 				});

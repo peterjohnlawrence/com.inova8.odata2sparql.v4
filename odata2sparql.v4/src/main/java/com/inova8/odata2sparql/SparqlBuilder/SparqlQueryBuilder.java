@@ -1801,7 +1801,7 @@ public class SparqlQueryBuilder {
 				return new StringBuilder();
 			expandItemWhere.append(indent).append("\t\t{")
 					.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
-
+			//.append(" {\n");
 			String matchingTargetKey = "?" + nextTargetKey + "_s";
 			if (this.rdfModel.getRdfRepository().isWithMatching()) {
 				matchingTargetKey = matchingTargetKey + "m";
