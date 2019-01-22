@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
+import com.inova8.odata2sparql.uri.RdfResourceEntitySet;
 import com.inova8.odata2sparql.uri.RdfResourceNavigationProperty;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
@@ -78,7 +79,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		// 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
 
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
-		EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet();
+		EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet(); 
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 		CountOption countOption = uriInfo.getCountOption();
@@ -146,11 +147,11 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
 			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(),
 					expandOption, selectOption);
-			contextUrl = ContextURL.with().entitySet(responseEdmEntitySet).keyPath(rdfResourceParts.getLocalKey())
+			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet()).keyPath(rdfResourceParts.getLocalKey())
 					.navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
 					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
+			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
 					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 		}
 

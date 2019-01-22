@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
@@ -130,7 +131,7 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 						.navOrPropertyPath(rdfResourceParts.getNavPath())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 			} catch (URISyntaxException e) {
-				throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
+				throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
 						HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 			}
 			ComplexSerializerOptions options = ComplexSerializerOptions.with().select(uriInfo.getSelectOption())

@@ -79,13 +79,14 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		// 3. serialize
 		ContextURL contextUrl = null;
 		try {
-			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients)
+			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients) URLEncoder.encode(q, "UTF-8");
 			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(), expandOption,
 					selectOption);
-			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet()).keyPath(rdfResourceParts.getLocalKey()).navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
+			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())//.keyPath(rdfResourceParts.getLocalKey())
+					.navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
 					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
+			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
 					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
 		}
 

@@ -1329,58 +1329,55 @@ public class SparqlQueryBuilder {
 		StringBuilder search = new StringBuilder().append(indent);
 		if (DEBUG)
 			search.append("#search\n");
-		if (this.uriInfo.getSearchOption() != null)
-			switch (uriType) {
-			case URI1:
-			case URI15:
-				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
-				case RDF4J_LUCENE:
-					search.append(indent)
-							.append("?" + rdfEntityType.entityTypeName + "_s <" + RdfConstants.URI_LUCENE_MATCHES
-									+ "> [ <" + RdfConstants.URI_LUCENE_QUERY + "> '"
-									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
-					break;
-				case HALYARD_ES:
-					search.append(indent)
-							.append("?" + rdfEntityType.entityTypeName + "_s ?p '"
-									+ this.uriInfo.getSearchOption().getText() + "'^^<"
-									+ RdfConstants.URI_HALYARD_SEARCH + "> .\n");
-					break;
-				case DEFAULT:
-				default:
-					search.append(indent)
-							.append("?" + rdfEntityType.entityTypeName
-									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
-									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
-
-				}
-				break;
-			case URI6B:
-				switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
-				case RDF4J_LUCENE:
-					search.append(indent)
-							.append("?" + rdfTargetEntityType.entityTypeName + "_s <" + RdfConstants.URI_LUCENE_MATCHES
-									+ "> [ <" + RdfConstants.URI_LUCENE_QUERY + "> '"
-									+ this.uriInfo.getSearchOption().getText() + "' ] .\n");
-					break;
-				case HALYARD_ES:
-					search.append(indent)
-							.append("?" + rdfTargetEntityType.entityTypeName + "_s ?p '"
-									+ this.uriInfo.getSearchOption().getText() + "'^^<"
-									+ RdfConstants.URI_HALYARD_SEARCH + "> .\n");
-					break;
-				case DEFAULT:
-				default:
-					search.append(indent)
-							.append("?" + rdfTargetEntityType.entityTypeName
-									+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'"
-									+ this.uriInfo.getSearchOption().getText() + "', \"i\")) .\n");
-
-				}
-				break;
-			default:
-				break;
+		if (this.uriInfo.getSearchOption() != null) {
+			String searchText = this.uriInfo.getSearchOption().getText();
+			if (searchText.startsWith("\"")) {
+				searchText = searchText.substring(1, searchText.length() - 1);
 			}
+			if (this.uriInfo.getSearchOption() != null)
+				switch (uriType) {
+				case URI1:
+				case URI15:
+					switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
+					case RDF4J_LUCENE:
+						search.append(indent)
+								.append("?" + rdfEntityType.entityTypeName + "_s <" + RdfConstants.URI_LUCENE_MATCHES
+										+ "> [ <" + RdfConstants.URI_LUCENE_QUERY + "> '" + searchText + "' ] .\n");
+						break;
+					case HALYARD_ES:
+						search.append(indent).append("?" + rdfEntityType.entityTypeName + "_s ?p '" + searchText
+								+ "'^^<" + RdfConstants.URI_HALYARD_SEARCH + "> .\n");
+						break;
+					case DEFAULT:
+					default:
+						search.append(indent).append("?" + rdfEntityType.entityTypeName
+								+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'" + searchText + "', \"i\")) .\n");
+
+					}
+					break;
+				case URI6B:
+					switch (this.rdfModel.getRdfRepository().getTextSearchType()) {
+					case RDF4J_LUCENE:
+						search.append(indent)
+								.append("?" + rdfTargetEntityType.entityTypeName + "_s <"
+										+ RdfConstants.URI_LUCENE_MATCHES + "> [ <" + RdfConstants.URI_LUCENE_QUERY
+										+ "> '" + searchText + "' ] .\n");
+						break;
+					case HALYARD_ES:
+						search.append(indent).append("?" + rdfTargetEntityType.entityTypeName + "_s ?p '" + searchText
+								+ "'^^<" + RdfConstants.URI_HALYARD_SEARCH + "> .\n");
+						break;
+					case DEFAULT:
+					default:
+						search.append(indent).append("?" + rdfTargetEntityType.entityTypeName
+								+ "_s ?p ?searchvalue . FILTER( REGEX(?searchvalue ,'" + searchText + "', \"i\")) .\n");
+
+					}
+					break;
+				default:
+					break;
+				}
+		}
 		return search;
 	}
 
@@ -1799,9 +1796,12 @@ public class SparqlQueryBuilder {
 					expandItem.getSelectOption());
 			if (selectedProperties != null && selectedProperties.isEmpty())
 				return new StringBuilder();
-			expandItemWhere.append(indent).append("\t\t{")
-					.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
-			//.append(" {\n");
+			if (navProperty.getDomainClass().isOperation()) {
+				expandItemWhere.append(indent).append("\t\t{").append(" {\n");
+			} else {
+				expandItemWhere.append(indent).append("\t\t{")
+						.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+			}
 			String matchingTargetKey = "?" + nextTargetKey + "_s";
 			if (this.rdfModel.getRdfRepository().isWithMatching()) {
 				matchingTargetKey = matchingTargetKey + "m";
