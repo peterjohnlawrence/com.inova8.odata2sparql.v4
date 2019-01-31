@@ -2,13 +2,11 @@ package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.EntityCollection;
-import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
@@ -27,12 +25,10 @@ import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.ReferenceSerializerOptions;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceEntitySet;
-
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
+import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
 public class SparqlReferenceProcessor implements ReferenceProcessor {
@@ -56,13 +52,9 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
-		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
-		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
-
+		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider, uriInfo);	
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entityCollection data
-
 		EntityCollection entityCollection;
 		try {
 			entityCollection = SparqlBaseCommand.readReferenceCollection(rdfEdmProvider, uriInfo, UriType.URI7B);
@@ -74,21 +66,12 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 			throw new ODataApplicationException("References not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
-
 		// 3. serialize
 		ODataSerializer serializer = odata.createSerializer(responseFormat);
-		ContextURL contextUrl = null;
-		try {
-			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-			contextUrl = ContextURL.with().serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
-		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
-					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-		}
-
+		ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ;
 		ReferenceSerializerOptions opts = ReferenceSerializerOptions.with().contextURL(contextUrl).build();
 
-		SerializerResult serializerResult = serializer.reference(serviceMetadata, edmEntitySet,
+		SerializerResult serializerResult = serializer.reference(serviceMetadata, rdfResourceParts.getEntitySet().getEdmEntitySet(),
 				entityCollection.getEntities().get(0), opts);
 		InputStream serializedContent = serializerResult.getContent();
 		// Finally: configure the response object: set the body, headers and status code

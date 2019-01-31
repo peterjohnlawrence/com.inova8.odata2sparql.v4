@@ -1,8 +1,6 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,7 +59,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. retrieve the Entity Type
 		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider, uriInfo);		
-		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();;
+		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 //		rdfResourceParts.getEntitySet().getEdmEntitySet();
@@ -77,19 +75,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 					Locale.ENGLISH);
 		}
 		// 3. serialize
-		ContextURL contextUrl = null;
-		try {
-			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients) URLEncoder.encode(q, "UTF-8");
-			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(), expandOption,
-					selectOption);
-			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())//.keyPath(rdfResourceParts.getLocalKey())
-					.navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
-					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
-		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
-					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-		}
-
+		ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ; 
 		EntitySerializerOptions options = EntitySerializerOptions.with().select(selectOption).expand(expandOption)
 				.contextURL(contextUrl).build();
 

@@ -2,8 +2,6 @@ package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
@@ -11,7 +9,6 @@ import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
-import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
 import org.apache.olingo.commons.api.edm.EdmProperty;
@@ -35,7 +32,6 @@ import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.UriResourceProperty;
 
@@ -79,9 +75,6 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		// 1.1. retrieve the info about the requested entity set
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
 		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider,uriInfo);
-		
-		UriResourceEntitySet uriEntityset = (UriResourceEntitySet) resourceParts.get(0);
-		EdmEntitySet edmEntitySet = uriEntityset.getEntitySet();
 		UriType uriType = null;
 
 		// 1.2. retrieve the requested (Edm) property
@@ -134,14 +127,14 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 
 		// 3. serialize
 		if (isValue) {
-			writePropertyValue(response, property);
+			writePropertyValue(rdfResourceParts, response, property);
 		} else {
-			writeProperty(request, response, responseFormat, edmEntitySet, edmPropertyName, edmPropertyType, property);
+			writeProperty(rdfResourceParts, request, response, responseFormat,  edmPropertyName, edmPropertyType, property);
 		}
 
 	}
 
-	private void writePropertyValue(ODataResponse response, Property property) throws ODataApplicationException {
+	private void writePropertyValue(RdfResourceParts rdfResourceParts, ODataResponse response, Property property) throws ODataApplicationException {
 		if (property == null) {
 			throw new ODataApplicationException("No property found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
@@ -158,24 +151,15 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
-	private void writeProperty(ODataRequest request, ODataResponse response, ContentType responseFormat,
-			EdmEntitySet edmEntitySet, String edmPropertyName, EdmPrimitiveType edmPropertyType, Property property)
+	private void writeProperty(RdfResourceParts rdfResourceParts, ODataRequest request, ODataResponse response, ContentType responseFormat,
+			String edmPropertyName, EdmPrimitiveType edmPropertyType, Property property)
 			throws SerializerException, ODataApplicationException {
 		Object value = property.getValue();
 		if (value != null) {
 
 			// 3.1. configure the serializer
 			ODataSerializer serializer = odata.createSerializer(responseFormat);
-			ContextURL contextUrl = null;
-			try {
-				//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-				contextUrl = ContextURL.with().entitySet(edmEntitySet).navOrPropertyPath(edmPropertyName)
-						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
-			} catch (URISyntaxException e) {
-				throw new ODataApplicationException("Inavlid RawBaseURI " + request.getRawBaseUri(),
-						HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-			}
-
+			ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ;
 			PrimitiveSerializerOptions options = PrimitiveSerializerOptions.with().contextURL(contextUrl).build();
 			// 3.2. serialize
 			SerializerResult serializerResult = serializer.primitive(serviceMetadata, edmPropertyType, property,

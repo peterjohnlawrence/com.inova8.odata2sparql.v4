@@ -1,8 +1,8 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfLiteral;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
-import com.inova8.odata2sparql.uri.RdfResourceEntitySet;
 import com.inova8.odata2sparql.uri.RdfResourceNavigationProperty;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
@@ -79,7 +78,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		// 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
 
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
-		EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet(); 
+		EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet();
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 		CountOption countOption = uriInfo.getCountOption();
@@ -87,7 +86,8 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		// it has to be delivered as EntitySet object
 		EntityCollection entitySet = null;
 		try {
-			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, rdfResourceParts.getUriType(),rdfResourceParts);
+			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, rdfResourceParts.getUriType(),
+					rdfResourceParts);
 		} catch (ODataException | OData2SparqlException e) {
 			log.info("No data found");
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
@@ -142,19 +142,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			//}
 
 		// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
-		ContextURL contextUrl = null;
-		try {
-			//Need absolute URI for PowewrQuery and Linqpad (and probably other MS based OData clients)
-			String selectList = odata.createUriHelper().buildContextURLSelectList(responseEdmEntitySet.getEntityType(),
-					expandOption, selectOption);
-			contextUrl = ContextURL.with().entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet()).keyPath(rdfResourceParts.getLocalKey())
-					.navOrPropertyPath(rdfResourceParts.getNavPath()).selectList(selectList)
-					.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
-		} catch (URISyntaxException e) {
-			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
-					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-		}
-
+		ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ; //null;
 		final String id = request.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
 		EntityCollectionSerializerOptions opts = null;
 
@@ -197,33 +185,52 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 					public int compare(Entity entity1, Entity entity2) {
 						Property property1 = entity1.getProperty(sortPropertyName);
 						Property property2 = entity2.getProperty(sortPropertyName);
-						if(property1 == null) {
+						if (property1 == null) {
 							return (property2 == null) ? 0 : -1;
 						}
-					    if (property2 == null) {
-					        return 1;
-					    }
+						if (property2 == null) {
+							return 1;
+						}
 						Object value1 = property1.getValue();
 						Object value2 = property2.getValue();
-						if(value1 == null) {
+						if (value1 == null) {
 							return (value2 == null) ? 0 : -1;
 						}
-					    if (value2 == null) {
-					        return 1;
-					    }
+						if (value2 == null) {
+							return 1;
+						}
 						int compareResult = 0;
-						if (sortPropertyType.equals("Integer")) {
+						switch (sortPropertyType) {
+
+						case "Integer":
+						case "Int32":
 							Integer integer1 = (Integer) value1;
 							Integer integer2 = (Integer) entity2.getProperty(sortPropertyName).getValue();
-
 							compareResult = integer1.compareTo(integer2);
-						} else if (sortPropertyType.equals("Double")) {
+							break;
+						case "Decimal":
+							BigDecimal decimal1 = (BigDecimal) value1;
+							BigDecimal decimal2 = (BigDecimal) entity2.getProperty(sortPropertyName).getValue();
+							compareResult = decimal1.compareTo(decimal2);
+							break;
+						case "Double":
 							Double double1 = (Double) value1;
 							Double double2 = (Double) entity2.getProperty(sortPropertyName).getValue();
-
 							compareResult = double1.compareTo(double2);
-						} else {
+							break;
+						case "Boolean":
+							Boolean boolean1 = (Boolean) value1;
+							Boolean boolean2 = (Boolean) entity2.getProperty(sortPropertyName).getValue();							
+							compareResult = boolean1.compareTo(boolean2);
+							break;
+						case "DateTimeOffset":
+							Timestamp offsetDateTime1 = (Timestamp) value1;
+							Timestamp offsetDateTime2 = (Timestamp) entity2.getProperty(sortPropertyName).getValue();		
+							compareResult = offsetDateTime1.compareTo(offsetDateTime2);
+							break;
+						default:
 							compareResult = ((String) value1).compareTo((String) value2);
+							break;
 						}
 						if (orderByItem.isDescending()) {
 							return -compareResult; // just reverse order

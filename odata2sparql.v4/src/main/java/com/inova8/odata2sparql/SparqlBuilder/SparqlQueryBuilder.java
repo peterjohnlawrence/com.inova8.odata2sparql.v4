@@ -2169,9 +2169,8 @@ public class SparqlQueryBuilder {
 		RdfAssociation rdfProperty = rdfEntityType
 				.findNavigationPropertyByEDMAssociationName(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getAssociationIRI();
-		StringBuilder sparql = new StringBuilder(
-				//			"CONSTRUCT {?" + key + "_s <" + expandedProperty + "> ?" + key + "_o . ?"+ key +"_o <http://targetEntity> true . }\n");
-				"CONSTRUCT { ?" + key + "_o <http://targetEntity> true . }\n");
+		StringBuilder sparql = new StringBuilder("CONSTRUCT { ?" + key + "_o <http://targetEntity> true .");	
+		sparql.append("?" + key + "_o <" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getIRI() + "> .}\n");
 		//		if (rdfProperty.IsInverse()) {
 		//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
 		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");

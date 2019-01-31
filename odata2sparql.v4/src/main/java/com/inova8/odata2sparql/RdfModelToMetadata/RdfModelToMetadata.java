@@ -101,6 +101,10 @@ public class RdfModelToMetadata {
 		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
 		TreeMap<String, CsdlEntitySet> entitySets = new TreeMap<String, CsdlEntitySet>();
 
+		List<CsdlAnnotation> instanceSchemaAnnotations = new ArrayList<CsdlAnnotation>();
+		addToAnnotations(instanceSchemaAnnotations, RdfConstants.ODATA_DEFAULTNAMESPACE_FQN, rdfModel.getRdfRepository().getDefaultPrefix());
+		instanceSchema.setAnnotations(instanceSchemaAnnotations);
+		
 		//Custom types langString
 
 		ArrayList<CsdlProperty> langStringProperties = new ArrayList<CsdlProperty>();

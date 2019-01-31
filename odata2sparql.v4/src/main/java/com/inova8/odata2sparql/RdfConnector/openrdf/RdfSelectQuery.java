@@ -25,6 +25,7 @@ public class RdfSelectQuery extends RdfQuery{
 			rdfResultSet = new RdfResultSet(rdfRoleRepository.getRepository(), super.query );
 		} catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
 			log.error( super.query);
+			log.error(e.toString());
 			throw new OData2SparqlException("RdfSelectQuery execSelect failure with message:\n"+ e.getMessage(),e);
 		}
 		return rdfResultSet;

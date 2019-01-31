@@ -79,6 +79,7 @@ public class RdfConstants {
 	private static final String SAP_QUICKINFO = "quickinfo";
 	
 	private static final String  ODATA_NS ="odata";
+	private static final String  ODATA_DEFAULTNAMESPACE ="defaultNamespace";
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
 	private static final String  ODATA_SUBTYPE ="subType";
@@ -167,9 +168,17 @@ public class RdfConstants {
 	/*
 	 * Modifiers for classes and properties as they appear in $metadata
 	*/
-
+	
+	/*	The following is from the odata BNF revealing that only '_' non-alpha-numeric characters are allowed. Thus the ~ cannot be used as a prefix separator for the odata names as it is used in the results
+ 
+ 	; Note: this pattern is overly restrictive, the normative definition is type TSimpleIdentifier in OData EDM XML Schema
+	odataIdentifier             = identifierLeadingCharacter *127identifierCharacter
+	identifierLeadingCharacter  = ALPHA / "_"         ; plus Unicode characters from the categories L or Nl
+	identifierCharacter         = ALPHA / "_" / DIGIT ; plus Unicode characters from the categories L, Nl, Nd, Mn, Mc, Pc, or Cf
+	*/
+	
 	public static final String PREDICATE_SEPARATOR = "_";
-	public static final String CLASS_SEPARATOR = "_";
+	public static final String CLASS_SEPARATOR ="_";
 
 	public static final String CLASS_LABEL_PREFIX = "";
 	public static final String PROPERTY_LABEL_PREFIX = "";
@@ -239,6 +248,7 @@ public class RdfConstants {
 	public final static String SAP_LABEL_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_LABEL;
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
+	public final static String ODATA_DEFAULTNAMESPACE_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_DEFAULTNAMESPACE;
 	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public static final String ODATA_FK_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_FK;
 	public static final String ODATA_SUBTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_SUBTYPE;
@@ -253,6 +263,7 @@ public class RdfConstants {
 	private final static CsdlTerm sapLabelTerm = new CsdlTerm().setName(RdfConstants.SAP_LABEL).setType("Edm.String");
 	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING).setType("Edm.String");
 	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO).setType("Edm.String");
+	private final static CsdlTerm odataDefaultNamespace = new CsdlTerm().setName(RdfConstants.ODATA_DEFAULTNAMESPACE).setType("Edm.String");
 	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
 	private final static CsdlTerm odataFK = new CsdlTerm().setName(RdfConstants.ODATA_FK).setType("Edm.String");
 	private final static CsdlTerm odataSubType = new CsdlTerm().setName(RdfConstants.ODATA_SUBTYPE).setType("Edm.String");
@@ -367,6 +378,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.SAP_LABEL, sapLabelTerm);
 		TERMS.put(RdfConstants.SAP_HEADING, sapheadingTerm);
 		TERMS.put(RdfConstants.SAP_QUICKINFO, sapquickinfoTerm);
+		TERMS.put(RdfConstants.ODATA_DEFAULTNAMESPACE, odataDefaultNamespace);
 		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.ODATA_FK, odataFK);
 		TERMS.put(RdfConstants.ODATA_SUBTYPE, odataSubType);
@@ -379,6 +391,7 @@ public class RdfConstants {
 		SAPTERMS.add(sapLabelTerm);
 		SAPTERMS.add(sapheadingTerm);
 		SAPTERMS.add(sapquickinfoTerm);
+		ODATATERMS.add(odataDefaultNamespace);
 		ODATATERMS.add(odatabaseType);
 		ODATATERMS.add(odataFK);
 		ODATATERMS.add(odataSubType);

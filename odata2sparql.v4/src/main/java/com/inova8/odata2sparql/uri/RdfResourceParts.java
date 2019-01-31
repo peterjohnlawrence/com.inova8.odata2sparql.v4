@@ -1,12 +1,21 @@
 package com.inova8.odata2sparql.uri;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
+import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.http.HttpStatusCode;
+import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataApplicationException;
+import org.apache.olingo.server.api.ODataRequest;
+import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
@@ -14,6 +23,8 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
+import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
+import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +43,7 @@ public class RdfResourceParts {
 	private RdfProperty lastComplexProperty;
 	private RdfEntityType responseRdfEntityType;
 	private RdfResourcePart penultimateResourcePart;
+	private boolean isRef;
 	private String decodedKey;
 	private String subjectId;
 	private String localKey;
@@ -65,6 +77,10 @@ public class RdfResourceParts {
 				UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePart;
 				rdfResourceParts.add(new RdfResourceProperty(this.rdfEdmProvider, uriResourcePrimitiveProperty));
 				break;
+			case ref:
+				List<UriResource> uriResourceParts = uriInfo.asUriInfoResource().getUriResourceParts();
+				isRef = uriResourceParts.get(uriResourceParts.size()-1).toString().equals("$ref");
+				break;
 			default:
 				log.error(resourcePart.getKind().toString() + " not handled in resourceParts constructor");
 				break;
@@ -72,6 +88,94 @@ public class RdfResourceParts {
 			}
 		}
 		build();
+	}
+	public ContextURL contextUrl(ODataRequest request,OData odata) throws ODataApplicationException {
+		ContextURL contextUrl = null;
+		SelectOption selectOption = uriInfo.getSelectOption();
+		ExpandOption expandOption = uriInfo.getExpandOption();
+		try {
+			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients) URLEncoder.encode(q, "UTF-8");
+			String selectList = odata.createUriHelper().buildContextURLSelectList(this.getResponseEntitySet().getEntityType(), expandOption,
+					selectOption);
+			switch(uriType) {
+			case URI1:
+				contextUrl = ContextURL.with()
+						.entitySet(this.getEntitySet()
+						.getEdmEntitySet())
+						.selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+						.build();				
+				break;
+			case URI2:
+				contextUrl = ContextURL.with()
+						//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
+						//.keyPath(rdfResourceParts.getLocalKey())
+						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
+						.suffix(ContextURL.Suffix.ENTITY)
+						.selectList(selectList)
+						.oDataPath(request.getRawBaseUri())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+						.build();
+				break;
+			case URI3: break;
+			case URI4: 
+				contextUrl = ContextURL.with()
+						.entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey())
+						.navOrPropertyPath(this.getNavPath())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();				
+				break;
+			case URI5: 
+				contextUrl = ContextURL.with()
+						.entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey())
+						.navOrPropertyPath(this.getNavPath())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
+				break;	
+			case URI6A:
+				contextUrl = ContextURL.with()
+						.entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey())
+						.navOrPropertyPath(this.getNavPath())
+						.suffix(ContextURL.Suffix.ENTITY)
+						.selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+						.build();				
+				break;
+			case URI6B: 
+				contextUrl = ContextURL.with()
+						.entitySet(this.getEntitySet()
+						.getEdmEntitySet())
+						.keyPath(this.getLocalKey())
+						.navOrPropertyPath(this.getNavPath())
+						.selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+						.build();	
+				break;
+			case URI7A: 
+				contextUrl = ContextURL.with()
+					.suffix(ContextURL.Suffix.REFERENCE)
+					.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+					.build();					
+				break;
+			case URI7B: 
+				contextUrl = ContextURL.with()
+						.asCollection()
+						.suffix(ContextURL.Suffix.REFERENCE)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
+						.build();	
+				break;
+			case URI14: break;
+			case URI15: break;
+			default:
+				break;
+			}
+		} catch (URISyntaxException | SerializerException e) {
+			throw new ODataApplicationException("Invalid RawBaseURI " + request.getRawBaseUri(),
+					HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+		}
+		return contextUrl;
+
 	}
 	private void build() throws EdmException, ODataApplicationException {
 		uriType = _getUriType();
@@ -293,15 +397,25 @@ public class RdfResourceParts {
 			}
 		} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.navigationProperty)) {
 			RdfResourceNavigationProperty lastNavigationProperty = ((RdfResourceNavigationProperty) (_getLastResourcePart()));
+
 			if (lastNavigationProperty.hasKey()) {
 				// <entitySetPath>/Key
-				return UriType.URI2;
+				if(isRef)
+					return UriType.URI7A;
+				else
+					return UriType.URI2;
 			} else if (lastNavigationProperty.getEdmNavigationProperty().isCollection()) {
 				// <entityPath>/NavSet
-				return UriType.URI6B;
+				if(isRef)
+					return UriType.URI7B;
+				else
+					return UriType.URI6B;
 			} else {
 				// <entityPath>/NavProp
-				return UriType.URI6A;
+				if(isRef)
+					return UriType.URI7A;
+				else
+					return UriType.URI6A;
 			}
 		} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.complexProperty)) {
 			//	<entityPath>/Complex

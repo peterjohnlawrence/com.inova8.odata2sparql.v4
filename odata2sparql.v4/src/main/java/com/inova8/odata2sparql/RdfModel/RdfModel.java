@@ -1301,6 +1301,7 @@ public class RdfModel {
 			return null;
 	}
 
+
 	RdfProperty getOrCreateProperty(RdfNode propertyNode, RdfNode equivalentPropertyNode, RdfNode propertyLabelNode,
 			RdfNode domainNode, RdfNode rangeNode, Cardinality cardinality) throws OData2SparqlException {
 
@@ -1469,7 +1470,20 @@ public class RdfModel {
 		association.inversePropertyOf = inversePropertyNode;
 		return inverseAssociation;
 	}
+	Boolean isAssociation(RdfNode propertyNode, RdfNode domainNode,RdfNode rangeNode, RdfNode multipleDomainNode, RdfNode multipleRangeNode)
+			throws OData2SparqlException {
 
+		RdfURI propertyURI = new RdfURI(propertyNode);
+		RdfURI domainURI = new RdfURI(domainNode);
+		RdfURI rangeURI = new RdfURI(rangeNode);
+		String associationName = createAssociationName(multipleDomainNode, multipleRangeNode, domainURI, propertyURI,
+				rangeURI);
+
+		RdfAssociation association = Enumerable.create(domainURI.graph.associations)
+				.firstOrNull(associationNameEquals(associationName));
+		if (association == null) {return false;}
+		return true;
+	}
 	private String createAssociationName(RdfNode multipleDomainNode, RdfNode multipleRangeNode, RdfURI domainURI,
 			RdfURI propertyURI, RdfURI rangeURI) throws OData2SparqlException {
 		if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {

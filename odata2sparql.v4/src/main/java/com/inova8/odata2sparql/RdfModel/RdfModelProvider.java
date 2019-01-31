@@ -297,7 +297,7 @@ public class RdfModelProvider {
 									superProperty.setComplexType(complexType);
 								}
 							} else {
-								log.error("Superproperty:" + superPropertyNode.getIRI().toString()
+								log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
 										+ " declared without specific domain");
 							}
 						}
@@ -360,7 +360,6 @@ public class RdfModelProvider {
 				}
 			} finally {
 				log.info(count + " DataTypeProperties_Ranges found");
-				//log.info(count + " DataTypeProperties_Ranges found [" + debug + "]");
 				properties.close();
 			}
 		} catch (OData2SparqlException e) {
@@ -408,7 +407,6 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				//log.info(count + " DataTypeProperties_Cardinality found [" + debug + "]");
 				log.info(count + " DataTypeProperties_Cardinality found");
 				properties.close();
 			}
@@ -494,16 +492,18 @@ public class RdfModelProvider {
 
 						if (soln.getRdfNode("superProperty") != null) {
 							RdfNode superdomainNode = soln.getRdfNode("superDomain");
-							RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
-									null, superdomainNode);
-							association.setSuperProperty(superProperty);
-							if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
-								RdfComplexType complexType = model.getOrCreateComplexType(
-										soln.getRdfNode("superProperty"), null, superdomainNode);
-								complexType.addNavigationProperty(association);
-								complexTypes.add(complexType);
-								superProperty.setIsComplex(true);
-								superProperty.setComplexType(complexType);
+							if (superdomainNode != null) {
+								RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
+										null, superdomainNode);
+								association.setSuperProperty(superProperty);
+								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+									RdfComplexType complexType = model.getOrCreateComplexType(
+											soln.getRdfNode("superProperty"), null, superdomainNode);
+									complexType.addNavigationProperty(association);
+									complexTypes.add(complexType);
+									superProperty.setIsComplex(true);
+									superProperty.setComplexType(complexType);
+								}
 							}
 						}
 
@@ -598,7 +598,7 @@ public class RdfModelProvider {
 									superProperty.setComplexType(complexType);
 								}
 							} else {
-								log.error("Superproperty:" + superPropertyNode.getIRI().toString()
+								log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
 										+ " declared without specific domain");
 							}
 						}

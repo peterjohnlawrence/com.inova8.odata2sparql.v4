@@ -5956,6 +5956,7 @@ where{
     <rdfs:label>subjectA</rdfs:label>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <skos:prefLabel>subjectA</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedSearch"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/node5">
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedEntitySearch"/>
@@ -6220,9 +6221,6 @@ GROUP BY ?entity ?type</sp:text>
     <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedSearch"/>
   </owl:ObjectProperty>
-  <rdf:Property rdf:about="http://spinrdf.org/arg#wildcard">
-    <rdfs:subPropertyOf rdf:resource="http://spinrdf.org/sp#arg"/>
-  </rdf:Property>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/value">
     <rdfs:label>value</rdfs:label>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
@@ -6233,6 +6231,7 @@ GROUP BY ?entity ?type</sp:text>
     <rdfs:label>stringA</rdfs:label>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <skos:prefLabel>stringA</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedEntitySearch"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/formattedValue">
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
@@ -6244,11 +6243,14 @@ GROUP BY ?entity ?type</sp:text>
     <rdfs:label>stringB</rdfs:label>
     <skos:prefLabel>stringB</skos:prefLabel>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedSearch"/>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedEntitySearch"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/string">
     <skos:prefLabel>string</skos:prefLabel>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label>string</rdfs:label>
+    <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/Search"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/formattedValueA">
     <rdfs:label>formattedValueA</rdfs:label>
