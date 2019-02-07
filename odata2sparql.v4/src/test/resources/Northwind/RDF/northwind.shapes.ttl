@@ -1,0 +1,106 @@
+# baseURI: http://northwind.com/shapes/
+# imports: http://northwind.com/model/
+# imports: http://www.w3.org/ns/shacl#
+# prefix: shapes
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix model: <http://northwind.com/model/> .
+@prefix northwind: <http://northwind.com/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shapes: <http://northwind.com/shapes/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix spin: <http://spinrdf.org/sp#> .
+@prefix terms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+shapes:
+  rdf:type owl:Ontology ;
+  owl:imports model: ;
+  owl:imports sh: ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+shapes:Orders
+  rdf:type sh:NodeShape ;
+  rdfs:label "Orders" ;
+  skos:prefLabel "Orders" ;
+  sh:description "Orders with OrderDetails, Customer, and Salesperson" ;
+  sh:name "Orders" ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      rdfs:label "must have a minimum of one line item for the order" ;
+      skos:prefLabel "" ;
+      sh:description "must have minimum of one line item  for the order" ;
+      sh:inversePath model:order ;
+      sh:minCount 1 ;
+      sh:name "mustHaveOrderDetails" ;
+      sh:node [
+          rdf:type sh:NodeShape ;
+          sh:description "OrderDetails with product, quantity, and discount" ;
+          sh:name "OrderDetails" ;
+          sh:property [
+              rdf:type sh:PropertyShape ;
+              sh:description "may have discount specified" ;
+              sh:maxCount 1 ;
+              sh:minCount 0 ;
+              sh:name "mayHaveOrderDetailDiscount" ;
+              sh:path model:discount ;
+            ] ;
+          sh:property [
+              rdf:type sh:PropertyShape ;
+              sh:description "must have product specified" ;
+              sh:maxCount 1 ;
+              sh:minCount 1 ;
+              sh:name "mustHaveOrderDetailProduct" ;
+              sh:path model:product ;
+            ] ;
+          sh:property [
+              rdf:type sh:PropertyShape ;
+              sh:description "must have quantity specified" ;
+              sh:maxCount 1 ;
+              sh:minCount 1 ;
+              sh:name "mustHaveOrderDetailQuantity" ;
+              sh:path model:quantity ;
+            ] ;
+          sh:targetClass model:OrderDetail ;
+        ] ;
+    ] ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      skos:prefLabel "" ;
+      sh:description "must have exactly one customer for order" ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "mustHaveCustomer" ;
+      sh:path model:customer ;
+    ] ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:description "must have a exactly one salesperson for order" ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "mustHaveSalesperson" ;
+      sh:path model:employee ;
+    ] ;
+  sh:targetClass model:Order ;
+.
+shapes:ShippingOrders
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shipping orders" ;
+  skos:prefLabel "Shipping orders" ;
+  sh:description "Orders with shipper specified" ;
+  sh:name "ShippingOrders" ;
+  sh:node shapes:Orders ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:description "must have exactly one shipper for the order" ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:path model:shipVia ;
+    ] ;
+.

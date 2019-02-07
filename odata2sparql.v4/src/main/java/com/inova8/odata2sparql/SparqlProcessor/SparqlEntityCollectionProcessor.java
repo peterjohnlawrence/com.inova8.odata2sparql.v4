@@ -77,91 +77,105 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1st we have retrieve the requested EntitySet from the uriInfo object (representation of the parsed service URI)
 
-		RdfResourceParts rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
-		EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet();
-		SelectOption selectOption = uriInfo.getSelectOption();
-		ExpandOption expandOption = uriInfo.getExpandOption();
-		CountOption countOption = uriInfo.getCountOption();
-		// 2nd: fetch the data from backend for this requested EntitySetName
-		// it has to be delivered as EntitySet object
-		EntityCollection entitySet = null;
+		RdfResourceParts rdfResourceParts = null;
 		try {
-			entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, rdfResourceParts.getUriType(),
-					rdfResourceParts);
-		} catch (ODataException | OData2SparqlException e) {
-			log.info("No data found");
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH);
+		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
+		if (rdfResourceParts.isFunction()) {
+			throw new ODataApplicationException("Calling FunctionImports directly not supported at present", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+					Locale.ENGLISH);			
+		} else {
+			EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet();
+			SelectOption selectOption = uriInfo.getSelectOption();
+			ExpandOption expandOption = uriInfo.getExpandOption();
+			CountOption countOption = uriInfo.getCountOption();
+			// 2nd: fetch the data from backend for this requested EntitySetName
+			// it has to be delivered as EntitySet object
+			EntityCollection entitySet = null;
+			try {
+				entitySet = SparqlBaseCommand.readEntitySet(this.rdfEdmProvider, uriInfo, rdfResourceParts.getUriType(),
+						rdfResourceParts);
+			} catch (ODataException | OData2SparqlException e) {
+				log.info("No data found");
+				throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
+						Locale.ENGLISH);
+			}
 
-		// 3rd apply $orderby
-		OrderByOption orderByOption = uriInfo.getOrderByOption();
-		if (orderByOption != null) {
-			sortEntityCollection(entitySet, orderByOption);
-		}
-		// 4th: create a serializer based on the requested format (json)
-		ODataSerializer serializer = odata.createSerializer(responseFormat);
-		// Analyze the URI segments
-		int segmentCount = rdfResourceParts.size();
-		if (segmentCount == 3) { //navigation via complextype
-			if (rdfResourceParts.getResourceKind(2).equals(UriResourceKind.navigationProperty)) {
-				RdfResourceNavigationProperty rdfNavigationProperty = rdfResourceParts.getAsNavigationProperty(2);
-				if (!rdfNavigationProperty.getEdmNavigationProperty().isCollection()) {
+			// 3rd apply $orderby
+			OrderByOption orderByOption = uriInfo.getOrderByOption();
+			if (orderByOption != null) {
+				sortEntityCollection(entitySet, orderByOption);
+			}
+			// 4th: create a serializer based on the requested format (json)
+			ODataSerializer serializer = odata.createSerializer(responseFormat);
+			// Analyze the URI segments
+			int segmentCount = rdfResourceParts.size();
+			if (segmentCount == 3) { //navigation via complextype
+				if (rdfResourceParts.getResourceKind(2).equals(UriResourceKind.navigationProperty)) {
+					RdfResourceNavigationProperty rdfNavigationProperty = rdfResourceParts.getAsNavigationProperty(2);
+					if (!rdfNavigationProperty.getEdmNavigationProperty().isCollection()) {
 
-					//TODO ***********************************************************
-					//Need to get the actual value of the complex property
-					//First find the entity, then its complexproperty value which will be a collection of entities
-					String entityString = rdfResourceParts.getEntityString();
-					Entity resultsEntity = null;
-					for (Entity entity : entitySet.getEntities()) {
-						if (entity.getId().toString().equals(entityString)) {
-							resultsEntity = entity;
-							break;
+						//TODO ***********************************************************
+						//Need to get the actual value of the complex property
+						//First find the entity, then its complexproperty value which will be a collection of entities
+						String entityString = rdfResourceParts.getEntityString();
+						Entity resultsEntity = null;
+						for (Entity entity : entitySet.getEntities()) {
+							if (entity.getId().toString().equals(entityString)) {
+								resultsEntity = entity;
+								break;
+							}
 						}
-					}
-					//Now its complexproperty value
+						//Now its complexproperty value
 
-					ComplexValue result = (ComplexValue) resultsEntity
-							.getProperty(rdfResourceParts.getLastComplexType().getName())//rdfResourceParts.getAsComplexProperty(segmentCount - 2).getComplexType().getName())
-							.getValue();
-					entitySet = new EntityCollection();
-					//Now its property value 
-					String navigationPropertyName = rdfResourceParts.getAsNavigationProperty(segmentCount - 1)
-							.getEdmNavigationProperty().getName();
-					for (Property property : result.getValue()) {
-						if (property.getName().equals(navigationPropertyName)) {
-							entitySet = (EntityCollection) property.getValue();
+						ComplexValue result = (ComplexValue) resultsEntity
+								.getProperty(rdfResourceParts.getLastComplexType().getName())//rdfResourceParts.getAsComplexProperty(segmentCount - 2).getComplexType().getName())
+								.getValue();
+						entitySet = new EntityCollection();
+						//Now its property value 
+						String navigationPropertyName = rdfResourceParts.getAsNavigationProperty(segmentCount - 1)
+								.getEdmNavigationProperty().getName();
+						for (Property property : result.getValue()) {
+							if (property.getName().equals(navigationPropertyName)) {
+								entitySet = (EntityCollection) property.getValue();
+							}
 						}
 					}
 				}
+			} // else {
+				// this would be the case for e.g. Products(1)/Category/Products(1)/Category
+				//	throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+				//			Locale.ROOT);
+				//}
+
+			// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
+			ContextURL contextUrl = rdfResourceParts.contextUrl(request, odata); //null;
+			final String id = request.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
+			EntityCollectionSerializerOptions opts = null;
+
+			if ((countOption != null) && countOption.getValue()) {
+				opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
+						.count(countOption).contextURL(contextUrl).build();
+			} else {
+				opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
+						.contextURL(contextUrl).build();
 			}
-		} // else {
-			// this would be the case for e.g. Products(1)/Category/Products(1)/Category
-			//	throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
-			//			Locale.ROOT);
-			//}
 
-		// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
-		ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ; //null;
-		final String id = request.getRawBaseUri() + "/" + responseEdmEntitySet.getName();
-		EntityCollectionSerializerOptions opts = null;
+			SerializerResult serializerResult = serializer.entityCollection(serviceMetadata,
+					responseEdmEntitySet.getEntityType(), entitySet, opts);
+			InputStream serializedContent = serializerResult.getContent();
 
-		if ((countOption != null) && countOption.getValue()) {
-			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
-					.count(countOption).contextURL(contextUrl).build();
-		} else {
-			opts = EntityCollectionSerializerOptions.with().select(selectOption).expand(expandOption).id(id)
-					.contextURL(contextUrl).build();
+			// Finally: configure the response object: set the body, headers and status code
+			response.setContent(serializedContent);
+			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+			response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 		}
-
-		SerializerResult serializerResult = serializer.entityCollection(serviceMetadata,
-				responseEdmEntitySet.getEntityType(), entitySet, opts);
-		InputStream serializedContent = serializerResult.getContent();
-
-		// Finally: configure the response object: set the body, headers and status code
-		response.setContent(serializedContent);
-		response.setStatusCode(HttpStatusCode.OK.getStatusCode());
-		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 
 	}
 
@@ -220,12 +234,12 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 							break;
 						case "Boolean":
 							Boolean boolean1 = (Boolean) value1;
-							Boolean boolean2 = (Boolean) entity2.getProperty(sortPropertyName).getValue();							
+							Boolean boolean2 = (Boolean) entity2.getProperty(sortPropertyName).getValue();
 							compareResult = boolean1.compareTo(boolean2);
 							break;
 						case "DateTimeOffset":
 							Timestamp offsetDateTime1 = (Timestamp) value1;
-							Timestamp offsetDateTime2 = (Timestamp) entity2.getProperty(sortPropertyName).getValue();		
+							Timestamp offsetDateTime2 = (Timestamp) entity2.getProperty(sortPropertyName).getValue();
 							compareResult = offsetDateTime1.compareTo(offsetDateTime2);
 							break;
 						default:
@@ -254,6 +268,9 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		} catch (EdmException | OData2SparqlException | ExpressionVisitException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (ODataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		// 3. serialize
 		if (count != null) {

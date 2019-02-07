@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.olingo.commons.api.edm.provider.CsdlAbstractEdmProvider;
@@ -185,7 +186,26 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 
 	@Override
 	public List<CsdlFunction> getFunctions(FullQualifiedName functionName) throws ODataException {
-		return super.getFunctions(functionName);
+	//	return super.getFunctions(functionName);
+		String nameSpace = functionName.getNamespace();
+		try {
+			for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+				if (nameSpace.equals(schema.getNamespace())) {
+					String fnName = functionName.getName();
+					for (CsdlFunction function : schema.getFunctions()) {
+						if (fnName.equals(function.getName())) {
+							ArrayList<CsdlFunction> listFunction = new ArrayList<CsdlFunction>();
+							listFunction.add(function);
+							return listFunction;
+						}
+					}
+				}
+			}
+		} catch (NullPointerException e) {
+			log.error("NullPointerException getFunctions " + functionName);
+			throw new ODataException("NullPointerException getFunctions " + functionName);
+		}
+		return null;
 	}
 
 	@Override

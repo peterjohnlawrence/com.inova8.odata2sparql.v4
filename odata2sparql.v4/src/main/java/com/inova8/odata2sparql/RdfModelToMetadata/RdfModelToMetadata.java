@@ -29,14 +29,17 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpress
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfDataPropertyShape;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNodeShape;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfObjectPropertyShape;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfSchema;
 import com.inova8.odata2sparql.Utils.FullQualifiedNameComparator;
 
 public class RdfModelToMetadata {
-	private class PrefixedNamespace {
+	public class PrefixedNamespace {
 		private final String uri;
 		private final String prefix;
 
@@ -60,6 +63,7 @@ public class RdfModelToMetadata {
 	public CsdlSchema getSchema(String nameSpace) {
 		return rdfEdm.get(nameSpace);
 	}
+
 	public CsdlTerm getTerm(FullQualifiedName termName) {
 		return null;
 	}
@@ -85,69 +89,14 @@ public class RdfModelToMetadata {
 
 		Map<String, RdfAssociation> navigationPropertyLookup = new TreeMap<String, RdfAssociation>();
 		Map<String, CsdlEntitySet> entitySetsMapping = new TreeMap<String, CsdlEntitySet>();
-
-		ArrayList<PrefixedNamespace> nameSpaces = new ArrayList<PrefixedNamespace>();
-		nameSpaces.add(new PrefixedNamespace(RdfConstants.RDF_SCHEMA, RdfConstants.RDF));
-		nameSpaces.add(new PrefixedNamespace(RdfConstants.RDFS_SCHEMA, RdfConstants.RDFS));
-		nameSpaces.add(new PrefixedNamespace(RdfConstants.OWL_SCHEMA, RdfConstants.OWL));
-		nameSpaces.add(new PrefixedNamespace(RdfConstants.XSD_SCHEMA, RdfConstants.XSD));
-
-		String entityContainerName = RdfConstants.ENTITYCONTAINER;
-		CsdlEntityContainer entityContainer = new CsdlEntityContainer().setName(entityContainerName);
-
-		CsdlSchema instanceSchema = new CsdlSchema().setNamespace(RdfConstants.ENTITYCONTAINERNAMESPACE)
-				.setEntityContainer(entityContainer);
-
-		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
 		TreeMap<String, CsdlEntitySet> entitySets = new TreeMap<String, CsdlEntitySet>();
-
-		List<CsdlAnnotation> instanceSchemaAnnotations = new ArrayList<CsdlAnnotation>();
-		addToAnnotations(instanceSchemaAnnotations, RdfConstants.ODATA_DEFAULTNAMESPACE_FQN, rdfModel.getRdfRepository().getDefaultPrefix());
-		instanceSchema.setAnnotations(instanceSchemaAnnotations);
 		
-		//Custom types langString
-
-		ArrayList<CsdlProperty> langStringProperties = new ArrayList<CsdlProperty>();
-		langStringProperties.add(new CsdlProperty().setName(RdfConstants.LANG)
-				.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setNullable(true));
-		langStringProperties.add(new CsdlProperty().setName(RdfConstants.VALUE)
-				.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()));
-		CsdlComplexType langLiteralType = new CsdlComplexType().setName(RdfConstants.LANGSTRING);
-		langLiteralType.setProperties(langStringProperties);
+		CsdlEntityContainer entityContainer = initializeMetadata(rdfModel);
+		CsdlComplexType langLiteralType = createLangType();
+		
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// First pass to locate all classes (entitytypes) and datatypes (typedefinitions)
-
-			for (RdfEntityType rdfClass : rdfGraph.classes) {
-				String entityTypeName = rdfClass.getEDMEntityTypeName();
-				CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
-				if (entityType == null) {
-					entityType = new CsdlEntityType().setName(entityTypeName);
-					globalEntityTypes.put(rdfClass.getIRI(), entityType);
-				}
-				if (useBaseType) {
-					if (rdfClass.getBaseType() != null) {
-						String baseTypeName = rdfClass.getBaseType().getEDMEntityTypeName();
-						CsdlEntityType baseType = globalEntityTypes.get(rdfClass.getBaseType().getIRI());
-						if (baseType == null) {
-							baseType = new CsdlEntityType().setName(baseTypeName);
-							globalEntityTypes.put(rdfClass.getBaseType().getIRI(), baseType);
-						}
-						entityType.setBaseType(RdfFullQualifiedName.getFullQualifiedName(rdfClass.getBaseType()));
-					}
-				}
-				List<CsdlAnnotation> entityTypeAnnotations = new ArrayList<CsdlAnnotation>();
-				if (withRdfAnnotations)
-					addToAnnotations(entityTypeAnnotations, RdfConstants.RDFS_CLASS_FQN, rdfClass.getIRI());
-				if (withSapAnnotations) {
-					addToAnnotations(entityTypeAnnotations, RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel());
-					if (rdfClass.getBaseType() != null)
-						addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN,
-								rdfClass.getBaseType().getEntityTypeName());
-				}
-				entityType.setAnnotations(entityTypeAnnotations);
-				//TODO testing openTypes
-				//entityType.setOpenType(true);
-			}
+			locateEntityTypes(withRdfAnnotations, withSapAnnotations, useBaseType, globalEntityTypes, rdfGraph);
 		}
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
@@ -158,150 +107,16 @@ public class RdfModelToMetadata {
 
 			String modelNamespace = rdfModel.getModelNamespace(rdfGraph);
 
-			for (RdfEntityType rdfClass : rdfGraph.classes) {
-				String entityTypeName = rdfClass.getEDMEntityTypeName();
-				CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
-				entityTypes.put(entityTypeName, entityType);
-				entityType.setAbstract(false);
-				entityTypeMapping.put(entityTypeName, entityType);
-				TreeMap<String, CsdlNavigationProperty> navigationProperties = new TreeMap<String, CsdlNavigationProperty>();
-				TreeMap<String, CsdlProperty> entityTypeProperties = new TreeMap<String, CsdlProperty>();
+			locateEntityTypes(withRdfAnnotations, withSapAnnotations, useBaseType, withFKProperties, globalEntityTypes,
+					entitySetsMapping, entitySets, rdfGraph, entityTypes, entityTypeMapping);
 
-				//Iterate through baseType if flattened metadata required
-				RdfEntityType currentRdfClass = rdfClass;
-				do {
-
-					ArrayList<CsdlPropertyRef> keys = new ArrayList<CsdlPropertyRef>();
-					for (RdfPrimaryKey primaryKey : currentRdfClass.getPrimaryKeys()) {
-						String propertyName = primaryKey.getEDMPropertyName();
-						keys.add(new CsdlPropertyRef().setName(propertyName));
-						entityType.setKey(keys);
-					}
-					for (RdfProperty rdfProperty : currentRdfClass.getProperties()) {
-						if ((withFKProperties && rdfProperty.isFK()) || !rdfProperty.isFK() || rdfProperty.getIsKey()) {
-							String propertyName = rdfProperty.getEDMPropertyName();
-							CsdlProperty property = null;
-							if (rdfProperty.getIsComplex()) {
-								if (currentRdfClass == rdfClass) {
-									//use complexType but do not inherit down
-									property = new CsdlProperty().setName(propertyName)
-											.setType(rdfProperty.getComplexType().getFullQualifiedName());
-								}
-							} else {
-								EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
-								property = new CsdlProperty().setName(propertyName)
-										.setType(propertyType.getFullQualifiedName());
-								if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
-									property.setPrecision(RdfConstants.DATE_PRECISION);
-								if (propertyType == EdmPrimitiveTypeKind.Decimal)
-									property.setScale(RdfConstants.DECIMAL_SCALE);
-
-							}
-							if (property != null) {
-								//Only build if not null
-								buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
-								entityTypeProperties.put(property.getName(), property);
-								propertyMapping.put(new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(),
-										property.getName()), rdfProperty);
-							}
-						}
-
-					}
-					entityType.setProperties(new ArrayList<CsdlProperty>(entityTypeProperties.values()));
-					entityType.setNavigationProperties(
-							new ArrayList<CsdlNavigationProperty>(navigationProperties.values()));
-
-					String entitySetName = rdfClass.getEDMEntitySetName();
-
-					CsdlEntitySet entitySet = new CsdlEntitySet().setName(entitySetName)
-							.setType(new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), entityTypeName));
-
-					List<CsdlAnnotation> entitySetAnnotations = new ArrayList<CsdlAnnotation>();
-					if (withSapAnnotations)
-						addToAnnotations(entitySetAnnotations, RdfConstants.SAP_LABEL_FQN,
-								rdfClass.getEntitySetLabel());
-					entitySet.setAnnotations(entitySetAnnotations);
-
-					entitySets.put(entitySet.getName(), entitySet);
-
-					entitySetMapping.put(entitySet.getTypeFQN(), rdfClass);
-					entitySetsMapping.put(entitySetName, entitySet);
-					if (useBaseType)
-						currentRdfClass = null;
-					else if (currentRdfClass.getBaseType() != currentRdfClass) {
-						currentRdfClass = currentRdfClass.getBaseType();
-					} else {
-						currentRdfClass = null;
-					}
-				} while (currentRdfClass != null);
-			}
-
-			for (RdfAssociation rdfAssociation : rdfGraph.associations) {
-				// if (!rdfAssociation.isInverse)
-				{
-					String associationName = rdfAssociation.getEDMAssociationName();
-
-					//TODO Do we need a new navigation property or extend an existing one?
-					CsdlNavigationProperty navigationProperty = new CsdlNavigationProperty().setName(associationName)
-							.setType(new FullQualifiedName(rdfAssociation.getRangeClass().getSchema().getSchemaPrefix(),
-									rdfAssociation.getRangeName()))
-							.setCollection((rdfAssociation.getDomainCardinality() == Cardinality.MANY)
-									|| (rdfAssociation.getDomainCardinality() == Cardinality.MULTIPLE));
-
-					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
-					if (withRdfAnnotations)
-						addToAnnotations(navigationPropertyAnnotations, RdfConstants.PROPERTY_FQN,
-								rdfAssociation.getAssociationIRI().toString());
-					if (withSapAnnotations)
-						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_LABEL_FQN,
-								rdfAssociation.getAssociationLabel());
-					if (withSapAnnotations)
-						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_HEADING_FQN,
-								rdfAssociation.getAssociationLabel());
-					if (withSapAnnotations)
-						addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN,
-								rdfAssociation.getAssociationLabel());
-					if (rdfAssociation.IsInverse()) {
-						if (withRdfAnnotations)
-							addToAnnotations(navigationPropertyAnnotations, RdfConstants.INVERSEOF_FQN,
-									rdfAssociation.getInversePropertyOfURI().toString());
-					}
-					navigationProperty.setAnnotations(navigationPropertyAnnotations);
-					//TODO should not add duplicates to the same entity, even though Olingo accepts them							
-					globalEntityTypes.get(rdfAssociation.getDomainNodeURI()).getNavigationProperties()
-							.add(navigationProperty);
-					navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
-					navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(), rdfAssociation);
-				}
-			}
-			for (RdfComplexType rdfComplexType : rdfGraph.getComplexTypes()) {
-				CsdlComplexType csdlComplexType = new CsdlComplexType().setName(rdfComplexType.getComplexTypeName());
-				for (RdfProperty rdfProperty : rdfComplexType.getProperties().values()) {
-					List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
-					addToAnnotations(propertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
-							rdfProperty.getOfClass().getEntityTypeName());
-					csdlComplexType.getProperties()
-							.add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName())
-									.setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName())
-									.setAnnotations(propertyAnnotations));
-				}
-				for (RdfAssociation rdfNavigationProperty : rdfComplexType.getNavigationProperties().values()) {
-					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
-					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
-							rdfNavigationProperty.getDomainName());
-					csdlComplexType.getNavigationProperties()
-							.add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName())
-									.setAnnotations(navigationPropertyAnnotations)
-									.setType(new FullQualifiedName(
-											rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
-											rdfNavigationProperty.getRangeName()))
-									.setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
-											|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE)));
-				}
-				complexTypes.put(rdfComplexType.getComplexTypeName(), csdlComplexType);
-			}
-			//Only add if  schema is not empty of entityTypes
-			if (!entityTypes.isEmpty()) {
+			locateNavigationProperties(withRdfAnnotations, withSapAnnotations, globalEntityTypes,
+					navigationPropertyLookup, rdfGraph);
+			locateComplexTypes(rdfGraph, complexTypes);
+			locateNodeShapes(withRdfAnnotations, withSapAnnotations, useBaseType, withFKProperties, globalEntityTypes,
+					entitySetsMapping, entitySets, rdfGraph, entityTypes, entityTypeMapping, complexTypes);
+			//Only add if  schema is not empty of entityTypes or complexTypes
+			if (!entityTypes.isEmpty()||!complexTypes.isEmpty()) {
 				List<CsdlAnnotation> schemaAnnotations = new ArrayList<CsdlAnnotation>();
 				addToAnnotations(schemaAnnotations, RdfConstants.ONTOLOGY_FQN, rdfGraph.getSchemaName());
 
@@ -318,36 +133,7 @@ public class RdfModelToMetadata {
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Third pass to add navigationPropertyBinding
-			for (RdfAssociation rdfAssociation : rdfGraph.associations) {
-				{
-					String path = rdfAssociation.getEDMAssociationName();
-					String target = rdfAssociation.getRangeClass().getEDMEntitySetName();//.getRangeName();
-					CsdlNavigationPropertyBinding navigationPropertyBinding = new CsdlNavigationPropertyBinding()
-							.setPath(path).setTarget(target);
-					//TODO Not supported in Olingo					
-					//					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
-					//					if (withRdfAnnotations)
-					//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,
-					//								rdfAssociation.getAssociationIRI().toString()));
-					//					if (withSapAnnotations)
-					//						navigationPropertyAnnotations.add(
-					//								buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfAssociation.getAssociationLabel()));
-					//					if (withSapAnnotations)
-					//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
-					//								rdfAssociation.getAssociationLabel()));
-					//					if (withSapAnnotations)
-					//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
-					//								rdfAssociation.getAssociationLabel()));
-					//					if (rdfAssociation.IsInverse()) {
-					//						if (withRdfAnnotations)
-					//							navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.INVERSEOF_FQN,
-					//									rdfAssociation.getInversePropertyOfURI().toString()));
-					//					}
-					//					navigationPropertyBinding.setAnnotations(navigationPropertyAnnotations);
-					entitySets.get(rdfAssociation.getDomainClass().getEDMEntitySetName())
-							.getNavigationPropertyBindings().add(navigationPropertyBinding);
-				}
-			}
+			locateNavigationPropertyBinding(entitySets, rdfGraph);
 		}
 		if (!useBaseType) {
 			// Fourth pass to flatten navigationPropertyBinding if baseTypes not supported
@@ -358,6 +144,46 @@ public class RdfModelToMetadata {
 			}
 		}
 
+		locateFunctionImports(rdfModel, entityContainer);
+		entityContainer.setEntitySets(new ArrayList<CsdlEntitySet>(entitySets.values()));
+
+		//Finally, add terms and schemas to which they belong if they do not exist that have been used	
+		addTermsToSchemas();
+	}
+
+	private CsdlEntityContainer initializeMetadata(RdfModel rdfModel) {
+		String entityContainerName = RdfConstants.ENTITYCONTAINER;
+		CsdlEntityContainer entityContainer = new CsdlEntityContainer().setName(entityContainerName);	
+		ArrayList<PrefixedNamespace> nameSpaces = new ArrayList<PrefixedNamespace>();
+		nameSpaces.add(new PrefixedNamespace(RdfConstants.RDF_SCHEMA, RdfConstants.RDF));
+		nameSpaces.add(new PrefixedNamespace(RdfConstants.RDFS_SCHEMA, RdfConstants.RDFS));
+		nameSpaces.add(new PrefixedNamespace(RdfConstants.OWL_SCHEMA, RdfConstants.OWL));
+		nameSpaces.add(new PrefixedNamespace(RdfConstants.XSD_SCHEMA, RdfConstants.XSD));
+		CsdlSchema instanceSchema = new CsdlSchema().setNamespace(RdfConstants.ENTITYCONTAINERNAMESPACE)
+				.setEntityContainer(entityContainer);
+		
+		rdfEdm.put(RdfConstants.ENTITYCONTAINERNAMESPACE, instanceSchema);
+		
+		List<CsdlAnnotation> instanceSchemaAnnotations = new ArrayList<CsdlAnnotation>();
+		addToAnnotations(instanceSchemaAnnotations, RdfConstants.ODATA_DEFAULTNAMESPACE_FQN,
+				rdfModel.getRdfRepository().getDefaultPrefix());
+		instanceSchema.setAnnotations(instanceSchemaAnnotations);
+		return entityContainer;
+	}
+
+	private CsdlComplexType createLangType() {
+		ArrayList<CsdlProperty> langStringProperties = new ArrayList<CsdlProperty>();
+		langStringProperties.add(new CsdlProperty().setName(RdfConstants.LANG)
+				.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setNullable(true));
+		langStringProperties.add(new CsdlProperty().setName(RdfConstants.VALUE)
+				.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()));
+		
+		CsdlComplexType langLiteralType = new CsdlComplexType().setName(RdfConstants.LANGSTRING);
+		langLiteralType.setProperties(langStringProperties);
+		return langLiteralType;
+	}
+
+	private void locateFunctionImports(RdfModel rdfModel, CsdlEntityContainer entityContainer) {
 		List<CsdlFunctionImport> functionImports = new ArrayList<CsdlFunctionImport>();
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Final pass to add any functionImports
@@ -395,10 +221,299 @@ public class RdfModelToMetadata {
 			}
 		}
 		entityContainer.setFunctionImports(functionImports);
-		entityContainer.setEntitySets(new ArrayList<CsdlEntitySet>(entitySets.values()));
+	}
 
-		//Finally, add terms and schemas to which they belong if they do not exist that have been used	
-		addTermsToSchemas();
+	private void locateNavigationPropertyBinding(TreeMap<String, CsdlEntitySet> entitySets, RdfSchema rdfGraph) {
+		for (RdfAssociation rdfAssociation : rdfGraph.associations) {
+			{
+				String path = rdfAssociation.getEDMAssociationName();
+				String target = rdfAssociation.getRangeClass().getEDMEntitySetName();//.getRangeName();
+				CsdlNavigationPropertyBinding navigationPropertyBinding = new CsdlNavigationPropertyBinding()
+						.setPath(path).setTarget(target);
+				//TODO Not supported in Olingo					
+				//					List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
+				//					if (withRdfAnnotations)
+				//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,
+				//								rdfAssociation.getAssociationIRI().toString()));
+				//					if (withSapAnnotations)
+				//						navigationPropertyAnnotations.add(
+				//								buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN, rdfAssociation.getAssociationLabel()));
+				//					if (withSapAnnotations)
+				//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,
+				//								rdfAssociation.getAssociationLabel()));
+				//					if (withSapAnnotations)
+				//						navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,
+				//								rdfAssociation.getAssociationLabel()));
+				//					if (rdfAssociation.IsInverse()) {
+				//						if (withRdfAnnotations)
+				//							navigationPropertyAnnotations.add(buildCsdlAnnotation(RdfConstants.INVERSEOF_FQN,
+				//									rdfAssociation.getInversePropertyOfURI().toString()));
+				//					}
+				//					navigationPropertyBinding.setAnnotations(navigationPropertyAnnotations);
+				entitySets.get(rdfAssociation.getDomainClass().getEDMEntitySetName())
+						.getNavigationPropertyBindings().add(navigationPropertyBinding);
+			}
+		}
+	}
+
+	private void locateEntityTypes(boolean withRdfAnnotations, boolean withSapAnnotations, boolean useBaseType,
+			boolean withFKProperties, Map<String, CsdlEntityType> globalEntityTypes,
+			Map<String, CsdlEntitySet> entitySetsMapping, TreeMap<String, CsdlEntitySet> entitySets, RdfSchema rdfGraph,
+			Map<String, CsdlEntityType> entityTypes, Map<String, CsdlEntityType> entityTypeMapping) {
+		for (RdfEntityType rdfClass : rdfGraph.classes) {
+			String entityTypeName = rdfClass.getEDMEntityTypeName();
+			CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
+			entityTypes.put(entityTypeName, entityType);
+			entityType.setAbstract(false);
+			entityTypeMapping.put(entityTypeName, entityType);
+			TreeMap<String, CsdlNavigationProperty> navigationProperties = new TreeMap<String, CsdlNavigationProperty>();
+			TreeMap<String, CsdlProperty> entityTypeProperties = new TreeMap<String, CsdlProperty>();
+
+			//Iterate through baseType if flattened metadata required
+			RdfEntityType currentRdfClass = rdfClass;
+			do {
+				ArrayList<CsdlPropertyRef> keys = new ArrayList<CsdlPropertyRef>();
+				for (RdfPrimaryKey primaryKey : currentRdfClass.getPrimaryKeys()) {
+					String propertyName = primaryKey.getEDMPropertyName();
+					keys.add(new CsdlPropertyRef().setName(propertyName));
+					entityType.setKey(keys);
+				}
+				for (RdfProperty rdfProperty : currentRdfClass.getProperties()) {
+					if ((withFKProperties && rdfProperty.isFK()) || !rdfProperty.isFK() || rdfProperty.getIsKey()) {
+						String propertyName = rdfProperty.getEDMPropertyName();
+						CsdlProperty property = null;
+						if (rdfProperty.getIsComplex()) {
+							if (currentRdfClass == rdfClass) {
+								//use complexType but do not inherit down
+								property = new CsdlProperty().setName(propertyName)
+										.setType(rdfProperty.getComplexType().getFullQualifiedName());
+							}
+						} else {
+							EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(rdfProperty.propertyTypeName);
+							property = new CsdlProperty().setName(propertyName)
+									.setType(propertyType.getFullQualifiedName());
+							if (propertyType == EdmPrimitiveTypeKind.DateTimeOffset)
+								property.setPrecision(RdfConstants.DATE_PRECISION);
+							if (propertyType == EdmPrimitiveTypeKind.Decimal)
+								property.setScale(RdfConstants.DECIMAL_SCALE);
+						}
+						if (property != null) {
+							//Only build if not null
+							buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
+							entityTypeProperties.put(property.getName(), property);
+							propertyMapping.put(new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(),
+									property.getName()), rdfProperty);
+						}
+					}
+				}
+				entityType.setProperties(new ArrayList<CsdlProperty>(entityTypeProperties.values()));
+				entityType.setNavigationProperties(
+						new ArrayList<CsdlNavigationProperty>(navigationProperties.values()));
+
+				addEntityTypeToEntitySets(withSapAnnotations, entitySetsMapping, entitySets, rdfClass);
+				
+				if (useBaseType)
+					currentRdfClass = null;
+				else if (currentRdfClass.getBaseType() != currentRdfClass) {
+					currentRdfClass = currentRdfClass.getBaseType();
+				} else {
+					currentRdfClass = null;
+				}
+			} while (currentRdfClass != null);
+		}
+	}
+
+	private void addEntityTypeToEntitySets(boolean withSapAnnotations, Map<String, CsdlEntitySet> entitySetsMapping,
+			TreeMap<String, CsdlEntitySet> entitySets, RdfEntityType rdfClass) {
+		String entitySetName = rdfClass.getEDMEntitySetName();
+
+		CsdlEntitySet entitySet = new CsdlEntitySet().setName(entitySetName)
+				.setType(new FullQualifiedName(rdfClass.getSchema().getSchemaPrefix(), rdfClass.getEDMEntityTypeName()));
+
+		List<CsdlAnnotation> entitySetAnnotations = new ArrayList<CsdlAnnotation>();
+		if (withSapAnnotations)
+			addToAnnotations(entitySetAnnotations, RdfConstants.SAP_LABEL_FQN,
+					rdfClass.getEntitySetLabel());
+		entitySet.setAnnotations(entitySetAnnotations);
+
+		entitySets.put(entitySet.getName(), entitySet);
+
+		entitySetMapping.put(entitySet.getTypeFQN(), rdfClass);
+		entitySetsMapping.put(entitySetName, entitySet);
+	}
+	private void locateNavigationProperties(boolean withRdfAnnotations, boolean withSapAnnotations,
+			Map<String, CsdlEntityType> globalEntityTypes, Map<String, RdfAssociation> navigationPropertyLookup,
+			RdfSchema rdfGraph) {
+		for (RdfAssociation rdfAssociation : rdfGraph.associations) {
+			// if (!rdfAssociation.isInverse)
+			{
+				String associationName = rdfAssociation.getEDMAssociationName();
+				if(rdfAssociation.getSuperProperty()!=null) {
+					int i=1;
+				}
+
+				//TODO Do we need a new navigation property or extend an existing one?
+				CsdlNavigationProperty navigationProperty = new CsdlNavigationProperty().setName(associationName)
+						.setType(new FullQualifiedName(rdfAssociation.getRangeClass().getSchema().getSchemaPrefix(),
+								rdfAssociation.getRangeName()))
+						.setCollection((rdfAssociation.getDomainCardinality() == Cardinality.MANY)
+								|| (rdfAssociation.getDomainCardinality() == Cardinality.MULTIPLE));
+
+				List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
+				if (withRdfAnnotations)
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.PROPERTY_FQN,
+							rdfAssociation.getAssociationIRI().toString());
+				if (withSapAnnotations)
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_LABEL_FQN,
+							rdfAssociation.getAssociationLabel());
+				if (withSapAnnotations)
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_HEADING_FQN,
+							rdfAssociation.getAssociationLabel());
+				if (withSapAnnotations)
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN,
+							rdfAssociation.getAssociationLabel());
+				if (rdfAssociation.IsInverse()) {
+					if (withRdfAnnotations)
+						addToAnnotations(navigationPropertyAnnotations, RdfConstants.INVERSEOF_FQN,
+								rdfAssociation.getInversePropertyOfURI().toString());
+				}
+				navigationProperty.setAnnotations(navigationPropertyAnnotations);
+				//TODO should not add duplicates to the same entity, even though Olingo accepts them							
+				globalEntityTypes.get(rdfAssociation.getDomainNodeURI()).getNavigationProperties()
+						.add(navigationProperty);
+				navigationPropertyLookup.put(navigationProperty.getName(), rdfAssociation);
+				navigationPropertyMapping.put(rdfAssociation.getFullQualifiedName(), rdfAssociation);
+			}
+		}
+	}
+
+	private void locateComplexTypes(RdfSchema rdfGraph, Map<String, CsdlComplexType> complexTypes) {
+		for (RdfComplexType rdfComplexType : rdfGraph.getComplexTypes()) {
+			CsdlComplexType csdlComplexType = new CsdlComplexType().setName(rdfComplexType.getComplexTypeName());
+			for (RdfProperty rdfProperty : rdfComplexType.getProperties().values()) {
+				List<CsdlAnnotation> propertyAnnotations = new ArrayList<CsdlAnnotation>();
+				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
+						rdfProperty.getOfClass().getEntityTypeName());
+				csdlComplexType.getProperties()
+						.add(new CsdlProperty().setName(rdfProperty.getEDMPropertyName())
+								.setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName())
+								.setAnnotations(propertyAnnotations));
+			}
+			for (RdfAssociation rdfNavigationProperty : rdfComplexType.getNavigationProperties().values()) {
+				List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
+				addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
+						rdfNavigationProperty.getDomainName());
+				csdlComplexType.getNavigationProperties()
+						.add(new CsdlNavigationProperty().setName(rdfNavigationProperty.getEDMAssociationName())
+								.setAnnotations(navigationPropertyAnnotations)
+								.setType(new FullQualifiedName(
+										rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
+										rdfNavigationProperty.getRangeName()))
+								.setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
+										|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE)));
+			}
+			complexTypes.put(rdfComplexType.getComplexTypeName(), csdlComplexType);
+		}
+	}
+	private void locateNodeShapes(boolean withRdfAnnotations, boolean withSapAnnotations, boolean useBaseType,
+			boolean withFKProperties, Map<String, CsdlEntityType> globalEntityTypes,
+			Map<String, CsdlEntitySet> entitySetsMapping, TreeMap<String, CsdlEntitySet> entitySets, RdfSchema rdfGraph,
+			Map<String, CsdlEntityType> entityTypes, Map<String, CsdlEntityType> entityTypeMapping,  Map<String, CsdlComplexType> complexTypes){
+		for (RdfNodeShape rdfNodeShape : rdfGraph.getNodeShapes()) {
+			CsdlComplexType csdlComplexType = new CsdlComplexType().setName(rdfNodeShape.getNodeShapeName());
+			for (RdfDataPropertyShape dataPropertyShape : rdfNodeShape.getDataPropertyShapes().values()) {
+//				List<CsdlAnnotation> dataPropertyShapeAnnotations = new ArrayList<CsdlAnnotation>();
+//				addToAnnotations(dataPropertyShapeAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
+//						dataPropertyShape.getPath().getOfClass().getEntityTypeName());
+				csdlComplexType.getProperties().add(new CsdlProperty()
+						.setName(dataPropertyShape.getPath().getEDMPropertyName()).setType(RdfEdmType
+								.getEdmType(dataPropertyShape.getPath().propertyTypeName).getFullQualifiedName()));
+//						.setAnnotations(dataPropertyShapeAnnotations));
+			}
+			for (RdfObjectPropertyShape objectPropertyShape : rdfNodeShape.getObjectPropertyShapes().values()) {
+//				List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
+//				addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_SUBTYPE_FQN,
+//						objectPropertyShape.getPath().getDomainName());
+				if(objectPropertyShape.getPropertyNode()!=null ) {
+					csdlComplexType.getProperties().add(new CsdlProperty()
+							.setName(objectPropertyShape.getPath().getEDMAssociationName()).setType(objectPropertyShape.getPropertyNode().getFullQualifiedName()));				
+				}else {
+					csdlComplexType.getNavigationProperties()
+						.add(new CsdlNavigationProperty()
+								.setName(objectPropertyShape.getPath().getEDMAssociationName())
+//								.setAnnotations(navigationPropertyAnnotations)
+								.setType(new FullQualifiedName(
+										objectPropertyShape.getPath().getRangeClass().getSchema().getSchemaPrefix(),
+										objectPropertyShape.getPath().getRangeName()))
+								.setCollection(
+										(objectPropertyShape.getPath().getDomainCardinality() == Cardinality.MANY)
+												|| (objectPropertyShape.getPath()
+														.getDomainCardinality() == Cardinality.MULTIPLE)));
+				}
+			}
+			complexTypes.put(rdfNodeShape.getNodeShapeName(), csdlComplexType);
+			
+			String entityTypeName = rdfNodeShape.getEntityType().getEDMEntityTypeName();
+			CsdlEntityType entityType = new CsdlEntityType().setName(entityTypeName);
+			globalEntityTypes.put(rdfNodeShape.getEntityType().getIRI(), entityType);
+			entityTypes.put(entityTypeName, entityType);
+			entityType.setAbstract(false);
+			entityTypeMapping.put(entityTypeName, entityType);		
+
+			ArrayList<CsdlPropertyRef> keys = new ArrayList<CsdlPropertyRef>();
+			keys.add(new CsdlPropertyRef().setName("subjectId"));
+			entityType.setKey(keys);
+	
+			
+			ArrayList< CsdlProperty> entityTypeProperties = new ArrayList<CsdlProperty>();
+			CsdlProperty key = new CsdlProperty().setName("subjectId").setNullable(false).setType("Edm.String");
+			entityTypeProperties.add( key);
+			CsdlProperty property = new CsdlProperty().setName(entityTypeName).setType(rdfNodeShape.getFullQualifiedName()).setCollection(true);
+			//buildProperty(withRdfAnnotations, withSapAnnotations, rdfProperty, property);
+			entityTypeProperties.add( property);
+			
+			entityType.setProperties(entityTypeProperties);
+
+			//propertyMapping.put(new FullQualifiedName(rdfNodeShape.getSchema().getSchemaPrefix(),	property.getName()), rdfProperty);
+			
+			addEntityTypeToEntitySets(withSapAnnotations, entitySetsMapping, entitySets, rdfNodeShape.getEntityType());
+
+		}
+	}
+
+	private void locateEntityTypes(boolean withRdfAnnotations, boolean withSapAnnotations, boolean useBaseType,
+			Map<String, CsdlEntityType> globalEntityTypes, RdfSchema rdfGraph) {
+		for (RdfEntityType rdfClass : rdfGraph.classes) {
+			String entityTypeName = rdfClass.getEDMEntityTypeName();
+			CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
+			if (entityType == null) {
+				entityType = new CsdlEntityType().setName(entityTypeName);
+				globalEntityTypes.put(rdfClass.getIRI(), entityType);
+			}
+			if (useBaseType) {
+				if (rdfClass.getBaseType() != null) {
+					String baseTypeName = rdfClass.getBaseType().getEDMEntityTypeName();
+					CsdlEntityType baseType = globalEntityTypes.get(rdfClass.getBaseType().getIRI());
+					if (baseType == null) {
+						baseType = new CsdlEntityType().setName(baseTypeName);
+						globalEntityTypes.put(rdfClass.getBaseType().getIRI(), baseType);
+					}
+					entityType.setBaseType(RdfFullQualifiedName.getFullQualifiedName(rdfClass.getBaseType()));
+				}
+			}
+			List<CsdlAnnotation> entityTypeAnnotations = new ArrayList<CsdlAnnotation>();
+			if (withRdfAnnotations)
+				addToAnnotations(entityTypeAnnotations, RdfConstants.RDFS_CLASS_FQN, rdfClass.getIRI());
+			if (withSapAnnotations) {
+				addToAnnotations(entityTypeAnnotations, RdfConstants.SAP_LABEL_FQN, rdfClass.getEntityTypeLabel());
+				if (rdfClass.getBaseType() != null)
+					addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN,
+							rdfClass.getBaseType().getEntityTypeName());
+			}
+			entityType.setAnnotations(entityTypeAnnotations);
+			//TODO testing openTypes
+			//entityType.setOpenType(true);
+		}
 	}
 
 	private void buildProperty(boolean withRdfAnnotations, boolean withSapAnnotations, RdfProperty rdfProperty,
@@ -408,27 +523,21 @@ public class RdfModelToMetadata {
 			if (rdfProperty.isFK()) {
 				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_FK_FQN,
 						rdfProperty.getFkProperty().getAssociationName());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.ODATA_FK_FQN, rdfProperty.getFkProperty().getAssociationName()));
 			}
 			if (withRdfAnnotations) {
 				addToAnnotations(propertyAnnotations, RdfConstants.PROPERTY_FQN,
 						rdfProperty.getPropertyURI().toString());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.PROPERTY_FQN,					rdfProperty.getPropertyURI().toString()));
 				addToAnnotations(propertyAnnotations, RdfConstants.DATATYPE_FQN, rdfProperty.propertyTypeName);
-				//propertyAnnotations.add(			buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, rdfProperty.propertyTypeName));
+			
 				if (rdfProperty.getEquivalentProperty() != null) {
 					addToAnnotations(propertyAnnotations, RdfConstants.OWL_EQUIVALENTPROPERTY_FQN,
 							rdfProperty.getEquivalentProperty());
-					//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.OWL_EQUIVALENTPROPERTY_FQN,					rdfProperty.getEquivalentProperty()));
 				}
 			}
 			if (withSapAnnotations) {
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_LABEL_FQN, rdfProperty.getPropertyLabel());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,						rdfProperty.getPropertyLabel()));
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_HEADING_FQN, rdfProperty.getPropertyLabel());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,						rdfProperty.getPropertyLabel()));
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN, rdfProperty.getDescription());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,						rdfProperty.getDescription()));
 			}
 			property.setAnnotations(propertyAnnotations);
 
@@ -456,11 +565,8 @@ public class RdfModelToMetadata {
 			//propertyAnnotations.add(						buildCsdlAnnotation(RdfConstants.DATATYPE_FQN, RdfConstants.RDFS_RESOURCE));
 			if (withSapAnnotations) {
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_LABEL_FQN, rdfProperty.getPropertyLabel());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_LABEL_FQN,						rdfProperty.getPropertyLabel()));
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_HEADING_FQN, rdfProperty.getPropertyLabel());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_HEADING_FQN,						rdfProperty.getPropertyLabel()));
 				addToAnnotations(propertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN, rdfProperty.getDescription());
-				//propertyAnnotations.add(buildCsdlAnnotation(RdfConstants.SAP_QUICKINFO_FQN,						rdfProperty.getDescription()));
 			}
 			property.setAnnotations(propertyAnnotations);
 

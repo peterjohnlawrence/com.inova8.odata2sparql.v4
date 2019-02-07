@@ -238,6 +238,10 @@ public class RdfConstants {
 			.createIRI("http://inova8.com/odata4sparql#propertyQuery_Cardinality");
 	public static final Value URI_REPOSITORYQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#repositoryQuery");
+	public static final Value URI_NODESHAPESQUERY = valueFactoryImpl
+			.createIRI("http://inova8.com/odata4sparql#nodeShapesQuery");
+	public static final Value URI_PROPERTYSHAPESQUERY = valueFactoryImpl
+			.createIRI("http://inova8.com/odata4sparql#propertyShapesQuery");
 	public static final Value URI_HALYARD_SEARCH = valueFactoryImpl
 			.createIRI("http://merck.github.io/Halyard/ns#search");
 	public static final Value URI_LUCENE_MATCHES = valueFactoryImpl

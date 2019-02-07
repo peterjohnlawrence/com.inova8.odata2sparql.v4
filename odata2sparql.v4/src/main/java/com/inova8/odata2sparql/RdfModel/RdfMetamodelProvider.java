@@ -100,4 +100,15 @@ class RdfMetamodelProvider {
 		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
 		return  rdfQuery.execSelect(false);
 	}
+	
+	public RdfResultSet getNodeShapes() throws OData2SparqlException{
+		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_NODESHAPESQUERY);
+		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
+		return  rdfQuery.execSelect(false);
+	}
+	public RdfResultSet getPropertyShapes() throws OData2SparqlException{
+		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_PROPERTYSHAPESQUERY);
+		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
+		return  rdfQuery.execSelect(false);
+	}
 }

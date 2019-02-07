@@ -56,7 +56,9 @@ public class RdfNode {
 			return ((IRI) node).toString();
 		}
 	}
-
+	public String getIRIString() {
+		return this.getIRI().toString();
+	}
 	public IRI getLiteralDatatype() {
 		return ((Literal) node).getDatatype();
 	}
@@ -179,7 +181,11 @@ public class RdfNode {
 	}
 
 	public String getLocalName() {
-		return ((IRI) node).getLocalName();
+		if(this.isBlank()) {
+			return ((BNode) node).toString();
+		}else {
+			return ((IRI) node).getLocalName();
+		}
 	}
 
 	public String getNamespace() {

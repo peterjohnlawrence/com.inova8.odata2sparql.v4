@@ -53,12 +53,20 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 	@Override
 	public void readComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
-		this.readComplexValue(request, response, uriInfo, responseFormat, false);
+		try {
+			this.readComplexValue(request, response, uriInfo, responseFormat, false);
+		} catch (EdmException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		} catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
 
 	}
 
 	private void readComplexValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-			ContentType responseFormat, Boolean isValue) throws ODataApplicationException, SerializerException {
+			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);

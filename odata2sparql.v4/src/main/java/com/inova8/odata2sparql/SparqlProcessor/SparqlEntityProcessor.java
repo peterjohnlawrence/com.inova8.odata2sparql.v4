@@ -58,7 +58,16 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. retrieve the Entity Type
-		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider, uriInfo);		
+		RdfResourceParts rdfResourceParts = null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		} catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}		
 		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();

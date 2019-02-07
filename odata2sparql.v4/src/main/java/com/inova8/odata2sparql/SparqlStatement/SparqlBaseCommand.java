@@ -21,7 +21,6 @@ import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
-import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +155,7 @@ public class SparqlBaseCommand {
 	}
 
 	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
-			throws OData2SparqlException, EdmException, ODataApplicationException, ExpressionVisitException {
+			throws OData2SparqlException, EdmException, ODataException {
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
 				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
@@ -182,7 +181,7 @@ public class SparqlBaseCommand {
 
 	static public EntityCollection readReferenceCollection(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
 			UriType uriType)
-			throws OData2SparqlException, EdmException, ODataApplicationException, ExpressionVisitException {
+			throws OData2SparqlException, EdmException, ODataException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
 		RdfEntityType rdfEntityType = null;

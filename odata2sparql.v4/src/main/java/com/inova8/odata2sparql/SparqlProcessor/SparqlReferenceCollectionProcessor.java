@@ -48,7 +48,16 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
-		RdfResourceParts rdfResourceParts  = new RdfResourceParts(this.rdfEdmProvider, uriInfo);	
+		RdfResourceParts rdfResourceParts = null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		} catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}	
 
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entityCollection data

@@ -52,6 +52,8 @@ public class RdfModelProvider {
 		getOperationAssociationResults();
 		getOperationPropertyResults();
 		getOperationArguments();
+		getNodeShapes();
+		getPropertyShapes();
 		cleanupOrphanClasses(rdfsResource);
 		if (rdfMetamodelProvider.getRdfRepository().getWithFKProperties())
 			createFKProperties();
@@ -486,27 +488,31 @@ public class RdfModelProvider {
 							domainCardinalityNode = soln.getRdfNode("domainCardinality");
 						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-						RdfAssociation association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
-								domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
-								rangeCardinality);
-
+						RdfAssociation association=null;
 						if (soln.getRdfNode("superProperty") != null) {
 							RdfNode superdomainNode = soln.getRdfNode("superDomain");
 							if (superdomainNode != null) {
 								RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
-										null, superdomainNode);
-								association.setSuperProperty(superProperty);
+										null, superdomainNode);						
 								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
 									RdfComplexType complexType = model.getOrCreateComplexType(
 											soln.getRdfNode("superProperty"), null, superdomainNode);
+									association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+											domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
+											rangeCardinality);
+									
+									association.setSuperProperty(superProperty);
 									complexType.addNavigationProperty(association);
 									complexTypes.add(complexType);
 									superProperty.setIsComplex(true);
 									superProperty.setComplexType(complexType);
 								}
 							}
+						}else {						
+							association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+									domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
+									rangeCardinality);
 						}
-
 						if (soln.getRdfNode("description") != null) {
 							association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 						}
@@ -794,7 +800,99 @@ public class RdfModelProvider {
 			throw new OData2SparqlException("OperationsAssociations query exception ", e);
 		}
 	}
+	private void getNodeShapes() throws OData2SparqlException {
+		try {
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
+			RdfResultSet NodeShapes = rdfMetamodelProvider.getNodeShapes();
+			try {
+				while (NodeShapes.hasNext()) {
+					RdfNode nodeShape = null;
+					RdfNode baseNodeShape = null;
+					RdfNode nodeShapeLabel = null;
+					RdfNode nodeShapeName = null;
+					RdfNode nodeShapeDescription = null;
+					RdfNode nodeShapeTargetClass = null;
+					RdfNode nodeShapeDeactivated = null;
+					try {
+						//SELECT ?nodeShape  ?nodeShapeLabel ?nodeShapeName ?nodeShapeDescription  ?nodeShapeTargetClass ?nodeShapeDeactivated
+						RdfQuerySolution soln = NodeShapes.nextSolution();
+						nodeShape = soln.getRdfNode("nodeShape");
+						baseNodeShape = soln.getRdfNode("baseNodeShape");
+						nodeShapeLabel = soln.getRdfNode("nodeShapeLabel");
+						nodeShapeName = soln.getRdfNode("nodeShapeName");
+						nodeShapeDescription = soln.getRdfNode("nodeShapeDescription");
+						nodeShapeTargetClass = soln.getRdfNode("nodeShapeTargetClass");
+						nodeShapeDeactivated = soln.getRdfNode("nodeShapeDeactivated");
+						model.getOrCreateNodeShape(nodeShape, baseNodeShape, nodeShapeLabel, nodeShapeName, nodeShapeDescription,nodeShapeTargetClass,nodeShapeDeactivated);
+						count++;
+						debug.append(nodeShape.getIRI().toString()).append(";");
+					} catch (Exception e) {
+						log.info("Failed to create nodeShape:" + nodeShape.getIRI().toString()
+								+ " with exception " + e.getMessage());
+					}
+				}
+			} finally {
+				log.info(count + " NodeShapes found [" + debug + "]");
+				NodeShapes.close();
+			}
+		} catch (OData2SparqlException e) {
+			log.error("Failed to execute NodeShapes query. Check availability of triple store. Exception "
+					+ e.getMessage());
+			throw new OData2SparqlException("NodeShapes query exception ", e);
+		}
+	}
+	private void getPropertyShapes() throws OData2SparqlException {
+		try {
+			int count = 0;
+			StringBuilder debug = new StringBuilder();
+			RdfResultSet PropertyShapes = rdfMetamodelProvider.getPropertyShapes();
+			try {
+				while (PropertyShapes.hasNext()) {
+					RdfNode nodeShape = null;
+					RdfNode propertyShape = null;
+					RdfNode propertyShapeLabel = null;
+					RdfNode propertyShapeName = null;
+					RdfNode propertyShapeDescription = null;
+					RdfNode path = null;
+					RdfNode inversePath = null;
+					RdfNode propertyNode = null;
+					RdfNode minCount = null;
+					RdfNode maxCount = null;
+					try {
+						//SELECT ?nodeShape  ?propertyShape ?propertyShapeLabel ?propertyShapeName ?propertyShapeDescription  ?path ?inversePath  ?propertyNode ?minCount ?maxCount
+						RdfQuerySolution soln = PropertyShapes.nextSolution();
+						nodeShape = soln.getRdfNode("nodeShape");
+						propertyShape = soln.getRdfNode("propertyShape");
+						propertyShapeLabel = soln.getRdfNode("propertyShapeLabel");
+						propertyShapeName = soln.getRdfNode("propertyShapeName");
+						propertyShapeDescription = soln.getRdfNode("propertyShapeDescription");
+						path = soln.getRdfNode("path");
+						inversePath = soln.getRdfNode("inversePath");
+						propertyNode = soln.getRdfNode("propertyNode");
+						minCount = soln.getRdfNode("minCount");
+						maxCount = soln.getRdfNode("maxCount");
 
+						model.getOrCreatePropertyShape(nodeShape, propertyShape, propertyShapeLabel, propertyShapeName,propertyShapeDescription,path,inversePath,propertyNode,minCount,maxCount);
+						count++;
+						debug.append(nodeShape.getIRI().toString()).append("\\")
+								.append(propertyShape.getIRI().toString()).append(";");
+					} catch (Exception e) {
+						log.info("Failed to create propertyShape:" + propertyShape.getIRI().toString()
+								+ " with exception " + e.getMessage());
+					}
+				}
+			} finally {
+				model.allocateNodeShapesToGraphs();
+				log.info(count + " PropertyShapes found [" + debug + "]");
+				PropertyShapes.close();
+			}
+		} catch (OData2SparqlException e) {
+			log.error("Failed to execute NodeShapes query. Check availability of triple store. Exception "
+					+ e.getMessage());
+			throw new OData2SparqlException("PropertyShapes query exception ", e);
+		}
+	}
 	private void cleanupOrphanClasses(RdfEntityType rdfsResource) {
 
 		// Clean up orphaned classes

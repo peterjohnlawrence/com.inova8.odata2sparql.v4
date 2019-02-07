@@ -11,6 +11,10 @@ import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.provider.CsdlFunction;
+import org.apache.olingo.commons.api.edm.provider.CsdlFunctionImport;
+import org.apache.olingo.commons.api.edm.provider.CsdlReturnType;
+import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataApplicationException;
@@ -44,6 +48,7 @@ public class RdfResourceParts {
 	private RdfEntityType responseRdfEntityType;
 	private RdfResourcePart penultimateResourcePart;
 	private boolean isRef;
+	private boolean isFunction;
 	private String decodedKey;
 	private String subjectId;
 	private String localKey;
@@ -56,7 +61,7 @@ public class RdfResourceParts {
 	private UriType uriType;
 	private RdfResourceEntitySet entitySet;
 
-	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataApplicationException {
+	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataException {
 		this.rdfEdmProvider = rdfEdmProvider;
 		this.uriInfo = uriInfo;
 		for (UriResource resourcePart : uriInfo.getUriResourceParts()) {
@@ -79,94 +84,133 @@ public class RdfResourceParts {
 				break;
 			case ref:
 				List<UriResource> uriResourceParts = uriInfo.asUriInfoResource().getUriResourceParts();
-				isRef = uriResourceParts.get(uriResourceParts.size()-1).toString().equals("$ref");
+				isRef = uriResourceParts.get(uriResourceParts.size() - 1).toString().equals("$ref");
+				break;
+			case function:
+				//UriResource function = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
+				isFunction = true;
 				break;
 			default:
 				log.error(resourcePart.getKind().toString() + " not handled in resourceParts constructor");
 				break;
-
 			}
 		}
 		build();
 	}
-	public ContextURL contextUrl(ODataRequest request,OData odata) throws ODataApplicationException {
+
+	public ContextURL contextUrl(ODataRequest request, OData odata) throws ODataApplicationException {
 		ContextURL contextUrl = null;
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
 		try {
 			//Need absolute URI for PowerQuery and Linqpad (and probably other MS based OData clients) URLEncoder.encode(q, "UTF-8");
-			String selectList = odata.createUriHelper().buildContextURLSelectList(this.getResponseEntitySet().getEntityType(), expandOption,
-					selectOption);
-			switch(uriType) {
+			String selectList = odata.createUriHelper()
+					.buildContextURLSelectList(this.getResponseEntitySet().getEntityType(), expandOption, selectOption);
+			switch (uriType) {
 			case URI1:
-				contextUrl = ContextURL.with()
-						.entitySet(this.getEntitySet()
-						.getEdmEntitySet())
-						.selectList(selectList)
-						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-						.build();				
+				/**
+				 * Entity set
+				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet()).selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI2:
+				/**
+				 * Entity set with key predicate
+				 */
 				contextUrl = ContextURL.with()
 						//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
 						//.keyPath(rdfResourceParts.getLocalKey())
 						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
-						.suffix(ContextURL.Suffix.ENTITY)
-						.selectList(selectList)
-						.oDataPath(request.getRawBaseUri())
-						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-						.build();
-				break;
-			case URI3: break;
-			case URI4: 
-				contextUrl = ContextURL.with()
-						.entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey())
-						.navOrPropertyPath(this.getNavPath())
-						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();				
-				break;
-			case URI5: 
-				contextUrl = ContextURL.with()
-						.entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey())
-						.navOrPropertyPath(this.getNavPath())
+						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
-				break;	
+				break;
+			case URI3:
+				/**
+				 * Complex property of an entity
+				 */
+				break;
+			case URI4:
+				/**
+				 * Simple property of a complex property of an entity
+				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
+				break;
+			case URI5:
+				/**
+				 * Simple property of an entity
+				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
+				break;
 			case URI6A:
-				contextUrl = ContextURL.with()
-						.entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey())
-						.navOrPropertyPath(this.getNavPath())
-						.suffix(ContextURL.Suffix.ENTITY)
-						.selectList(selectList)
-						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-						.build();				
+				/**
+				 * Navigation property of an entity with target multiplicity '1'
+				 * or '0..1'
+				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
-			case URI6B: 
-				contextUrl = ContextURL.with()
-						.entitySet(this.getEntitySet()
-						.getEdmEntitySet())
-						.keyPath(this.getLocalKey())
-						.navOrPropertyPath(this.getNavPath())
-						.selectList(selectList)
-						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-						.build();	
+			case URI6B:
+				/**
+				 * Navigation property of an entity with target multiplicity '*'
+				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath()).selectList(selectList)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
-			case URI7A: 
-				contextUrl = ContextURL.with()
-					.suffix(ContextURL.Suffix.REFERENCE)
-					.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-					.build();					
+			case URI7A:
+				/**
+				 * Link to a single entity
+				 */
+				contextUrl = ContextURL.with().suffix(ContextURL.Suffix.REFERENCE)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
-			case URI7B: 
-				contextUrl = ContextURL.with()
-						.asCollection()
-						.suffix(ContextURL.Suffix.REFERENCE)
-						.serviceRoot(new URI(request.getRawBaseUri() + "/"))
-						.build();	
+			case URI7B:
+				/**
+				 * Link to multiple entities
+				 */
+				contextUrl = ContextURL.with().asCollection().suffix(ContextURL.Suffix.REFERENCE)
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
-			case URI14: break;
-			case URI15: break;
+			case URI10:
+				/**
+				 * Function import returning a single instance of an entity type
+				 */
+				break;
+			case URI11:
+				/**
+				 * Function import returning a collection of complex-type
+				 * instances
+				 */
+				break;
+			case URI12:
+				/**
+				 * Function import returning a single instance of a complex type
+				 */
+				break;
+			case URI13:
+				/**
+				 * Function import returning a collection of primitive-type
+				 * instances
+				 */
+				break;
+			case URI14:
+				/**
+				 * Function import returning a single instance of a primitive
+				 * type
+				 */
+				break;
+			case URI15:
+				/**
+				 * Count of an entity set
+				 */
+				break;
 			default:
 				break;
 			}
@@ -177,85 +221,111 @@ public class RdfResourceParts {
 		return contextUrl;
 
 	}
-	private void build() throws EdmException, ODataApplicationException {
+
+	private void build() throws EdmException, ODataException {
 		uriType = _getUriType();
 		lastResourcePart = _getLastResourcePart();
 		lastPropertyName = _getLastPropertyName();
 		lastComplexType = _getLastComplexType();
-		lastComplexProperty=_getLastComplexProperty();
-		responseEntitySet=_getResponseEntitySet();
-		responseRdfEntityType=_getResponseRdfEntityType();
+		lastComplexProperty = _getLastComplexProperty();
+		responseEntitySet = _getResponseEntitySet();
+		responseRdfEntityType = _getResponseRdfEntityType();
 		penultimateResourcePart = _getPenultimateResourcePart();
-		decodedKey= _getDecodedKey();
-		localKey= _getLocalKey();
-		subjectId=_getSubjectId();
-		targetSubjectId=_getTargetSubjectId();
+		decodedKey = _getDecodedKey();
+		localKey = _getLocalKey();
+		subjectId = _getSubjectId();
+		targetSubjectId = _getTargetSubjectId();
 		entitySet = _getEntitySet();
-		entityString=_getEntityString();
-		navPath=_getNavPath();
-		size=_size();
+		entityString = _getEntityString();
+		navPath = _getNavPath();
+		size = _size();
 	}
+
 	public UriInfo getUriInfo() {
 		return uriInfo;
 	}
+
 	public UriType getUriType() {
 		return uriType;
 	}
+
 	public RdfResourcePart getLastResourcePart() {
 		return lastResourcePart;
 	}
+
 	public String getLastPropertyName() {
 		return lastPropertyName;
 	}
+
 	public EdmComplexType getLastComplexType() {
 		return lastComplexType;
 	}
+
 	public RdfProperty getLastComplexProperty() {
 		return lastComplexProperty;
 	}
+
 	public EdmEntitySet getResponseEntitySet() {
 		return responseEntitySet;
 	}
+
 	public RdfEntityType getResponseRdfEntityType() {
 		return responseRdfEntityType;
 	}
+
 	public RdfResourcePart getPenultimateResourcePart() {
 		return penultimateResourcePart;
 	}
+
 	public String getDecodedKey() {
 		return decodedKey;
 	}
+
 	public String getSubjectId() {
 		return subjectId;
 	}
+
 	public String getLocalKey() {
 		return localKey;
 	}
+
 	public String getTargetSubjectId() {
 		return targetSubjectId;
 	}
+
 	public RdfResourceEntitySet getEntitySet() {
 		return entitySet;
 	}
+
 	public String getEntityString() {
 		return entityString;
 	}
+
 	public String getNavPath() {
 		return navPath;
 	}
+
 	public int size() {
 		return size;
 	}
+
 	private RdfResourcePart _getLastResourcePart() {
-		return rdfResourceParts.get(rdfResourceParts.size() - 1);
+		if (rdfResourceParts.size() == 0) {
+			return null;
+		} else {
+			return rdfResourceParts.get(rdfResourceParts.size() - 1);
+		}
+
 	}
 
 	private String _getLastPropertyName() {
 		RdfResourcePart lastResourcePart = _getLastResourcePart();
-		if (lastResourcePart.uriResourceKind.equals(UriResourceKind.primitiveProperty)) {
-			return ((RdfResourceProperty) lastResourcePart).getEdmProperty().getName();
-		} else if (lastResourcePart.uriResourceKind.equals(UriResourceKind.complexProperty)) {
-			return ((RdfResourceComplexProperty) lastResourcePart).getComplexType().getName();
+		if (lastResourcePart != null) {
+			if (lastResourcePart.uriResourceKind.equals(UriResourceKind.primitiveProperty)) {
+				return ((RdfResourceProperty) lastResourcePart).getEdmProperty().getName();
+			} else if (lastResourcePart.uriResourceKind.equals(UriResourceKind.complexProperty)) {
+				return ((RdfResourceComplexProperty) lastResourcePart).getComplexType().getName();
+			}
 		}
 		return null;
 	}
@@ -272,28 +342,34 @@ public class RdfResourceParts {
 		return null;
 	}
 
-	private RdfProperty _getLastComplexProperty() throws EdmException, ODataApplicationException {	
-		EdmComplexType edmComplexType = null ;
+	private RdfProperty _getLastComplexProperty() throws EdmException, ODataApplicationException {
+		EdmComplexType edmComplexType = null;
 		int complexIndex = 0;
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
-			if( rdfResourceParts.get(j).getUriResourceKind().equals(UriResourceKind.complexProperty)) {
+			if (rdfResourceParts.get(j).getUriResourceKind().equals(UriResourceKind.complexProperty)) {
 				edmComplexType = ((RdfResourceComplexProperty) rdfResourceParts.get(j)).getComplexType();
 				complexIndex = j;
 				break;
 			}
 		}
-		if(edmComplexType == null )
-		{
+		if (edmComplexType == null) {
 			return null;
-		}else {
-			RdfEntityType rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(getEntitySet(complexIndex-1));
+		} else {
+			RdfEntityType rdfEntityType = rdfEdmProvider
+					.getRdfEntityTypefromEdmEntitySet(getEntitySet(complexIndex - 1));
 
 			return rdfEntityType.findProperty(edmComplexType.getName());
 		}
 	}
+
 	private RdfEntityType _getResponseRdfEntityType() throws EdmException, ODataApplicationException {
-		return rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(_getResponseEntitySet());
+		if (isFunction) {
+			return responseRdfEntityType;
+		} else {
+			return rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(_getResponseEntitySet());
+		}
 	}
+
 	private RdfResourcePart _getPenultimateResourcePart() {
 		if (_size() > 1) {
 			return rdfResourceParts.get(rdfResourceParts.size() - 2);
@@ -301,18 +377,23 @@ public class RdfResourceParts {
 			return null;
 		}
 	}
+
 	private String _getDecodedKey() {
-		return getAsEntitySet(0).getDecodedKey();
+		if (getAsEntitySet(0) != null)
+			return getAsEntitySet(0).getDecodedKey();
+		return null;
 	}
 
 	private String _getLocalKey() {
-
-		return getAsEntitySet(0).getLocalKey();
+		if (getAsEntitySet(0) != null)
+			return getAsEntitySet(0).getLocalKey();
+		return null;
 	}
 
 	private String _getSubjectId() {
-
-		return getAsEntitySet(0).getSubjectId();
+		if (getAsEntitySet(0) != null)
+			return getAsEntitySet(0).getSubjectId();
+		return null;
 	}
 
 	private String _getTargetSubjectId() {
@@ -339,38 +420,50 @@ public class RdfResourceParts {
 	}
 
 	private String _getEntityString() {
-
-		return getAsEntitySet(0).geEntityString();
+		if (getAsEntitySet(0) != null)
+			return getAsEntitySet(0).geEntityString();
+		return null;
 	}
+
 	private RdfResourceEntitySet _getEntitySet() {
-
-		return getAsEntitySet(0);
+		if (getAsEntitySet(0) != null)
+			return getAsEntitySet(0);
+		return null;
 	}
+
 	private String _getNavPath() {
-		String navPath = "";
-		for (RdfResourcePart rdfResourcePart : rdfResourceParts.subList(1, rdfResourceParts.size())) {
-			navPath = navPath + rdfResourcePart.getNavPath() + "/";
-		}
-		if (navPath.isEmpty()) {
+		if (rdfResourceParts.size() == 0) {
 			return null;
 		} else {
-			return navPath.substring(0, navPath.length() - 1);
+			String navPath = "";
+			for (RdfResourcePart rdfResourcePart : rdfResourceParts.subList(1, rdfResourceParts.size())) {
+				navPath = navPath + rdfResourcePart.getNavPath() + "/";
+			}
+			if (navPath.isEmpty()) {
+				return null;
+			} else {
+				return navPath.substring(0, navPath.length() - 1);
+			}
 		}
 	}
 
 	private int _size() {
 		return rdfResourceParts.size();
 	}
+
 	private EdmEntitySet _getResponseEntitySet() throws ODataApplicationException {
 
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
 			case navigationProperty:
 				//EdmNavigationProperty edmNavigationProperty = getAsNavigationProperty(j).getEdmNavigationProperty();
-				if(getResourceKind(j-1).equals(UriResourceKind.complexProperty)) {
-					return Util.getNavigationTargetEntitySet(getPriorEntitySet(j), getAsComplexProperty(j-1).complexType, getAsNavigationProperty(j).getEdmNavigationProperty());  
-				}else {
-					return Util.getNavigationTargetEntitySet(getPriorEntitySet(j),  getAsNavigationProperty(j).getEdmNavigationProperty());  
+				if (getResourceKind(j - 1).equals(UriResourceKind.complexProperty)) {
+					return Util.getNavigationTargetEntitySet(getPriorEntitySet(j),
+							getAsComplexProperty(j - 1).complexType,
+							getAsNavigationProperty(j).getEdmNavigationProperty());
+				} else {
+					return Util.getNavigationTargetEntitySet(getPriorEntitySet(j),
+							getAsNavigationProperty(j).getEdmNavigationProperty());
 				}
 			case entitySet:
 				return getAsEntitySet(j).getEdmEntitySet();
@@ -386,57 +479,78 @@ public class RdfResourceParts {
 	// <complexPath>   ::= <entityPath> / Complex
 	// <propertyPath>  ::= <entityPath> / Property
 
-	private UriType _getUriType() {
-		if (rdfResourceParts.size() == 1) {
-			if (getAsEntitySet(0).hasKey()) {
-				// <entitySetPath>/Key
-				return UriType.URI2;
-			} else {
-				// <entitySetPath>
-				return UriType.URI1;
-			}
-		} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.navigationProperty)) {
-			RdfResourceNavigationProperty lastNavigationProperty = ((RdfResourceNavigationProperty) (_getLastResourcePart()));
+	private UriType _getUriType() throws ODataException {
+		if (isFunction()) {
+			UriResource functionResource = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
+			CsdlFunctionImport functionImport = rdfEdmProvider.getEntityContainer()
+					.getFunctionImport(functionResource.getSegmentValue());
+			List<CsdlFunction> function = rdfEdmProvider.getFunctions(functionImport.getFunctionFQN());
+			CsdlReturnType functionReturnType = function.get(0).getReturnType();
 
-			if (lastNavigationProperty.hasKey()) {
-				// <entitySetPath>/Key
-				if(isRef)
-					return UriType.URI7A;
-				else
+			responseRdfEntityType = rdfEdmProvider.getMappedEntityType(functionReturnType.getTypeFQN());
+			if (functionReturnType.isCollection()) {
+				//URI11/13
+				return UriType.URI11;
+			} else {
+				//URI10/12
+				return UriType.URI10;
+			}
+		} else {
+			if (rdfResourceParts.size() == 1) {
+				if (getAsEntitySet(0).hasKey()) {
+					// <entitySetPath>/Key
 					return UriType.URI2;
-			} else if (lastNavigationProperty.getEdmNavigationProperty().isCollection()) {
-				// <entityPath>/NavSet
-				if(isRef)
-					return UriType.URI7B;
-				else
-					return UriType.URI6B;
-			} else {
-				// <entityPath>/NavProp
-				if(isRef)
-					return UriType.URI7A;
-				else
-					return UriType.URI6A;
-			}
-		} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.complexProperty)) {
-			//	<entityPath>/Complex
-			return UriType.URI3;
+				} else {
+					// <entitySetPath>
+					return UriType.URI1;
+				}
+			} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.navigationProperty)) {
+				RdfResourceNavigationProperty lastNavigationProperty = ((RdfResourceNavigationProperty) (_getLastResourcePart()));
 
-		} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.primitiveProperty)) {
-			//return UriType.URI4/5
-			if (_getPenultimateResourcePart().getUriResourceKind().equals(UriResourceKind.complexProperty)) {
-				// <complexPath>/Property
-				return UriType.URI4;
-			} else {
-				//<entityPath>/Property
-				return UriType.URI5;
+				if (lastNavigationProperty.hasKey()) {
+					// <entitySetPath>/Key
+					if (isRef)
+						return UriType.URI7A;
+					else
+						return UriType.URI2;
+				} else if (lastNavigationProperty.getEdmNavigationProperty().isCollection()) {
+					// <entityPath>/NavSet
+					if (isRef)
+						return UriType.URI7B;
+					else
+						return UriType.URI6B;
+				} else {
+					// <entityPath>/NavProp
+					if (isRef)
+						return UriType.URI7A;
+					else
+						return UriType.URI6A;
+				}
+			} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.complexProperty)) {
+				//	<entityPath>/Complex
+				return UriType.URI3;
+
+			} else if (_getLastResourcePart().getUriResourceKind().equals(UriResourceKind.primitiveProperty)) {
+				//return UriType.URI4/5
+				if (_getPenultimateResourcePart().getUriResourceKind().equals(UriResourceKind.complexProperty)) {
+					// <complexPath>/Property
+					return UriType.URI4;
+				} else {
+					//<entityPath>/Property
+					return UriType.URI5;
+				}
 			}
 		}
 		return null;
 	}
 
 	private RdfResourceEntitySet getAsEntitySet(int index) {
-
+		if (rdfResourceParts.size() == 0) {
+			return null;
+		} else {
+		}
 		return (RdfResourceEntitySet) (rdfResourceParts.get(index));
+
 	}
 
 	private EdmEntitySet getEntitySet(int index) {
@@ -482,7 +596,6 @@ public class RdfResourceParts {
 		return rdfResourceParts.get(index).getUriResourceKind();
 	}
 
-
 	private EdmEntitySet getPriorEntitySet(int index) throws ODataApplicationException {
 		int startIndex = 0;
 		RdfResourceEntitySet startEntitySet = getAsEntitySet(0);
@@ -495,13 +608,15 @@ public class RdfResourceParts {
 			default:
 				break;
 			}
-			if (startIndex>0) break;
+			if (startIndex > 0)
+				break;
 		}
 		EdmEntitySet edmEntitySet = startEntitySet.getEdmEntitySet();
-		for (int j = startIndex+1; j < index; j++) {
+		for (int j = startIndex + 1; j < index; j++) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
 			case navigationProperty:
-				edmEntitySet=Util.getNavigationTargetEntitySet(edmEntitySet,  getAsNavigationProperty(j).getEdmNavigationProperty());
+				edmEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet,
+						getAsNavigationProperty(j).getEdmNavigationProperty());
 				break;
 			default:
 				break;
@@ -509,13 +624,19 @@ public class RdfResourceParts {
 		}
 		return (EdmEntitySet) edmEntitySet;
 	}
+
 	public Boolean isValueRequest() {
 		UriResource lastResourcePart = uriInfo.getUriResourceParts().get(uriInfo.getUriResourceParts().size() - 1);
 		return lastResourcePart.getSegmentValue().equals("$value");
 	}
+
 	public Boolean isRefRequest() {
 		UriResource lastResourcePart = uriInfo.getUriResourceParts().get(uriInfo.getUriResourceParts().size() - 1);
 		return lastResourcePart.getSegmentValue().equals("$ref");
+	}
+
+	public boolean isFunction() {
+		return isFunction;
 	}
 
 }
