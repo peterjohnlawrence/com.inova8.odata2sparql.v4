@@ -560,7 +560,7 @@ public class SparqlQueryBuilder {
 			if ((this.uriInfo.getCountOption() != null) && (this.uriInfo.getCountOption().getValue())) {
 				construct.append("\t").append("#entitySetCount\n");
 				construct.append("\t").append(
-						"<" + rdfTargetEntityType.getIRI() + "> <" + RdfConstants.COUNT + "> ?" + key + "_count.\n");
+						"<" + rdfTargetEntityType.getURL() + "> <" + RdfConstants.COUNT + "> ?" + key + "_count.\n");
 			}
 			construct.append(constructPath());
 		}
@@ -582,7 +582,7 @@ public class SparqlQueryBuilder {
 		StringBuilder constructType = new StringBuilder();
 		if (DEBUG)
 			constructType.append(indent).append("#constructType\n");
-		String type = rdfEntityType.getIRI();
+		String type = rdfEntityType.getURL();
 		constructType.append(indent).append("?" + key + "_s <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> .\n");
 
 		return constructType;
@@ -601,7 +601,7 @@ public class SparqlQueryBuilder {
 		StringBuilder constructOperation = new StringBuilder();
 		if (DEBUG)
 			constructOperation.append(indent).append("#constructOperation\n");
-		String type = rdfOperationType.getIRI();
+		String type = rdfOperationType.getURL();
 		constructOperation.append(indent + "\t");
 		constructOperation.append("?" + nextTargetKey + "_s ");
 		if (isExpand)
@@ -965,9 +965,9 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder valuesSubClassOf(RdfEntityType rdfEntityType) {
 		StringBuilder valuesSubClassOf = new StringBuilder();
-		valuesSubClassOf.append("VALUES(?class){").append("(<" + rdfEntityType.getIRI() + ">)");
+		valuesSubClassOf.append("VALUES(?class){").append("(<" + rdfEntityType.getURL() + ">)");
 		for (RdfEntityType subType : rdfEntityType.getAllSubTypes()) {
-			valuesSubClassOf.append("(<" + subType.getIRI() + ">)");
+			valuesSubClassOf.append("(<" + subType.getURL() + ">)");
 		}
 		return valuesSubClassOf;
 	}
@@ -1868,7 +1868,7 @@ public class SparqlQueryBuilder {
 
 		if (navProperty.getDomainClass().isOperation()) {
 			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
-				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getIRI()))
+				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getURL()))
 					expandItemWhereCount.append(indent)
 							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 			}
@@ -1880,7 +1880,7 @@ public class SparqlQueryBuilder {
 			// BIND(?prod as ?Orderorder_orderSummaryorderSummary_product_s
 			// )
 			for (RdfProperty property : navProperty.getRangeClass().getProperties()) {
-				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getIRI()))
+				if (property.getPropertyTypeName().equals(navProperty.getDomainClass().getURL()))
 					expandItemWhereCount.append("BIND(?" + property.getVarName() + " AS ?" + targetKey + "_s)\n");
 			}
 		} else {
@@ -2170,7 +2170,7 @@ public class SparqlQueryBuilder {
 				.findNavigationPropertyByEDMAssociationName(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getAssociationIRI();
 		StringBuilder sparql = new StringBuilder("CONSTRUCT { ?" + key + "_o <http://targetEntity> true .");	
-		sparql.append("?" + key + "_o <" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getIRI() + "> .}\n");
+		sparql.append("?" + key + "_o <" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getURL() + "> .}\n");
 		//		if (rdfProperty.IsInverse()) {
 		//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
 		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");

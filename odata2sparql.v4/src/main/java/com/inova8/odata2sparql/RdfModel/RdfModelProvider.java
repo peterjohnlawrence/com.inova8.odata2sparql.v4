@@ -277,31 +277,11 @@ public class RdfModelProvider {
 
 						RdfNode domainNode = soln.getRdfNode("domain");
 
-						RdfProperty datatypeProperty = model.getOrCreateProperty(propertyNode, propertyLabelNode,
+						RdfProperty datatypeProperty = getOrCreateSuperProperty(propertyNode, soln, propertyLabelNode,
 								domainNode);
 						if (soln.getRdfNode("description") != null) {
 							datatypeProperty
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
-						}
-						RdfNode superPropertyNode = soln.getRdfNode("superProperty");
-						if (superPropertyNode != null) {
-							RdfNode superdomainNode = soln.getRdfNode("superDomain");
-							if (superdomainNode != null) {
-								RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
-										null, superdomainNode);
-								datatypeProperty.setSuperProperty(superProperty);
-								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
-									RdfComplexType complexType = model.getOrCreateComplexType(
-											soln.getRdfNode("superProperty"), null, superdomainNode);
-									complexType.addProperty(datatypeProperty);
-									complexTypes.add(complexType);
-									superProperty.setIsComplex(true);
-									superProperty.setComplexType(complexType);
-								}
-							} else {
-								log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
-										+ " declared without specific domain");
-							}
 						}
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						if (classes == null) {
@@ -328,6 +308,39 @@ public class RdfModelProvider {
 					+ e.getMessage());
 			throw new OData2SparqlException("DataTypeProperties_Domains query exception ", e);
 		}
+	}
+
+	private RdfProperty getOrCreateSuperProperty(RdfNode propertyNode, RdfQuerySolution soln, RdfNode propertyLabelNode,
+			RdfNode domainNode) throws OData2SparqlException {
+		RdfProperty datatypeProperty = null;
+		
+		datatypeProperty = model.getOrCreateProperty(propertyNode, propertyLabelNode,
+				domainNode);
+
+		RdfNode superPropertyNode = soln.getRdfNode("superProperty");
+		if (superPropertyNode != null) {
+			RdfNode superdomainNode = soln.getRdfNode("superDomain");
+			if (superdomainNode != null) {
+				RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
+						null, superdomainNode);	
+				if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+					datatypeProperty =	model.getOrCreateProperty(propertyNode, propertyLabelNode,	domainNode);
+					datatypeProperty.setSuperProperty(superProperty);
+					RdfComplexType complexType = model.getOrCreateComplexType(
+							soln.getRdfNode("superProperty"), null, superdomainNode);
+					complexType.addProperty(datatypeProperty);
+					complexTypes.add(complexType);
+					superProperty.setIsComplex(true);
+					superProperty.setComplexType(complexType);
+				}
+			} else {
+				log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
+						+ " declared without specific domain");
+			}
+		}else {
+			datatypeProperty =	model.getOrCreateProperty(propertyNode, propertyLabelNode,	domainNode);
+		}
+		return datatypeProperty;
 	}
 
 	private void getDataTypeProperties_Ranges(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
@@ -474,8 +487,6 @@ public class RdfModelProvider {
 							minRangeCardinalityNode = soln.getRdfNode("minRangeCardinality");
 						if (soln.getRdfNode("rangeCardinality") != null)
 							rangeCardinalityNode = soln.getRdfNode("rangeCardinality");
-						Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
-								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfNode maxDomainCardinalityNode = null;
 						RdfNode minDomainCardinalityNode = null;
@@ -486,43 +497,18 @@ public class RdfModelProvider {
 							minDomainCardinalityNode = soln.getRdfNode("minDomainCardinality");
 						if (soln.getRdfNode("domainCardinality") != null)
 							domainCardinalityNode = soln.getRdfNode("domainCardinality");
-						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
-								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-						RdfAssociation association=null;
-						if (soln.getRdfNode("superProperty") != null) {
-							RdfNode superdomainNode = soln.getRdfNode("superDomain");
-							if (superdomainNode != null) {
-								RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
-										null, superdomainNode);						
-								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
-									RdfComplexType complexType = model.getOrCreateComplexType(
-											soln.getRdfNode("superProperty"), null, superdomainNode);
-									association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
-											domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
-											rangeCardinality);
-									
-									association.setSuperProperty(superProperty);
-									complexType.addNavigationProperty(association);
-									complexTypes.add(complexType);
-									superProperty.setIsComplex(true);
-									superProperty.setComplexType(complexType);
-								}
-							}
-						}else {						
-							association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
-									domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
-									rangeCardinality);
-						}
-						if (soln.getRdfNode("description") != null) {
-							association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
-						}
+
+						
+						createSuperObjectProperty(soln, propertyNode, propertyLabelNode, domainNode,
+								multipleDomainNode, rangeNode, multipleRangeNode, maxRangeCardinalityNode,
+								minRangeCardinalityNode, rangeCardinalityNode, maxDomainCardinalityNode,
+								minDomainCardinalityNode, domainCardinalityNode);
 						count++;
 						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create objectproperty:" + propertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
-
 				}
 			} finally {
 				//log.info(count + " ObjectProperties found [" + debug + "]");
@@ -534,6 +520,48 @@ public class RdfModelProvider {
 					+ e.getMessage());
 			throw new OData2SparqlException("ObjectProperties query exception ", e);
 		}
+	}
+
+	private void createSuperObjectProperty(RdfQuerySolution soln, RdfNode propertyNode, RdfNode propertyLabelNode,
+			RdfNode domainNode, RdfNode multipleDomainNode, RdfNode rangeNode, RdfNode multipleRangeNode,
+			RdfNode maxRangeCardinalityNode, RdfNode minRangeCardinalityNode, RdfNode rangeCardinalityNode,
+			RdfNode maxDomainCardinalityNode, RdfNode minDomainCardinalityNode, RdfNode domainCardinalityNode)
+			throws OData2SparqlException {
+		Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
+				minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
+		Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
+				minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
+		RdfAssociation association=null;
+		if (soln.getRdfNode("superProperty") != null) {
+			RdfNode superdomainNode = soln.getRdfNode("superDomain");
+			if (superdomainNode != null) {
+				RdfProperty superProperty = model.getOrCreateProperty(soln.getRdfNode("superProperty"),
+						null, superdomainNode);						
+				if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+					RdfComplexType complexType = model.getOrCreateComplexType(
+							soln.getRdfNode("superProperty"), null, superdomainNode);
+					association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+							domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
+							rangeCardinality);
+					if (soln.getRdfNode("description") != null) {
+						association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+					}
+					association.setSuperProperty(superProperty);
+					complexType.addNavigationProperty(association);
+					complexTypes.add(complexType);
+					superProperty.setIsComplex(true);
+					superProperty.setComplexType(complexType);
+				}
+			}
+		}else {						
+			association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+					domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
+					rangeCardinality);
+			if (soln.getRdfNode("description") != null) {
+				association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+			}
+		}
+
 	}
 
 	private void getInverseProperties() throws OData2SparqlException {
@@ -569,8 +597,6 @@ public class RdfModelProvider {
 							minRangeCardinalityNode = soln.getRdfNode("minRangeCardinality");
 						if (soln.getRdfNode("rangeCardinality") != null)
 							rangeCardinalityNode = soln.getRdfNode("rangeCardinality");
-						Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
-								minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
 
 						RdfNode maxDomainCardinalityNode = null;
 						RdfNode minDomainCardinalityNode = null;
@@ -581,45 +607,16 @@ public class RdfModelProvider {
 							minDomainCardinalityNode = soln.getRdfNode("minDomainCardinality");
 						if (soln.getRdfNode("domainCardinality") != null)
 							domainCardinalityNode = soln.getRdfNode("domainCardinality");
-						Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
-								minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-
-						RdfAssociation inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
-								inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
-								multipleRangeNode, domainCardinality, rangeCardinality);
-
-						RdfNode superPropertyNode = soln.getRdfNode("superProperty");
-						if (superPropertyNode != null) {
-							RdfNode superdomainNode = soln.getRdfNode("superDomain");
-							if (superdomainNode != null) {
-								RdfProperty superProperty = model.getOrCreateProperty(superPropertyNode, null,
-										superdomainNode);
-								inverseAssociation.setSuperProperty(superProperty);
-								if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
-									RdfComplexType complexType = model.getOrCreateComplexType(
-											soln.getRdfNode("superProperty"), null, superdomainNode);
-									complexType.addNavigationProperty(inverseAssociation);
-									complexTypes.add(complexType);
-									superProperty.setIsComplex(true);
-									superProperty.setComplexType(complexType);
-								}
-							} else {
-								log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
-										+ " declared without specific domain");
-							}
-						}
-
-						if (soln.getRdfNode("description") != null) {
-							inverseAssociation
-									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
-						}
+						createInverseSuperProperty(soln, inversePropertyNode, inversePropertyLabelNode, propertyNode,
+								domainNode, multipleDomainNode, rangeNode, multipleRangeNode, maxRangeCardinalityNode,
+								minRangeCardinalityNode, rangeCardinalityNode, maxDomainCardinalityNode,
+								minDomainCardinalityNode, domainCardinalityNode);
 						count++;
 						debug.append(inversePropertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create inverseproperty:" + inversePropertyNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
-
 				}
 			} finally {
 				log.info(count + " InverseProperties found [" + debug + "]");
@@ -629,6 +626,50 @@ public class RdfModelProvider {
 			log.error("Failed to execute Inverse Associations query. Check availability of triple store. Exception "
 					+ e.getMessage());
 			throw new OData2SparqlException("InverseProperties query exception ", e);
+		}
+	}
+
+	private void createInverseSuperProperty(RdfQuerySolution soln, RdfNode inversePropertyNode,
+			RdfNode inversePropertyLabelNode, RdfNode propertyNode, RdfNode domainNode, RdfNode multipleDomainNode,
+			RdfNode rangeNode, RdfNode multipleRangeNode, RdfNode maxRangeCardinalityNode,
+			RdfNode minRangeCardinalityNode, RdfNode rangeCardinalityNode, RdfNode maxDomainCardinalityNode,
+			RdfNode minDomainCardinalityNode, RdfNode domainCardinalityNode) throws OData2SparqlException {
+		Cardinality rangeCardinality = interpretCardinality(maxRangeCardinalityNode,
+				minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
+
+		Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
+				minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
+		RdfAssociation inverseAssociation=null;
+		RdfNode superPropertyNode = soln.getRdfNode("superProperty");
+		if (superPropertyNode != null) {
+			RdfNode superdomainNode = soln.getRdfNode("superDomain");
+			if (superdomainNode != null) {
+				RdfProperty superProperty = model.getOrCreateProperty(superPropertyNode, null,
+						superdomainNode);
+				if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
+					inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+							inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
+							multipleRangeNode, domainCardinality, rangeCardinality);
+					inverseAssociation.setSuperProperty(superProperty);
+					RdfComplexType complexType = model.getOrCreateComplexType(
+							soln.getRdfNode("superProperty"), null, superdomainNode);
+					complexType.addNavigationProperty(inverseAssociation);
+					complexTypes.add(complexType);
+					superProperty.setIsComplex(true);
+					superProperty.setComplexType(complexType);
+				}
+			} else {
+				log.warn("Superproperty:" + superPropertyNode.getIRI().toString()
+						+ " declared without specific domain");
+			}
+		}else {
+			inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+					inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
+					multipleRangeNode, domainCardinality, rangeCardinality);						
+		}
+		if (soln.getRdfNode("description") != null) {
+			inverseAssociation
+					.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 		}
 	}
 
@@ -825,6 +866,12 @@ public class RdfModelProvider {
 						nodeShapeTargetClass = soln.getRdfNode("nodeShapeTargetClass");
 						nodeShapeDeactivated = soln.getRdfNode("nodeShapeDeactivated");
 						model.getOrCreateNodeShape(nodeShape, baseNodeShape, nodeShapeLabel, nodeShapeName, nodeShapeDescription,nodeShapeTargetClass,nodeShapeDeactivated);
+//						RdfComplexType complexType = model.getOrCreateComplexType(
+//								soln.getRdfNode("superProperty"), null, null);
+//						complexType.addProperty(datatypeProperty);
+//						complexTypes.add(complexType);
+//						superProperty.setIsComplex(true);
+//						superProperty.setComplexType(complexType);
 						count++;
 						debug.append(nodeShape.getIRI().toString()).append(";");
 					} catch (Exception e) {

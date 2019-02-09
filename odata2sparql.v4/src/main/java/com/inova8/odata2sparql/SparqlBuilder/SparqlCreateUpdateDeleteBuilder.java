@@ -146,7 +146,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				if (property != null) {
 					if (property.getIsKey()) {
 						properties.append(
-								"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getIRI() + ">");
+								"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getURL() + ">");
 						entityKey = prop.getValue().toString();
 					} else {
 						properties.append("<" + property.getPropertyURI() + "> ");

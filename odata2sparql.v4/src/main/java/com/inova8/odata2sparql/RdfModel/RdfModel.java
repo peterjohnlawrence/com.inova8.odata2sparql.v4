@@ -1,7 +1,5 @@
 package com.inova8.odata2sparql.RdfModel;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -358,6 +356,10 @@ public class RdfModel {
 			return subTypes;
 		}
 
+		public boolean isNodeShape() {
+			return (nodeShape != null);
+		}
+
 		public RdfNodeShape getNodeShape() {
 			return nodeShape;
 		}
@@ -456,9 +458,19 @@ public class RdfModel {
 		}
 
 		public String getIRI() {
-			return entityTypeNode.getIRI().toString();
-		}
 
+				return entityTypeNode.getIRI().toString();
+
+		}
+		public String getURL() {
+			//Gts the IRI that should be used in SPARQL
+			if (isNodeShape()) {
+				//get the target emtityType rather than the ndoeShape
+				return getNodeShape().getTargetClass().getIRI().toString();
+			} else {
+				return entityTypeNode.getIRI().toString();
+			}
+		}
 		public Collection<RdfModel.RdfAssociation> getNavigationProperties() {
 			return navigationProperties.values();
 		}
@@ -486,17 +498,14 @@ public class RdfModel {
 		}
 
 		public RdfAssociation findNavigationProperty(String navigationPropertyName) {
-			//TODO do we not want to find inherited properties as well?
 			return navigationProperties.get(navigationPropertyName);
 		}
 
 		public RdfAssociation findInverseNavigationProperty(String navigationPropertyName) {
-			//TODO do we not want to find inherited properties as well?
 			return incomingAssociations.get(navigationPropertyName);
 		}
 
 		public RdfAssociation findNavigationPropertyByEDMAssociationName(String edmAssociationName) {
-			//TODO do we not want to find inherited properties as well?
 			String navigationPropertyName = null;
 			if (this.schema.isDefault) {
 				navigationPropertyName = edmAssociationName;
@@ -684,7 +693,7 @@ public class RdfModel {
 		private Boolean isKey = false;
 		private Boolean isComplex = false;
 		private RdfComplexType complexType;
-		private RdfConstants.Cardinality cardinality = RdfConstants.Cardinality.MANY;
+		private RdfConstants.Cardinality cardinality = RdfConstants.Cardinality.ZERO_TO_ONE;
 		private String equivalentProperty;
 
 		RdfEntityType ofClass;
@@ -693,6 +702,16 @@ public class RdfModel {
 
 		public RdfConstants.Cardinality getCardinality() {
 			return cardinality;
+		}
+
+		public boolean isCollection() {
+			switch (cardinality) {
+			case MANY:
+			case MULTIPLE:
+				return true;
+			default:
+				return false;
+			}
 		}
 
 		public void setCardinality(RdfConstants.Cardinality cardinality) {
@@ -863,9 +882,15 @@ public class RdfModel {
 		private String complexTypeLabel;
 		private RdfNode domainNode;
 		private String domainName;
+		private RdfSchema schema;
 		private TreeMap<String, RdfProperty> properties = new TreeMap<String, RdfProperty>();
 		private TreeMap<String, RdfAssociation> navigationProperties = new TreeMap<String, RdfAssociation>();
 		public RdfEntityType domainClass;
+		private boolean provenanceType = false;
+
+		public RdfComplexType() {
+
+		}
 
 		public void addProperty(RdfProperty rdfProperty) {
 			properties.put(RdfModel.rdfToOdata(rdfProperty.propertyName), rdfProperty);
@@ -904,7 +929,24 @@ public class RdfModel {
 		}
 
 		public FullQualifiedName getFullQualifiedName() {
-			return new FullQualifiedName(domainClass.schema.schemaPrefix, this.getComplexTypeName());
+			if (domainClass != null) {
+				return new FullQualifiedName(domainClass.schema.schemaPrefix, this.getComplexTypeName());
+			} else {
+				return new FullQualifiedName(this.schema.schemaPrefix, this.getComplexTypeName());
+			}
+		}
+
+		public void setSchema(RdfSchema schema) {
+			this.schema = schema;
+
+		}
+
+		public void setProvenanceType(boolean provenanceType) {
+			this.provenanceType = provenanceType;
+		}
+
+		public boolean isProvenanceType() {
+			return this.provenanceType;
 		}
 
 	}
@@ -1180,13 +1222,11 @@ public class RdfModel {
 		private String nodeShapeDescription;
 		private RdfSchema schema;
 		private RdfEntityType targetClass;
+		private RdfComplexType complexType;
 		private boolean deactivated;
 		private TreeMap<String, RdfDataPropertyShape> dataPropertyShapes = new TreeMap<String, RdfDataPropertyShape>();
 		private TreeMap<String, RdfObjectPropertyShape> objectPropertyShapes = new TreeMap<String, RdfObjectPropertyShape>();
 
-		//		public RdfNodeShape(RdfSchema schema) {
-		//			this.schema = schema;
-		//		}
 		public RdfNodeShape(RdfNode nodeShapeNode) throws OData2SparqlException {
 			this.nodeShapeNode = nodeShapeNode;
 			RdfURI nodeShapeURI = new RdfURI(nodeShapeNode);
@@ -1299,9 +1339,19 @@ public class RdfModel {
 				return null;
 			}
 		}
+
 		public FullQualifiedName getFullQualifiedName() {
 			return new FullQualifiedName(this.getSchema().getSchemaPrefix(), this.getNodeShapeName());
 		}
+
+		public void setComplexType(RdfComplexType complexType) {
+			this.complexType = complexType;
+		}
+
+		public RdfComplexType getComplexType() {
+			return complexType;
+		}
+
 	}
 
 	public class RdfDataPropertyShape {
@@ -1378,7 +1428,6 @@ public class RdfModel {
 
 	public class RdfObjectPropertyShape {
 		private RdfNodeShape nodeShape;
-		private RdfNode propertyShapeNode;
 		private String propertyShapeName;
 		private String propertyShapeLabel;
 		private String propertyShapeDescription;
@@ -1386,10 +1435,10 @@ public class RdfModel {
 		private RdfNodeShape propertyNode;
 		private int minCount;
 		private int maxCount;
+		private boolean isInversePath = false;
 
 		public RdfObjectPropertyShape(RdfNodeShape nodeShape, RdfNode propertyShapeNode) {
 			this.nodeShape = nodeShape;
-			this.propertyShapeNode = propertyShapeNode;
 		}
 
 		public String getPropertyShapeName() {
@@ -1452,6 +1501,13 @@ public class RdfModel {
 			this.maxCount = maxCount;
 		}
 
+		public void setInversePath(boolean isInversePath) {
+			this.isInversePath = isInversePath;
+		}
+
+		public boolean isInversePath() {
+			return isInversePath;
+		}
 	}
 
 	public RdfEntityType getOrCreateEntityType(RdfNode classNode) throws OData2SparqlException {
@@ -1666,6 +1722,25 @@ public class RdfModel {
 		return property;
 	}
 
+	RdfProperty getOrCreateComplexProperty(RdfNodeShape nodeShape) throws OData2SparqlException {
+
+		RdfEntityType clazz = nodeShape.getEntityType();
+		RdfProperty property = null;
+		if (clazz != null) {
+			property = Enumerable.create(clazz.getProperties())
+					.firstOrNull(propertyNameEquals(rdfToOdata(nodeShape.getNodeShapeName())));
+		}
+		if (property == null) {
+			property = new RdfProperty();
+			property.propertyName = rdfToOdata(nodeShape.getNodeShapeName());
+			property.propertyLabel = nodeShape.getNodeShapeLabel();
+			//	property.propertyNode = propertyNode;
+			property.ofClass = clazz;
+			//	clazz.properties.put(property.propertyName, property);
+		}
+		return property;
+	}
+
 	RdfProperty getOrCreateProperty(RdfNode propertyNode, RdfNode propertyLabelNode, RdfNode domainNode)
 			throws OData2SparqlException {
 
@@ -1702,16 +1777,32 @@ public class RdfModel {
 		return property;
 	}
 
+	public RdfComplexType getOrCreateComplexType(RdfNodeShape nodeShape) throws OData2SparqlException {
+		//Used for regular complexTypes such as NodeShapes
+		RdfComplexType complexType = Enumerable.create(nodeShape.getSchema().getComplexTypes())
+				.firstOrNull(complexTypeNameEquals(rdfToOdata(nodeShape.getNodeShapeName())));
+		if (complexType == null) {
+			complexType = new RdfComplexType();
+			complexType.complexTypeName = rdfToOdata(nodeShape.getNodeShapeName());
+			complexType.complexTypeLabel = nodeShape.getNodeShapeLabel();
+			complexType.setSchema(nodeShape.getSchema());
+			complexType.setProvenanceType(false);
+			nodeShape.getSchema().getComplexTypes().add(complexType);
+			nodeShape.setComplexType(complexType);
+		}
+		return complexType;
+	}
+
 	public RdfComplexType getOrCreateComplexType(RdfNode complexTypeNode, RdfNode complexTypeLabelNode,
 			RdfNode superdomainNode) throws OData2SparqlException {
+		//Used for complex types that contain the provenance of properties
 		RdfURI complexTypeURI = new RdfURI(complexTypeNode);
-
 		RdfEntityType clazz = this.getOrCreateEntityType(superdomainNode);
-
 		RdfComplexType complexType = Enumerable.create(clazz.getSchema().getComplexTypes())
 				.firstOrNull(complexTypeNameEquals(rdfToOdata(complexTypeURI.localName)));
 		if (complexType == null) {
 			complexType = new RdfComplexType();
+			complexType.setProvenanceType(true);
 			complexType.complexTypeName = rdfToOdata(complexTypeURI.localName);
 			if (complexTypeLabelNode == null) {
 				complexType.complexTypeLabel = RdfConstants.PROPERTY_LABEL_PREFIX + complexType.complexTypeName;
@@ -1719,10 +1810,10 @@ public class RdfModel {
 				complexType.complexTypeLabel = complexTypeLabelNode.getLiteralObject().toString();
 			}
 			complexType.complexTypeNode = complexTypeNode;
-			complexType.domainClass = this.getOrCreateEntityType(superdomainNode);
 			clazz.complexTypes.put(complexType.complexTypeName, complexType);
 			clazz.getSchema().getComplexTypes().add(complexType);
 		}
+		complexType.domainClass = this.getOrCreateEntityType(superdomainNode);
 		return complexType;
 	}
 
@@ -1824,21 +1915,21 @@ public class RdfModel {
 
 	private String createAssociationName(RdfNode multipleDomainNode, RdfNode multipleRangeNode, RdfURI domainURI,
 			RdfURI propertyURI, RdfURI rangeURI) throws OData2SparqlException {
-//Removed for V4 as multiple ranges and domains do not matter any more as navigationProperties are directly associated with EntityType and EntitySet
-//		if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
-//			if (!(multipleRangeNode.getLiteralObject().equals(1) || multipleRangeNode.getLiteralObject().equals("1"))) {
-//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//						+ rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//						+ rdfToOdata(rangeURI.localName);
-//			} else {
-//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//						+ rdfToOdata(propertyURI.localName);
-//			}
-//		} else if (!(multipleRangeNode.getLiteralObject().equals(1)
-//				|| multipleRangeNode.getLiteralObject().equals("1"))) {
-//			return rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//					+ rdfToOdata(rangeURI.localName);
-//		}
+		//Removed for V4 as multiple ranges and domains do not matter any more as navigationProperties are directly associated with EntityType and EntitySet
+		//		if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
+		//			if (!(multipleRangeNode.getLiteralObject().equals(1) || multipleRangeNode.getLiteralObject().equals("1"))) {
+		//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+		//						+ rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+		//						+ rdfToOdata(rangeURI.localName);
+		//			} else {
+		//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+		//						+ rdfToOdata(propertyURI.localName);
+		//			}
+		//		} else if (!(multipleRangeNode.getLiteralObject().equals(1)
+		//				|| multipleRangeNode.getLiteralObject().equals("1"))) {
+		//			return rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+		//					+ rdfToOdata(rangeURI.localName);
+		//		}
 		return rdfToOdata(propertyURI.localName);
 	}
 
@@ -1879,7 +1970,6 @@ public class RdfModel {
 		RdfNodeShape nodeShape = this.pendingNodeShapes.get(nodeShapeNode.getIRIString());
 		if (nodeShape == null) {
 			nodeShape = new RdfNodeShape(nodeShapeNode);
-
 		}
 		RdfNodeShape baseNodeShape = null;
 		String nodeShapeName = null;
@@ -1900,7 +1990,6 @@ public class RdfModel {
 				baseNodeShape = new RdfNodeShape(baseNodeShapeNode);
 			nodeShape.setBaseNodeShape(baseNodeShape);
 		}
-
 		if (nodeShapeNameNode != null) {
 			nodeShapeName = nodeShapeNameNode.getLiteralValue().stringValue();
 		} else if (nodeShapeLabelNode != null) {
@@ -1909,8 +1998,8 @@ public class RdfModel {
 			nodeShapeName = nodeShapeNode.getLocalName();
 		}
 		nodeShape.setNodeShapeName(nodeShapeName);
-		if(nodeShapeLabelNode!=null)
-			nodeShape.setNodeShapeLabel(nodeShapeLabelNode.getLiteralValue().stringValue()); 
+		if (nodeShapeLabelNode != null)
+			nodeShape.setNodeShapeLabel(nodeShapeLabelNode.getLiteralValue().stringValue());
 		if (nodeShapeDescriptionNode != null) {
 			nodeShapeDescription = nodeShapeDescriptionNode.getLiteralValue().stringValue();
 			nodeShape.setNodeShapeDescription(nodeShapeDescription);
@@ -1920,12 +2009,28 @@ public class RdfModel {
 			nodeShapeDeactivated = nodeShapeDeactivatedNode.getLiteralValue().toString().equals("true");
 			nodeShape.setDeactivated(nodeShapeDeactivated);
 		}
-
 		this.pendingNodeShapes.put(nodeShapeNode.getIRIString(), nodeShape);
-		//	nodeShapeURI.graph.nodeShapes.add(nodeShape);
-
+		//		nodeShape.setEntityType(getOrCreateNodeShapeEntityComplexType(nodeShape, nodeShapeNode, nodeShapeNameNode, nodeShapeLabelNode));
 		return nodeShape;
+	}
 
+	RdfEntityType getOrCreateNodeShapeEntityComplexType(RdfNodeShape nodeShape)//, RdfNode nodeShapeNode, RdfNode nodeShapeNameNode,	RdfNode nodeShapeLabelNode) 
+			throws OData2SparqlException {
+		RdfEntityType nodeShapeEntityType = getOrCreateEntityType(nodeShape);
+		nodeShapeEntityType.setOperation(false);
+		nodeShapeEntityType.setBaseType(null);
+		nodeShapeEntityType.setNodeShape(nodeShape);
+
+		RdfComplexType nodeShapeComplexType = getOrCreateComplexType(nodeShape);
+
+		RdfProperty nodeShapeProperty = getOrCreateComplexProperty(nodeShape);
+		nodeShapeProperty.setIsComplex(true);
+		nodeShapeProperty.setComplexType(nodeShapeComplexType);
+		nodeShapeProperty.setCardinality(RdfConstants.Cardinality.MANY);
+		nodeShapeProperty.setIsKey(false);
+		nodeShapeEntityType.properties.put(nodeShapeProperty.getEDMPropertyName(), nodeShapeProperty);
+
+		return nodeShapeEntityType;
 	}
 
 	public void getOrCreatePropertyShape(RdfNode nodeShapeNode, RdfNode propertyShapeNode,
@@ -2012,6 +2117,7 @@ public class RdfModel {
 				objectPropertyShape.setPropertyShapeLabel(propertyShapeLabel);
 				objectPropertyShape.setMinCount(minCount);
 				objectPropertyShape.setMaxCount(maxCount);
+				objectPropertyShape.setInversePath(true);
 				if (propertyNode != null) {
 					RdfNodeShape propertyNodeShape = this.pendingNodeShapes.get(propertyNode.getIRIString());
 					objectPropertyShape.setPropertyNode(propertyNodeShape);
@@ -2102,13 +2208,13 @@ public class RdfModel {
 		};
 	}
 
-	private static final Predicate1<RdfNodeShape> nodeShapeNameEquals(final String nodeShapeName) {
-		return new Predicate1<RdfNodeShape>() {
-			public boolean apply(RdfNodeShape rdfNodeShape) {
-				return rdfNodeShape.nodeShapeName.equals(nodeShapeName);
-			}
-		};
-	}
+//	private static final Predicate1<RdfNodeShape> nodeShapeNameEquals(final String nodeShapeName) {
+//		return new Predicate1<RdfNodeShape>() {
+//			public boolean apply(RdfNodeShape rdfNodeShape) {
+//				return rdfNodeShape.nodeShapeName.equals(nodeShapeName);
+//			}
+//		};
+//	}
 
 	public void allocateNodeShapesToGraphs() throws OData2SparqlException {
 		for (RdfNodeShape nodeShape : pendingNodeShapes.values()) {
@@ -2120,7 +2226,6 @@ public class RdfModel {
 					nodeShape.setSchema(schema);
 					schema.nodeShapes.add(nodeShape);
 				} else {
-					//TODO probably need to traverse the tree more than once
 					for (RdfNodeShape nodeShape1 : pendingNodeShapes.values()) {
 						for (RdfObjectPropertyShape propertyShape : nodeShape1.getObjectPropertyShapes().values()) {
 							if (propertyShape.getPropertyNode() == null) {
@@ -2135,8 +2240,46 @@ public class RdfModel {
 					}
 				}
 			}
-			RdfEntityType nodeShapeEntityType = getOrCreateEntityType(nodeShape);
-			nodeShape.setEntityType(nodeShapeEntityType);
+			nodeShape.setEntityType(getOrCreateNodeShapeEntityComplexType(nodeShape));
+			for (RdfDataPropertyShape dataPropertyShape : nodeShape.getDataPropertyShapes().values()) {
+				nodeShape.getComplexType().addProperty(dataPropertyShape.path);
+			}
+			for (RdfObjectPropertyShape objectPropertyShape : nodeShape.getObjectPropertyShapes().values()) {
+				if (objectPropertyShape.isInversePath()) {
+					nodeShape.getComplexType()
+							.addNavigationProperty(objectPropertyShape.getPath().getInverseAssociation());
+				} else {
+					nodeShape.getComplexType().addNavigationProperty(objectPropertyShape.getPath());
+				}
+			}
+		}
+		//second pass to add 'inherited' properties from baseNodeShape
+		inheritBaseNodeProperties();
+
+	}
+
+	private void inheritBaseNodeProperties() {
+		for (RdfNodeShape nodeShape : pendingNodeShapes.values()) {
+			if (nodeShape.getBaseNodeShape() != null) {
+				inheritProperties(nodeShape, nodeShape.getBaseNodeShape());
+			}
+		}
+	}
+
+	private void inheritProperties(RdfNodeShape nodeShape, RdfNodeShape baseNodeShape) {
+		for (RdfDataPropertyShape dataPropertyShape : nodeShape.getBaseNodeShape().getDataPropertyShapes().values()) {
+			nodeShape.getComplexType().addProperty(dataPropertyShape.path);
+		}
+		for (RdfObjectPropertyShape objectPropertyShape : nodeShape.getBaseNodeShape().getObjectPropertyShapes()
+				.values()) {
+			if (objectPropertyShape.isInversePath()) {
+				nodeShape.getComplexType().addNavigationProperty(objectPropertyShape.getPath().getInverseAssociation());
+			} else {
+				nodeShape.getComplexType().addNavigationProperty(objectPropertyShape.getPath());
+			}
+		}
+		if (baseNodeShape.getBaseNodeShape() != null) {
+			inheritProperties(nodeShape, baseNodeShape.getBaseNodeShape());
 		}
 	}
 
