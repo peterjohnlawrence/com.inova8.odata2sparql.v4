@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
@@ -51,7 +51,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedProperty(fqnProperty);
 	}
 
-	public RdfAssociation getMappedNavigationProperty(FullQualifiedName edmNavigationProperty) {
+	public RdfNavigationProperty getMappedNavigationProperty(FullQualifiedName edmNavigationProperty) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedNavigationProperty(edmNavigationProperty);
 	}
 

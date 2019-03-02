@@ -72,6 +72,7 @@ public class RdfConstants {
 	public static final String PROPERTY_POSTFIX = "_value";
 	public static final String PLURAL = "s";
 
+
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";
 	private static final String SAP_ANNOTATION_NS = "sap";
 	private static final String SAP_LABEL = "label";
@@ -182,8 +183,13 @@ public class RdfConstants {
 
 	public static final String CLASS_LABEL_PREFIX = "";
 	public static final String PROPERTY_LABEL_PREFIX = "";
+	
+	/*	
+	 * Although it is legal for FunctionImports to share names with EntitySets, Openui5 has a problem
+	 */
 	public static final String NAVIGATIONPROPERTY_LABEL_PREFIX = "";
-
+	public static final String FUNCTION_POSTFIX ="_fn";//  "";//
+	
 	/*	
 	The following from http://www.ietf.org/ defining what is allowed in a URI
 	Needed to match ':' of qname with embeded key in odata.

@@ -28,7 +28,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.UnaryOperatorKind
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
@@ -143,7 +143,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return "";
 	}
 
-	private void putNavPropertyPropertyFilter(String sPath, RdfAssociation navProperty, RdfProperty property,
+	private void putNavPropertyPropertyFilter(String sPath, RdfNavigationProperty navProperty, RdfProperty property,
 			String filter) {
 		NavPropertyPropertyFilter navPropertyPropertyFilter;
 		if (!(navPropertyPropertyFilters.containsKey(sPath))) {

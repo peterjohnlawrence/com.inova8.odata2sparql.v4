@@ -87,10 +87,11 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
-		if (rdfResourceParts.isFunction()) {
-			throw new ODataApplicationException("Calling FunctionImports directly not supported at present", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
-					Locale.ENGLISH);			
-		} else {
+		//if (rdfResourceParts.isFunction()) {
+		//	throw new ODataApplicationException("Calling FunctionImports directly not supported at present", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+		//			Locale.ENGLISH);			
+		//} else {
+		{
 			EdmEntitySet responseEdmEntitySet = rdfResourceParts.getResponseEntitySet();
 			SelectOption selectOption = uriInfo.getSelectOption();
 			ExpandOption expandOption = uriInfo.getExpandOption();

@@ -12,7 +12,6 @@ import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
-import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
@@ -24,11 +23,12 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitEx
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.PropertyFilter;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.SparqlExpressionVisitor;
+import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
 public class SparqlFilterClausesBuilder {
@@ -47,15 +47,15 @@ public class SparqlFilterClausesBuilder {
 	private RdfEntityType rdfTargetEntityType;
 
 	public SparqlFilterClausesBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
-			UriType uriType)
+			UriType uriType,RdfResourceParts  rdfResourceParts)
 			throws ODataApplicationException, ExpressionVisitException, EdmException, OData2SparqlException {
 		this.rdfModel = rdfModel;
 		this.rdfModelToMetadata = rdfModelToMetadata;
-		this.uriType = uriType;
+		this.uriType =rdfResourceParts.getUriType();// uriType;
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
-		this.edmEntitySet = uriResourceEntitySet.getEntitySet();
-		this.rdfEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+		//UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
+		this.edmEntitySet = rdfResourceParts.getEntitySet().getEdmEntitySet(); //uriResourceEntitySet.getEntitySet();
+		this.rdfEntityType = rdfResourceParts.getEntitySet().getRdfEntityType();//rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 		// By default
 		this.edmTargetEntitySet = edmEntitySet;
 		this.rdfTargetEntityType = rdfEntityType;
@@ -206,7 +206,7 @@ public class SparqlFilterClausesBuilder {
 				}else if (firstResourcePart instanceof UriResourceComplexProperty ) {
 					resourceNavigation = (UriResourceNavigation) resourceParts.get(1);
 				}
-				RdfAssociation navProperty = rdfModelToMetadata.getMappedNavigationProperty(
+				RdfNavigationProperty navProperty = rdfModelToMetadata.getMappedNavigationProperty(
 						new FullQualifiedName(targetEntityType.getSchema().getSchemaPrefix(), 
 								resourceNavigation.getProperty().getName()));
 				String nextTargetKey = targetKey + resourceNavigation.getProperty().getName();
@@ -224,7 +224,7 @@ public class SparqlFilterClausesBuilder {
 		}
 	}
 
-	private void expandItem(String targetKey, String indent, ExpandItem expandItem, RdfAssociation navProperty,
+	private void expandItem(String targetKey, String indent, ExpandItem expandItem, RdfNavigationProperty navProperty,
 			String nextTargetKey, RdfEntityType nextTargetEntityType)
 			throws ODataApplicationException, ExpressionVisitException {
 		SparqlExpressionVisitor filterClause = filterClause(expandItem.getFilterOption(), nextTargetEntityType,
@@ -241,11 +241,11 @@ public class SparqlFilterClausesBuilder {
 					+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
 			clausesExpandFilter.append(indent).append("\t").append("}UNION{\n");
 			clausesExpandFilter.append(indent).append("\t").append("\t").append(
-					"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+					"?" + targetKey + "_s <" + navProperty.getNavigationPropertyIRI() + "> ?" + nextTargetKey + "_s .\n");
 			clausesExpandFilter.append(indent).append("\t").append("}\n");
 		} else {
 			clausesExpandFilter.append(indent).append("\t").append(
-					"?" + targetKey + "_s <" + navProperty.getAssociationIRI() + "> ?" + nextTargetKey + "_s .\n");
+					"?" + targetKey + "_s <" + navProperty.getNavigationPropertyIRI() + "> ?" + nextTargetKey + "_s .\n");
 		}
 		//Check if there are any relevant filters before proceeding
 		if (!filterClause.getNavPropertyPropertyFilters().isEmpty()) {

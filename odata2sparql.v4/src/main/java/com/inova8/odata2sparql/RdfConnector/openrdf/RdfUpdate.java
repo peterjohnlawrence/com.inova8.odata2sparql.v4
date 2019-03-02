@@ -12,7 +12,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;
 
 public class RdfUpdate extends RdfQuery{
-	private final Logger log = LoggerFactory.getLogger(RdfConstructQuery.class);
+	private final Logger log = LoggerFactory.getLogger(RdfUpdate.class);
 	private Update updateQuery;
 	public RdfUpdate(RdfRoleRepository rdfRoleRepository, String query) {
 		super.rdfRoleRepository = rdfRoleRepository;
@@ -22,11 +22,14 @@ public class RdfUpdate extends RdfQuery{
 		try {
 			super.connection = rdfRoleRepository.getRepository().getConnection();
 			log.info( super.query);
+			super.connection.begin();
 			updateQuery = connection.prepareUpdate(QueryLanguage.SPARQL, super.query);
 			updateQuery.execute();
+			super.connection.commit();
 
 		} catch (RepositoryException | MalformedQueryException |UpdateExecutionException e) {
 			log.error( e.getMessage());
+			super.connection.rollback();
 			throw new OData2SparqlException("RdfUpdate execUpdate failure",e);
 		} 
 	}

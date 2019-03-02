@@ -37,6 +37,7 @@ public class OData2SPARQLTest {
 	@SuppressWarnings("unused")
 	private String test;
 	private String skip;
+	private String method;
 	private String repository;
 	private String requestURI;
 	private String query;
@@ -45,12 +46,13 @@ public class OData2SPARQLTest {
 	@SuppressWarnings("unused")
 	private String comments;
 
-	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String repository, String requestURI,
-			String query, String options, String expected, String comments) {
+	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String method, String repository,
+			String requestURI, String query, String options, String expected, String comments) {
 		this.group = group;
 		this.subgroup = subgroup;
 		this.test = test;
 		this.skip = skip;
+		this.method = method;
 		this.repository = repository;
 		this.requestURI = requestURI;
 		this.query = query;
@@ -64,38 +66,32 @@ public class OData2SPARQLTest {
 		String record;
 		BufferedReader file = new BufferedReader(new FileReader(fileName));
 		Boolean titleRow = true;
-		int maxlength = 10;
+		int maxlength = 11;
 		while ((record = file.readLine()) != null) {
 			// assume tab delimited
 			String fields[] = record.split("\t");
 			if (titleRow)
 				maxlength = fields.length;
 			fields = copyOf(fields, maxlength);
-			//			// strip " that Excel will sometimes add
-			//			if(fields[3].startsWith("\"")) fields[3] =fields[3].substring(1, fields[3].length() - 1);
-			//			if(fields[4].equals("?")){
-			//				fields[4]=null;
-			//			}else if(fields[4].charAt(0)=='"'){
-			//				// strip " that Excel will sometimes add
-			//				if(fields[4].startsWith("\"")) fields[4]=fields[4].substring(1, fields[4].length() - 1);
-			//			}else{
-			//				
-			//			}
-			//			// replace the expected JSON embedded "" as added by Excel
-			if (fields[5] != null && fields[5].startsWith("\""))
-				fields[5] = fields[5].substring(1, fields[5].length() - 1);
 			if (fields[6] != null && fields[6].startsWith("\""))
 				fields[6] = fields[6].substring(1, fields[6].length() - 1);
-			if (fields[8] != null && fields[8] != "") {
-				fields[8] = fields[8].replace("\"\"", "\"");
+			if (fields[7] != null && fields[7] != "") {
+				fields[7] = fields[7].replace("\"\"", "\"");
 				// strip " that Excel will sometimes add
-				if (fields[8].startsWith("\""))
-					fields[8] = fields[8].substring(1, fields[8].length() - 1);
+				if (fields[7].startsWith("\""))
+					fields[7] = fields[7].substring(1, fields[7].length() - 1);
+			}
+			if (fields[9] != null && fields[9] != "") {
+				fields[9] = fields[9].replace("\"\"", "\"");
+				// strip " that Excel will sometimes add
+				if (fields[9].startsWith("\""))
+					fields[9] = fields[9].substring(1, fields[9].length() - 1);
 			} else {
-				fields[8] = "?";
+				fields[9] = "?";
 			}
 			if (!titleRow) {
-				if (fields[0] != null ) records.add(fields);
+				if (fields[0] != null)
+					records.add(fields);
 			} else {
 				titleRow = false;
 			}
@@ -125,7 +121,7 @@ public class OData2SPARQLTest {
 	}
 
 	//@Parameters(name = "{0}:{1}/{2}:URI={3}?{4}")
-	@Parameters(name = "{2}:URI={5}?{6}")
+	@Parameters(name = "{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
 		return getTestData("src/test/resources/TestServlet.txt");
 	}
@@ -135,29 +131,48 @@ public class OData2SPARQLTest {
 		servlet = new RdfODataServlet();
 		servletContext = new MockServletContext();
 		servletConfig = new MockServletConfig(servletContext);
-		request = new MockHttpServletRequest(servletContext);
 		servletContext.addInitParameter(ServletContext.TEMPDIR, "C:\\");
 		servletContext.addInitParameter("configFolder", "/var/opt/inova8/odata2sparql");
 		servletContext.addInitParameter("repositoryFolder", "V4");
 		servletContext.addInitParameter("repositoryUrl", "");
-		request.setServerName("localhost:8080/odata2sparql/");
-		request.setMethod("GET");
 		servlet.init(servletConfig);
 	}
 
 	@Test
 	public void serviceRequest() throws ServletException, IOException {
-		if (!(repository == null || repository.isEmpty() || requestURI == null || requestURI.isEmpty())) {
+		request = new MockHttpServletRequest(servletContext);
+		request.setServerName("localhost:8080/odata2sparql/");
+		if (!(repository == null || repository.isEmpty()) ) {     // || requestURI == null || requestURI.isEmpty())) {
 			if (skip.isEmpty()) {
+				request.setMethod(method);
 				request.setPathInfo("/" + repository);
 				request.setRequestURI(repository + "/" + requestURI);
-				request.setQueryString(query + options);
+				switch (method) {
+				case "GET":
+					request.setQueryString(query + options);
+					break;
+				case "POST":
+					request.setContent(query.getBytes());
+					request.setContentType(options);
+					break;
+				case "PUT":
+					request.setContent(query.getBytes());
+					request.setContentType(options);
+					break;
+				case "DELETE":				
+					break;
+				case "PATCH":
+					request.setContent(query.getBytes());
+					request.setContentType(options);
+					break;
+				default:
+				}
 				response = new MockHttpServletResponse();
 				servlet.service(request, response);
-				assertStringEquals(expected, response.getContentAsString());
+				assertStringEquals(expected.equals("?")?"":expected, response.getContentAsString());
 				//response.reset();
 				//response.flushBuffer();
-
+ 
 			}
 		}
 	}

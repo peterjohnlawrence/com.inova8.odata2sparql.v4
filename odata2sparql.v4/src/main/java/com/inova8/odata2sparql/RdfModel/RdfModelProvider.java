@@ -18,7 +18,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNodeFactory;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfQuerySolution;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfDatatype;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -130,7 +130,7 @@ public class RdfModelProvider {
 		model.getOrCreateProperty(rdfsLabelNode, null, rdfsLabelLabelNode, rdfsResourceNode, rdfStringNode,
 				RdfConstants.Cardinality.ZERO_TO_ONE);
 
-		model.getOrCreateAssociation(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_STATEMENT_LABEL),
 				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
 				RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT), unityNode, unityNode,
@@ -149,9 +149,9 @@ public class RdfModelProvider {
 		@SuppressWarnings("unused")
 		RdfEntityType owlDatatypeProperty = model.getOrCreateEntityType(owlDatatypePropertyNode,
 				owlDatatypePropertyLabelNode, rdfProperty);
-		model.getOrCreateAssociation(rdfsSubClassOfNode, rdfsSubClassOfLabelNode, rdfsClassNode, rdfsClassNode,
+		model.getOrCreateNavigationProperty(rdfsSubClassOfNode, rdfsSubClassOfLabelNode, rdfsClassNode, rdfsClassNode,
 				unityNode, unityNode, RdfConstants.Cardinality.ZERO_TO_ONE, RdfConstants.Cardinality.MANY);
-		model.getOrCreateAssociation(owlImportsNode, owlImportsLabelNode, owlOntologyNode, owlOntologyNode, unityNode,
+		model.getOrCreateNavigationProperty(owlImportsNode, owlImportsLabelNode, owlOntologyNode, owlOntologyNode, unityNode,
 				unityNode, RdfConstants.Cardinality.ZERO_TO_ONE, RdfConstants.Cardinality.MANY);
 		return rdfsResource;
 	}
@@ -286,10 +286,10 @@ public class RdfModelProvider {
 						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						if (classes == null) {
 							classes = new HashSet<RdfEntityType>();
-							classes.add(datatypeProperty.ofClass);
+							classes.add(datatypeProperty.getOfClass());
 							propertyClasses.put(propertyNode.getIRI().toString(), classes);
 						} else {
-							classes.add(datatypeProperty.ofClass);
+							classes.add(datatypeProperty.getOfClass());
 						}
 						count++;
 						debug.append(propertyNode.getIRI().toString()).append(";");
@@ -531,7 +531,7 @@ public class RdfModelProvider {
 				minRangeCardinalityNode, rangeCardinalityNode, RdfConstants.Cardinality.MANY);
 		Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 				minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-		RdfAssociation association=null;
+		RdfNavigationProperty rdfNavigationProperty=null;
 		if (soln.getRdfNode("superProperty") != null) {
 			RdfNode superdomainNode = soln.getRdfNode("superDomain");
 			if (superdomainNode != null) {
@@ -540,25 +540,25 @@ public class RdfModelProvider {
 				if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
 					RdfComplexType complexType = model.getOrCreateComplexType(
 							soln.getRdfNode("superProperty"), null, superdomainNode);
-					association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+					rdfNavigationProperty = model.getOrCreateNavigationProperty(propertyNode, propertyLabelNode,
 							domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
 							rangeCardinality);
 					if (soln.getRdfNode("description") != null) {
-						association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+						rdfNavigationProperty.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 					}
-					association.setSuperProperty(superProperty);
-					complexType.addNavigationProperty(association);
+					rdfNavigationProperty.setSuperProperty(superProperty);
+					complexType.addNavigationProperty(rdfNavigationProperty);
 					complexTypes.add(complexType);
 					superProperty.setIsComplex(true);
 					superProperty.setComplexType(complexType);
 				}
 			}
 		}else {						
-			association = model.getOrCreateAssociation(propertyNode, propertyLabelNode,
+			rdfNavigationProperty = model.getOrCreateNavigationProperty(propertyNode, propertyLabelNode,
 					domainNode, rangeNode, multipleDomainNode, multipleRangeNode, domainCardinality,
 					rangeCardinality);
 			if (soln.getRdfNode("description") != null) {
-				association.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+				rdfNavigationProperty.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 			}
 		}
 
@@ -627,7 +627,7 @@ public class RdfModelProvider {
 					+ e.getMessage());
 			throw new OData2SparqlException("InverseProperties query exception ", e);
 		}
-	}
+	} 
 
 	private void createInverseSuperProperty(RdfQuerySolution soln, RdfNode inversePropertyNode,
 			RdfNode inversePropertyLabelNode, RdfNode propertyNode, RdfNode domainNode, RdfNode multipleDomainNode,
@@ -639,7 +639,7 @@ public class RdfModelProvider {
 
 		Cardinality domainCardinality = interpretCardinality(maxDomainCardinalityNode,
 				minDomainCardinalityNode, domainCardinalityNode, RdfConstants.Cardinality.MANY);
-		RdfAssociation inverseAssociation=null;
+		RdfNavigationProperty inverseRdfNavigationProperty=null;
 		RdfNode superPropertyNode = soln.getRdfNode("superProperty");
 		if (superPropertyNode != null) {
 			RdfNode superdomainNode = soln.getRdfNode("superDomain");
@@ -647,13 +647,13 @@ public class RdfModelProvider {
 				RdfProperty superProperty = model.getOrCreateProperty(superPropertyNode, null,
 						superdomainNode);
 				if (!domainNode.getIRI().toString().equals(superdomainNode.getIRI().toString())) {
-					inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+					inverseRdfNavigationProperty = model.getOrCreateInverseNavigationProperty(inversePropertyNode,
 							inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
 							multipleRangeNode, domainCardinality, rangeCardinality);
-					inverseAssociation.setSuperProperty(superProperty);
+					inverseRdfNavigationProperty.setSuperProperty(superProperty);
 					RdfComplexType complexType = model.getOrCreateComplexType(
 							soln.getRdfNode("superProperty"), null, superdomainNode);
-					complexType.addNavigationProperty(inverseAssociation);
+					complexType.addNavigationProperty(inverseRdfNavigationProperty);
 					complexTypes.add(complexType);
 					superProperty.setIsComplex(true);
 					superProperty.setComplexType(complexType);
@@ -663,12 +663,12 @@ public class RdfModelProvider {
 						+ " declared without specific domain");
 			}
 		}else {
-			inverseAssociation = model.getOrCreateInverseAssociation(inversePropertyNode,
+			inverseRdfNavigationProperty = model.getOrCreateInverseNavigationProperty(inversePropertyNode,
 					inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
 					multipleRangeNode, domainCardinality, rangeCardinality);						
 		}
 		if (soln.getRdfNode("description") != null) {
-			inverseAssociation
+			inverseRdfNavigationProperty
 					.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 		}
 	}
@@ -734,7 +734,7 @@ public class RdfModelProvider {
 						}
 						RdfNode queryPropertyRange = soln.getRdfNode("range");
 
-						RdfAssociation operationAssociation = model.getOrCreateOperationAssociation(query,
+						RdfNavigationProperty operationAssociation = model.getOrCreateOperationNavigationProperty(query,
 								queryProperty, queryPropertyLabel, queryPropertyRange, varName);
 						if (soln.getRdfNode("description") != null) {
 							operationAssociation
@@ -958,9 +958,9 @@ public class RdfModelProvider {
 										+ clazz.getIRI());
 						//Remove any association  that uses this class
 						for (RdfSchema associationGraph : model.graphs) {
-							Iterator<RdfAssociation> associationsIterator = associationGraph.associations.iterator();
+							Iterator<RdfNavigationProperty> associationsIterator = associationGraph.navigationProperties.iterator();
 							while (associationsIterator.hasNext()) {
-								RdfAssociation association = associationsIterator.next();
+								RdfNavigationProperty association = associationsIterator.next();
 								if ((association.getDomainClass() == clazz) || (association.getRangeClass() == clazz)) {
 									associationsIterator.remove();
 								}
@@ -978,7 +978,7 @@ public class RdfModelProvider {
 		for (RdfSchema rdfGraph : model.graphs) {
 			for (RdfEntityType rdfEntityType : rdfGraph.classes) {
 				if (!rdfEntityType.isOperation()) {
-					for (RdfAssociation rdfNavigationProperty : rdfEntityType.getNavigationProperties()) {
+					for (RdfNavigationProperty rdfNavigationProperty : rdfEntityType.getNavigationProperties()) {
 						if (!((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
 								|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE))) {
 							model.getOrCreateFKProperty(rdfNavigationProperty);

@@ -35,7 +35,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTriple;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTripleSet;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexTypePropertyPair;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
@@ -112,7 +112,7 @@ class SparqlEntityCollection extends EntityCollection {
 		return links;
 	}
 
-	private void addNavPropertyObjectValues(String subject, String associationName, SparqlEntity rdfObjectEntity) {
+	private void addNavPropertyObjectValues(String subject, String navigationPropertyName, SparqlEntity rdfObjectEntity) {
 
 		List<Object> navPropertyObjectValues;
 		Map<String, List<Object>> navProperties;
@@ -123,15 +123,15 @@ class SparqlEntityCollection extends EntityCollection {
 		} else {
 			navProperties = navPropertyResults.get(subject);
 			// navPropertyObjectValues = navProperties.get(associationName);
-			if (!navProperties.containsKey(associationName)) {
+			if (!navProperties.containsKey(navigationPropertyName)) {
 				navPropertyObjectValues = new ArrayList<Object>();
 			} else {
-				navPropertyObjectValues = navProperties.get(associationName);
+				navPropertyObjectValues = navProperties.get(navigationPropertyName);
 			}
 		}
 
 		navPropertyObjectValues.add(rdfObjectEntity);
-		navProperties.put(associationName, navPropertyObjectValues);
+		navProperties.put(navigationPropertyName, navPropertyObjectValues);
 		navPropertyResults.put(subject, navProperties);
 		// Mark as an expanded entity that should not be returned as part of the
 		// entitySet results unless it is also a targetEntity
@@ -171,28 +171,28 @@ class SparqlEntityCollection extends EntityCollection {
 							rdfObjectEntity.addMatching(rdfSubjectEntity);
 						}
 					} else {
-						RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType()
+						RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType()
 								.findNavigationProperty(propertyNode);
 						RdfComplexTypePropertyPair rdfComplexTypeProperty;
-						if (rdfAssociation != null) {
+						if (rdfNavigationProperty != null) {
 							//if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
 							//will only get here if rdfs_type in $expand
 							//} else {
 							// Locate which of the $expand this is related to
 							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
 
-							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
+							rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
 							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
-									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
+									rdfNavigationProperty.getEDMNavigationPropertyName(), rdfObjectEntity);
 							// fixes #7 add to the Entity
-							findOrCreateLink(rdfSubjectEntity, rdfAssociation, rdfObjectEntity);
+							findOrCreateLink(rdfSubjectEntity, rdfNavigationProperty, rdfObjectEntity);
 							//}
 						} else if ((rdfComplexTypeProperty = rdfSubjectEntity.getEntityType()
 								.findComplexProperty(propertyNode)) != null) {
-							rdfAssociation = rdfComplexTypeProperty.getRdfNavigationProperty();
+							rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
 							//Could be associated with a complexType's navigation property
 							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-							rdfObjectEntity.setEntityType(rdfAssociation.getRangeClass());
+							rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
 							//							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
 							//									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
 							// fixes #7 add to the Entity
@@ -214,10 +214,10 @@ class SparqlEntityCollection extends EntityCollection {
 												.toQName(objectNode, RdfConstants.QNAME_SEPARATOR))));
 							}
 						}
-						if (rdfAssociation != null && rdfAssociation.hasFkProperty()) {
+						if (rdfNavigationProperty != null && rdfNavigationProperty.hasFkProperty()) {
 							//Add QName of FK URI as literal property so that dumb BI tools can think in relational table terms
 							rdfSubjectEntity.addProperty((new Property(null,
-									rdfAssociation.getFkProperty().getEDMPropertyName(), ValueType.PRIMITIVE,
+									rdfNavigationProperty.getFkProperty().getEDMPropertyName(), ValueType.PRIMITIVE,
 									SparqlEntity.URLEncodeEntityKey(sparqlEdmProvider.getRdfModel().getRdfPrefixes()
 											.toQName(objectNode, RdfConstants.QNAME_SEPARATOR)))));
 						}
@@ -232,13 +232,13 @@ class SparqlEntityCollection extends EntityCollection {
 					rdfSubjectEntity.setTargetEntity(true);
 				} else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
 					//Provides counted value hashed by subject/navigationPropertyName
-					RdfAssociation rdfAssociation = rdfSubjectEntity.getEntityType().findNavigationProperty(
+					RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType().findNavigationProperty(
 							propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length() + 1));
 					//Fixes #77						counts.put(
 					//							subjectNode.getIRI().toString()
 					//									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
 					//							(Integer) objectNode.getLiteralObject());
-					findOrCreateLinkCount(rdfSubjectEntity, rdfAssociation, (Integer) objectNode.getLiteralObject());
+					findOrCreateLinkCount(rdfSubjectEntity, rdfNavigationProperty, (Integer) objectNode.getLiteralObject());
 				} else if (rdfSubjectEntity.getEntityType().isOperation()
 						&& (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)) {
 					//Fixes #81 OK this is an operation that is returning a literal for a primaryKey so  use UNDEF 
@@ -262,7 +262,7 @@ class SparqlEntityCollection extends EntityCollection {
 
 	private void findOrCreateComplexLink(SparqlEntity rdfSubjectEntity,
 			RdfComplexTypePropertyPair rdfComplexTypeProperty, SparqlEntity rdfObjectEntity) {
-		RdfAssociation rdfAssociation = rdfComplexTypeProperty.getRdfNavigationProperty();
+		RdfNavigationProperty rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
 
 		Property complexProperty = rdfSubjectEntity
 				.getProperty(rdfComplexTypeProperty.getRdfComplexType().getComplexTypeName());
@@ -281,20 +281,20 @@ class SparqlEntityCollection extends EntityCollection {
 			//Problem!!!
 		} else if (rdfComplexTypeProperty.getRdfNavigationProperty() != null) {
 
-			RdfAssociation complexNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
-			Link navigationLink = complexValue.getNavigationLink(complexNavigationProperty.getAssociationName());
+			RdfNavigationProperty complexNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
+			Link navigationLink = complexValue.getNavigationLink(complexNavigationProperty.getNavigationPropertyName());
 			if (navigationLink == null) {
 				navigationLink = new Link();
-				navigationLink.setTitle(complexNavigationProperty.getAssociationName());
+				navigationLink.setTitle(complexNavigationProperty.getNavigationPropertyName());
 				if (navigationLink.getRel() == null)
 					navigationLink.setRel(
-							"http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
+							"http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
 				complexValue.getNavigationLinks().add(navigationLink);
 			}
 			//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
 			navigationLink.setHref(rdfObjectEntity.getId().toString());
 
-			if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
+			if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
 				// to MANY, MULTIPLE
 				EntityCollection inlineEntitySet = navigationLink.getInlineEntitySet();
 				if (inlineEntitySet == null) {
@@ -304,7 +304,7 @@ class SparqlEntityCollection extends EntityCollection {
 				inlineEntitySet.getEntities().add(rdfObjectEntity);
 				Property valueProperty = null;
 				for (Property property : complexValue.getValue()) {
-					if (property.getName().equals(complexNavigationProperty.getAssociationName())) {
+					if (property.getName().equals(complexNavigationProperty.getNavigationPropertyName())) {
 						valueProperty = property;
 						((EntityCollection) valueProperty.getValue()).getEntities().add(rdfObjectEntity);
 						break;
@@ -313,41 +313,41 @@ class SparqlEntityCollection extends EntityCollection {
 				if (valueProperty == null) {
 					EntityCollection entityCollection = new EntityCollection();
 					entityCollection.getEntities().add(rdfObjectEntity);
-					valueProperty = new Property(null, complexNavigationProperty.getAssociationName(),
+					valueProperty = new Property(null, complexNavigationProperty.getNavigationPropertyName(),
 							ValueType.COLLECTION_ENTITY, entityCollection);
 					complexValue.getValue().add(valueProperty);
 				}
 			} else {
 				// to ONE
 				navigationLink.setInlineEntity(rdfObjectEntity);
-				Property valueProperty = new Property(null, complexNavigationProperty.getAssociationName(),
+				Property valueProperty = new Property(null, complexNavigationProperty.getNavigationPropertyName(),
 						ValueType.ENTITY, rdfObjectEntity);
 				complexValue.getValue().add(valueProperty);
 			}
 		}
 	}
 
-	private Link findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfAssociation rdfAssociation,
+	private Link findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty,
 			SparqlEntity rdfObjectEntity) {
 		Link link = null;
 		if (rdfSubjectEntity.getNavigationLinks() == null) {
 			link = new Link();
-			link.setTitle(rdfAssociation.getEDMAssociationName());
+			link.setTitle(rdfNavigationProperty.getEDMNavigationPropertyName());
 			rdfSubjectEntity.getNavigationLinks().add(link);
 		} else {
 			for (Link searchLink : rdfSubjectEntity.getNavigationLinks()) {
-				if (searchLink.getTitle().equals(rdfAssociation.getEDMAssociationName())) {
+				if (searchLink.getTitle().equals(rdfNavigationProperty.getEDMNavigationPropertyName())) {
 					link = searchLink;
 					break;
 				}
 			}
 			if (link == null) {
 				link = new Link();
-				link.setTitle(rdfAssociation.getEDMAssociationName());
+				link.setTitle(rdfNavigationProperty.getEDMNavigationPropertyName());
 				rdfSubjectEntity.getNavigationLinks().add(link);
 			}
 		}
-		if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
+		if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
 			// to MANY, MULTIPLE
 			EntityCollection inlineEntitySet = link.getInlineEntitySet();
 			if (inlineEntitySet == null) {
@@ -361,30 +361,30 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		// Required to make sure rel is not empty
 		if (link.getRel() == null)
-			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
 		return link;
 	}
 
-	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfAssociation rdfAssociation, int count) {
+	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty, int count) {
 		Link link = null;
 		if (rdfSubjectEntity.getNavigationLinks() == null) {
 			link = new Link();
-			link.setTitle(rdfAssociation.getEDMAssociationName());
+			link.setTitle(rdfNavigationProperty.getEDMNavigationPropertyName());
 			rdfSubjectEntity.getNavigationLinks().add(link);
 		} else {
 			for (Link searchLink : rdfSubjectEntity.getNavigationLinks()) {
-				if (searchLink.getTitle().equals(rdfAssociation.getEDMAssociationName())) {
+				if (searchLink.getTitle().equals(rdfNavigationProperty.getEDMNavigationPropertyName())) {
 					link = searchLink;
 					break;
 				}
 			}
 			if (link == null) {
 				link = new Link();
-				link.setTitle(rdfAssociation.getEDMAssociationName());
+				link.setTitle(rdfNavigationProperty.getEDMNavigationPropertyName());
 				rdfSubjectEntity.getNavigationLinks().add(link);
 			}
 		}
-		if (rdfAssociation.getDomainCardinality().equals(Cardinality.MANY)) {
+		if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
 			// to MANY, MULTIPLE
 			EntityCollection inlineEntitySet = link.getInlineEntitySet();
 			if (inlineEntitySet == null) {
@@ -397,7 +397,7 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		// Required to make sure rel is not empty
 		if (link.getRel() == null)
-			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfAssociation.getEDMAssociationName());
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
 		return link;
 	}
 
@@ -473,7 +473,7 @@ class SparqlEntityCollection extends EntityCollection {
 						// test to make sure a objectproperty first?
 						if (!propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)
 								&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
-							RdfAssociation rdfNavigationProperty = rdfSubjectEntityType
+							RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntityType
 									.findNavigationProperty(rdfPropertyLocalName);
 							if (rdfNavigationProperty != null) {
 								rdfProperty = rdfSubjectEntityType.findProperty(rdfNavigationProperty.getRelatedKey());

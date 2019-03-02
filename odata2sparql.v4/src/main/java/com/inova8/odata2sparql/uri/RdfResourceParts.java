@@ -24,6 +24,7 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceFunction;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
@@ -87,7 +88,10 @@ public class RdfResourceParts {
 				isRef = uriResourceParts.get(uriResourceParts.size() - 1).toString().equals("$ref");
 				break;
 			case function:
+				UriResourceFunction function = (UriResourceFunction) resourcePart ;
+				EdmEntitySet edmEntitySet =  function.getFunctionImport().getReturnedEntitySet();
 				//UriResource function = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
+				rdfResourceParts.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet,function.getParameters()));
 				isFunction = true;
 				break;
 			default:
@@ -188,6 +192,12 @@ public class RdfResourceParts {
 				 * Function import returning a collection of complex-type
 				 * instances
 				 */
+				contextUrl = ContextURL.with()
+				//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
+				//.keyPath(rdfResourceParts.getLocalKey())
+				.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
+				.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
+				.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI12:
 				/**

@@ -25,7 +25,13 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 		this.edmEntitySet = edmEntitySet;
 	}
-
+	public RdfResourceEntitySet(RdfEdmProvider rdfEdmProvider, EdmEntitySet edmEntitySet, List<UriParameter> keyPredicates) {
+		super.setUriResourceKind(UriResourceKind.entitySet);
+		this.rdfEdmProvider = rdfEdmProvider;
+		this.keyPredicates = keyPredicates;
+		rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+		this.edmEntitySet = edmEntitySet;
+	}
 	public EdmEntitySet getEdmEntitySet() {
 		return edmEntitySet;
 	}

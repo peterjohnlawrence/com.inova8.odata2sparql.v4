@@ -18,7 +18,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 
 import com.inova8.odata2sparql.RdfModel.RdfModel;
-import com.inova8.odata2sparql.RdfModel.RdfModel.RdfAssociation;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
@@ -153,8 +153,8 @@ public class SparqlCreateUpdateDeleteBuilder {
 						properties.append(castObjectToXsd(prop.getValue()));
 					}
 				} else {
-					RdfAssociation association = entityType.findNavigationPropertyByEDMAssociationName(prop.getName());
-					properties.append("<" + association.getAssociationIRI() + "> ");
+					RdfNavigationProperty association = entityType.findNavigationPropertyByEDMNavigationPropertyName(prop.getName());
+					properties.append("<" + association.getNavigationPropertyIRI() + "> ");
 					properties.append(castObjectToXsd(prop.getValue()));
 				}
 			}
@@ -361,7 +361,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 	}
 
 	public SparqlStatement generateInsertLinkQuery(RdfEntityType entityType, List<UriParameter> entityKeys,
-			RdfAssociation navigationProperty, List<URI> requestEntityReferences) throws OData2SparqlException {
+			RdfNavigationProperty navigationProperty, List<URI> requestEntityReferences) throws OData2SparqlException {
 
 		if (entityType.isOperation()) {
 			//TODO
@@ -372,7 +372,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			if (navigationProperty.IsInverse()) {
 				navigationPropertyUri = "<" + navigationProperty.getInversePropertyOf().getIRI() + ">";
 			} else {
-				navigationPropertyUri = "<" + navigationProperty.getAssociationIRI() + ">";
+				navigationPropertyUri = "<" + navigationProperty.getNavigationPropertyIRI() + ">";
 			}
 			String expandedKeyUri = "<" + rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText())
 					+ ">";
@@ -402,7 +402,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 	}
 
 	public SparqlStatement generateDeleteLinkQuery(RdfEntityType entityType, List<UriParameter> entityKeys,
-			RdfAssociation navigationProperty, List<UriParameter> navigationEntityKeys) throws OData2SparqlException {
+			RdfNavigationProperty navigationProperty, List<UriParameter> navigationEntityKeys) throws OData2SparqlException {
 		if (entityType.isOperation()) {
 			//TODO
 			return null;
@@ -424,7 +424,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 							.append(".}");
 				}
 			} else {
-				navigationPropertyUri = "<" + navigationProperty.getAssociationIRI() + ">";
+				navigationPropertyUri = "<" + navigationProperty.getNavigationPropertyIRI() + ">";
 				//String expandedTargetKeyUri = "<" + rdfModel.getRdfPrefixes().expandPredicateKey(navigationEntityKeys.get(0).getText()) + ">";
 				if (navigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
 					String expandedTargetKeyUri = "<"
@@ -442,7 +442,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 	}
 
 	public SparqlStatement generateUpdateLinkQuery(RdfEntityType entityType, List<UriParameter> entityKeys,
-			RdfAssociation navigationProperty, List<UriParameter> navigationEntityKeys,
+			RdfNavigationProperty navigationProperty, List<UriParameter> navigationEntityKeys,
 			List<URI> requestEntityReferences) throws OData2SparqlException {
 		if (entityType.isOperation()) {
 			//TODO
@@ -461,7 +461,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				links.append("{").append(expandedTargetKeyUri).append(navigationPropertyUri).append(expandedKeyUri)
 						.append(".}");
 			} else {
-				navigationPropertyUri = "<" + navigationProperty.getAssociationIRI() + ">";
+				navigationPropertyUri = "<" + navigationProperty.getNavigationPropertyIRI() + ">";
 				links.append("{").append(expandedKeyUri).append(navigationPropertyUri).append(expandedTargetKeyUri)
 						.append(".}");
 			}

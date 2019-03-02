@@ -2,6 +2,8 @@ package com.inova8.odata2sparql.RdfRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
@@ -41,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Constants.*;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
-
 public class RdfRepositories {
 
 	private final Logger log = LoggerFactory.getLogger(RdfRepositories.class);
@@ -50,17 +51,17 @@ public class RdfRepositories {
 	private final String repositoryUrl;
 	private final String repositoryDir;
 	private Map<String, RdfRepository> rdfRepositoryList = new TreeMap<String, RdfRepository>();
-	String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
-	String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
+	String localRepositoryManagerModel = RdfConstants.repositoryWorkingDirectory;
+	String localRepositoryManagerDirectory = RdfConstants.repositoryWorkingDirectory;
 
-	public RdfRepositories(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
-		super();	
-		if(configFolder==null || configFolder.isEmpty()){
-		}else{
+	public RdfRepositories(String configFolder, String repositoryFolder, String repositoryUrl, String repositoryDir) {
+		super();
+		if (configFolder == null || configFolder.isEmpty()) {
+		} else {
 		}
-		if(repositoryFolder==null || repositoryFolder.isEmpty()){
-			this.repositoryFolder=RdfConstants.DEFAULTFOLDER;
-		}else{
+		if (repositoryFolder == null || repositoryFolder.isEmpty()) {
+			this.repositoryFolder = RdfConstants.DEFAULTFOLDER;
+		} else {
 			this.repositoryFolder = repositoryFolder;
 		}
 		this.repositoryUrl = repositoryUrl;
@@ -101,13 +102,54 @@ public class RdfRepositories {
 		return rdfRepositoryList;
 	}
 
+	private String verifyRDF4JUpdateEndpointUrl(String queryEndpointUrl, String updateEndpointUrl, String profile) {
+		if (profile == "" || profile.equals(SPARQLProfile.RDF4J.getCode())) {
+			URI updateEndpointUri;
+			if (updateEndpointUrl == "")
+				return queryEndpointUrl;
+			else
+				try {
+					updateEndpointUri = new URI(updateEndpointUrl);
+					String[] updateEndpointUriParts = updateEndpointUri.getPath().split("/");
+					String updateEndpointUriLastPart = updateEndpointUriParts[updateEndpointUriParts.length - 1];
+					if (!updateEndpointUriLastPart.equals("statements")) {
+						try {
+							URI queryEndpointUri = new URI(queryEndpointUrl);
+							updateEndpointUrl = queryEndpointUri.getScheme() + "://" + queryEndpointUri.getAuthority()
+									+ queryEndpointUri.getPath() + "/statements";
+							log.error(
+									"updateEndpointUrl for RDF4J must end with /statements. Modified queryEndpoinUrl instead to create: "
+											+ updateEndpointUrl);
+							return updateEndpointUrl;
+						} catch (URISyntaxException e) {
+							log.error("queryEndpointUrl invalid, cannot be used to construct updateEndpointUrl:",
+									queryEndpointUrl);
+						}
+
+					} else {
+						return updateEndpointUrl;
+					}
+				} catch (URISyntaxException e) {
+					log.error("updateEndpointUrl invalid:", updateEndpointUrl);
+				}
+
+		} else {
+			if (updateEndpointUrl == "")
+				return queryEndpointUrl;
+			else
+				return updateEndpointUrl;
+		}
+		return updateEndpointUrl;
+
+	}
+
 	private void loadRepositories() throws OData2SparqlException, RepositoryConfigException {
 		try {
-			if (this.repositoryUrl!=null && !this.repositoryUrl.isEmpty()) {
+			if (this.repositoryUrl != null && !this.repositoryUrl.isEmpty()) {
 				try {
 					//repositoryManager = bootstrapRemoteRepository(properties.getProperty(RdfConstants.repositoryUrl));
 					repositoryManager = bootstrapRemoteRepository(this.repositoryUrl);
-					} catch (OData2SparqlException e) {
+				} catch (OData2SparqlException e) {
 					try {
 						repositoryManager = bootstrapLocalRepository();
 					} catch (OData2SparqlException | IOException e1) {
@@ -184,10 +226,13 @@ public class RdfRepositories {
 								switch (valueOfDataRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig dataRepositoryTypeSpec = new SPARQLRepositoryConfig();
-									dataRepositoryTypeSpec.setQueryEndpointUrl(valueOfDataRepositoryImplQueryEndpoint
-											.stringValue());
-									dataRepositoryTypeSpec.setUpdateEndpointUrl(valueOfDataRepositoryImplUpdateEndpoint
-											.stringValue());
+									dataRepositoryTypeSpec
+											.setQueryEndpointUrl(valueOfDataRepositoryImplQueryEndpoint.stringValue());
+
+									dataRepositoryTypeSpec.setUpdateEndpointUrl(verifyRDF4JUpdateEndpointUrl(
+											valueOfDataRepositoryImplQueryEndpoint.stringValue(),
+											valueOfDataRepositoryImplUpdateEndpoint.stringValue(),
+											valueOfDataRepositoryImplProfile.toString()));
 									dataRepositoryConfig = new RepositoryConfig(valueOfDataRepositoryID.stringValue(),
 											dataRepositoryTypeSpec);
 									repositoryManager.addRepositoryConfig(dataRepositoryConfig);
@@ -217,12 +262,12 @@ public class RdfRepositories {
 								switch (valueOfVocabularyRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig vocabularyRepositoryTypeSpec = new SPARQLRepositoryConfig();
-									vocabularyRepositoryTypeSpec
-											.setQueryEndpointUrl(valueOfVocabularyRepositoryImplQueryEndpoint
-													.stringValue());
-									vocabularyRepositoryTypeSpec
-											.setUpdateEndpointUrl(valueOfVocabularyRepositoryImplUpdateEndpoint
-													.stringValue());
+									vocabularyRepositoryTypeSpec.setQueryEndpointUrl(
+											valueOfVocabularyRepositoryImplQueryEndpoint.stringValue());
+									vocabularyRepositoryTypeSpec.setUpdateEndpointUrl(verifyRDF4JUpdateEndpointUrl(
+											valueOfVocabularyRepositoryImplQueryEndpoint.stringValue(),
+											valueOfVocabularyRepositoryImplUpdateEndpoint.stringValue(),
+											valueOfVocabularyRepositoryImplProfile.toString()));
 									vocabularyRepositoryConfig = new RepositoryConfig(
 											valueOfVocabularyRepositoryID.stringValue(), vocabularyRepositoryTypeSpec);
 									repositoryManager.addRepositoryConfig(vocabularyRepositoryConfig);
@@ -250,11 +295,10 @@ public class RdfRepositories {
 							Namespace defaultPrefix = null;
 							try {
 								if ((valueOfDefaultPrefix == null) || (valueOfDefaultNamespace == null)) {
-									log.error("Null default prefix or namespace for "
-											+ valueOfDataset
+									log.error("Null default prefix or namespace for " + valueOfDataset
 											+ ". Check repository or models.ttl for statements { odata4sparql:<prefix>  odata4sparql:defaultPrefix odata4sparql:<prefix> ;   odata4sparql:namespace <namespace> ; .. }");
-									throw new RepositoryConfigException("Null default prefix or namespace for"
-											+ valueOfDataset);
+									throw new RepositoryConfigException(
+											"Null default prefix or namespace for" + valueOfDataset);
 								} else {
 									defaultPrefix = namespaces.get(valueOfDefaultPrefix.stringValue());
 									if (defaultPrefix == null) {
@@ -269,59 +313,59 @@ public class RdfRepositories {
 							RdfRepository repository = new RdfRepository(((IRI) valueOfDataset).getLocalName(),
 									defaultPrefix, namespaces);
 							if (((IRI) valueOfDataset).getLocalName().equals("ODATA2SPARQL")) {
-								repository.setDataRepository(new RdfRoleRepository(repositoryManager
-										.getRepository("ODATA2SPARQL"), Integer
-										.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()), SPARQLProfile
-										.get(valueOfDataRepositoryImplProfile.stringValue()),"",""
-										
-										));
-								repository.setModelRepository(new RdfRoleRepository(repositoryManager
-										.getRepository("ODATA2SPARQL"), Integer
-										.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
-										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),"",""));
+								repository.setDataRepository(new RdfRoleRepository(
+										repositoryManager.getRepository("ODATA2SPARQL"),
+										Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
+										SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue()), "", ""
+
+								));
+								repository.setModelRepository(
+										new RdfRoleRepository(repositoryManager.getRepository("ODATA2SPARQL"),
+												Integer.parseInt(
+														valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
+												SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),
+												"", ""));
 
 							} else {
 
-								repository.setDataRepository(new RdfRoleRepository(repositoryManager
-										.getRepository(valueOfDataRepositoryID.stringValue()), Integer
-										.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()), SPARQLProfile
-										.get(valueOfDataRepositoryImplProfile.stringValue()),valueOfDataRepositoryImplQueryEndpoint
-										.stringValue(),valueOfDataRepositoryImplUpdateEndpoint
-										.stringValue()));
-								repository.setModelRepository(new RdfRoleRepository(repositoryManager
-										.getRepository(valueOfVocabularyRepositoryID.stringValue()), Integer
-										.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
-										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),valueOfVocabularyRepositoryImplQueryEndpoint
-										.stringValue(),valueOfVocabularyRepositoryImplUpdateEndpoint
-										.stringValue()));
+								repository.setDataRepository(new RdfRoleRepository(
+										repositoryManager.getRepository(valueOfDataRepositoryID.stringValue()),
+										Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
+										SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue()),
+										valueOfDataRepositoryImplQueryEndpoint.stringValue(),
+										valueOfDataRepositoryImplUpdateEndpoint.stringValue()));
+								repository.setModelRepository(new RdfRoleRepository(
+										repositoryManager.getRepository(valueOfVocabularyRepositoryID.stringValue()),
+										Integer.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
+										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue()),
+										valueOfVocabularyRepositoryImplQueryEndpoint.stringValue(),
+										valueOfVocabularyRepositoryImplUpdateEndpoint.stringValue()));
 							}
 							if (valueOfWithRdfAnnotations != null) {
-								repository.setWithRdfAnnotations(Boolean.parseBoolean(valueOfWithRdfAnnotations
-										.stringValue()));
+								repository.setWithRdfAnnotations(
+										Boolean.parseBoolean(valueOfWithRdfAnnotations.stringValue()));
 							} else {
 								repository.setWithRdfAnnotations(false);
 							}
 							if (valueOfWithSapAnnotations != null) {
-								repository.setWithSapAnnotations(Boolean.parseBoolean(valueOfWithSapAnnotations
-										.stringValue()));
+								repository.setWithSapAnnotations(
+										Boolean.parseBoolean(valueOfWithSapAnnotations.stringValue()));
 							} else {
 								repository.setWithSapAnnotations(false);
 							}
 							if (valueOfUseBaseType != null) {
-								repository.setUseBaseType(Boolean.parseBoolean(valueOfUseBaseType
-										.stringValue()));
+								repository.setUseBaseType(Boolean.parseBoolean(valueOfUseBaseType.stringValue()));
 							} else {
 								repository.setUseBaseType(true);
 							}
 							if (valueOfWithFKProperties != null) {
-								repository.setWithFKProperties(Boolean.parseBoolean(valueOfWithFKProperties
-										.stringValue()));
+								repository.setWithFKProperties(
+										Boolean.parseBoolean(valueOfWithFKProperties.stringValue()));
 							} else {
 								repository.setWithFKProperties(false);
 							}
 							if (valueOfWithMatching != null) {
-								repository.setWithMatching(Boolean.parseBoolean(valueOfWithMatching
-										.stringValue()));
+								repository.setWithMatching(Boolean.parseBoolean(valueOfWithMatching.stringValue()));
 							} else {
 								repository.setWithMatching(false);
 							}
@@ -331,8 +375,8 @@ public class RdfRepositories {
 								repository.setMatch(RdfConstants.MATCH);
 							}
 							if (valueOfExpandOperations != null) {
-								repository.setExpandOperations(Boolean.parseBoolean(valueOfExpandOperations
-										.stringValue()));
+								repository.setExpandOperations(
+										Boolean.parseBoolean(valueOfExpandOperations.stringValue()));
 							} else {
 								repository.setExpandOperations(true);
 							}
@@ -355,9 +399,8 @@ public class RdfRepositories {
 				log.error("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
 				throw new OData2SparqlException();
 			} catch (QueryEvaluationException e) {
-				log.error(
-						"Query Evaluation Exception "
-								+ RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
+				log.error("Query Evaluation Exception "
+						+ RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
 				throw new OData2SparqlException();
 			} finally {
 				modelsConnection.close();
@@ -389,31 +432,32 @@ public class RdfRepositories {
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException, IOException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		//String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
-		if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
+		if (this.repositoryFolder != null && !this.repositoryFolder.isEmpty()) {
 			// Should be local to Tomcat as specific to each running servlet/webapp
-			localRepositoryManagerDirectory = Paths.get(repositoryDir,this.repositoryFolder).toString();
+			localRepositoryManagerDirectory = Paths.get(repositoryDir, this.repositoryFolder).toString();
 		}
 		try {
 			FileUtil.deleteDir(new File(localRepositoryManagerDirectory));
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.info("Local repository directory does not yet exists at " + localRepositoryManagerDirectory);
 			FileUtil.createDirIfNotExists(new File(localRepositoryManagerDirectory));
 			//throw new RepositoryConfigException(e);
 		}
-		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(new File(localRepositoryManagerDirectory));
+		LocalRepositoryManager repositoryManager = new LocalRepositoryManager(
+				new File(localRepositoryManagerDirectory));
 		log.info("Using local repository at " + localRepositoryManagerDirectory);
 
 		try {
 			repositoryManager.initialize();
 		} catch (RepositoryException e) {
-			log.error("Cannot initialize repository manager at " + localRepositoryManagerDirectory + "Check also web-xml init-param repositoryFolder", e);
+			log.error("Cannot initialize repository manager at " + localRepositoryManagerDirectory
+					+ "Check also web-xml init-param repositoryFolder", e);
 			throw new OData2SparqlException("RdfRepositories loadRepositories failure", e);
 		}
 
 		//Create a configuration for the system repository implementation which is a native store
 
-		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();	 
+		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();
 		RepositoryImplConfig systemRepositoryTypeSpec = new SailRepositoryConfig(systemRepositoryImplConfig);
 		RepositoryConfig systemRepositoryConfig = new RepositoryConfig(RdfConstants.systemId, systemRepositoryTypeSpec);
 		try {
@@ -431,7 +475,7 @@ public class RdfRepositories {
 			log.error("Cannot add configuration to repository", e);
 			throw new OData2SparqlException();
 		}
-		
+
 		Repository systemRepository = null;
 
 		try {
@@ -451,24 +495,29 @@ public class RdfRepositories {
 			//TODO does not seem to be clearing triples
 			modelsConnection.clear();
 			//String localRepositoryManagerModel=RdfConstants.repositoryWorkingDirectory;
-			if(this.repositoryFolder!=null && !this.repositoryFolder.isEmpty()){
-				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,this.repositoryFolder,"models.ttl").toString();
-			}else{
-				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory,"models.ttl").toString();
+			if (this.repositoryFolder != null && !this.repositoryFolder.isEmpty()) {
+				localRepositoryManagerModel = Paths
+						.get(RdfConstants.repositoryWorkingDirectory, this.repositoryFolder, "models.ttl").toString();
+			} else {
+				localRepositoryManagerModel = Paths.get(RdfConstants.repositoryWorkingDirectory, "models.ttl")
+						.toString();
 			}
 			log.info("Loading models.ttl from " + localRepositoryManagerModel);
 			try {
 				modelsConnection.add(new File(localRepositoryManagerModel), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
-				log.error("RDFParseException: Cannot parse  " + localRepositoryManagerModel + " Check to ensure valid RDF/XML or TTL", e);
+				log.error("RDFParseException: Cannot parse  " + localRepositoryManagerModel
+						+ " Check to ensure valid RDF/XML or TTL", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (IOException e) {
-				log.error("Cannot access " + localRepositoryManagerModel + " Check it is located in correct directory and is visible", e);
+				log.error("Cannot access " + localRepositoryManagerModel
+						+ " Check it is located in correct directory and is visible", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} catch (RepositoryException e) {
-				log.error("RepositoryException: Cannot access " + localRepositoryManagerModel + " Check it is located in WEBINF/classes/", e);
+				log.error("RepositoryException: Cannot access " + localRepositoryManagerModel
+						+ " Check it is located in WEBINF/classes/", e);
 				System.exit(1);
 				//throw new Olingo2SparqlException();
 			} finally {
@@ -488,7 +537,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading rdf from " + RdfConstants.rdfFile);
-				modelsConnection.add(new File(RdfConstants.rdfFile ), RdfConstants.systemId, RDFFormat.TURTLE);
+				modelsConnection.add(new File(RdfConstants.rdfFile), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.rdfFile, e);
 				throw new OData2SparqlException();
@@ -500,7 +549,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
-				modelsConnection.add(new File(RdfConstants.rdfsFile ), RdfConstants.systemId, RDFFormat.TURTLE);
+				modelsConnection.add(new File(RdfConstants.rdfsFile), RdfConstants.systemId, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.rdfsFile, e);
 				throw new OData2SparqlException();
@@ -556,8 +605,8 @@ public class RdfRepositories {
 					BindingSet bindingSet = result.next();
 					Value valueOfPrefix = bindingSet.getValue("prefix");
 					Value valueOfNamespace = bindingSet.getValue("namespace");
-					namespaces.put(valueOfPrefix.stringValue(), new SimpleNamespace(valueOfPrefix.stringValue(),
-							valueOfNamespace.stringValue()));
+					namespaces.put(valueOfPrefix.stringValue(),
+							new SimpleNamespace(valueOfPrefix.stringValue(), valueOfNamespace.stringValue()));
 				}
 			} finally {
 				result.close();
@@ -591,16 +640,16 @@ public class RdfRepositories {
 					BindingSet bindingSet = result.next();
 					Value valueOfMetaModel = bindingSet.getValue("Metadata");
 					Hashtable<Value, String> metaModelQueries;
-					if( metaModels.containsKey(valueOfMetaModel) ){
-						 metaModelQueries = metaModels.get(valueOfMetaModel);
-					}else{
-						metaModelQueries= new Hashtable<Value, String> ();
+					if (metaModels.containsKey(valueOfMetaModel)) {
+						metaModelQueries = metaModels.get(valueOfMetaModel);
+					} else {
+						metaModelQueries = new Hashtable<Value, String>();
 						metaModels.put(valueOfMetaModel, metaModelQueries);
 					}
-					
+
 					Value valueOfQuery = bindingSet.getValue("Query");
 					Value valueOfQueryString = bindingSet.getValue("QueryString");
-					
+
 					metaModelQueries.put(valueOfQuery, valueOfQueryString.stringValue());
 				}
 				RdfConstants.setMetaQueries(metaModels.get(RdfConstants.URI_DEFAULTMETAMODEL));
