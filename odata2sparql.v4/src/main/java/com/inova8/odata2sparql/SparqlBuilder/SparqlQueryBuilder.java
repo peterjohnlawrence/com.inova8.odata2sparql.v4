@@ -665,6 +665,7 @@ public class SparqlQueryBuilder {
 						.append("\t?" + entityTypeName + "_s <" + complexNavigationProperty.getNavigationPropertyIRI()
 								+ "> ?" + entityTypeName + "_s" + complexProperty.getComplexPropertyName() + " .\n");
 			}
+			constructNodeShapePath.append(constructNodeShapeType(entityTypeName,  complexProperty));
 			constructComplexType(entityTypeName + complexProperty.getComplexPropertyName(), constructNodeShapePath,
 					complexProperty.getComplexType());
 
@@ -675,6 +676,15 @@ public class SparqlQueryBuilder {
 					+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + "> ?" + entityTypeName + "_"
 					+ complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName() + " .\n");
 		}
+	}
+
+	private StringBuilder constructNodeShapeType(String entityTypeName,
+			RdfComplexProperty complexProperty) {
+		StringBuilder constructNodeShapeType = new StringBuilder();
+		if (DEBUG)
+			constructNodeShapeType.append("\t#constructNodeShapeType\n");
+		constructNodeShapeType.append("\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s <" + RdfConstants.ASSERTEDTYPE + "> <" + complexProperty.getComplexType().getIRI() + "> .\n");
+		return constructNodeShapeType;
 	}
 
 	private StringBuilder constructPath() throws EdmException {
@@ -1128,8 +1138,13 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder valuesSubClassOf(RdfEntityType rdfEntityType) {
 		StringBuilder valuesSubClassOf = new StringBuilder();
-		valuesSubClassOf.append("VALUES(?class){").append("(<" + rdfEntityType.getURL() + ">)");
-		for (RdfEntityType subType : rdfEntityType.getAllSubTypes()) {
+		valuesSubClassOf.append("VALUES(?class){");
+		RdfEntityType actualRdfEntityType = rdfEntityType;
+		if(rdfEntityType.isNodeShape()) {
+			actualRdfEntityType= rdfEntityType.getNodeShape().getTargetClass();
+		}	
+		valuesSubClassOf.append("(<" + actualRdfEntityType.getURL() + ">)");
+		for (RdfEntityType subType : actualRdfEntityType.getAllSubTypes()) {
 			valuesSubClassOf.append("(<" + subType.getURL() + ">)");
 		}
 		return valuesSubClassOf;

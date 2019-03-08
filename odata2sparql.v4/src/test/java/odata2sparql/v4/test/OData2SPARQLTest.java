@@ -171,7 +171,7 @@ public class OData2SPARQLTest {
 				servlet.service(request, response);
 				assertStringEquals(expected.equals("?")?"":expected, response.getContentAsString());
 				//response.reset();
-				//response.flushBuffer();
+				//response.flushBuffer(); 
  
 			}
 		}

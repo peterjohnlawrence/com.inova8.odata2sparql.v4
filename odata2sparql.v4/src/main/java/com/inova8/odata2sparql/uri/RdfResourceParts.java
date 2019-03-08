@@ -123,9 +123,7 @@ public class RdfResourceParts {
 				 * Entity set with key predicate
 				 */
 				contextUrl = ContextURL.with()
-						//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
-						//.keyPath(rdfResourceParts.getLocalKey())
-						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
+						.entitySetOrSingletonOrType(this.getEntitySet().getEntitySetName())// getEdmEntitySet().getEntityType().getName())
 						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;

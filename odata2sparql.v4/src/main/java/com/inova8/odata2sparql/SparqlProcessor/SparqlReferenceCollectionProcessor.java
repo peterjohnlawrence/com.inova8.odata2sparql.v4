@@ -43,7 +43,7 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 	}
 	
 	
-	@Override
+	@Override 
 	public void readReferenceCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve info from URI

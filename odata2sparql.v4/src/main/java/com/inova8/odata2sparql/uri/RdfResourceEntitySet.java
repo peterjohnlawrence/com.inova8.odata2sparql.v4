@@ -106,4 +106,8 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 	public boolean hasKey() {
 		return !keyPredicates.isEmpty();
 	}
+	public String getEntitySetName() {
+		
+		return  this.edmEntitySet.getName();
+	}
 }

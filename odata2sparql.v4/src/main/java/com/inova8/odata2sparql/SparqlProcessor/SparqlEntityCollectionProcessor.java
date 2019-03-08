@@ -85,7 +85,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 					Locale.ENGLISH);
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
-					Locale.ENGLISH);
+					Locale.ENGLISH); 
 		}
 		//if (rdfResourceParts.isFunction()) {
 		//	throw new ODataApplicationException("Calling FunctionImports directly not supported at present", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
@@ -149,11 +149,7 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 						}
 					}
 				}
-			} // else {
-				// this would be the case for e.g. Products(1)/Category/Products(1)/Category
-				//	throw new ODataApplicationException("Not supported", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
-				//			Locale.ROOT);
-				//}
+			} 
 
 			// 5th: Now serialize the content: transform from the EntitySet object to InputStream	
 			ContextURL contextUrl = rdfResourceParts.contextUrl(request, odata); //null;

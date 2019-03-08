@@ -93,7 +93,7 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 	@Override
 	public void createReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
-		// 2. create the data in backend
+		// 2. create the data in backend 
 		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
 		InputStream requestInputStream = request.getBody();
 		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);

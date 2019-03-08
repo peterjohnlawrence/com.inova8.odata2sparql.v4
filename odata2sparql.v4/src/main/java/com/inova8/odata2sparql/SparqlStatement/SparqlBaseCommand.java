@@ -78,7 +78,7 @@ public class SparqlBaseCommand {
 		RdfEntityType rdfEntityType = null;
 		EdmEntitySet edmEntitySet = null;
 		String key = null;
-		Boolean knownKey = false;
+		Boolean knownKey = false; 
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider.getRdfModel(),
 				rdfEdmProvider.getEdmMetadata(), uriInfo, uriType, rdfResourceParts);
 

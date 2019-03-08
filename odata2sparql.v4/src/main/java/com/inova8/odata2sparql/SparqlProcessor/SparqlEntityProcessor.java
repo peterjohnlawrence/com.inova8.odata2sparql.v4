@@ -40,7 +40,7 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 
 public class SparqlEntityProcessor implements EntityProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
-	private OData odata;
+	private OData odata; 
 	private ServiceMetadata serviceMetadata;
 
 	public SparqlEntityProcessor(RdfEdmProvider rdfEdmProvider) {
@@ -58,7 +58,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. retrieve the Entity Type
-		RdfResourceParts rdfResourceParts = null;
+		RdfResourceParts rdfResourceParts = null; 
 		try {
 			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
 		} catch (EdmException e) {

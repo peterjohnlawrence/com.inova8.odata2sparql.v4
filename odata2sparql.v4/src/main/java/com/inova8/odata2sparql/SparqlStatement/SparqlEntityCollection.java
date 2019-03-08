@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -36,6 +37,7 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfTripleSet;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexTypePropertyPair;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
@@ -47,7 +49,6 @@ class SparqlEntityCollection extends EntityCollection {
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
 	private final Map<String, SparqlEntity> entitySetResultsMap = new TreeMap<String, SparqlEntity>();
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new TreeMap<String, Map<String, List<Object>>>();
-	//	private final Map<String, Integer> counts = new TreeMap<String, Integer>();
 	private RdfEdmProvider sparqlEdmProvider;
 
 	// Clarification of expanded structure
@@ -62,9 +63,11 @@ class SparqlEntityCollection extends EntityCollection {
 		this.toSparqlEntityCollection(entityType, results, expand, select);
 	}
 
-//	public Map<String, SparqlEntity> getEntitySetResultsMap() {
-//		return entitySetResultsMap;
-//	}
+	//	public Map<String, SparqlEntity> getEntitySetResultsMap() {
+	//		return entitySetResultsMap;
+	//	}
+
+
 
 	public EntityCollection getEntityCollection() throws ODataException {
 
@@ -112,7 +115,8 @@ class SparqlEntityCollection extends EntityCollection {
 		return links;
 	}
 
-	private void addNavPropertyObjectValues(String subject, String navigationPropertyName, SparqlEntity rdfObjectEntity) {
+	private void addNavPropertyObjectValues(String subject, String navigationPropertyName,
+			SparqlEntity rdfObjectEntity) {
 
 		List<Object> navPropertyObjectValues;
 		Map<String, List<Object>> navProperties;
@@ -189,14 +193,23 @@ class SparqlEntityCollection extends EntityCollection {
 							//}
 						} else if ((rdfComplexTypeProperty = rdfSubjectEntity.getEntityType()
 								.findComplexProperty(propertyNode)) != null) {
-							rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
-							//Could be associated with a complexType's navigation property
-							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-							rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
-							//							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
-							//									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
-							// fixes #7 add to the Entity
-							findOrCreateComplexLink(rdfSubjectEntity, rdfComplexTypeProperty, rdfObjectEntity);
+							if (rdfComplexTypeProperty.isNavigationProperty()) {
+								rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
+								//Could be associated with a complexType's navigation property
+								SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
+								rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
+								//							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
+								//									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
+								// fixes #7 add to the Entity
+								findOrCreateComplexLink(rdfSubjectEntity, rdfComplexTypeProperty, rdfObjectEntity);
+							} else if (rdfComplexTypeProperty.isComplexProperty()) {
+								SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
+								rdfObjectEntity.setEntityType(rdfComplexTypeProperty.getRdfComplexProperty()
+										.getRdfObjectPropertyShape().getPropertyNode().getEntityType());
+								findOrCreateComplexLink(rdfSubjectEntity, rdfComplexTypeProperty, rdfObjectEntity);
+							} else if (rdfComplexTypeProperty.isProperty()) {								
+								log.error("Should be handling rdfComplexTypePropertyy case: " + rdfComplexTypeProperty.toString());
+							}
 
 						} else {
 							// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
@@ -232,13 +245,15 @@ class SparqlEntityCollection extends EntityCollection {
 					rdfSubjectEntity.setTargetEntity(true);
 				} else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
 					//Provides counted value hashed by subject/navigationPropertyName
-					RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType().findNavigationProperty(
-							propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length() + 1));
+					RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType()
+							.findNavigationProperty(
+									propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length() + 1));
 					//Fixes #77						counts.put(
 					//							subjectNode.getIRI().toString()
 					//									+ propertyNode.getIRI().toString().substring(RdfConstants.COUNT.length()),
 					//							(Integer) objectNode.getLiteralObject());
-					findOrCreateLinkCount(rdfSubjectEntity, rdfNavigationProperty, (Integer) objectNode.getLiteralObject());
+					findOrCreateLinkCount(rdfSubjectEntity, rdfNavigationProperty,
+							(Integer) objectNode.getLiteralObject());
 				} else if (rdfSubjectEntity.getEntityType().isOperation()
 						&& (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)) {
 					//Fixes #81 OK this is an operation that is returning a literal for a primaryKey so  use UNDEF 
@@ -260,6 +275,7 @@ class SparqlEntityCollection extends EntityCollection {
 		return this.build();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void findOrCreateComplexLink(SparqlEntity rdfSubjectEntity,
 			RdfComplexTypePropertyPair rdfComplexTypeProperty, SparqlEntity rdfObjectEntity) {
 		RdfNavigationProperty rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
@@ -276,10 +292,12 @@ class SparqlEntityCollection extends EntityCollection {
 			complexValue = (ComplexValue) complexProperty.getValue();
 		}
 
-		if (rdfComplexTypeProperty.getRdfProperty() != null) {
+		if (rdfComplexTypeProperty.isProperty()) {
 			//Add property value
-			//Problem!!!
-		} else if (rdfComplexTypeProperty.getRdfNavigationProperty() != null) {
+			log.error("Ignoring complextype property statement has datatype value:"
+					+ rdfComplexTypeProperty.getRdfComplexType().getComplexTypeName() + " : "
+					+ rdfComplexTypeProperty.getRdfProperty().getEDMPropertyName());
+		} else if (rdfComplexTypeProperty.isNavigationProperty()) {
 
 			RdfNavigationProperty complexNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
 			Link navigationLink = complexValue.getNavigationLink(complexNavigationProperty.getNavigationPropertyName());
@@ -287,8 +305,8 @@ class SparqlEntityCollection extends EntityCollection {
 				navigationLink = new Link();
 				navigationLink.setTitle(complexNavigationProperty.getNavigationPropertyName());
 				if (navigationLink.getRel() == null)
-					navigationLink.setRel(
-							"http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
+					navigationLink.setRel("http://docs.oasis-open.org/odata/ns/related/"
+							+ rdfNavigationProperty.getEDMNavigationPropertyName());
 				complexValue.getNavigationLinks().add(navigationLink);
 			}
 			//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
@@ -322,6 +340,52 @@ class SparqlEntityCollection extends EntityCollection {
 				navigationLink.setInlineEntity(rdfObjectEntity);
 				Property valueProperty = new Property(null, complexNavigationProperty.getNavigationPropertyName(),
 						ValueType.ENTITY, rdfObjectEntity);
+				complexValue.getValue().add(valueProperty);
+			}
+		} else if (rdfComplexTypeProperty.isComplexProperty()) {
+			RdfComplexProperty rdfComplexProperty = rdfComplexTypeProperty.getRdfComplexProperty();
+			Link navigationLink = complexValue.getNavigationLink(rdfComplexProperty.getComplexPropertyName());
+			if (navigationLink == null) {
+				navigationLink = new Link();
+				navigationLink.setTitle(rdfComplexProperty.getComplexPropertyName());
+				if (navigationLink.getRel() == null)
+					navigationLink.setRel("http://docs.oasis-open.org/odata/ns/related/"
+							+ rdfComplexProperty.getComplexPropertyName());
+				complexValue.getNavigationLinks().add(navigationLink);
+			}
+			//TODO this should simply be the navigation  to the complex property, eg Employee('NWD~ContractEmployee-2')/employer
+			navigationLink.setHref(rdfObjectEntity.getId().toString());
+
+			if (rdfComplexProperty.getCardinality().equals(Cardinality.MANY)) {
+				// to MANY, MULTIPLE
+				EntityCollection inlineEntitySet = navigationLink.getInlineEntitySet();
+				if (inlineEntitySet == null) {
+					inlineEntitySet = new EntityCollection();
+					navigationLink.setInlineEntitySet(inlineEntitySet);
+				}
+				inlineEntitySet.getEntities().add(rdfObjectEntity);
+				Property valueProperty = null;
+
+				for (Property property : complexValue.getValue()) {
+					if (property.getName().equals(rdfComplexProperty.getComplexPropertyName())) {
+						valueProperty = property;
+						break;
+					}
+				}
+				if (valueProperty == null) {					
+					List<SparqlEntity> complexValueCollection = new ArrayList<SparqlEntity>();					
+					complexValueCollection.add(rdfObjectEntity);
+					valueProperty = new Property(null, rdfComplexProperty.getComplexPropertyName(),
+							ValueType.COLLECTION_COMPLEX, complexValueCollection);
+					complexValue.getValue().add(valueProperty);
+				} else {
+					((List<SparqlEntity>) valueProperty.getValue()).add(rdfObjectEntity);
+				}
+			} else {
+				// to ONE
+				navigationLink.setInlineEntity(rdfObjectEntity);
+				Property valueProperty = new Property(null, rdfComplexProperty.getComplexPropertyName(),
+						ValueType.COMPLEX, rdfObjectEntity);
 				complexValue.getValue().add(valueProperty);
 			}
 		}
@@ -361,11 +425,13 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		// Required to make sure rel is not empty
 		if (link.getRel() == null)
-			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/"
+					+ rdfNavigationProperty.getEDMNavigationPropertyName());
 		return link;
 	}
 
-	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty, int count) {
+	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty,
+			int count) {
 		Link link = null;
 		if (rdfSubjectEntity.getNavigationLinks() == null) {
 			link = new Link();
@@ -397,7 +463,8 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 		// Required to make sure rel is not empty
 		if (link.getRel() == null)
-			link.setRel("http://docs.oasis-open.org/odata/ns/related/" + rdfNavigationProperty.getEDMNavigationPropertyName());
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/"
+					+ rdfNavigationProperty.getEDMNavigationPropertyName());
 		return link;
 	}
 
@@ -439,6 +506,48 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 	}
 
+	private void resolveComplexProperties(SparqlEntity rdfEntity, List<Property> properties) {
+
+		for (Property property : properties) {
+			ValueType propertyValueType = property.getValueType();
+			switch (propertyValueType) {
+			case COMPLEX:
+				Object complexValue = property.getValue();
+				switch (complexValue.getClass().getName()) {
+				case "com.inova8.odata2sparql.SparqlStatement.SparqlEntity":
+					log.error("Should be handling COMPLEX case: " + complexValue.toString());
+					break;
+				default:
+					resolveComplexProperties(rdfEntity, ((ComplexValue) complexValue).getValue());
+					break;
+				}
+				break;
+
+			case COLLECTION_COMPLEX:
+				//Everything in the collection should be complex, if Entity then convert to complex val
+				@SuppressWarnings("unchecked") List<Object> complexCollection = (List<Object>) property.getValue();
+				for (ListIterator<Object> complexCollectionIterator = complexCollection.listIterator(); complexCollectionIterator.hasNext();) {
+					Object complexCollectionElement = complexCollectionIterator.next();
+					switch (complexCollectionElement.getClass().getName()) {
+					case "com.inova8.odata2sparql.SparqlStatement.SparqlEntity":
+						ComplexValue resolvedComplexValue;// = new ComplexValue();
+						SparqlEntity sparqlEntity = (SparqlEntity)complexCollectionElement;
+						resolvedComplexValue= (ComplexValue)sparqlEntity.getProperty(sparqlEntity.getEntityType().getEntityTypeName()).getValue();
+						complexCollectionIterator.set(resolvedComplexValue);
+						break;
+					default:
+						resolveComplexProperties(rdfEntity, ((ComplexValue) complexCollectionElement).getValue());
+						break;  
+					}
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
 	private SparqlEntityCollection build() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
@@ -462,6 +571,9 @@ class SparqlEntityCollection extends EntityCollection {
 			//				if ((count != null) && (navigationLink.getInlineEntitySet() != null))
 			//					navigationLink.getInlineEntitySet().setCount(count);
 			//			}
+
+	//resolveComplexProperties(rdfEntity, rdfEntity.getProperties());
+
 			for (Entry<RdfNode, Object> entry : rdfEntity.getDatatypeProperties().entrySet()) {
 				RdfNode propertyNode = entry.getKey();
 				Object value = entry.getValue();
@@ -512,22 +624,18 @@ class SparqlEntityCollection extends EntityCollection {
 								} else {
 									complexValue = (ComplexValue) complexProperty.getValue();
 								}
-								if (rdfComplexTypeProperty.getRdfProperty() != null) {
+								if (rdfComplexTypeProperty.isProperty()) {
 									//Add property value
 									Property valueProperty = new Property(null,
 											rdfComplexTypeProperty.getRdfProperty().propertyName, ValueType.PRIMITIVE,
 											Cast(value, rdfComplexTypeProperty.getRdfProperty().propertyTypeName));
 									complexValue.getValue().add(valueProperty);
-								} else if (rdfComplexTypeProperty.getRdfNavigationProperty() != null) {
+								} else if (rdfComplexTypeProperty.isNavigationProperty()) {
 									//Build link to entity
-									//RdfAssociation complexNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
-									//									Link navigationLink = new Link();
-									//									navigationLink.setHref(complexNavigationProperty.getRangeName() + "('" + sparqlEdmProvider.getRdfModel().getRdfPrefixes().toQName(value.toString(), RdfConstants.QNAME_SEPARATOR) + "')");
-									//									navigationLink.setTitle(complexNavigationProperty.getAssociationName());
-									//									//navigationLink.setType(complexNavigationProperty.getRangeName());
-									//									navigationLink.setRel("edit");
-									//									navigationLink.setInlineEntity((SparqlEntity) value);
-									//									complexValue.getNavigationLinks().add(navigationLink);
+									log.error("Ignoring navigationProperty statement: " + propertyNode.getLocalName());
+								} else if (rdfComplexTypeProperty.isComplexProperty()) {
+									//Build link to complex
+									log.error("Ignoring complexProperty statement: " + propertyNode.getLocalName());
 								}
 							} else {
 								log.info("Ignoring property statement that is not part of EDM: "
@@ -553,6 +661,13 @@ class SparqlEntityCollection extends EntityCollection {
 					}
 				}
 			}
+		}
+		entitySetResultsMapIterator = entitySetResultsMap.entrySet()
+				.iterator();
+		while (entitySetResultsMapIterator.hasNext()) {
+			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
+			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
+			resolveComplexProperties(rdfEntity, rdfEntity.getProperties());
 		}
 
 		//Fixes #77		this.setCount(counts.get(this.entityType.getIRI()));

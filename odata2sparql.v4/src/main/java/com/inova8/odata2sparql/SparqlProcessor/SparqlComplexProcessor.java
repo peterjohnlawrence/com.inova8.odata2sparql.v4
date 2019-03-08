@@ -22,6 +22,7 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.processor.ComplexCollectionProcessor;
 import org.apache.olingo.server.api.processor.ComplexProcessor;
 import org.apache.olingo.server.api.serializer.ComplexSerializerOptions;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
@@ -34,7 +35,7 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
-public class SparqlComplexProcessor implements ComplexProcessor {
+public class SparqlComplexProcessor implements ComplexProcessor,ComplexCollectionProcessor {
 	private final RdfEdmProvider rdfEdmProvider;
 	private OData odata;
 	private ServiceMetadata serviceMetadata;
@@ -63,6 +64,13 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 					Locale.ENGLISH);
 		}
 
+	}
+	@Override
+	public void readComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException("Not Implemented", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+				Locale.ENGLISH);
+		
 	}
 
 	private void readComplexValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
@@ -171,5 +179,24 @@ public class SparqlComplexProcessor implements ComplexProcessor {
 		throw new ODataApplicationException("Not Implemented", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
 				Locale.ENGLISH);
 
+	}
+
+
+
+	@Override
+	public void updateComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+			ContentType requestFormat, ContentType responseFormat)
+			throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException("Not Implemented", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+				Locale.ENGLISH);
+		
+	}
+
+	@Override
+	public void deleteComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+			throws ODataApplicationException, ODataLibraryException {
+		throw new ODataApplicationException("Not Implemented", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+				Locale.ENGLISH);
+		
 	}
 }

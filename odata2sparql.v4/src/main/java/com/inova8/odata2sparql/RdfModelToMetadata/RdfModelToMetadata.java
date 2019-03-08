@@ -391,7 +391,7 @@ public class RdfModelToMetadata {
 				navigationPropertyLookup.put(navigationProperty.getName(), rdfNavigationProperty);
 				navigationPropertyMapping.put(rdfNavigationProperty.getFullQualifiedName(), rdfNavigationProperty);
 			}
-		}
+		} 
 	}
 
 	private void locateComplexTypes(RdfSchema rdfGraph, Map<String, CsdlComplexType> complexTypes) {

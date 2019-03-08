@@ -858,7 +858,7 @@ public class RdfModelProvider {
 					try {
 						//SELECT ?nodeShape  ?nodeShapeLabel ?nodeShapeName ?nodeShapeDescription  ?nodeShapeTargetClass ?nodeShapeDeactivated
 						RdfQuerySolution soln = NodeShapes.nextSolution();
-						nodeShape = soln.getRdfNode("nodeShape");
+						nodeShape = soln.getRdfNode("nodeShape"); 
 						baseNodeShape = soln.getRdfNode("baseNodeShape");
 						nodeShapeLabel = soln.getRdfNode("nodeShapeLabel");
 						nodeShapeName = soln.getRdfNode("nodeShapeName");
@@ -866,12 +866,6 @@ public class RdfModelProvider {
 						nodeShapeTargetClass = soln.getRdfNode("nodeShapeTargetClass");
 						nodeShapeDeactivated = soln.getRdfNode("nodeShapeDeactivated");
 						model.getOrCreateNodeShape(nodeShape, baseNodeShape, nodeShapeLabel, nodeShapeName, nodeShapeDescription,nodeShapeTargetClass,nodeShapeDeactivated);
-//						RdfComplexType complexType = model.getOrCreateComplexType(
-//								soln.getRdfNode("superProperty"), null, null);
-//						complexType.addProperty(datatypeProperty);
-//						complexTypes.add(complexType);
-//						superProperty.setIsComplex(true);
-//						superProperty.setComplexType(complexType);
 						count++;
 						debug.append(nodeShape.getIRI().toString()).append(";");
 					} catch (Exception e) {

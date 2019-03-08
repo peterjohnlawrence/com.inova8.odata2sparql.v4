@@ -41,11 +41,11 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 
 	public RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedEntityType(fullQualifiedName);
-	}
+	} 
 
 	public RdfEntityType getRdfEntityTypefromEdmEntitySet(EdmEntitySet edmEntitySet) throws EdmException {
 		return this.getMappedEntityType(new FullQualifiedName(edmEntitySet.getEntityType().getNamespace(), edmEntitySet
-				.getEntityType().getName()));
+				.getEntityType().getName()));  
 	}
 	public RdfProperty getMappedProperty(FullQualifiedName fqnProperty) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedProperty(fqnProperty);
@@ -66,7 +66,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	public RdfModel getRdfModel() {
 		return this.rdfEdmModelProvider.getRdfModel();
 	}
-
+ 
 	@Override
 	public List<CsdlSchema> getSchemas() throws ODataException {
 		return this.rdfEdmModelProvider.getEdmMetadata().getSchemas();
