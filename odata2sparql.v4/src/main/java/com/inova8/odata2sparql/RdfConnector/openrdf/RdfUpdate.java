@@ -21,7 +21,7 @@ public class RdfUpdate extends RdfQuery{
 	public void execUpdate() throws OData2SparqlException {
 		try {
 			super.connection = rdfRoleRepository.getRepository().getConnection();
-			log.info( super.query);
+			log.info( "\n"+ super.query);
 			super.connection.begin();
 			updateQuery = connection.prepareUpdate(QueryLanguage.SPARQL, super.query);
 			updateQuery.execute();

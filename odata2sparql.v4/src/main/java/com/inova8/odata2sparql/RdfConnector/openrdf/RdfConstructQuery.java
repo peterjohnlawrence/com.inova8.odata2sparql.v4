@@ -21,7 +21,7 @@ public class RdfConstructQuery extends RdfQuery{
 		try {
 			super.connection = rdfRoleRepository.getRepository().getConnection();
 			graphQuery = connection.prepareGraphQuery(QueryLanguage.SPARQL, super.query);
-			log.info( super.query);
+			log.info( "\n"+ super.query);
 			rdfTripleSet = new RdfTripleSet(connection, QueryResults.distinctResults(graphQuery.evaluate()));
 		} catch (Exception e) {		
 			log.error( " RdfTripleSet execConstruct() failure with exception" + e.getMessage());

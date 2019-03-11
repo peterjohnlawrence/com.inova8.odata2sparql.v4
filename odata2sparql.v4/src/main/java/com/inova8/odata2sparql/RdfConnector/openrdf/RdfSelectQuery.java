@@ -21,7 +21,7 @@ public class RdfSelectQuery extends RdfQuery{
 	public RdfResultSet execSelect(Boolean logQuery) throws OData2SparqlException {
 		RdfResultSet rdfResultSet = null;
 		try {
-			if( logQuery)log.info( super.query);
+			if( logQuery)log.info( "\n"+ super.query);
 			rdfResultSet = new RdfResultSet(rdfRoleRepository.getRepository(), super.query );
 		} catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
 			log.error( super.query);

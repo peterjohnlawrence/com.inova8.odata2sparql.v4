@@ -683,7 +683,7 @@ public class SparqlQueryBuilder {
 		StringBuilder constructNodeShapeType = new StringBuilder();
 		if (DEBUG)
 			constructNodeShapeType.append("\t#constructNodeShapeType\n");
-		constructNodeShapeType.append("\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s <" + RdfConstants.ASSERTEDTYPE + "> <" + complexProperty.getComplexType().getIRI() + "> .\n");
+		constructNodeShapeType.append("\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s <" + RdfConstants.ASSERTEDSHAPE + "> <" + complexProperty.getComplexType().getIRI() + "> .\n");
 		return constructNodeShapeType;
 	}
 

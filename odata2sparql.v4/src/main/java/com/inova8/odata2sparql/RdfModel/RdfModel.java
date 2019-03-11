@@ -974,6 +974,10 @@ public class RdfModel {
 			this.isComplexProperty=true;
 		}
 
+		public String getEquivalentComplexPropertyName() {
+			return getRdfComplexType().getComplexTypeName().replace(RdfConstants.SHAPE_POSTFIX, "");
+			
+		}
 		public RdfComplexType getRdfComplexType() {
 			return rdfComplexType;
 		}
@@ -1479,7 +1483,9 @@ public class RdfModel {
 		public String getNodeShapeName() {
 			return nodeShapeName;
 		}
-
+		public String getNodeShapeComplexTypeName() {
+			return nodeShapeName + RdfConstants.SHAPE_POSTFIX;
+		}
 		public void setNodeShapeName(String nodeShapeName) {
 			this.nodeShapeName = nodeShapeName;
 		}
@@ -1737,6 +1743,22 @@ public class RdfModel {
 		return rdfPrefixes;
 	}
 
+	public RdfEntityType getOrCreateEntityTypeFromShape(RdfNode shapeNode) throws OData2SparqlException {
+		RdfURI classURI = new RdfURI(shapeNode);
+		String equivalentClassName = classURI.localName.replace(RdfConstants.SHAPE_POSTFIX, "");
+		RdfEntityType clazz = Enumerable.create(classURI.graph.classes)
+				.firstOrNull(classNameEquals(rdfToOdata(equivalentClassName)));
+		if (clazz == null) {
+			//Should never get here
+			clazz = new RdfEntityType();
+			clazz.schema = classURI.graph;
+			clazz.entityTypeName = rdfToOdata(equivalentClassName);
+
+			//clazz.entityTypeNode = entityTypeNode;
+			classURI.graph.classes.add(clazz);
+		}
+		return clazz;
+	}
 	public RdfEntityType getOrCreateEntityType(RdfNode classNode) throws OData2SparqlException {
 		return getOrCreateEntityType(classNode, null);
 	}
@@ -2065,10 +2087,10 @@ public class RdfModel {
 	public RdfComplexType getOrCreateComplexType(RdfNodeShape nodeShape) throws OData2SparqlException {
 		//Used for regular complexTypes such as NodeShapes
 		RdfComplexType complexType = Enumerable.create(nodeShape.getSchema().getComplexTypes())
-				.firstOrNull(complexTypeNameEquals(rdfToOdata(nodeShape.getNodeShapeName())));
+				.firstOrNull(complexTypeNameEquals(rdfToOdata(nodeShape.getNodeShapeComplexTypeName())));
 		if (complexType == null) {
 			complexType = new RdfComplexType();
-			complexType.complexTypeName = rdfToOdata(nodeShape.getNodeShapeName());
+			complexType.complexTypeName = rdfToOdata(nodeShape.getNodeShapeComplexTypeName());
 			complexType.complexTypeLabel = nodeShape.getNodeShapeLabel();
 			complexType.setSchema(nodeShape.getSchema());
 			complexType.setProvenanceType(false);

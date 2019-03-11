@@ -66,11 +66,13 @@ public class RdfConstants {
 
 	public static final String TARGETENTITY = "http://targetEntity";
 	public static final String ASSERTEDTYPE = "http://assertedType";
+	public static final String ASSERTEDSHAPE = "http://assertedShape";
 	public static final String MATCHING = "http://matching";
 	public static final String COUNT = "http://count";
 	public static final String PREFIX = "j";
 	public static final String PROPERTY_POSTFIX = "_value";
 	public static final String PLURAL = "s";
+	public static final String SHAPE_POSTFIX = "_shape";//"";//
 
 
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";

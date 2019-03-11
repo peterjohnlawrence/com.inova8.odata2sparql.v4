@@ -174,6 +174,7 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.2.3</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -217,6 +218,16 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<junit.version>4.11</junit.version>
+		<servlet-api-version>4.0</servlet-api-version>
 	</properties>
 	<url>http://www.inova8.com</url>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>{servlet-api-version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
