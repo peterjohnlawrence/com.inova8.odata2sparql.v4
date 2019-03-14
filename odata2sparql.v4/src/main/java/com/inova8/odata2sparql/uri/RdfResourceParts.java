@@ -33,6 +33,7 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -55,7 +56,7 @@ public class RdfResourceParts {
 	private String localKey;
 	private String targetSubjectId;
 	private String entityString;
-	private String navPath;
+	private String navPathString;
 	private int size;
 	private EdmEntitySet responseEntitySet;
 	private UriInfo uriInfo;
@@ -88,10 +89,11 @@ public class RdfResourceParts {
 				isRef = uriResourceParts.get(uriResourceParts.size() - 1).toString().equals("$ref");
 				break;
 			case function:
-				UriResourceFunction function = (UriResourceFunction) resourcePart ;
-				EdmEntitySet edmEntitySet =  function.getFunctionImport().getReturnedEntitySet();
+				UriResourceFunction function = (UriResourceFunction) resourcePart;
+				EdmEntitySet edmEntitySet = function.getFunctionImport().getReturnedEntitySet();
 				//UriResource function = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
-				rdfResourceParts.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet,function.getParameters()));
+				rdfResourceParts
+						.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet, function.getParameters()));
 				isFunction = true;
 				break;
 			default:
@@ -122,8 +124,7 @@ public class RdfResourceParts {
 				/**
 				 * Entity set with key predicate
 				 */
-				contextUrl = ContextURL.with()
-						.entitySetOrSingletonOrType(this.getEntitySet().getEntitySetName())// getEdmEntitySet().getEntityType().getName())
+				contextUrl = ContextURL.with().entitySetOrSingletonOrType(this.getEntitySet().getEntitySetName())// getEdmEntitySet().getEntityType().getName())
 						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
@@ -131,13 +132,16 @@ public class RdfResourceParts {
 				/**
 				 * Complex property of an entity
 				 */
+				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPathString())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI4:
 				/**
 				 * Simple property of a complex property of an entity
 				 */
 				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPathString())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI5:
@@ -145,7 +149,7 @@ public class RdfResourceParts {
 				 * Simple property of an entity
 				 */
 				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPathString())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI6A:
@@ -154,7 +158,7 @@ public class RdfResourceParts {
 				 * or '0..1'
 				 */
 				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath())
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPathString())
 						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList)
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
@@ -163,7 +167,7 @@ public class RdfResourceParts {
 				 * Navigation property of an entity with target multiplicity '*'
 				 */
 				contextUrl = ContextURL.with().entitySet(this.getEntitySet().getEdmEntitySet())
-						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPath()).selectList(selectList)
+						.keyPath(this.getLocalKey()).navOrPropertyPath(this.getNavPathString()).selectList(selectList)
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI7A:
@@ -191,11 +195,11 @@ public class RdfResourceParts {
 				 * instances
 				 */
 				contextUrl = ContextURL.with()
-				//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
-				//.keyPath(rdfResourceParts.getLocalKey())
-				.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
-				.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
-				.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
+						//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
+						//.keyPath(rdfResourceParts.getLocalKey())
+						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
+						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
+						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI12:
 				/**
@@ -245,7 +249,7 @@ public class RdfResourceParts {
 		targetSubjectId = _getTargetSubjectId();
 		entitySet = _getEntitySet();
 		entityString = _getEntityString();
-		navPath = _getNavPath();
+		navPathString = _getNavPathString();
 		size = _size();
 	}
 
@@ -309,8 +313,8 @@ public class RdfResourceParts {
 		return entityString;
 	}
 
-	public String getNavPath() {
-		return navPath;
+	public String getNavPathString() {
+		return navPathString;
 	}
 
 	public int size() {
@@ -363,10 +367,9 @@ public class RdfResourceParts {
 		if (edmComplexType == null) {
 			return null;
 		} else {
-			RdfEntityType rdfEntityType = rdfEdmProvider
-					.getRdfEntityTypefromEdmEntitySet(getEntitySet(complexIndex - 1));
-
-			return rdfEntityType.findProperty(edmComplexType.getName());
+			RdfEntityType rdfEntityType = null;
+			rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(getEntitySet(complexIndex - 1));
+			return rdfEntityType.findProperty(edmComplexType.getName().replace(RdfConstants.SHAPE_POSTFIX, ""));
 		}
 	}
 
@@ -437,9 +440,10 @@ public class RdfResourceParts {
 		if (getAsEntitySet(0) != null)
 			return getAsEntitySet(0);
 		return null;
+	
 	}
 
-	private String _getNavPath() {
+	private String _getNavPathString() {
 		if (rdfResourceParts.size() == 0) {
 			return null;
 		} else {
@@ -454,7 +458,21 @@ public class RdfResourceParts {
 			}
 		}
 	}
-
+	public ArrayList<RdfResourcePart> getNavPath() {
+		ArrayList<RdfResourcePart> navParts = new ArrayList<RdfResourcePart>();
+		if (rdfResourceParts.size() == 0) {
+			return null;
+		} else {
+			for (RdfResourcePart rdfResourcePart : rdfResourceParts.subList(1, rdfResourceParts.size())) {
+				navParts.add(rdfResourcePart);
+			}
+			if (navParts.isEmpty()) {
+				return null;
+			} else {
+				return navParts;
+			}
+		}
+	}
 	private int _size() {
 		return rdfResourceParts.size();
 	}
@@ -581,6 +599,7 @@ public class RdfResourceParts {
 			}
 			return null;
 		case complexProperty:
+			return getEntitySet(index-1);
 		default:
 			log.error(getResourceKind(index).toString() + " not handled for getEntitySet");
 			return null;

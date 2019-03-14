@@ -975,7 +975,7 @@ public class RdfModel {
 		}
 
 		public String getEquivalentComplexPropertyName() {
-			return getRdfComplexType().getComplexTypeName().replace(RdfConstants.SHAPE_POSTFIX, "");
+			return getRdfComplexType().getEquivalentComplexPropertyName();
 			
 		}
 		public RdfComplexType getRdfComplexType() {
@@ -1053,6 +1053,10 @@ public class RdfModel {
 			return complexTypeName;
 		}
 
+		public String getEquivalentComplexPropertyName() {
+			return getComplexTypeName().replace(RdfConstants.SHAPE_POSTFIX, "");
+			
+		}
 		public String getComplexTypeLabel() {
 			return complexTypeLabel;
 		}

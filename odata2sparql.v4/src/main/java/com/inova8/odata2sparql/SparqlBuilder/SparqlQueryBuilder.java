@@ -755,20 +755,22 @@ public class SparqlQueryBuilder {
 		StringBuilder clausesNodeShapeProperties = new StringBuilder();
 		if (DEBUG)
 			clausesNodeShapeProperties.append("\t#clausesNodeShapeProperties\n");
+		clausesNodeShapeProperties.append("\t{\n");
 		for (RdfProperty property : rdfTargetEntityType.getInheritedProperties()) {
 			if (property.getIsComplex()) {
 				clausesComplexType(entityTypeName, clausesNodeShapeProperties, property.getComplexType());
 			} else {
 				if (property.isOptional()) {
 					clausesNodeShapeProperties
-							.append("\tOPTIONAL{\t?" + entityTypeName + "_s <" + property.getPropertyURI() + "> ?"
+							.append("\t\tOPTIONAL{\t\t?" + entityTypeName + "_s <" + property.getPropertyURI() + "> ?"
 									+ entityTypeName + "_" + property.getEDMPropertyName() + " }\n");
 				} else {
-					clausesNodeShapeProperties.append("\t?" + entityTypeName + "_s <" + property.getPropertyURI()
+					clausesNodeShapeProperties.append("\t\t?" + entityTypeName + "_s <" + property.getPropertyURI()
 							+ "> ?" + entityTypeName + "_" + property.getEDMPropertyName() + ".\n");
 				}
 			}
 		}
+		clausesNodeShapeProperties.append("\t}\n");
 		return clausesNodeShapeProperties;
 	}
 
