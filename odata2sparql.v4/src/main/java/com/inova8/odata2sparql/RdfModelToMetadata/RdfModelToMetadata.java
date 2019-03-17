@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
@@ -78,7 +80,7 @@ public class RdfModelToMetadata {
 		if (text == null || text.isEmpty()) {
 		} else {
 			annotations.add(new CsdlAnnotation().setTerm(fqn).setExpression(
-					new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.String, text)));
+					new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.String, StringEscapeUtils.escapeXml11(text))));
 		}
 	}
 

@@ -667,7 +667,7 @@ public class RdfModelProvider {
 					inversePropertyLabelNode, propertyNode, domainNode, rangeNode, multipleDomainNode,
 					multipleRangeNode, domainCardinality, rangeCardinality);						
 		}
-		if (soln.getRdfNode("description") != null) {
+		if (inverseRdfNavigationProperty!=null && soln.getRdfNode("description") != null) {
 			inverseRdfNavigationProperty
 					.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 		}

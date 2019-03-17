@@ -385,7 +385,14 @@ public class RdfModel {
 
 		public String getEntitySetLabel() {
 			if (this.entitySetLabel == null) {
-				return this.getEntityTypeLabel() + RdfConstants.PLURAL;
+				String derivedName = this.getEntityTypeLabel();
+				if( derivedName.equals("")) {
+					derivedName = this.getEntityTypeName();
+				}
+				if (!derivedName.substring(derivedName.length() - 1).equals(RdfConstants.PLURAL))
+					return derivedName + RdfConstants.PLURAL;
+				else
+					return derivedName;
 			} else {
 				return this.entitySetLabel;
 			}
@@ -543,20 +550,22 @@ public class RdfModel {
 							.getNavigationProperties().values()) {
 						if (complexNavigationProperty.getNavigationPropertyIRI().toString()
 								.equals(propertyNode.getIRI().toString())) {
-							return new RdfComplexTypePropertyPair(property.getComplexType(),
-									complexNavigationProperty);
+							return new RdfComplexTypePropertyPair(property.getComplexType(), complexNavigationProperty);
 						}
 					}
 					for (RdfComplexProperty complexProperty : property.getComplexType().getComplexProperties()
 							.values()) {
-						if (complexProperty.getComplexPropertyIRI().toString().equals(propertyNode.getIRI().toString())) {
+						if (complexProperty.getComplexPropertyIRI().toString()
+								.equals(propertyNode.getIRI().toString())) {
 							return new RdfComplexTypePropertyPair(property.getComplexType(), complexProperty);
 						}
 					}
-					for (RdfShapedNavigationProperty shapedNavigationProperty : property.getComplexType().getShapedNavigationProperties()
-							.values()) {
-						if (shapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI().toString().equals(propertyNode.getIRI().toString())) {
-							return new RdfComplexTypePropertyPair(property.getComplexType(), shapedNavigationProperty.getRdfNavigationProperty());
+					for (RdfShapedNavigationProperty shapedNavigationProperty : property.getComplexType()
+							.getShapedNavigationProperties().values()) {
+						if (shapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI().toString()
+								.equals(propertyNode.getIRI().toString())) {
+							return new RdfComplexTypePropertyPair(property.getComplexType(),
+									shapedNavigationProperty.getRdfNavigationProperty());
 						}
 					}
 				}
@@ -572,13 +581,13 @@ public class RdfModel {
 						return new RdfComplexTypePropertyPair(property.getComplexType(),
 								property.getComplexType().getProperties().get(propertyName));
 					} else if (property.getComplexType().getNavigationProperties().containsKey(propertyName)) {
-						return new RdfComplexTypePropertyPair(property.getComplexType(), 
+						return new RdfComplexTypePropertyPair(property.getComplexType(),
 								property.getComplexType().getNavigationProperties().get(propertyName));
 					} else if (property.getComplexType().getShapedNavigationProperties().containsKey(propertyName)) {
-						return new RdfComplexTypePropertyPair(property.getComplexType(),  property.getComplexType()
+						return new RdfComplexTypePropertyPair(property.getComplexType(), property.getComplexType()
 								.getShapedNavigationProperties().get(propertyName).getRdfNavigationProperty());
 					} else if (property.getComplexType().getComplexProperties().containsKey(propertyName)) {
-						return new RdfComplexTypePropertyPair(property.getComplexType(),  property.getComplexType()
+						return new RdfComplexTypePropertyPair(property.getComplexType(), property.getComplexType()
 								.getComplexProperties().get(propertyName).getRdfObjectPropertyShape().getPath());
 					}
 				}
@@ -765,12 +774,13 @@ public class RdfModel {
 			else
 				return false;
 		}
+
 		public String getComplexPropertyIRI() {
-			if(rdfObjectPropertyShape.isInversePath() ) {
+			if (rdfObjectPropertyShape.isInversePath()) {
 				return rdfObjectPropertyShape.getPath().getInversePropertyOfURI();
-			}else {
+			} else {
 				return rdfObjectPropertyShape.getPath().getNavigationPropertyIRI();
-			}		
+			}
 		}
 	}
 
@@ -954,30 +964,32 @@ public class RdfModel {
 		private boolean isProperty;
 		private boolean isComplexProperty;
 
-		public RdfComplexTypePropertyPair(RdfComplexType rdfComplexType, 
-				RdfNavigationProperty rdfNavigationProperty) {
+		public RdfComplexTypePropertyPair(RdfComplexType rdfComplexType, RdfNavigationProperty rdfNavigationProperty) {
 			super();
 			this.rdfComplexType = rdfComplexType;
 			this.setRdfNavigationProperty(rdfNavigationProperty);
-			this.isNavigationProperty=true;
+			this.isNavigationProperty = true;
 		}
+
 		public RdfComplexTypePropertyPair(RdfComplexType rdfComplexType, RdfProperty rdfProperty) {
 			super();
 			this.rdfComplexType = rdfComplexType;
 			this.rdfProperty = rdfProperty;
-			this.isProperty=true;
+			this.isProperty = true;
 		}
+
 		public RdfComplexTypePropertyPair(RdfComplexType rdfComplexType, RdfComplexProperty rdfComplexProperty) {
 			super();
 			this.rdfComplexType = rdfComplexType;
 			this.rdfComplexProperty = rdfComplexProperty;
-			this.isComplexProperty=true;
+			this.isComplexProperty = true;
 		}
 
 		public String getEquivalentComplexPropertyName() {
 			return getRdfComplexType().getEquivalentComplexPropertyName();
-			
+
 		}
+
 		public RdfComplexType getRdfComplexType() {
 			return rdfComplexType;
 		}
@@ -989,6 +1001,7 @@ public class RdfModel {
 		public RdfComplexProperty getRdfComplexProperty() {
 			return rdfComplexProperty;
 		}
+
 		public RdfNavigationProperty getRdfNavigationProperty() {
 			return rdfNavigationProperty;
 		}
@@ -996,16 +1009,19 @@ public class RdfModel {
 		public void setRdfNavigationProperty(RdfNavigationProperty rdfNavigationProperty) {
 			this.rdfNavigationProperty = rdfNavigationProperty;
 		}
+
 		public boolean isNavigationProperty() {
 			return isNavigationProperty;
 		}
+
 		public boolean isProperty() {
 			return isProperty;
 		}
+
 		public boolean isComplexProperty() {
 			return isComplexProperty;
 		}
-		
+
 	}
 
 	public static class RdfComplexType {
@@ -1055,8 +1071,9 @@ public class RdfModel {
 
 		public String getEquivalentComplexPropertyName() {
 			return getComplexTypeName().replace(RdfConstants.SHAPE_POSTFIX, "");
-			
+
 		}
+
 		public String getComplexTypeLabel() {
 			return complexTypeLabel;
 		}
@@ -1472,7 +1489,7 @@ public class RdfModel {
 		}
 
 		public String getIRI() {
-//			return nodeShapeNode.getIRI().toString();
+			//			return nodeShapeNode.getIRI().toString();
 			return schema.getSchemaName() + nodeShapeName;
 		}
 
@@ -1487,9 +1504,11 @@ public class RdfModel {
 		public String getNodeShapeName() {
 			return nodeShapeName;
 		}
+
 		public String getNodeShapeComplexTypeName() {
 			return nodeShapeName + RdfConstants.SHAPE_POSTFIX;
 		}
+
 		public void setNodeShapeName(String nodeShapeName) {
 			this.nodeShapeName = nodeShapeName;
 		}
@@ -1763,6 +1782,7 @@ public class RdfModel {
 		}
 		return clazz;
 	}
+
 	public RdfEntityType getOrCreateEntityType(RdfNode classNode) throws OData2SparqlException {
 		return getOrCreateEntityType(classNode, null);
 	}
