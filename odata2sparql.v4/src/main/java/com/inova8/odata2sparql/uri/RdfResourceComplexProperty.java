@@ -4,7 +4,6 @@ import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 
-import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 
 public class RdfResourceComplexProperty extends RdfResourcePart {
@@ -22,6 +21,6 @@ public class RdfResourceComplexProperty extends RdfResourcePart {
 		return complexType;
 	}
 	public String getNavPath() {
-		return uriResourceComplexProperty.toString();//complexType.getName().replace(RdfConstants.SHAPE_POSTFIX, "");
+		return uriResourceComplexProperty.toString();
 	}
 }

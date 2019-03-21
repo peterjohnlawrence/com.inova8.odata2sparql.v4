@@ -1667,7 +1667,7 @@ public class SparqlQueryBuilder {
 						}
 					}
 				} else {
-					for (RdfNavigationProperty navigationProperty : targetEntityType.getNavigationProperties()) {
+					for (RdfNavigationProperty navigationProperty : targetEntityType.getInheritedNavigationProperties()) {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsConstruct.append(expandItemConstruct(targetEntityType, targetKey, indent,
 									expandItem, navigationProperty,
@@ -1918,7 +1918,7 @@ public class SparqlQueryBuilder {
 						}
 					}
 				} else {
-					for (RdfNavigationProperty navigationProperty : targetEntityType.getNavigationProperties()) {
+					for (RdfNavigationProperty navigationProperty : targetEntityType.getInheritedNavigationProperties()) {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 									navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),

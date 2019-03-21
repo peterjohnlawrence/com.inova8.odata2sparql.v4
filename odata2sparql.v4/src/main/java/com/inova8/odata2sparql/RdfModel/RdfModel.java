@@ -270,12 +270,13 @@ public class RdfModel {
 		private RdfNode entityTypeNode;
 		private RdfEntityType baseType;
 		private RdfNodeShape nodeShape;
+		private HashSet<RdfEntityType> superTypes = new HashSet<RdfEntityType>(); 
 		private boolean rootClass = false;
 		private boolean isOperation = false;
 		private boolean isEntity = false;
 		private boolean functionImport = false;
 		private String description;
-		private Set<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
+		private HashSet<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
 		public String queryText;
 		private String deleteText;
 		private String insertText;
@@ -340,6 +341,10 @@ public class RdfModel {
 			return baseType;
 		}
 
+		public HashSet<RdfEntityType> getSuperTypes() {
+			return superTypes;
+		}
+
 		protected void addSubType(RdfEntityType subType) {
 			subTypes.add(subType);
 		}
@@ -360,8 +365,8 @@ public class RdfModel {
 			this.nodeShape = nodeShape;
 		}
 
-		public Set<RdfEntityType> getAllSubTypes() {
-			Set<RdfEntityType> allSubTypes = new HashSet<RdfEntityType>();
+		public HashSet<RdfEntityType> getAllSubTypes() {
+			HashSet<RdfEntityType> allSubTypes = new HashSet<RdfEntityType>();
 			allSubTypes.addAll(subTypes);
 			for (RdfEntityType subType : subTypes) {
 				allSubTypes.addAll(subType.getAllSubTypes());
@@ -370,9 +375,12 @@ public class RdfModel {
 		}
 
 		public void setBaseType(RdfEntityType baseType) {
+			
 			this.baseType = baseType;
-			if (baseType != null)
+			if (baseType != null) {
 				baseType.addSubType(this);
+				this.superTypes.add(baseType);
+			}
 		}
 
 		public RdfSchema getSchema() {
@@ -434,10 +442,6 @@ public class RdfModel {
 			return functionImportParameters;
 		}
 
-		//		public TreeMap<String, RdfModel.RdfComplexType> getComplexTypes() {
-		//			return complexTypes;
-		//		}
-
 		public boolean isOperation() {
 			return isOperation;
 		}
@@ -457,9 +461,7 @@ public class RdfModel {
 		}
 
 		public String getIRI() {
-
 			return entityTypeNode.getIRI().toString();
-
 		}
 
 		public String getURL() {
@@ -479,8 +481,13 @@ public class RdfModel {
 		public Collection<RdfModel.RdfNavigationProperty> getInheritedNavigationProperties() {
 			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
-			if (this.getBaseType() != null) {
-				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
+//			if (this.getBaseType() != null) {
+//				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
+//			}
+			if (!this.getSuperTypes().isEmpty()) {
+				for(  RdfEntityType superType: this.getSuperTypes()) {
+					inheritedNavigationProperties.addAll(superType.getInheritedNavigationProperties());
+				}
 			}
 			return inheritedNavigationProperties;
 		}
@@ -492,8 +499,13 @@ public class RdfModel {
 		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
 			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
-			if (this.getBaseType() != null) {
-				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
+//			if (this.getBaseType() != null) {
+//				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
+//			}
+			if (!this.getSuperTypes().isEmpty()) {
+				for(  RdfEntityType superType: this.getSuperTypes()) {
+					inheritedProperties.addAll(superType.getInheritedProperties());
+				}
 			}
 			return inheritedProperties;
 		}
