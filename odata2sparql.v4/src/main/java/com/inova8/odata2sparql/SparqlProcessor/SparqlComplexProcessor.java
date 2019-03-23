@@ -2,14 +2,11 @@ package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ComplexValue;
-import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmComplexType;

@@ -270,7 +270,7 @@ public class RdfModel {
 		private RdfNode entityTypeNode;
 		private RdfEntityType baseType;
 		private RdfNodeShape nodeShape;
-		private HashSet<RdfEntityType> superTypes = new HashSet<RdfEntityType>(); 
+		private HashSet<RdfEntityType> superTypes = new HashSet<RdfEntityType>();
 		private boolean rootClass = false;
 		private boolean isOperation = false;
 		private boolean isEntity = false;
@@ -375,7 +375,7 @@ public class RdfModel {
 		}
 
 		public void setBaseType(RdfEntityType baseType) {
-			
+
 			this.baseType = baseType;
 			if (baseType != null) {
 				baseType.addSubType(this);
@@ -394,7 +394,7 @@ public class RdfModel {
 		public String getEntitySetLabel() {
 			if (this.entitySetLabel == null) {
 				String derivedName = this.getEntityTypeLabel();
-				if( derivedName.equals("")) {
+				if (derivedName.equals("")) {
 					derivedName = this.getEntityTypeName();
 				}
 				if (!derivedName.substring(derivedName.length() - 1).equals(RdfConstants.PLURAL))
@@ -481,11 +481,11 @@ public class RdfModel {
 		public Collection<RdfModel.RdfNavigationProperty> getInheritedNavigationProperties() {
 			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
-//			if (this.getBaseType() != null) {
-//				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
-//			}
+			//			if (this.getBaseType() != null) {
+			//				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
+			//			}
 			if (!this.getSuperTypes().isEmpty()) {
-				for(  RdfEntityType superType: this.getSuperTypes()) {
+				for (RdfEntityType superType : this.getSuperTypes()) {
 					inheritedNavigationProperties.addAll(superType.getInheritedNavigationProperties());
 				}
 			}
@@ -499,11 +499,11 @@ public class RdfModel {
 		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
 			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
-//			if (this.getBaseType() != null) {
-//				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
-//			}
+			//			if (this.getBaseType() != null) {
+			//				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
+			//			}
 			if (!this.getSuperTypes().isEmpty()) {
-				for(  RdfEntityType superType: this.getSuperTypes()) {
+				for (RdfEntityType superType : this.getSuperTypes()) {
 					inheritedProperties.addAll(superType.getInheritedProperties());
 				}
 			}
@@ -1205,6 +1205,7 @@ public class RdfModel {
 		private Cardinality rangeCardinality;
 		private Cardinality domainCardinality;
 		private RdfProperty fkProperty = null;
+		public RdfSchema navigationPropertySchema;
 
 		public String getNavigationPropertyName() {
 			return navigationPropertyName;
@@ -1315,20 +1316,25 @@ public class RdfModel {
 		}
 
 		public String getEDMNavigationPropertyName() {
-			if (this.domainClass.schema.isDefault) {
+			if (this.navigationPropertySchema.isDefault) {
 				return this.navigationPropertyName;
 			} else {
-				return this.domainClass.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR
+				return this.navigationPropertySchema.schemaPrefix + RdfConstants.CLASS_SEPARATOR
 						+ this.navigationPropertyName;
 			}
 		}
 
+		public RdfSchema getNavigationPropertySchema() {
+			return this.navigationPropertySchema;
+		}
+
 		public String getNavigationPropertyNameFromEDM(String edmNavigationPropertyName) {
-			if (this.domainClass.schema.isDefault) {
+			
+			if (this.navigationPropertySchema.isDefault) {
 				return edmNavigationPropertyName;
 			} else {
 				return edmNavigationPropertyName
-						.replace(this.domainClass.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR, "");
+						.replace(this.navigationPropertySchema.schemaPrefix + RdfConstants.CLASS_SEPARATOR, "");
 			}
 		}
 
@@ -1457,10 +1463,6 @@ public class RdfModel {
 			this.graphName = graph.getSchemaName();
 			this.graphPrefix = graph.getSchemaPrefix();
 		}
-
-		//		public String getLocalName() {
-		//			return localName;
-		//		}
 
 		@Override
 		public String toString() {
@@ -2284,6 +2286,7 @@ public class RdfModel {
 		RdfNavigationProperty navigationProperty = new RdfNavigationProperty();
 		navigationProperty.navigationPropertyName = navigationPropertyName;
 		navigationProperty.navigationPropertyNode = propertyNode;
+		navigationProperty.navigationPropertySchema  = (new RdfURI(propertyNode)).graph;
 		navigationProperty.rangeName = rdfToOdata(rangeURI.localName);
 		navigationProperty.rangeNode = rangeNode;
 		navigationProperty.domainName = rdfToOdata(domainURI.localName);

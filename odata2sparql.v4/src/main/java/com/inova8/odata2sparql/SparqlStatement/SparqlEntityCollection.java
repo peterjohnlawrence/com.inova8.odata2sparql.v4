@@ -165,9 +165,14 @@ class SparqlEntityCollection extends EntityCollection {
 						rdfSubjectEntity
 								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityTypeFromShape(objectNode));
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+						
 						//TODO what can we use this for
 						//rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
-
+						
+						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
+						this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
+								RdfConstants.RDF_TYPE_EDMNAME, rdfObjectEntity);
+						findOrCreateRdfTypeLink(rdfSubjectEntity,  rdfObjectEntity);
 					} else if (propertyNode.getIRI().toString().equals(RdfConstants.MATCHING)) {
 						//TODO add to local linkset
 						SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
@@ -176,6 +181,7 @@ class SparqlEntityCollection extends EntityCollection {
 							rdfObjectEntity.addMatching(rdfSubjectEntity);
 						}
 					} else {
+						//TODO This all assumes that there is a defined entityType for the subjectEntity
 						RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType()
 								.findNavigationProperty(propertyNode);
 						RdfComplexTypePropertyPair rdfComplexTypeProperty;
@@ -432,6 +438,45 @@ class SparqlEntityCollection extends EntityCollection {
 		return link;
 	}
 
+	private Link findOrCreateRdfTypeLink(SparqlEntity rdfSubjectEntity, 
+			SparqlEntity rdfObjectEntity) {
+		 String edmNavigationPropertyName = RdfConstants.RDF_TYPE_EDMNAME;
+		Link link = null;
+		if (rdfSubjectEntity.getNavigationLinks() == null) {
+			link = new Link();
+			link.setTitle(edmNavigationPropertyName);
+			rdfSubjectEntity.getNavigationLinks().add(link);
+		} else {
+			for (Link searchLink : rdfSubjectEntity.getNavigationLinks()) {
+				if (searchLink.getTitle().equals(edmNavigationPropertyName)) {
+					link = searchLink;
+					break;
+				}
+			}
+			if (link == null) {
+				link = new Link();
+				link.setTitle(edmNavigationPropertyName);
+				rdfSubjectEntity.getNavigationLinks().add(link);
+			}
+		}
+	//	if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
+			// to MANY, MULTIPLE
+			EntityCollection inlineEntitySet = link.getInlineEntitySet();
+			if (inlineEntitySet == null) {
+				inlineEntitySet = new EntityCollection();
+			}
+			inlineEntitySet.getEntities().add(rdfObjectEntity);
+			link.setInlineEntitySet(inlineEntitySet);
+	//	} else {
+			// to ONE
+	//		link.setInlineEntity(rdfObjectEntity);
+	//	}
+		// Required to make sure rel is not empty
+		if (link.getRel() == null)
+			link.setRel("http://docs.oasis-open.org/odata/ns/related/"
+					+edmNavigationPropertyName);
+		return link;
+	}
 	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty,
 			int count) {
 		Link link = null;
