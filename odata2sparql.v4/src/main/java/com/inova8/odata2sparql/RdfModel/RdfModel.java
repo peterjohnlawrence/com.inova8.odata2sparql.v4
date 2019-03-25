@@ -481,17 +481,28 @@ public class RdfModel {
 		public Collection<RdfModel.RdfNavigationProperty> getInheritedNavigationProperties() {
 			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
-			//			if (this.getBaseType() != null) {
-			//				inheritedNavigationProperties.addAll(this.getBaseType().getInheritedNavigationProperties());
-			//			}
+			if (!this.getSuperTypes().isEmpty()) {
+				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
+				inheritedNavigationProperties.addAll(this.getSuperTypeNavigationProperties(visited));				
+//				for (RdfEntityType superType : this.getSuperTypes()) {
+//					inheritedNavigationProperties.addAll(superType.getInheritedNavigationProperties());
+//				}
+			}
+			return inheritedNavigationProperties;
+		}
+		public Collection<RdfModel.RdfNavigationProperty> getSuperTypeNavigationProperties(HashSet<RdfEntityType> visited) {
+			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
+			inheritedNavigationProperties.addAll(navigationProperties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				for (RdfEntityType superType : this.getSuperTypes()) {
-					inheritedNavigationProperties.addAll(superType.getInheritedNavigationProperties());
+					if( !visited.contains(superType)) {
+						visited.add(superType);
+						inheritedNavigationProperties.addAll(superType.getSuperTypeNavigationProperties(visited));
+					}
 				}
 			}
 			return inheritedNavigationProperties;
 		}
-
 		public Collection<RdfModel.RdfProperty> getProperties() {
 			return properties.values();
 		}
@@ -499,17 +510,30 @@ public class RdfModel {
 		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
 			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
-			//			if (this.getBaseType() != null) {
-			//				inheritedProperties.addAll(this.getBaseType().getInheritedProperties());
-			//			}
 			if (!this.getSuperTypes().isEmpty()) {
-				for (RdfEntityType superType : this.getSuperTypes()) {
-					inheritedProperties.addAll(superType.getInheritedProperties());
-				}
+				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
+				inheritedProperties.addAll(this.getSuperTypeProperties(visited));
+//				for (RdfEntityType superType : this.getSuperTypes()) {
+//					inheritedProperties.addAll(superType.getInheritedProperties());
+//				}
 			}
 			return inheritedProperties;
 		}
 
+		public Collection<RdfModel.RdfProperty> getSuperTypeProperties(HashSet<RdfEntityType> visited) {
+			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
+			inheritedProperties.addAll(properties.values());
+			if (!this.getSuperTypes().isEmpty()) {
+				for (RdfEntityType superType : this.getSuperTypes()) {
+					if( !visited.contains(superType)) {
+						visited.add(superType);
+						inheritedProperties.addAll(superType.getSuperTypeProperties(visited));
+					}
+				}
+			}
+			return inheritedProperties;
+		}	
+		
 		public RdfNavigationProperty findNavigationProperty(String navigationPropertyName) {
 			return navigationProperties.get(navigationPropertyName);
 		}
