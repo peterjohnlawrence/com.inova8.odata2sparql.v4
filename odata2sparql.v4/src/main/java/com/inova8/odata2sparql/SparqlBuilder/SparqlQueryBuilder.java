@@ -850,7 +850,7 @@ public class SparqlQueryBuilder {
 		//Ensures that URN of deduced key is repeatable so all results always in same order
 		clausesOperationProperties.append("BIND(").append(operationUUID(rdfOperationType))
 				.append(" AS ?" + nextTargetKey + "_s)\n");
-		clausesOperationProperties.append("\t}");
+		clausesOperationProperties.append("\t}\n");
 		return clausesOperationProperties;
 	}
 
@@ -1964,20 +1964,20 @@ public class SparqlQueryBuilder {
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandItemWhere.append(indent).append("#expandItemWhere\n").append(indent);
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
-			expandItemWhere.append("OPTIONAL");
-		} else {
-			expandItemWhere.append("UNION");//.append("UNION");
-		}
-		expandItemWhere.append("{\n");
-		expandItemWhere.append(indent);
-		if (navProperty.getDomainClass().isOperation()) {
-			expandItemWhere.append(indent)
-					.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
-			if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
-				expandItemWhere.append("m");
+			if (navProperty.getDomainClass().isOperation()) {
+				expandItemWhere.append(indent)
+						.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
+				if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
+					expandItemWhere.append("m");
+				}
+				expandItemWhere.append(")\n");
 			}
-			expandItemWhere.append(")\n");
+			expandItemWhere.append(indent).append("OPTIONAL");
+		} else {
+			expandItemWhere.append(indent).append("UNION");//.append("UNION");
 		}
+		expandItemWhere.append("\t{\n");
+		expandItemWhere.append(indent);
 		expandItemWhere.append(indent).append("{\n");
 		if (navProperty.getRangeClass().isOperation()) {
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));

@@ -25,12 +25,12 @@ shapes:
   owl:imports sh: ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
-shapes:Orders
+shapes:QualifiedOrder
   rdf:type sh:NodeShape ;
-  rdfs:label "Orders" ;
-  skos:prefLabel "Orders" ;
-  sh:description "Orders with OrderDetails, Customer, and Salesperson" ;
-  sh:name "Orders" ;
+  rdfs:label "QualifiedOrder" ;
+  skos:prefLabel "QualifiedOrder" ;
+  sh:description "QualifiedOrder with OrderDetails, Customer, and Salesperson" ;
+  sh:name "QualifiedOrder" ;
   sh:property [
       rdf:type sh:PropertyShape ;
       rdfs:label "must have a minimum of one line item for the order" ;
@@ -41,8 +41,8 @@ shapes:Orders
       sh:name "mustHaveOrderDetails" ;
       sh:node [
           rdf:type sh:NodeShape ;
-          sh:description "OrderDetails with product, quantity, and discount" ;
-          sh:name "OrderDetails" ;
+          sh:description "QualifiedOrderDetail with product, quantity, and discount" ;
+          sh:name "QualifiedOrderDetail" ;
           sh:property [
               rdf:type sh:PropertyShape ;
               sh:description "may have discount specified" ;
@@ -89,13 +89,13 @@ shapes:Orders
     ] ;
   sh:targetClass model:Order ;
 .
-shapes:ShippingOrders
+shapes:ShippingOrder
   rdf:type sh:NodeShape ;
-  rdfs:label "Shipping orders" ;
-  skos:prefLabel "Shipping orders" ;
-  sh:description "Orders with shipper specified" ;
-  sh:name "ShippingOrders" ;
-  sh:node shapes:Orders ;
+  rdfs:label "ShippingOrder" ;
+  skos:prefLabel "ShippingOrder" ;
+  sh:description "ShippingOrder with shipper specified" ;
+  sh:name "ShippingOrder" ;
+  sh:node shapes:QualifiedOrder ;
   sh:property [
       rdf:type sh:PropertyShape ;
       sh:description "must have exactly one shipper for the order" ;

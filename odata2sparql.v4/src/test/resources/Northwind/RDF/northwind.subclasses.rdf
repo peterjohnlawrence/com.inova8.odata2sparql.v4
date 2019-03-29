@@ -10,138 +10,145 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://inova8.northwind/subclasses/">
   <owl:Ontology rdf:about="">
-    <owl:imports rdf:resource="http://northwind.com/"/>
     <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
+    <owl:imports rdf:resource="http://northwind.com/"/>
   </owl:Ontology>
   <owl:Class rdf:about="http://northwind.com/model/SystemBProduct">
-    <rdfs:label>SystemB product</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Product"/>
     <skos:prefLabel>SystemB product</skos:prefLabel>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Product"/>
+    <rdfs:label>SystemB product</rdfs:label>
   </owl:Class>
   <owl:Class rdf:about="http://northwind.com/model/SystemAEmployee">
-    <rdfs:label>SystemA employee</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
+    <skos:prefLabel>SystemA employee</skos:prefLabel>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
-        >1</owl:maxCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:about="http://northwind.com/model/systemAFavorite"/>
         </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <skos:prefLabel>SystemA employee</skos:prefLabel>
-  </owl:Class>
-  <owl:Class rdf:about="http://northwind.com/model/SystemBEmployee">
-    <rdfs:label>SystemB employee</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
-    <rdfs:subClassOf>
-      <owl:Restriction>
         <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
         >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:label>SystemA employee</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://northwind.com/model/SystemBEmployee">
+    <skos:prefLabel>SystemB employee</skos:prefLabel>
+    <rdfs:subClassOf>
+      <owl:Restriction>
         <owl:onProperty>
           <owl:ObjectProperty rdf:about="http://northwind.com/model/systemBFavorite"/>
         </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
       </owl:Restriction>
     </rdfs:subClassOf>
-    <skos:prefLabel>SystemB employee</skos:prefLabel>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:label>SystemB employee</rdfs:label>
   </owl:Class>
   <owl:Class rdf:about="http://northwind.com/model/SystemAProduct">
-    <rdfs:label>SystemA product</rdfs:label>
-    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Product"/>
     <skos:prefLabel>SystemA product</skos:prefLabel>
+    <rdfs:subClassOf rdf:resource="http://northwind.com/model/Product"/>
+    <rdfs:label>SystemA product</rdfs:label>
   </owl:Class>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/systemAFavorite">
-    <rdfs:range rdf:resource="http://northwind.com/model/Product"/>
+    <skos:prefLabel>SystemA favorite</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
+    <rdfs:label>SystemA favorite</rdfs:label>
     <rdfs:subPropertyOf>
       <owl:ObjectProperty rdf:about="http://northwind.com/model/favorite"/>
     </rdfs:subPropertyOf>
-    <rdfs:label>SystemA favorite</rdfs:label>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
-    <skos:prefLabel>SystemA favorite</skos:prefLabel>
+    <rdfs:range rdf:resource="http://northwind.com/model/Product"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/employer">
-    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
-    <rdfs:label>employer</rdfs:label>
     <skos:prefLabel>employer</skos:prefLabel>
+    <rdfs:label>employer</rdfs:label>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/systemAEmployer">
-    <skos:prefLabel>SystemA employer</skos:prefLabel>
-    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employer"/>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
-    <rdfs:label>SystemA employer</rdfs:label>
     <rdfs:range rdf:resource="http://northwind.com/model/Supplier"/>
+    <rdfs:label>SystemA employer</rdfs:label>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employer"/>
+    <skos:prefLabel>SystemA employer</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/systemACustomer">
-    <skos:prefLabel>SystemB customer</skos:prefLabel>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
-    <rdfs:range rdf:resource="http://northwind.com/model/Customer"/>
     <rdfs:label>SystemB customer</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Customer"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
+    <skos:prefLabel>SystemB customer</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/favorite">
-    <skos:prefLabel>favorite</skos:prefLabel>
-    <rdfs:label>favorite</rdfs:label>
     <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:label>favorite</rdfs:label>
+    <skos:prefLabel>favorite</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/systemBFavorite">
-    <skos:prefLabel>SystemB favorite</skos:prefLabel>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
-    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/favorite"/>
-    <rdfs:range rdf:resource="http://northwind.com/model/Product"/>
     <rdfs:label>SystemB favorite</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Product"/>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/favorite"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
+    <skos:prefLabel>SystemB favorite</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="http://northwind.com/model/systemBEmployer">
-    <skos:prefLabel>SystemB employer</skos:prefLabel>
-    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employer"/>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
-    <rdfs:range rdf:resource="http://northwind.com/model/Supplier"/>
     <rdfs:label>SystemB employer</rdfs:label>
+    <rdfs:range rdf:resource="http://northwind.com/model/Supplier"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employer"/>
+    <skos:prefLabel>SystemB employer</skos:prefLabel>
   </owl:ObjectProperty>
   <owl:DatatypeProperty rdf:about="http://northwind.com/model/employeeSalary">
-    <skos:prefLabel>employee salary</skos:prefLabel>
-    <rdfs:label>employee salary</rdfs:label>
     <rdfs:domain rdf:resource="http://northwind.com/model/Employee"/>
+    <rdfs:label>employee salary</rdfs:label>
+    <skos:prefLabel>employee salary</skos:prefLabel>
   </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemAEmployeeSalary">
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
-    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employeeSalary"/>
-    <skos:prefLabel>SystemA  employee salary</skos:prefLabel>
-    <rdfs:label>SystemA employee salary</rdfs:label>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemBEmployeeSalary">
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemBEmployeeMonthlySalary">
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employeeSalary"/>
     <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
-    <skos:prefLabel>SystemB employee salary</skos:prefLabel>
-    <rdfs:label>SystemB employee salary</rdfs:label>
+    <skos:prefLabel>SystemB employee monthly salary</skos:prefLabel>
+    <rdfs:label>SystemB employee monthly salary</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemAEmployeeSalary">
+    <rdfs:label>SystemA employee salary</rdfs:label>
+    <skos:prefLabel>SystemA  employee salary</skos:prefLabel>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employeeSalary"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemAEmployee"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemBUnitCommission">
-    <rdfs:label>systemB unit commission</rdfs:label>
-    <skos:prefLabel>system B unit commission</skos:prefLabel>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBProduct"/>
     <rdfs:subPropertyOf>
       <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitCommission"/>
     </rdfs:subPropertyOf>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBProduct"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:prefLabel>system B unit commission</skos:prefLabel>
+    <rdfs:label>systemB unit commission</rdfs:label>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://northwind.com/model/unitCommission">
-    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
-    <rdfs:label>unit commission</rdfs:label>
     <skos:prefLabel>unit commission</skos:prefLabel>
+    <rdfs:label>unit commission</rdfs:label>
+    <rdfs:domain rdf:resource="http://northwind.com/model/Product"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemBHours">
-    <rdfs:label>SystemB hours</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
     <skos:prefLabel>SystemB hours</skos:prefLabel>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <rdfs:label>SystemB hours</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemBEmployeeAnnualSalary">
+    <skos:prefLabel>SystemB employee annual salary</skos:prefLabel>
+    <rdfs:label>SystemB employee annual salary</rdfs:label>
+    <rdfs:domain rdf:resource="http://northwind.com/model/SystemBEmployee"/>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/employeeSalary"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://northwind.com/model/systemAUnitCommision">
-    <rdfs:label>SystemA unit commision</rdfs:label>
-    <skos:prefLabel>SystemA unit commision</skos:prefLabel>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
-    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/unitCommission"/>
     <rdfs:domain rdf:resource="http://northwind.com/model/SystemAProduct"/>
+    <rdfs:subPropertyOf rdf:resource="http://northwind.com/model/unitCommission"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    <skos:prefLabel>SystemA unit commision</skos:prefLabel>
+    <rdfs:label>SystemA unit commision</rdfs:label>
   </owl:DatatypeProperty>
   <model:SystemAEmployee rdf:about="http://northwind.com/SystemAEmployee-2">
     <model:employeeLinkedIn rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI"
@@ -150,42 +157,44 @@
     <model:territory rdf:resource="http://northwind.com/Territory-02184"/>
     <model:territory rdf:resource="http://northwind.com/Territory-01833"/>
     <model:extension>3457</model:extension>
-    <rdfs:label>SystemAEmployee-2</rdfs:label>
+    <model:territory rdf:resource="http://northwind.com/Territory-01730"/>
     <model:homePhone>(206) 555-9482</model:homePhone>
     <model:employeeCountry>USA</model:employeeCountry>
-    <model:lastName>Fuller</model:lastName>
     <model:photo>http://accweb/emmployees/fuller.bmp</model:photo>
-    <model:territory rdf:resource="http://northwind.com/Territory-01730"/>
+    <model:lastName>Fuller</model:lastName>
+    <rdfs:label>SystemAEmployee-2</rdfs:label>
     <model:systemAEmployer rdf:resource="http://northwind.com/Supplier-20"/>
     <model:hireDate>2012-08-14</model:hireDate>
-    <model:employeeRegion rdf:resource="http://northwind.com/Region-4306a04670067b5b27e766335d3d40fa"/>
-    <model:titleOfCourtesy>Dr.</model:titleOfCourtesy>
+    <model:territory rdf:resource="http://northwind.com/Territory-02116"/>
+    <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+    >38.9720570</geo:lat>
     <model:employeeCity>Tacoma</model:employeeCity>
     <model:territory rdf:resource="http://northwind.com/Territory-01581"/>
     <model:systemACustomer rdf:resource="http://northwind.com/Customer-ALFKI"/>
-    <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
-    >38.9720570</geo:lat>
-    <model:territory rdf:resource="http://northwind.com/Territory-02116"/>
+    <model:titleOfCourtesy>Dr.</model:titleOfCourtesy>
+    <model:employeeRegion rdf:resource="http://northwind.com/Region-4306a04670067b5b27e766335d3d40fa"/>
     <model:firstName>Andrew</model:firstName>
     <geo:lat_long>38.9720570,-77.0268860</geo:lat_long>
     <model:employeeAddress>908 W. Capital Way</model:employeeAddress>
     <model:systemAEmployer rdf:resource="http://northwind.com/Supplier-18"/>
     <model:systemAFavorite rdf:resource="http://northwind.com/Product-1"/>
     <model:territory rdf:resource="http://northwind.com/Territory-40222"/>
-    <model:notes>Andrew received his BTS commercial in 1974 and a Ph.D. in international marketing from the University of Dallas in 1981.  He is fluent in French and Italian and reads German.  He joined the company as a sales representative, was promoted to sales manager in January 1992 and to vice president of sales in March 1993.  Andrew is a member of the Sales Management Roundtable, the Seattle Chamber of Commerce, and the Pacific Rim Importers Association.</model:notes>
     <skos:exactMatch>
       <model:SystemBEmployee rdf:about="http://northwind.com/SystemBEmployee-2">
-        <rdfs:label>SystemB employee-2</rdfs:label>
-        <skos:prefLabel>SystemB employee-2</skos:prefLabel>
-        <model:systemBEmployer rdf:resource="http://northwind.com/Supplier-1"/>
-        <model:systemBHours rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
-        >32</model:systemBHours>
-        <model:systemBEmployeeSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-        >4.2</model:systemBEmployeeSalary>
+        <model:systemBEmployeeAnnualSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >48</model:systemBEmployeeAnnualSalary>
+        <model:systemBEmployeeMonthlySalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >4.2</model:systemBEmployeeMonthlySalary>
         <model:employeePostalCode>98401</model:employeePostalCode>
         <model:systemBFavorite rdf:resource="http://northwind.com/Product-1"/>
+        <model:systemBHours rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
+        >32</model:systemBHours>
+        <model:systemBEmployer rdf:resource="http://northwind.com/Supplier-1"/>
+        <skos:prefLabel>SystemB employee-2</skos:prefLabel>
+        <rdfs:label>SystemB employee-2</rdfs:label>
       </model:SystemBEmployee>
     </skos:exactMatch>
+    <model:notes>Andrew received his BTS commercial in 1974 and a Ph.D. in international marketing from the University of Dallas in 1981.  He is fluent in French and Italian and reads German.  He joined the company as a sales representative, was promoted to sales manager in January 1992 and to vice president of sales in March 1993.  Andrew is a member of the Sales Management Roundtable, the Seattle Chamber of Commerce, and the Pacific Rim Importers Association.</model:notes>
     <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
     >-77.0268860</geo:long>
     <model:territory rdf:resource="http://northwind.com/Territory-02139"/>
@@ -194,14 +203,16 @@
     <model:title>Vice President, Sales</model:title>
   </model:SystemAEmployee>
   <model:SystemBEmployee rdf:about="http://northwind.com/SystemBEmployee-1">
+    <model:systemBEmployeeAnnualSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >50</model:systemBEmployeeAnnualSalary>
+    <model:systemBEmployeeMonthlySalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >4.2</model:systemBEmployeeMonthlySalary>
+    <skos:prefLabel>SystemB Employee-1</skos:prefLabel>
+    <rdfs:label>SystemB Employee-1</rdfs:label>
+    <model:systemBEmployer rdf:resource="http://northwind.com/Supplier-10"/>
+    <model:systemBFavorite rdf:resource="http://northwind.com/Product-10"/>
     <model:systemBHours rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal"
     >32</model:systemBHours>
-    <model:systemBFavorite rdf:resource="http://northwind.com/Product-10"/>
-    <model:systemBEmployeeSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >4.2</model:systemBEmployeeSalary>
-    <rdfs:label>SystemB Employee-1</rdfs:label>
-    <skos:prefLabel>SystemB Employee-1</skos:prefLabel>
-    <model:systemBEmployer rdf:resource="http://northwind.com/Supplier-10"/>
   </model:SystemBEmployee>
   <rdf:Description rdf:about="http://northwind.com/MatchingEmployee-2">
     <model:managesEmployee rdf:resource="http://northwind.com/Employee-7"/>
@@ -220,8 +231,8 @@
     <model:employeeLinkedIn rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI"
     >https://www.linkedin.com/in/peterjohnlawrence/</model:employeeLinkedIn>
     <model:titleOfCourtesy>Doctor</model:titleOfCourtesy>
-    <model:employeeCountry>USA</model:employeeCountry>
     <model:employeeCity>Tacoma</model:employeeCity>
+    <model:employeeCountry>USA</model:employeeCountry>
     <model:territory rdf:resource="http://northwind.com/Territory-40222"/>
     <model:photo>http://accweb/emmployees/fuller.bmp</model:photo>
     <rdfs:label>MatchingEmployee-2</rdfs:label>
@@ -245,28 +256,28 @@
     <model:reportsTo rdf:resource="http://northwind.com/SystemBEmployee-2"/>
     <model:territory rdf:resource="http://northwind.com/Territory-40222"/>
     <model:systemAEmployer rdf:resource="http://northwind.com/Supplier-2"/>
-    <model:homePhone>(206) 555-9482</model:homePhone>
+    <model:systemAEmployeeSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >42</model:systemAEmployeeSalary>
     <model:employeeCountry>USA</model:employeeCountry>
-    <model:territory rdf:resource="http://northwind.com/Territory-02139"/>
+    <model:homePhone>(206) 555-9482</model:homePhone>
+    <model:territory rdf:resource="http://northwind.com/Territory-01730"/>
     <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
     >-77.0268860</geo:long>
-    <model:territory rdf:resource="http://northwind.com/Territory-01730"/>
-    <model:systemAEmployeeSalary rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >42</model:systemAEmployeeSalary>
+    <model:territory rdf:resource="http://northwind.com/Territory-02139"/>
     <rdfs:label>SystemAEmployee-1</rdfs:label>
     <model:title>Vice President, Sales</model:title>
-    <model:territory rdf:resource="http://northwind.com/Territory-01581"/>
-    <model:employeeCity>Tacoma</model:employeeCity>
     <model:birthDate>1972-02-19</model:birthDate>
-    <model:employeeRegion rdf:resource="http://northwind.com/Region-4306a04670067b5b27e766335d3d40fa"/>
-    <model:territory rdf:resource="http://northwind.com/Territory-02116"/>
+    <model:employeeCity>Tacoma</model:employeeCity>
+    <model:territory rdf:resource="http://northwind.com/Territory-01581"/>
     <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
     >38.9720570</geo:lat>
+    <model:territory rdf:resource="http://northwind.com/Territory-02116"/>
+    <model:employeeRegion rdf:resource="http://northwind.com/Region-4306a04670067b5b27e766335d3d40fa"/>
     <model:firstName>Andrew</model:firstName>
     <geo:lat_long>38.9720570,-77.0268860</geo:lat_long>
     <model:employeeAddress>908 W. Capital Way</model:employeeAddress>
-    <model:territory rdf:resource="http://northwind.com/Territory-01833"/>
     <model:territory rdf:resource="http://northwind.com/Territory-02184"/>
+    <model:territory rdf:resource="http://northwind.com/Territory-01833"/>
     <model:systemAFavorite rdf:resource="http://northwind.com/Product-1"/>
   </model:SystemAEmployee>
 </rdf:RDF>

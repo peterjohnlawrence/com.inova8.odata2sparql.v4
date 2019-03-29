@@ -1,0 +1,26 @@
+connect http://localhost:8082/rdf4j-server
+drop northwind
+yes
+create native-lucene
+northwind
+northwind
+10000
+spoc,posc,ospc,sopc,opsc,psoc
+
+open northwind
+load RDF/northwind.v1.rdf into file://northwind.v1.rdf
+load RDF/22-rdf-syntax-ns.ttl into file://nexifysolutions.com/quorum360/northwind-rdf
+load RDF/northwind.data.v3.rdf into file://22-rdf-syntax-ns.ttl
+load RDF/northwind.datacube.data.v0.rdf into file://northwind.datacube.data.v0.rdf
+load RDF/northwind.geo.v0.rdf into file://nexifysolutions.com/quorum360/northwind-geo
+load RDF/northwind.model.v4.rdf into file://northwind.geo.v0.rdf 
+load RDF/northwind.operations.v5.rdf into file://northwind.operations.v5.rdf
+load RDF/northwind.shapes.ttl into file://northwind.shapes.ttl
+load RDF/northwind.subclasses.rdf into file://northwind.subclasses.rdf
+load RDF/northwind.website.v0.rdf into file://northwind.website.v0.rdf
+load RDF/odata4sparql.contextmenu.v1.0.0.rdf into file://odata4sparql.contextmenu.v1.0.0.rdf
+load RDF/odata4sparql.datacube.v1.0.0.rdf into file://odata4sparql.datacube.v1.0.0.rdf
+load RDF/odata4sparql.lucenesearch.v2.0.1.rdf into file://odata4sparql.lucenesearch.v2.0.1.rdf
+load RDF/rdf-schema.ttl into file://rdf-schema.ttl
+load RDF/wgs84_pos.ttl into file://wgs84_pos.ttl
+exit
