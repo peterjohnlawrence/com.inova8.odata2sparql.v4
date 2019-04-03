@@ -443,14 +443,13 @@ VALUES(?NEWcustomer  ?NEWcustomerCompanyName ?NEWcustomerCity  ?NEWorder ?NEWshi
 ##INSERTVALUES(?customer  ?customerCompanyName ?customerCity  ?order ?shipCity )##&#xD;
 }&#xD;
 # Use the same core query graph pattern as the Operation Query to find the URIs of things to be deleted&#xD;
-{ 	?OLDcustomer a  &lt;http://northwind.com/model/Customer&gt; .&#xD;
+	?OLDcustomer a  &lt;http://northwind.com/model/Customer&gt; .&#xD;
 	OPTIONAL{?OLDcustomer  &lt;http://northwind.com/model/customerCompanyName&gt; ?OLDcustomerCompanyName }&#xD;
 	OPTIONAL{?OLDcustomer  &lt;http://northwind.com/model/customerCity&gt; ?OLDcustomerCity } &#xD;
 	OPTIONAL{ ?OLDorder &lt;http://northwind.com/model/customer&gt; ?OLDcustomer . &#xD;
 		OPTIONAL{ ?OLDorder  &lt;http://northwind.com/model/shipCity&gt; ?OLDshipCity  }&#xD;
 		} &#xD;
 	}&#xD;
-}&#xD;
 </sp:text>  <sp:where rdf:parseType="Collection">
               <sp:Values>
                 <sp:varNames rdf:parseType="Resource">
@@ -725,13 +724,12 @@ VALUES(?OLDcustomer  ?OLDcustomerCompanyName ?OLDcustomerCity  ?OLDorder ?OLDshi
 ##DELETEVALUES(?customer  ?customerCompanyName ?customerCity  ?order ?shipCity )##&#xD;
 }&#xD;
 # Use the same core query graph pattern as the Operation Query&#xD;
-{ 	?OLDcustomer a  &lt;http://northwind.com/model/Customer&gt; .&#xD;
+	?OLDcustomer a  &lt;http://northwind.com/model/Customer&gt; .&#xD;
 	OPTIONAL{?OLDcustomer  &lt;http://northwind.com/model/customerCompanyName&gt; ?OLDcustomerCompanyName }&#xD;
 	OPTIONAL{?OLDcustomer  &lt;http://northwind.com/model/customerCity&gt; ?OLDcustomerCity } &#xD;
 	OPTIONAL{ ?OLDorder &lt;http://northwind.com/model/customer&gt; ?OLDcustomer . &#xD;
 		OPTIONAL{ ?OLDorder  &lt;http://northwind.com/model/shipCity&gt; ?OLDshipCity  }&#xD;
 		} &#xD;
-	}&#xD;
 # Find all order predicate statements that need to be deleted&#xD;
 # and then union all statements related to dependent orderDetails.&#xD;
 {&#xD;

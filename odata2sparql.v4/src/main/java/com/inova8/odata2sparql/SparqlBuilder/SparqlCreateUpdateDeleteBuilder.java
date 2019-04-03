@@ -89,7 +89,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		String deleteReplace = group;
 		for (UriParameter entityKey : entityKeys) {
 			RdfProperty property;
-			property = entityType.findProperty(entityKey.getReferencedProperty());//entityKeys.get(0).getText()
+			property = entityType.findProperty(entityKey.getName());//entityKeys.get(0).getText()
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey.getText());
 			deleteReplace = deleteReplace.replaceAll("\\?" + property.getVarName() + "\\b", "<" + expandedKey + ">");
 		}
@@ -116,7 +116,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				RdfProperty property = entityType.findProperty(prop.getName());
 				if (property.getIsKey()) {
 					insertReplace = insertReplace.replaceAll("\\?" + property.getVarName() + "\\b",
-							"<" + prop.getValue().toString() + ">");
+							"<" + this.rdfModel.getRdfPrefixes().expandPrefix(prop.getValue().toString()) + ">");
 				} else {
 					insertReplace = insertReplace.replaceAll("\\?" + property.getVarName() + "\\b",
 							"\"" + prop.getValue().toString() + "\"");

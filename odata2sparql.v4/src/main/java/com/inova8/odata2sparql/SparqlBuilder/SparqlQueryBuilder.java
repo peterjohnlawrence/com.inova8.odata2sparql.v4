@@ -1962,7 +1962,7 @@ public class SparqlQueryBuilder {
 		//SparqlExpressionVisitor expandFilterClause;
 
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
-		expandItemWhere.append(indent).append("#expandItemWhere\n").append(indent);
+		expandItemWhere.append(indent).append("#expandItemWhere\n");
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
 			if (navProperty.getDomainClass().isOperation()) {
 				expandItemWhere.append(indent)

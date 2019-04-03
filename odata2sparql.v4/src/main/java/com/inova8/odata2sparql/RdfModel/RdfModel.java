@@ -1448,9 +1448,6 @@ public class RdfModel {
 	}
 
 	private class RdfURI {
-		@SuppressWarnings("unused")
-		//@Deprecated
-		//private RdfNode node;
 		public String localName;
 
 		private String graphName;

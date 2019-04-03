@@ -2547,11 +2547,7 @@
 	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 		{
 			?entity a ?type .
-			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-				&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?stringB; 
-				&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-				&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-				&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
+			?entity ?property ?snippet . FILTER REGEX(?snippet , ?stringA, "i").
 			OPTIONAL{?property  rdfs:label ?labelProperty }.
 		}
 		GROUP BY ?entity ?type
@@ -2601,47 +2597,47 @@
 												{?node5 ?p56 ?entityB . }	
 												UNION	
 												{?entityB ?i65 ?node5 .  }
-											}
+											} FILTER (!BOUND(?i65) || (?i65 NOT IN( rdf:type) )) FILTER (!BOUND(?p56) || (?p56 NOT IN( rdf:type))) 
 										}
 										{ #step = 5
 											{?node4 ?p45 ?node5 . } 
 											UNION
 											{?node5 ?i54 ?node4	.  }
 										}
-										?node5 a ?type5 .FILTER (!BOUND(?i54) || (?i54 != rdf:type)) FILTER (!BOUND(?p45) || (?p45 != rdf:type)) 
-									}	
+										?node5 a ?type5 .
+									}FILTER (!BOUND(?i54) || (?i54  NOT IN( rdf:type))) FILTER (!BOUND(?p45) || (?p45  NOT IN( rdf:type))) 		
 								}
 								{ #step = 4
 									{?node3 ?p34 ?node4 . } 
 									UNION 
 									{?node4 ?i43 ?node3 . }
 								}
-								?node4 a ?type4 .FILTER (!BOUND(?i43) || (?i43 != rdf:type)) FILTER (!BOUND(?p34) || (?p34 != rdf:type))
-							}
+								?node4 a ?type4 
+							} FILTER (!BOUND(?i43) || (?i43  NOT IN( rdf:type))) FILTER (!BOUND(?p34) || (?p34  NOT IN( rdf:type)))
 						}
 						{ #step = 3
 							{?node2 ?p23 ?node3 . } 
 							UNION 
 							{?node3 ?i32 ?node2 . }	
 						}
-						?node3 a ?type3 .FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type))
-					}
+						?node3 a ?type3 
+					}FILTER (!BOUND(?i32) || (?i32  NOT IN( rdf:type))) FILTER (!BOUND(?p23) || (?p23  NOT IN( rdf:type)))
 				}
 				{ #step = 2
 					{?node1 ?p12 ?node2 .} 
 					UNION	
 					{?node2 ?i21 ?node1 .}
 				}
-				?node2 a ?type2 .FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type))
-			}
+				?node2 a ?type2 
+			} FILTER (!BOUND(?i21) || (?i21 NOT IN( rdf:type))) FILTER (!BOUND(?p12) || (?p12  NOT IN( rdf:type)))
 		}
 		{ #step = 1
 			{?entityA ?p01 ?node1 }
 			UNION
 			{?node1 ?i10 ?entityA }
 		}
-		?node1 a ?type1 .FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))
-	}
+		?node1 a ?type1 
+	} FILTER (!BOUND(?i10) || (?i10  NOT IN( rdf:type))) FILTER (!BOUND(?p01) || (?p01  NOT IN( rdf:type)))
 }</sp:text> <sp:resultVariables rdf:parseType="Collection">
               <rdf:Description>
                 <spl:predicate>
@@ -5622,24 +5618,16 @@
 {
 	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 		{
-			?entity a ?type .
-			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-				&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?stringB;#"scones";# ?stringB;#
-				&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-				&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-				&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
+			?entity a ?type  .
+			?entity ?property ?snippet . FILTER REGEX(?snippet , ?stringB, "i")
 			OPTIONAL{?property  rdfs:label ?labelProperty }.
 		}
 		GROUP BY ?entity ?type
 	}
 	{	select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
 		{
-			?entity a ?type .
-			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-				&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?stringA;#"Princesa Isabel Vinhos";# ?stringA;#
-				&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-				&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-				&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
+			?entity a ?type  .
+			?entity ?property ?snippet . FILTER REGEX(?snippet , ?stringA, "i").
 			OPTIONAL{?property  rdfs:label ?labelProperty }.
 		}
 		GROUP BY ?entity ?type
@@ -5688,47 +5676,47 @@
 												{?node5 ?p56 ?entityB . }	
 												UNION	
 												{?entityB ?i65 ?node5 .  }
-											}
+											} FILTER (!BOUND(?i65) || (?i65 NOT IN( rdf:type) )) FILTER (!BOUND(?p56) || (?p56 NOT IN( rdf:type))) 
 										}
 										{ #step = 5
 											{?node4 ?p45 ?node5 . } 
 											UNION
 											{?node5 ?i54 ?node4	.  }
 										}
-										?node5 a ?type5 .FILTER (!BOUND(?i54) || (?i54 != rdf:type)) FILTER (!BOUND(?p45) || (?p45 != rdf:type)) 
-									}	
+										?node5 a ?type5 
+									}FILTER (!BOUND(?i54) || (?i54  NOT IN( rdf:type))) FILTER (!BOUND(?p45) || (?p45  NOT IN( rdf:type))) 		
 								}
 								{ #step = 4
 									{?node3 ?p34 ?node4 . } 
 									UNION 
 									{?node4 ?i43 ?node3 . }
 								}
-								?node4 a ?type4 .FILTER (!BOUND(?i43) || (?i43 != rdf:type)) FILTER (!BOUND(?p34) || (?p34 != rdf:type))
-							}
+								?node4 a ?type4 
+							}FILTER (!BOUND(?i43) || (?i43  NOT IN( rdf:type))) FILTER (!BOUND(?p34) || (?p34  NOT IN( rdf:type)))
 						}
 						{ #step = 3
 							{?node2 ?p23 ?node3 . } 
 							UNION 
 							{?node3 ?i32 ?node2 . }	
 						}
-						?node3 a ?type3 .FILTER (!BOUND(?i32) || (?i32 != rdf:type)) FILTER (!BOUND(?p23) || (?p23 != rdf:type))
-					}
+						?node3 a ?type3
+					}FILTER (!BOUND(?i32) || (?i32  NOT IN( rdf:type))) FILTER (!BOUND(?p23) || (?p23  NOT IN( rdf:type)))
 				}
 				{ #step = 2
 					{?node1 ?p12 ?node2 .} 
 					UNION	
 					{?node2 ?i21 ?node1 .}
 				}
-				?node2 a ?type2 .FILTER (!BOUND(?i21) || (?i21 != rdf:type)) FILTER (!BOUND(?p12) || (?p12 != rdf:type))
-			}
+				?node2 a ?type2 
+			}FILTER (!BOUND(?i21) || (?i21 NOT IN( rdf:type))) FILTER (!BOUND(?p12) || (?p12  NOT IN( rdf:type)))
 		}
 		{ #step = 1
 			{?entityA ?p01 ?node1 }
 			UNION
 			{?node1 ?i10 ?entityA }
 		}
-		?node1 a ?type1 .FILTER (!BOUND(?i10) || (?i10 != rdf:type)) FILTER (!BOUND(?p01) || (?p01 != rdf:type))
-	}
+		?node1 a ?type1
+	}FILTER (!BOUND(?i10) || (?i10  NOT IN( rdf:type))) FILTER (!BOUND(?p01) || (?p01  NOT IN( rdf:type)))
 }</sp:text>
           </sp:Select>
         </spin:body>
@@ -5856,12 +5844,9 @@
             </sp:where>
             <sp:text>select ?resource ?type ?property ?value
 where{
-	  OPTIONAL {?resource a ?type }
-			?resource &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-				&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?string ; 
-				&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-				&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-				&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?value] .
+	?resource ?property ?value . 
+	OPTIONAL {?resource a ?type }
+	FILTER( regex(?value,?string,"i"))
 }</sp:text>
           </sp:Select>
         </spin:body>
@@ -6120,15 +6105,10 @@ where{
               </rdf:Description>
             </sp:where>
             <sp:text>select ?entity ?type (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValue)
-{	select ?entity ?type  ?labelProperty ?property ?snippet {
-		?entity a ?type .
-		?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-			&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?string ; 
-			&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-			&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-			&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
-		OPTIONAL{?property  rdfs:label ?labelProperty }.
-	}
+{
+	?entity a ?type  .
+	?entity ?property ?snippet . FILTER REGEX(?snippet , ?string, "i")
+	?property  rdfs:label ?labelProperty .
 }
 GROUP BY ?entity ?type</sp:text>
           </sp:Select>
