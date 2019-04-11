@@ -203,3 +203,10 @@ Delete  'NWD~Customer-TEST1'	CRUD	SimpleCRUD.6		DELETE	northwind	Customer('NWD~C
 	CRUD	OperationCRUD.5		DELETE	northwind	"Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')"		&$format=json		
 	CRUD	OperationCRUD.5.test		GET	northwind	"Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')"		&$format=json	"{""error"":{""code"":null,""message"":""No data found""}}"	
 Reset	CRUD	OperationCRUD.reset		PUT	northwind	Customer('NWD~Customer-ALFKI')/customerCity/$value	Berlin	text/plain		
+Patch value	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""stateName"":""Floridapq""} "	application/json		
+Patch value	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')		&$format=json	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#USState/$entity"",""comment"":"" "",""label"":""Florida"",""regionDescription"":null,""regionNotation"":null,""stateAbbr"":""FL"",""stateName"":""Floridapq"",""subjectId"":""NWD~USState-10""}"	
+Patch value	CRUD	Patch.reset		PATCH	northwind	USState('NWD~USState-10')	"{""stateName"":""Florida""} "	application/json		
+	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""regionDescription"":""the sunshine state""} "	application/json		
+	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')/regionDescription/$value			the sunshine state	
+	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""regionDescription"":null} "	application/json		
+	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')/regionDescription/$value				

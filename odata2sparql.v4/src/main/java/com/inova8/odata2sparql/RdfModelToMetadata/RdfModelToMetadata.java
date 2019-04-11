@@ -580,7 +580,9 @@ public class RdfModelToMetadata {
 			if (rdfClass.getBaseType() != null) {
 				ArrayList<String> superTypes = new ArrayList<String>();
 				for (RdfEntityType superType : rdfClass.getSuperTypes()) {
-					superTypes.add(superType.getEntityTypeName());
+					//superTypes.add(superType.getEntityTypeName());
+					superTypes.add(superType.getEDMEntitySetName());
+					
 					//addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN,	superType.getEntityTypeName());
 				}
 				addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN, superTypes);

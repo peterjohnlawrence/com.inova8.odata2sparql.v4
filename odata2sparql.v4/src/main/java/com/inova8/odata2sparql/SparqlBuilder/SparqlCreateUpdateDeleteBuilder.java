@@ -43,7 +43,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				throw new OData2SparqlException("No insertBody for insertQuery of " + entityType.entityTypeName, null);
 			}
 		} else {
-			StringBuilder insertQuery = generateInsertProperties(entityType, entry);
+			StringBuilder insertQuery = generateInsertProperties(entityType, null, entry);
 			return new SparqlStatement(insertQuery.toString() + "WHERE {}");
 		}
 	}
@@ -128,12 +128,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return insertReplace;
 	}
 
-	private StringBuilder generateInsertProperties(RdfEntityType entityType, Entity entry)
+	private StringBuilder generateInsertProperties(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry)
 			throws OData2SparqlException {
 		StringBuilder insertProperties = new StringBuilder("INSERT { ");
 		StringBuilder properties = new StringBuilder();
 		//String entityKey=entityKeys.get(0).getLiteral();
-		String entityKey = null;
+		String entityKey = (entityKeys!=null) ? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1): null; 
 		boolean first = true;
 		for (Property prop : entry.getProperties()) {
 			if (prop.getValue() != null) {
@@ -159,12 +159,13 @@ public class SparqlCreateUpdateDeleteBuilder {
 				}
 			}
 		}
+		if(properties.length()>0) {
 		properties.append(" .\n");
 		if (entityKey == null) {
 			throw new OData2SparqlException("No keys " + entityType.getPrimaryKeys().toString() + " specified for "
 					+ entityType.getEntityTypeName(), null);
 		} else {
-			String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(entityKey);
+			String expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
 			UrlValidator urlValidator = new UrlValidator();
 			if (urlValidator.isValid(expandedKey)) {
 				insertProperties.append("<" + expandedKey + ">");
@@ -175,6 +176,8 @@ public class SparqlCreateUpdateDeleteBuilder {
 				throw new OData2SparqlException("Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(),
 						null);
 			}
+		}}else {
+			return properties;
 		}
 	}
 
@@ -247,7 +250,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		} else {
 			String key = entityType.entityTypeName;
 			StringBuilder sparql = new StringBuilder("DELETE {?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
-			sparql.append(generateInsertProperties(entityType, entry));
+			sparql.append(generateInsertProperties(entityType, entityKeys, entry));
 
 			sparql.append("WHERE { OPTIONAL{ ?" + key + "_s ?" + key + "_p ?" + key + "_o .");
 			//Only need one key for an RDF entity
@@ -270,7 +273,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		StringBuilder properties = new StringBuilder();
 		boolean first = true;
 		for (Property prop : entry.getProperties()) {
-			if (prop.getValue() != null) {
+			//if (prop.getValue() != null) {
 				if (!first) {
 					properties.append(" ;\n");
 				} else {
@@ -282,7 +285,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				} else {
 					updatePropertyValues.append("(<" + property.getPropertyURI() + ">) ");
 				}
-			}
+			//}
 		}
 		return updatePropertyValues.append("}.");
 	}

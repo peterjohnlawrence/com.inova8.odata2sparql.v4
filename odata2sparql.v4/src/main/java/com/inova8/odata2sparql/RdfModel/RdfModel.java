@@ -98,17 +98,19 @@ public class RdfModel {
 				return uri == null ? decodedEntityKey : uri + decodedEntityKey.substring(colon + 1);
 			}
 		}
-
-		public String expandPredicateKey(String predicateKey) throws OData2SparqlException {
+		public String expandPredicate(String entityKey) throws OData2SparqlException {
 			UrlValidator urlValidator = new UrlValidator();
-			String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
 			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey);
 			String expandedEntityKey = expandPrefix(decodedEntityKey);
 			if (urlValidator.isValid(expandedEntityKey)) {
 				return expandedEntityKey;
 			} else {
-				throw new OData2SparqlException("Invalid key: " + predicateKey, null);
+				throw new OData2SparqlException("Invalid key: " + entityKey, null);
 			}
+		}
+		public String expandPredicateKey(String predicateKey) throws OData2SparqlException {
+			String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
+			return expandPredicate(entityKey);
 		}
 
 		private void checkLegal(String prefix) throws OData2SparqlException {

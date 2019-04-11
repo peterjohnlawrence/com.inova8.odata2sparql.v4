@@ -136,7 +136,7 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 			property = entity.getProperty(edmPropertyName);
 		}
 		
-		if (property == null) {
+		if (property == null && !isValue) {
 			throw new ODataApplicationException("Property " + edmPropertyName + " not found", HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH);
 		}
@@ -152,8 +152,11 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 
 	private void writePropertyValue(RdfResourceParts rdfResourceParts, ODataResponse response, Property property) throws ODataApplicationException {
 		if (property == null) {
-			throw new ODataApplicationException("No property found", HttpStatusCode.NOT_FOUND.getStatusCode(),
-					Locale.ENGLISH);
+			//ByteArrayInputStream serializerContent = new ByteArrayInputStream(null);//Charset.forName("UTF-8")));
+			//response.setContent(serializerContent);
+			response.setStatusCode(HttpStatusCode.OK.getStatusCode());
+			response.setHeader(HttpHeader.CONTENT_TYPE, ContentType.TEXT_PLAIN.toContentTypeString());
+			//throw new ODataApplicationException("No property found", HttpStatusCode.NOT_FOUND.getStatusCode(),	Locale.ENGLISH);
 		} else {
 			if (property.getValue() == null) {
 				response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
