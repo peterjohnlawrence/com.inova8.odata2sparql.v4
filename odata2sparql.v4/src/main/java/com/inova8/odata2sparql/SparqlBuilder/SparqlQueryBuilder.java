@@ -885,14 +885,23 @@ public class SparqlQueryBuilder {
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
-					String resource = queryOption.getText().replace("'", "")
-							.replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
-					return resource;
+					return encodeIRI(queryOption);
 				default:
 					return queryOption.getText();
 				}
 		}
 		return null;
+	}
+
+	private String encodeIRI(CustomQueryOption queryOption) {
+		String resource = queryOption.getText().substring(1,queryOption.getText().length()-1);
+		if(resource.startsWith(RdfConstants.BLANKNODE)) {
+			return "<" + resource.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF)+ ">";
+		}else {
+			resource = queryOption.getText().replace("'", "")
+				.replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
+		return resource;
+		}
 	}
 
 	private String getParameterValues(List<UriParameter> keyPredicates,

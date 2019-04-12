@@ -59,7 +59,6 @@ public class SparqlEntity extends Entity {//TreeMap<String, Object>{
 				return new URI(rdfEntityType.getEDMEntitySetName() + "('"
 						+ subject.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED) + "')");
 			}
-
 		} catch (URISyntaxException e) {
 			throw new ODataRuntimeException("Unable to create id for entity: " + rdfEntityType.getEDMEntitySetName(),
 					e);

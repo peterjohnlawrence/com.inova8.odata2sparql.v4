@@ -189,7 +189,7 @@ public class RdfModel {
 		public String toQName(RdfNode node, String qNameSeparator) {
 			String qname = null;
 			if (node.isBlank()) {
-				return ((BNode) node.getNode()).toString();
+				return (((BNode) node.getNode()).toString()).replace(RdfConstants.QNAME_SEPARATOR_RDF, RdfConstants.QNAME_SEPARATOR_ENCODED);
 			} else {
 				try {
 					qname = rdfPrefixes.getOrCreatePrefix(null, node.getNamespace()) + qNameSeparator

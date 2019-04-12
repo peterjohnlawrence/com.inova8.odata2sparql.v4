@@ -44,6 +44,7 @@ public class RdfConstants {
 	public static final String LOGS = "$logs";
 	public static final String WILDCARD = "*";
 	public static final String UNDEFVALUE = "UNDEF";
+	
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();
 	static private Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
 	static private final Hashtable<Value, Hashtable<Value, String>> metaModels = new Hashtable<Value, Hashtable<Value, String>>();
@@ -212,9 +213,10 @@ public class RdfConstants {
 	   of the URI, but this should not be done unless the URI is being used
 	   in a context that does not allow the unescaped character to appear.
 	*/
-
-	public static final String QNAME_SEPARATOR = "~";// ":";
-	public static final String QNAME_SEPARATOR_ENCODED = "~";// "%3A";
+	public static final String BLANKNODE = "_~";
+	public static final String BLANKNODE_RDF = "_:";
+	public static final String QNAME_SEPARATOR = "~";
+	public static final String QNAME_SEPARATOR_ENCODED = "~";
 	public static final String QNAME_SEPARATOR_RDF = ":";
 	public static final Object RDF_LANG_STRING = RDF + "." + LANGSTRING;
 
@@ -295,6 +297,8 @@ public class RdfConstants {
 	public static final ArrayList< CsdlTerm> RDFTERMS = new ArrayList<CsdlTerm>();
 	public static final ArrayList< CsdlTerm> RDFSTERMS = new ArrayList<CsdlTerm>();
 	public static final ArrayList< CsdlTerm> OWLTERMS = new ArrayList<CsdlTerm>();
+
+
 
 	public static Hashtable<Value, String> getMetaQueries() {
 		return metaQueries;
