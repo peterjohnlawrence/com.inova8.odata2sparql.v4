@@ -638,7 +638,7 @@ public class SparqlQueryBuilder {
 		for (RdfProperty property : rdfTargetEntityType.getInheritedProperties()) {
 			if (property.getIsComplex()) {
 				//Complex properties
-				constructComplexType(key, constructNodeShapePath, property.getComplexType());
+				constructNodeShapePath.append(constructComplexType(key, property.getComplexType()));
 			} else {
 				constructNodeShapePath.append("\t").append("?" + key + "_s <" + property.getPropertyURI() + "> ?" + key
 						+ "_" + property.getEDMPropertyName() + ".\n");
@@ -647,8 +647,8 @@ public class SparqlQueryBuilder {
 		return constructNodeShapePath;
 	}
 
-	private void constructComplexType(String entityTypeName, StringBuilder constructNodeShapePath,
-			RdfComplexType complexType) {
+	private StringBuilder constructComplexType(String entityTypeName, RdfComplexType complexType) {
+		StringBuilder constructNodeShapePath = new StringBuilder();
 		for (RdfProperty complexProperty : complexType.getProperties().values()) {
 			constructNodeShapePath.append("\t?" + entityTypeName + "_s <" + complexProperty.getPropertyURI() + "> ?"
 					+ entityTypeName + "_" + complexProperty.getEDMPropertyName() + " .\n");
@@ -665,25 +665,29 @@ public class SparqlQueryBuilder {
 						.append("\t?" + entityTypeName + "_s <" + complexNavigationProperty.getNavigationPropertyIRI()
 								+ "> ?" + entityTypeName + "_s" + complexProperty.getComplexPropertyName() + " .\n");
 			}
-			constructNodeShapePath.append(constructNodeShapeType(entityTypeName,  complexProperty));
-			constructComplexType(entityTypeName + complexProperty.getComplexPropertyName(), constructNodeShapePath,
-					complexProperty.getComplexType());
+			constructNodeShapePath.append(constructNodeShapeType(entityTypeName, complexProperty));
+			constructNodeShapePath.append(constructComplexType(
+					entityTypeName + complexProperty.getComplexPropertyName(), complexProperty.getComplexType()));
 
 		}
-		for (RdfShapedNavigationProperty complexShapedNavigationProperty : complexType.getShapedNavigationProperties().values()) {
+		for (RdfShapedNavigationProperty complexShapedNavigationProperty : complexType.getShapedNavigationProperties()
+				.values()) {
 
 			constructNodeShapePath.append("\t?" + entityTypeName + "_s <"
-					+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + "> ?" + entityTypeName + "_"
-					+ complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName() + " .\n");
+					+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + "> ?"
+					+ entityTypeName + "_"
+					+ complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName()
+					+ " .\n");
 		}
+		return constructNodeShapePath;
 	}
 
-	private StringBuilder constructNodeShapeType(String entityTypeName,
-			RdfComplexProperty complexProperty) {
+	private StringBuilder constructNodeShapeType(String entityTypeName, RdfComplexProperty complexProperty) {
 		StringBuilder constructNodeShapeType = new StringBuilder();
 		if (DEBUG)
 			constructNodeShapeType.append("\t#constructNodeShapeType\n");
-		constructNodeShapeType.append("\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s <" + RdfConstants.ASSERTEDSHAPE + "> <" + complexProperty.getComplexType().getIRI() + "> .\n");
+		constructNodeShapeType.append("\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s <"
+				+ RdfConstants.ASSERTEDSHAPE + "> <" + complexProperty.getComplexType().getIRI() + "> .\n");
 		return constructNodeShapeType;
 	}
 
@@ -803,7 +807,7 @@ public class SparqlQueryBuilder {
 			} else {
 				clausesNodeShapeProperties
 						.append("\t?" + entityTypeName + "_s <" + complexNavigationProperty.getNavigationPropertyIRI()
-								+ "> ?" + entityTypeName + "_s" + complexProperty.getComplexPropertyName() );
+								+ "> ?" + entityTypeName + "_s" + complexProperty.getComplexPropertyName());
 			}
 			clausesComplexType(entityTypeName + complexProperty.getComplexPropertyName(), clausesNodeShapeProperties,
 					complexProperty.getComplexType());
@@ -812,13 +816,22 @@ public class SparqlQueryBuilder {
 			//else
 			//	clausesNodeShapeProperties.append(" .\n");
 		}
-		for (RdfShapedNavigationProperty complexShapedNavigationProperty : complexType.getShapedNavigationProperties().values()) {
-			
+		for (RdfShapedNavigationProperty complexShapedNavigationProperty : complexType.getShapedNavigationProperties()
+				.values()) {
+
 			if (complexShapedNavigationProperty.isOptional())
 				clausesNodeShapeProperties.append("\tOPTIONAL{");
-			clausesNodeShapeProperties
-					.append("\t?" + entityTypeName + "_s <" + complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI()
-							+ "> ?" + entityTypeName + "_" + complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName());
+			//if(complexShapedNavigationProperty.getRdfNavigationProperty().IsInverse() ) {
+			//	clausesNodeShapeProperties
+			//	.append("\t?" + entityTypeName + "_" + complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName() + " <" + complexShapedNavigationProperty.getRdfNavigationProperty().getInversePropertyOfURI()
+			//			+ "> ?" + entityTypeName + "_s");
+			//}else 
+			{
+				clausesNodeShapeProperties.append("\t?" + entityTypeName + "_s <"
+						+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + "> ?"
+						+ entityTypeName + "_"
+						+ complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName());
+			}
 			if (complexShapedNavigationProperty.isOptional())
 				clausesNodeShapeProperties.append(" }\n");
 			else
@@ -894,13 +907,13 @@ public class SparqlQueryBuilder {
 	}
 
 	private String encodeIRI(CustomQueryOption queryOption) {
-		String resource = queryOption.getText().substring(1,queryOption.getText().length()-1);
-		if(resource.startsWith(RdfConstants.BLANKNODE)) {
-			return "<" + resource.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF)+ ">";
-		}else {
-			resource = queryOption.getText().replace("'", "")
-				.replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
-		return resource;
+		String resource = queryOption.getText().substring(1, queryOption.getText().length() - 1);
+		if (resource.startsWith(RdfConstants.BLANKNODE)) {
+			return "<" + resource.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF) + ">";
+		} else {
+			resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED,
+					RdfConstants.QNAME_SEPARATOR_RDF);
+			return resource;
 		}
 	}
 
@@ -1151,9 +1164,9 @@ public class SparqlQueryBuilder {
 		StringBuilder valuesSubClassOf = new StringBuilder();
 		valuesSubClassOf.append("VALUES(?class){");
 		RdfEntityType actualRdfEntityType = rdfEntityType;
-		if(rdfEntityType.isNodeShape()) {
-			actualRdfEntityType= rdfEntityType.getNodeShape().getTargetClass();
-		}	
+		if (rdfEntityType.isNodeShape()) {
+			actualRdfEntityType = rdfEntityType.getNodeShape().getTargetClass();
+		}
 		valuesSubClassOf.append("(<" + actualRdfEntityType.getURL() + ">)");
 		for (RdfEntityType subType : actualRdfEntityType.getAllSubTypes()) {
 			valuesSubClassOf.append("(<" + subType.getURL() + ">)");
@@ -1203,6 +1216,7 @@ public class SparqlQueryBuilder {
 		if (uriInfo.getUriResourceParts().size() > 2) {
 			clausesPath.append(clausesPathNavigation(indent, uriInfo.getUriResourceParts(),
 					((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates()));
+		//	clausesPath.append(clausesPath_KeyPredicateValues(indent));
 		} else {
 			clausesPath.append(clausesPath_KeyPredicateValues(indent));
 		}
@@ -1395,15 +1409,11 @@ public class SparqlQueryBuilder {
 			for (UriParameter entityKey : rdfResourceParts.getEntitySet().getKeyPredicates()) {
 				//	for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 				//			.getKeyPredicates()) {
-				String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
 				// Strip leading and trailing single quote from key
 				String expandedKey = rdfModel.getRdfPrefixes()
-						.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
-				if (expandedKey.equals(RdfConstants.SPARQL_UNDEF)) {
-					keyValues.put(entityKey.getName(), " " + RdfConstants.SPARQL_UNDEF + " ");
-				} else {
-					keyValues.put(entityKey.getName(), "<" + expandedKey + ">");
-				}
+						.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+
+				keyValues.put(entityKey.getName(), expandKey(expandedKey));
 			}
 			clausesPath_KeyPredicateValues.append("{(");
 			for (String value : keyValues.values()) {
@@ -1415,6 +1425,19 @@ public class SparqlQueryBuilder {
 			clausesPath_KeyPredicateValues.append(clausesMatch(key, indent));
 		}
 		return clausesPath_KeyPredicateValues;
+	}
+
+	private String expandKey(String expandedKey) {
+		String pathVariable = "";
+		expandedKey = SparqlEntity.URLDecodeEntityKey(expandedKey);
+		if (expandedKey.equals(RdfConstants.SPARQL_UNDEF)) {
+			pathVariable = " " + RdfConstants.SPARQL_UNDEF + " ";
+		} else if (expandedKey.startsWith(RdfConstants.BLANKNODE)) {
+			pathVariable = "<" + expandedKey.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF) + ">";
+		} else {
+			pathVariable = "<" + expandedKey + ">";
+		}
+		return pathVariable;
 	}
 
 	private StringBuilder clausesPathNavigation(String indent, List<UriResource> navigationSegments,
@@ -1448,10 +1471,9 @@ public class SparqlQueryBuilder {
 				if (isFirstSegment) {
 					// Not possible to have more than one key field is it?
 					for (UriParameter entityKey : entityKeys) {
-						String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
 						String expandedKey = rdfModel.getRdfPrefixes()
-								.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
-						pathVariable = "<" + expandedKey + ">";
+								.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+						pathVariable = expandKey(expandedKey);
 					}
 					if (this.rdfModel.getRdfRepository().isWithMatching()) {
 						keyVariable = "?key_s";
@@ -1494,16 +1516,31 @@ public class SparqlQueryBuilder {
 					if (uriResourceNavigation.getKeyPredicates().size() > 0) {
 						String navigationKey = "";
 						for (UriParameter entityKey : uriResourceNavigation.getKeyPredicates()) {
-							String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
+
 							String expandedKey = rdfModel.getRdfPrefixes()
-									.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
-							navigationKey = "<" + expandedKey + ">";
+									.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+							navigationKey = expandKey(expandedKey);
 						}
 						clausesPathNavigation.append(clausesMatchNavigationKey(targetVariable, navigationKey, indent));
 					}
 				}
 				path += navProperty.getNavigationPropertyName();
 				isFirstSegment = false;
+			}else {
+				if (isFirstSegment) {
+					// Not possible to have more than one key field is it?
+					for (UriParameter entityKey : entityKeys) {
+						String expandedKey = rdfModel.getRdfPrefixes()
+								.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+						pathVariable = expandKey(expandedKey);
+					}
+					if (this.rdfModel.getRdfRepository().isWithMatching()) {
+						keyVariable = "?" + path + "_s";;
+						clausesPathNavigation.append(clausesMatch(keyVariable, pathVariable, indent));
+						pathVariable = keyVariable;
+					}
+				}
+				
 			}
 		}
 		return clausesPathNavigation;
@@ -1676,7 +1713,8 @@ public class SparqlQueryBuilder {
 						}
 					}
 				} else {
-					for (RdfNavigationProperty navigationProperty : targetEntityType.getInheritedNavigationProperties()) {
+					for (RdfNavigationProperty navigationProperty : targetEntityType
+							.getInheritedNavigationProperties()) {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsConstruct.append(expandItemConstruct(targetEntityType, targetKey, indent,
 									expandItem, navigationProperty,
@@ -1927,7 +1965,8 @@ public class SparqlQueryBuilder {
 						}
 					}
 				} else {
-					for (RdfNavigationProperty navigationProperty : targetEntityType.getInheritedNavigationProperties()) {
+					for (RdfNavigationProperty navigationProperty : targetEntityType
+							.getInheritedNavigationProperties()) {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 									navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),
@@ -2176,9 +2215,10 @@ public class SparqlQueryBuilder {
 				.values()) {
 			complexProperties.append("(<" + complexNavigationProperty.getNavigationPropertyIRI() + ">)");
 		}
-		for (RdfShapedNavigationProperty complexShapedNavigationProperty : selectProperty.getComplexType().getShapedNavigationProperties()
-				.values()) {
-			complexProperties.append("(<" + complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + ">)");
+		for (RdfShapedNavigationProperty complexShapedNavigationProperty : selectProperty.getComplexType()
+				.getShapedNavigationProperties().values()) {
+			complexProperties.append("(<"
+					+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + ">)");
 		}
 		return complexProperties;
 	}

@@ -509,21 +509,18 @@ public class RdfModel {
 			return properties.values();
 		}
 
-		public Collection<RdfModel.RdfProperty> getInheritedProperties() {
-			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
+		public HashSet<RdfModel.RdfProperty> getInheritedProperties() {
+			HashSet <RdfModel.RdfProperty> inheritedProperties = new HashSet <RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
 				inheritedProperties.addAll(this.getSuperTypeProperties(visited));
-//				for (RdfEntityType superType : this.getSuperTypes()) {
-//					inheritedProperties.addAll(superType.getInheritedProperties());
-//				}
 			}
 			return inheritedProperties;
 		}
 
-		public Collection<RdfModel.RdfProperty> getSuperTypeProperties(HashSet<RdfEntityType> visited) {
-			Collection<RdfModel.RdfProperty> inheritedProperties = new ArrayList<RdfModel.RdfProperty>();
+		public HashSet<RdfModel.RdfProperty> getSuperTypeProperties(HashSet<RdfEntityType> visited) {
+			HashSet <RdfModel.RdfProperty> inheritedProperties = new HashSet <RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				for (RdfEntityType superType : this.getSuperTypes()) {
@@ -1476,8 +1473,9 @@ public class RdfModel {
 				}
 				graphName = rdfPrefixes.getNsPrefixURI(parts[0]);
 				graphPrefix = parts[0];
+				if(graphPrefix.equals("_")) return;
 			}
-			graph = getOrCreateGraph(graphName, graphPrefix);
+			graph = getOrCreateGraph(graphName, graphPrefix);	
 		}
 
 		RdfURI(RdfSchema graph, String localName) {
