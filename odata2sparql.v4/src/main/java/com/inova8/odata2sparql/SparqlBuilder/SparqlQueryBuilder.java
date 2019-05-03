@@ -2101,7 +2101,7 @@ public class SparqlQueryBuilder {
 		expandItemWhereCount.append(indent).append("\t#expandItemWhereCount\n");
 		//TODO UNION or OPTIONAL, currently OPTIONAL improves performance
 		expandItemWhereCount.append(indent).append("\tUNION{ SELECT ?").append(targetKey)
-				.append("_s (COUNT(?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n").append(indent)
+				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n").append(indent)
 				.append("\tWHERE {\n");
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
