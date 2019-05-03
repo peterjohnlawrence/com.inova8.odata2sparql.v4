@@ -25,6 +25,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
+import com.inova8.odata2sparql.uri.UriUtils;
 
 public class RdfModel {
 	private final Logger log = LoggerFactory.getLogger(RdfModel.class);
@@ -89,13 +90,13 @@ public class RdfModel {
 		}
 
 		public String expandPrefix(String decodedEntityKey) {
-
-			int colon = decodedEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
+			String encodeEntityKey = UriUtils.encodeUri(decodedEntityKey);//decodedEntityKey.replaceAll("\\(", "%28").replaceAll("\\)","%29").replaceAll("\\/", "%2F");
+			int colon = encodeEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
 			if (colon < 0)
-				return decodedEntityKey;
+				return encodeEntityKey;
 			else {
-				String uri = get(decodedEntityKey.substring(0, colon));
-				return uri == null ? decodedEntityKey : uri + decodedEntityKey.substring(colon + 1);
+				String uri = get(encodeEntityKey.substring(0, colon));
+				return uri == null ? encodeEntityKey : uri + encodeEntityKey.substring(colon + 1);
 			}
 		}
 		public String expandPredicate(String entityKey) throws OData2SparqlException {

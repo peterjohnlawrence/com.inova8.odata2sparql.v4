@@ -48,6 +48,7 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
+import com.inova8.odata2sparql.uri.UriUtils;
 
 //	Query Pseudocode
 //	================
@@ -911,9 +912,9 @@ public class SparqlQueryBuilder {
 		if (resource.startsWith(RdfConstants.BLANKNODE)) {
 			return "<" + resource.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF) + ">";
 		} else {
-			resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED,
-					RdfConstants.QNAME_SEPARATOR_RDF);
-			return resource;
+			resource = UriUtils.odataToRdfQname(queryOption.getText());
+			//resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED,	RdfConstants.QNAME_SEPARATOR_RDF);
+			return UriUtils.encodeUri(resource);
 		}
 	}
 
@@ -924,8 +925,8 @@ public class SparqlQueryBuilder {
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
-					String resource = queryOption.getText().replace("'", "")
-							.replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
+					String resource =  UriUtils.odataToRdfQname(queryOption.getText());
+					//queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
 					return resource;
 				default:
 					return queryOption.getText();

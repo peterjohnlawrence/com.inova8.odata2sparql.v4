@@ -414,6 +414,7 @@ public class RdfRepositories {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private RepositoryManager bootstrapRemoteRepository(String repositoryUrl) throws OData2SparqlException {
 		RemoteRepositoryManager repositoryManager = new RemoteRepositoryManager(repositoryUrl);
 		log.info("Trying remote Repository at " + repositoryUrl);
@@ -429,6 +430,7 @@ public class RdfRepositories {
 		return repositoryManager;
 	}
 
+	@SuppressWarnings("deprecation")
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException, IOException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
 		//String localRepositoryManagerDirectory=RdfConstants.repositoryWorkingDirectory;
