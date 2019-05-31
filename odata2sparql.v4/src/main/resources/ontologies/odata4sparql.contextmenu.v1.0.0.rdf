@@ -135,7 +135,7 @@
                 </sp:elements>
               </sp:Union>
             </sp:where>
-            <sp:text>select ?entity ?property (count(?o) as ?co) 
+            <sp:text>select ?entity ?property (count(distinct ?o) as ?co) 
 {
 	BIND (?subject as ?entity)
 	#VALUES(?entity){(NWD:Employee-2)}
