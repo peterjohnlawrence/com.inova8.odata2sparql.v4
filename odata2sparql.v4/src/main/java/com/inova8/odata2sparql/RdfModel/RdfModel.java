@@ -642,7 +642,13 @@ public class RdfModel {
 				return this.schema.schemaPrefix + RdfConstants.CLASS_SEPARATOR + this.entityTypeName;
 			}
 		}
-
+		public String getODataEntitySetName() {
+			if (this.schema.isDefault) {
+				return this.entityTypeName;
+			} else {
+				return this.schema.schemaPrefix + RdfConstants.QNAME_SEPARATOR + this.entityTypeName;
+			}
+		}
 		public Collection<RdfPrimaryKey> getPrimaryKeys() {
 			return getPrimaryKeys(true);
 		}

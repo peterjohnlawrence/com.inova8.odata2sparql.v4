@@ -213,7 +213,7 @@
 		<olingo.version>4.6.0</olingo.version>
 		<javax.version>2.5</javax.version>
 		<slf4j.version>1.7.11</slf4j.version>
-		<rdf4j.version>2.5.1</rdf4j.version>
+		<rdf4j.version>2.5.2</rdf4j.version>
 		<jetty.version>9.3.24.v20180605</jetty.version>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
