@@ -1462,27 +1462,31 @@ public class RdfModel {
 
 		RdfURI(RdfNode node) throws OData2SparqlException {
 			//	this.node = node;
-			String[] parts = rdfPrefixes.toQName(node, RdfConstants.QNAME_SEPARATOR)
-					.split(RdfConstants.QNAME_SEPARATOR); //node.toQName(rdfPrefixes).split(":");
-			if (parts[0].equals("http") || parts[0].equals("null")) {
-				localName = node.getLocalName();
-				graphName = node.getNamespace();
-				graphPrefix = getOrCreatePrefix(null, graphName);
-			} else if (parts.length == 1) {
-				localName = parts[0];
-				graphName = null;
-				graphPrefix = null;
-				return;
-			} else {
-				localName = parts[1];
-				for (int i = 2; i < parts.length; i++) {
-					localName += "_" + parts[i];
+			if(node.isBlank() ) {
+				log.error("Unexpected blank node" + node.getIRI().toString());
+			}else {
+				String[] parts = rdfPrefixes.toQName(node, RdfConstants.QNAME_SEPARATOR)
+						.split(RdfConstants.QNAME_SEPARATOR); //node.toQName(rdfPrefixes).split(":");
+				if (parts[0].equals("http") || parts[0].equals("null")) {
+					localName = node.getLocalName();
+					graphName = node.getNamespace();
+					graphPrefix = getOrCreatePrefix(null, graphName);
+				} else if (parts.length == 1) {
+					localName = parts[0];
+					graphName = null;
+					graphPrefix = null;
+					return;
+				} else {
+					localName = parts[1];
+					for (int i = 2; i < parts.length; i++) {
+						localName += "_" + parts[i];
+					}
+					graphName = rdfPrefixes.getNsPrefixURI(parts[0]);
+					graphPrefix = parts[0];
+					if(graphPrefix.equals("_")) return;
 				}
-				graphName = rdfPrefixes.getNsPrefixURI(parts[0]);
-				graphPrefix = parts[0];
-				if(graphPrefix.equals("_")) return;
+				graph = getOrCreateGraph(graphName, graphPrefix);	
 			}
-			graph = getOrCreateGraph(graphName, graphPrefix);	
 		}
 
 		RdfURI(RdfSchema graph, String localName) {

@@ -276,23 +276,26 @@ public class RdfModelProvider {
 						}
 
 						RdfNode domainNode = soln.getRdfNode("domain");
-
-						RdfProperty datatypeProperty = getOrCreateSuperProperty(propertyNode, soln, propertyLabelNode,
-								domainNode);
-						if (soln.getRdfNode("description") != null) {
-							datatypeProperty
-									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+						if(domainNode.isBlank()) {
+							log.error("Failed to create property:" + propertyNode.getIRI().toString() + " because domain is a blank node. Probably domain is defined as an owl:Restriction which is not currently supported");
+						}else {
+							RdfProperty datatypeProperty = getOrCreateSuperProperty(propertyNode, soln, propertyLabelNode,
+									domainNode);
+							if (soln.getRdfNode("description") != null) {
+								datatypeProperty
+										.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
+							}
+							HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
+							if (classes == null) {
+								classes = new HashSet<RdfEntityType>();
+								classes.add(datatypeProperty.getOfClass());
+								propertyClasses.put(propertyNode.getIRI().toString(), classes);
+							} else {
+								classes.add(datatypeProperty.getOfClass());
+							}
+							count++;
+							debug.append(propertyNode.getIRI().toString()).append(";");
 						}
-						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
-						if (classes == null) {
-							classes = new HashSet<RdfEntityType>();
-							classes.add(datatypeProperty.getOfClass());
-							propertyClasses.put(propertyNode.getIRI().toString(), classes);
-						} else {
-							classes.add(datatypeProperty.getOfClass());
-						}
-						count++;
-						debug.append(propertyNode.getIRI().toString()).append(";");
 					} catch (Exception e) {
 						log.info("Failed to create property:" + propertyNode.getIRI().toString() + " with exception "
 								+ e.getMessage());
