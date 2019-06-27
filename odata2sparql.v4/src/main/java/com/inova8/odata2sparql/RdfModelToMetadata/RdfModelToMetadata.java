@@ -42,6 +42,8 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfSchema;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfShapedNavigationProperty;
 import com.inova8.odata2sparql.Utils.FullQualifiedNameComparator;
+import com.inova8.odata2sparql.Utils.NavigationPropertyComparator;
+import com.inova8.odata2sparql.Utils.PropertyComparator;
 
 public class RdfModelToMetadata {
 	public class PrefixedNamespace {
@@ -76,9 +78,9 @@ public class RdfModelToMetadata {
 	private final Map<FullQualifiedName, RdfEntityType> entitySetMapping = new TreeMap<FullQualifiedName, RdfEntityType>(
 			new FullQualifiedNameComparator());
 	private final Map<FullQualifiedName, RdfProperty> propertyMapping = new TreeMap<FullQualifiedName, RdfProperty>(
-			new FullQualifiedNameComparator());
+			new PropertyComparator());
 	private final Map<FullQualifiedName, RdfNavigationProperty> navigationPropertyMapping = new TreeMap<FullQualifiedName, RdfNavigationProperty>(
-			new FullQualifiedNameComparator());
+			new NavigationPropertyComparator());
 
 	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, String text) {
 		if (text == null || text.isEmpty()) {

@@ -39,6 +39,7 @@ public class SparqlEntity extends Entity {//TreeMap<String, Object>{
 	@Override
 	public URI getId() {
 		try {
+			if (this.getEntityType()!=null) {
 			if (this.getEntityType().isOperation()) {
 				String id = rdfEntityType.getEDMEntitySetName() + "(";
 				boolean first = true;
@@ -56,11 +57,14 @@ public class SparqlEntity extends Entity {//TreeMap<String, Object>{
 				id = id + ")";
 				return new URI(id);
 			} else {
-				return new URI(rdfEntityType.getEDMEntitySetName() + "('"
+				return new URI(this.getEntityType().getEDMEntitySetName() + "('"
 						+ subject.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED) + "')");
 			}
+			}else {
+				return new URI(this.subject);
+			}
 		} catch (URISyntaxException e) {
-			throw new ODataRuntimeException("Unable to create id for entity: " + rdfEntityType.getEDMEntitySetName(),
+			throw new ODataRuntimeException("Unable to create id for entity: " + this.subject,
 					e);
 		}
 	}

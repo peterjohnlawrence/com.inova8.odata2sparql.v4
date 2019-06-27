@@ -514,8 +514,8 @@ public class RdfModelProvider {
 					}
 				}
 			} finally {
-				//log.info(count + " ObjectProperties found [" + debug + "]");
-				log.info(count + " ObjectProperties found");
+				log.info(count + " ObjectProperties found [" + debug + "]");
+				//log.info(count + " ObjectProperties found");
 				associations.close();
 			}
 		} catch (OData2SparqlException e) {

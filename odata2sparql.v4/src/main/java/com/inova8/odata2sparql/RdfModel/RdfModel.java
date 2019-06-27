@@ -2233,8 +2233,10 @@ public class RdfModel {
 		String navigationPropertyName = createNavigationPropertyName(multipleDomainNode, multipleRangeNode, domainURI,
 				propertyURI, rangeURI);
 
+//		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
+//				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
 		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
-				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
+				.firstOrNull(navigationPropertyEquals(navigationPropertyName,domainURI.toString()));
 		if (navigationProperty == null) {
 			navigationProperty = buildNavigationProperty(navigationPropertyName, propertyNode, propertyURI, domainNode,
 					domainURI, rangeNode, rangeURI);
@@ -2284,8 +2286,10 @@ public class RdfModel {
 		String navigationPropertyName = createNavigationPropertyName(multipleDomainNode, multipleRangeNode, domainURI,
 				propertyURI, rangeURI);
 
+//		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
+//				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
 		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
-				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
+				.firstOrNull(navigationPropertyEquals(navigationPropertyName,domainNode.getIRIString()));
 		if (navigationProperty == null) {
 			return false;
 		}
@@ -2295,20 +2299,20 @@ public class RdfModel {
 	private String createNavigationPropertyName(RdfNode multipleDomainNode, RdfNode multipleRangeNode, RdfURI domainURI,
 			RdfURI propertyURI, RdfURI rangeURI) throws OData2SparqlException {
 		//Removed for V4 as multiple ranges and domains do not matter any more as navigationProperties are directly associated with EntityType and EntitySet
-		//		if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
-		//			if (!(multipleRangeNode.getLiteralObject().equals(1) || multipleRangeNode.getLiteralObject().equals("1"))) {
-		//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-		//						+ rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-		//						+ rdfToOdata(rangeURI.localName);
-		//			} else {
-		//				return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-		//						+ rdfToOdata(propertyURI.localName);
-		//			}
-		//		} else if (!(multipleRangeNode.getLiteralObject().equals(1)
-		//				|| multipleRangeNode.getLiteralObject().equals("1"))) {
-		//			return rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-		//					+ rdfToOdata(rangeURI.localName);
-		//		}
+//				if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
+//					if (!(multipleRangeNode.getLiteralObject().equals(1) || multipleRangeNode.getLiteralObject().equals("1"))) {
+//						return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+//								+ rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+//								+ rdfToOdata(rangeURI.localName);
+//					} else {
+//						return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+//								+ rdfToOdata(propertyURI.localName);
+//					}
+//				} else if (!(multipleRangeNode.getLiteralObject().equals(1)
+//						|| multipleRangeNode.getLiteralObject().equals("1"))) {
+//					return rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
+//							+ rdfToOdata(rangeURI.localName);
+//				}
 		return rdfToOdata(propertyURI.localName);
 	}
 
@@ -2580,7 +2584,22 @@ public class RdfModel {
 			}
 		};
 	}
-
+	private static final Predicate1<RdfNavigationProperty> navigationPropertyDomainEquals(
+			final String navigationPropertyDomain) {
+		return new Predicate1<RdfNavigationProperty>() {
+			public boolean apply(RdfNavigationProperty navigationProperty) {
+				return navigationProperty.domainName.equals(navigationPropertyDomain);
+			}
+		};
+	}
+	private static final Predicate1<RdfNavigationProperty> navigationPropertyEquals(
+			final String navigationPropertyName, final String navigationPropertyDomainURI) {
+		return new Predicate1<RdfNavigationProperty>() {
+			public boolean apply(RdfNavigationProperty navigationProperty) {
+				return navigationProperty.navigationPropertyName.equals(navigationPropertyName) && navigationProperty.domainNode.getIRIString().equals(navigationPropertyDomainURI);
+			}
+		};
+	}
 	private static final Predicate1<RdfDatatype> datatypeNameEquals(final String datatypeName) {
 		return new Predicate1<RdfDatatype>() {
 			public boolean apply(RdfDatatype datatype) {

@@ -62,6 +62,7 @@ public class RdfConstants {
 	public static String rdfsFile;
 	public static String sailFile;
 	public static String spFile;
+	public static String contextmenuFile;
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
@@ -337,6 +338,7 @@ public class RdfConstants {
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
 			spFile = repositoryManagerDirPath + "ontologies/sp.ttl";
+			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.contextmenu.v1.0.0.rdf";
 
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());

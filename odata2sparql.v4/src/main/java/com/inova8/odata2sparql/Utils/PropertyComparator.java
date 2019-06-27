@@ -4,9 +4,9 @@ import java.util.Comparator;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 
 
-public class FullQualifiedNameComparator implements Comparator<FullQualifiedName>{ 
+public class PropertyComparator implements Comparator<FullQualifiedName>{ 
     @Override
 	public int compare(FullQualifiedName o1, FullQualifiedName o2) {
-		return o1.getFullQualifiedNameAsString().compareTo(o2.getFullQualifiedNameAsString());
+		return o1.getName().compareTo(o2.getName());
 	}
 }

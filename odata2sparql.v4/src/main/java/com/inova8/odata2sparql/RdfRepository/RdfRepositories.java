@@ -527,7 +527,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading odata4sparql from " + RdfConstants.odata4sparqlFile);
-				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), null, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), RdfConstants.systemId, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.odata4sparqlFile, e);
 				throw new OData2SparqlException();
@@ -537,30 +537,30 @@ public class RdfRepositories {
 			} finally {
 
 			}
-			try {
-				log.info("Loading rdf from " + RdfConstants.rdfFile);
-				modelsConnection.add(new File(RdfConstants.rdfFile), RdfConstants.systemId, RDFFormat.TURTLE);
-			} catch (RDFParseException e) {
-				log.error("Cannot parse " + RdfConstants.rdfFile, e);
-				throw new OData2SparqlException();
-			} catch (IOException e) {
-				log.error("Cannot access " + RdfConstants.rdfFile, e);
-				throw new OData2SparqlException();
-			} finally {
-
-			}
-			try {
-				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
-				modelsConnection.add(new File(RdfConstants.rdfsFile), RdfConstants.systemId, RDFFormat.TURTLE);
-			} catch (RDFParseException e) {
-				log.error("Cannot parse " + RdfConstants.rdfsFile, e);
-				throw new OData2SparqlException();
-			} catch (IOException e) {
-				log.error("Cannot access " + RdfConstants.rdfsFile, e);
-				throw new OData2SparqlException();
-			} finally {
-
-			}
+//			try {
+//				log.info("Loading rdf from " + RdfConstants.rdfFile);
+//				modelsConnection.add(new File(RdfConstants.rdfFile), RdfConstants.systemId, RDFFormat.TURTLE);
+//			} catch (RDFParseException e) {
+//				log.error("Cannot parse " + RdfConstants.rdfFile, e);
+//				throw new OData2SparqlException();
+//			} catch (IOException e) {
+//				log.error("Cannot access " + RdfConstants.rdfFile, e);
+//				throw new OData2SparqlException();
+//			} finally {
+//
+//			}
+//			try {
+//				log.info("Loading rdfs from " + RdfConstants.rdfsFile);
+//				modelsConnection.add(new File(RdfConstants.rdfsFile), RdfConstants.systemId, RDFFormat.TURTLE);
+//			} catch (RDFParseException e) {
+//				log.error("Cannot parse " + RdfConstants.rdfsFile, e);
+//				throw new OData2SparqlException();
+//			} catch (IOException e) {
+//				log.error("Cannot access " + RdfConstants.rdfsFile, e);
+//				throw new OData2SparqlException();
+//			} finally {
+//
+//			}
 			try {
 				log.info("Loading sail from " + RdfConstants.sailFile);
 				modelsConnection.add(new File(RdfConstants.sailFile), RdfConstants.systemId, RDFFormat.RDFXML);
@@ -573,14 +573,26 @@ public class RdfRepositories {
 			} finally {
 
 			}
+//			try {
+//				log.info("Loading sp from " + RdfConstants.spFile);
+//				modelsConnection.add(new File(RdfConstants.spFile), RdfConstants.systemId, RDFFormat.TURTLE);
+//			} catch (RDFParseException e) {
+//				log.error("Cannot parse " + RdfConstants.spFile, e);
+//				throw new OData2SparqlException();
+//			} catch (IOException e) {
+//				log.error("Cannot access " + RdfConstants.spFile, e);
+//				throw new OData2SparqlException();
+//			} finally {
+//
+//			}
 			try {
-				log.info("Loading sp from " + RdfConstants.spFile);
-				modelsConnection.add(new File(RdfConstants.spFile), RdfConstants.systemId, RDFFormat.TURTLE);
+				log.info("Loading contextmenu from " + RdfConstants.contextmenuFile);
+				modelsConnection.add(new File(RdfConstants.contextmenuFile), RdfConstants.systemId, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
-				log.error("Cannot parse " + RdfConstants.spFile, e);
+				log.error("Cannot parse " + RdfConstants.contextmenuFile, e);
 				throw new OData2SparqlException();
 			} catch (IOException e) {
-				log.error("Cannot access " + RdfConstants.spFile, e);
+				log.error("Cannot access " + RdfConstants.contextmenuFile, e);
 				throw new OData2SparqlException();
 			} finally {
 

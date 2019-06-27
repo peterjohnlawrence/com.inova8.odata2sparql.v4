@@ -39,5 +39,15 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="C:/Users/Peter/.m2/repository/org/eclipse/rdf4j/rdf4j-storage/2.5.2/rdf4j-storage-2.5.2.jar" sourcepath="C:/Users/Peter/.m2/repository/org/eclipse/rdf4j/rdf4j-storage/2.5.2/rdf4j-storage-2.5.2-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Peter/.m2/repository/org/eclipse/rdf4j/rdf4j-storage/2.5.2/rdf4j-storage-2.5.2-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.eclipse.rdf4j"/>
+			<attribute name="maven.artifactId" value="rdf4j-storage"/>
+			<attribute name="maven.version" value="2.5.2"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
