@@ -2576,22 +2576,22 @@ public class RdfModel {
 		};
 	}
 
-	private static final Predicate1<RdfNavigationProperty> navigationPropertyNameEquals(
-			final String navigationPropertyName) {
-		return new Predicate1<RdfNavigationProperty>() {
-			public boolean apply(RdfNavigationProperty navigationProperty) {
-				return navigationProperty.navigationPropertyName.equals(navigationPropertyName);
-			}
-		};
-	}
-	private static final Predicate1<RdfNavigationProperty> navigationPropertyDomainEquals(
-			final String navigationPropertyDomain) {
-		return new Predicate1<RdfNavigationProperty>() {
-			public boolean apply(RdfNavigationProperty navigationProperty) {
-				return navigationProperty.domainName.equals(navigationPropertyDomain);
-			}
-		};
-	}
+//	private static final Predicate1<RdfNavigationProperty> navigationPropertyNameEquals(
+//			final String navigationPropertyName) {
+//		return new Predicate1<RdfNavigationProperty>() {
+//			public boolean apply(RdfNavigationProperty navigationProperty) {
+//				return navigationProperty.navigationPropertyName.equals(navigationPropertyName);
+//			}
+//		};
+//	}
+//	private static final Predicate1<RdfNavigationProperty> navigationPropertyDomainEquals(
+//			final String navigationPropertyDomain) {
+//		return new Predicate1<RdfNavigationProperty>() {
+//			public boolean apply(RdfNavigationProperty navigationProperty) {
+//				return navigationProperty.domainName.equals(navigationPropertyDomain);
+//			}
+//		};
+//	}
 	private static final Predicate1<RdfNavigationProperty> navigationPropertyEquals(
 			final String navigationPropertyName, final String navigationPropertyDomainURI) {
 		return new Predicate1<RdfNavigationProperty>() {

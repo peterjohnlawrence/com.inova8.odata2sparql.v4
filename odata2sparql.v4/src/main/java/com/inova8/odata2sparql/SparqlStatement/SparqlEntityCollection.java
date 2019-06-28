@@ -25,6 +25,7 @@ import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,30 +143,60 @@ class SparqlEntityCollection extends EntityCollection {
 
 	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) throws EdmException {
-
+		
+		//First pass through data to assert types
+		ArrayList<RdfTriple> allResults = new ArrayList<RdfTriple>();
 		try {
 			while (results.hasNext()) {
 				RdfTriple triple = results.next();
+				allResults.add(triple);
+				RdfNode propertyNode = triple.getPredicate();
+				String propertyNodeURI = propertyNode.getIRI().toString();
+				if( propertyNodeURI.equals(RdfConstants.TARGETENTITY)) {
+					// Mark any targetEntity so that recursive queries can be executed
+					SparqlEntity rdfSubjectEntity = findOrCreateEntity( triple.getSubject());
+					RdfEntityType targetEntityType = sparqlEdmProvider.getRdfModel().getOrCreateEntityType(triple.getObject());
+					rdfSubjectEntity.assertTargetEntityType(targetEntityType);
+				}else if( propertyNodeURI.equals(RdfConstants.ASSERTEDTYPE)) {
+					SparqlEntity rdfSubjectEntity = findOrCreateEntity( triple.getSubject());
+					rdfSubjectEntity.assertEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(triple.getObject()));
+				}else if( propertyNodeURI.equals(RdfConstants.ASSERTEDSHAPE)) {
+					SparqlEntity rdfSubjectEntity = findOrCreateEntity( triple.getSubject());
+					rdfSubjectEntity.assertEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityTypeFromShape(triple.getObject()));
+				}		
+			}
+		} catch (OData2SparqlException e) {
+			e.printStackTrace();
+		} finally {
+			results.close();
+		}
+		//second pass through data to assign data and object properties based on asserted types
+		try {
+			Iterator<RdfTriple> allResultsIterator = allResults.iterator();
+			while (allResultsIterator.hasNext()) {
+				RdfTriple triple = allResultsIterator.next();
+				
 				RdfNode subjectNode = triple.getSubject();
 				RdfNode propertyNode = triple.getPredicate();
 				RdfNode objectNode = triple.getObject();
-
+				
 				SparqlEntity rdfSubjectEntity = findOrCreateEntity(subjectNode);
-				// TODO maybe not required
-				//				if ((expand == null || expand.getExpandItems().isEmpty())
-				//						&& (select == null || select.getSelectItems().isEmpty())) {
-				//					rdfSubjectEntity.setEntityType(rdfEntityType);
-				//				}
 				if (objectNode.isIRI() || objectNode.isBlank()) {
 					// Must be a navigation property pointing to an expanded entity
-					if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
-						rdfSubjectEntity
-								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode));
-					} else if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDSHAPE)) {
-						rdfSubjectEntity
-								.setEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityTypeFromShape(objectNode));
-					} else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {
+					if (propertyNode.getIRI().toString().equals(RdfConstants.TARGETENTITY)) {
+						//Already processed
+						// Mark any targetEntity so that recursive queries can be executed
+						//RdfEntityType targetEntityType = sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode);
+						//rdfSubjectEntity.assertTargetEntityType(targetEntityType);
 						
+					} else if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDTYPE)) {
+						//Already processed
+						//rdfSubjectEntity.assertEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityType(objectNode));
+						
+					}  else if (propertyNode.getIRI().toString().equals(RdfConstants.ASSERTEDSHAPE)) {
+						//Already processed
+						//rdfSubjectEntity.assertEntityType(sparqlEdmProvider.getRdfModel().getOrCreateEntityTypeFromShape(objectNode));
+					}else if (propertyNode.getIRI().toString().equals(RdfConstants.RDF_TYPE)) {						
 						//TODO what can we use this for
 						//rdfSubjectEntity.getDatatypeProperties().put(propertyNode, objectNode.getLiteralObject());
 						
@@ -191,8 +222,9 @@ class SparqlEntityCollection extends EntityCollection {
 							//} else {
 							// Locate which of the $expand this is related to
 							SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-
-							rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
+							if(!rdfObjectEntity.isTargetEntity()) {
+								rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
+							}
 							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
 									rdfNavigationProperty.getEDMNavigationPropertyName(), rdfObjectEntity);
 							// fixes #7 add to the Entity
@@ -204,20 +236,20 @@ class SparqlEntityCollection extends EntityCollection {
 								rdfNavigationProperty = rdfComplexTypeProperty.getRdfNavigationProperty();
 								//Could be associated with a complexType's navigation property
 								SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-								rdfObjectEntity.setEntityType(rdfNavigationProperty.getRangeClass());
-								//							this.addNavPropertyObjectValues(rdfSubjectEntity.getSubject(),
-								//									rdfAssociation.getEDMAssociationName(), rdfObjectEntity);
+								rdfObjectEntity.assertEntityType(rdfNavigationProperty.getRangeClass());
 								// fixes #7 add to the Entity
 								findOrCreateComplexLink(rdfSubjectEntity, rdfComplexTypeProperty, rdfObjectEntity);
 							} else if (rdfComplexTypeProperty.isComplexProperty()) {
 								SparqlEntity rdfObjectEntity = findOrCreateEntity(objectNode);
-								rdfObjectEntity.setEntityType(rdfComplexTypeProperty.getRdfComplexProperty()
-										.getRdfObjectPropertyShape().getPropertyNode().getEntityType());
+								rdfObjectEntity.assertEntityType(rdfComplexTypeProperty.getRdfComplexProperty().getRdfObjectPropertyShape().getPropertyNode().getEntityType());
 								findOrCreateComplexLink(rdfSubjectEntity, rdfComplexTypeProperty, rdfObjectEntity);
 							} else if (rdfComplexTypeProperty.isProperty()) {
 								log.error("Should be handling rdfComplexTypePropertyy case: "
 										+ rdfComplexTypeProperty.toString());
 							}
+
+						//} else if(false){
+							// It could be that the subjectEntity appears twice with different entityTypes.
 
 						} else {
 							// fixes #10 could be a datatypeProperty with a object (xrd:anyURI) as its value
@@ -225,7 +257,6 @@ class SparqlEntityCollection extends EntityCollection {
 						}
 						if (rdfSubjectEntity.getEntityType().isOperation()) {
 							// An operation so need to use these as the primary key of the record.
-							//TODO propertyNode.getLocalName() is not the same as the navigationproperty
 							if (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null) {
 								rdfSubjectEntity.addProperty(new Property(null,
 										rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode)
@@ -247,11 +278,7 @@ class SparqlEntityCollection extends EntityCollection {
 					// Must be a navigation property pointing to an expanded
 					// entity, but they should really be eliminated from the
 					// query in the first place
-				} else if (propertyNode.getIRI().toString().equals(RdfConstants.TARGETENTITY)) {
-					// Mark any targetEntity so that recursive queries can be
-					// executed
-					rdfSubjectEntity.setTargetEntity(true);
-				} else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
+				}  else if (propertyNode.getIRI().toString().startsWith(RdfConstants.COUNT)) {
 					//Provides counted value hashed by subject/navigationPropertyName
 					RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntity.getEntityType()
 							.findNavigationProperty(
@@ -276,7 +303,7 @@ class SparqlEntityCollection extends EntityCollection {
 		} catch (OData2SparqlException e) {
 			e.printStackTrace();
 		} finally {
-			results.close();
+			//results.close();
 		}
 		//This should only be if matching is enabled
 		this.mergeMatching();

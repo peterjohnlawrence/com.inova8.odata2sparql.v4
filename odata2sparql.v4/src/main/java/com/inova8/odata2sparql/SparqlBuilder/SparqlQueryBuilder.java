@@ -563,8 +563,8 @@ public class SparqlQueryBuilder {
 		if (this.rdfTargetEntityType.isOperation()) {
 			construct.append(constructOperation(key, rdfTargetEntityType, "", false));
 		} else {
-			construct.append(targetEntityIdentifier(key, "\t"));
-			construct.append(constructType(rdfTargetEntityType, key, "\t"));
+			construct.append(targetEntityIdentifier(rdfTargetEntityType, key, "\t"));
+			//construct.append(constructType(rdfTargetEntityType, key, "\t"));
 			if (this.rdfModel.getRdfRepository().isWithMatching())
 				construct.append(matching(key, "\t"));
 			if ((this.uriInfo.getCountOption() != null) && (this.uriInfo.getCountOption().getValue())) {
@@ -584,11 +584,12 @@ public class SparqlQueryBuilder {
 		return construct;
 	}
 
-	private StringBuilder targetEntityIdentifier(String key, String indent) throws EdmException {
+	private StringBuilder targetEntityIdentifier(RdfEntityType rdfEntityType, String key, String indent) throws EdmException {
 		StringBuilder targetEntityIdentifier = new StringBuilder();
 		if (DEBUG)
 			targetEntityIdentifier.append(indent).append("#targetEntityIdentifier\n");
-		targetEntityIdentifier.append(indent).append("?" + key + "_s <" + RdfConstants.TARGETENTITY + "> true .\n");
+		String type = rdfEntityType.getURL();
+		targetEntityIdentifier.append(indent).append("?" + key + "_s <" + RdfConstants.TARGETENTITY  + "> <" + type + "> .\n");
 		return targetEntityIdentifier;
 	}
 
@@ -622,7 +623,7 @@ public class SparqlQueryBuilder {
 			constructOperation.append("<" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		else
 			constructOperation
-					.append("<http://targetEntity> true ; <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
+					.append("<" + RdfConstants.TARGETENTITY  + "> <" +  type + ">; <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> ;\n");
 		for (RdfProperty property : rdfOperationType.getProperties()) {
 			constructOperation.append(indent + "\t\t")
 					.append(" <" + property.getPropertyURI() + "> ?" + property.getVarName() + " ;\n");
@@ -2414,8 +2415,8 @@ public class SparqlQueryBuilder {
 		RdfNavigationProperty rdfProperty = rdfEntityType
 				.findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
 		String expandedProperty = rdfProperty.getNavigationPropertyIRI();
-		StringBuilder sparql = new StringBuilder("CONSTRUCT { ?" + key + "_o <http://targetEntity> true .");
-		sparql.append("?" + key + "_o <" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getURL()
+		StringBuilder sparql = new StringBuilder("CONSTRUCT { ?" + key + "_o <" + RdfConstants.TARGETENTITY + "><" + rdfProperty.getRangeClass().getURL() + "> ;");
+		sparql.append("<" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getURL()
 				+ "> .}\n");
 		//		if (rdfProperty.IsInverse()) {
 		//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();

@@ -9,15 +9,19 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
+import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrefixes;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.Utils.RdfNodeComparator;
 
-public class SparqlEntity extends Entity {//TreeMap<String, Object>{
+public class SparqlEntity extends Entity {
+	private final Logger log = LoggerFactory.getLogger(RdfModel.class);
 	private final TreeMap<RdfNode, Object> datatypeProperties = new TreeMap<RdfNode, Object>(new RdfNodeComparator());
 	private HashSet<SparqlEntity> matching = new HashSet<SparqlEntity>();
 	private final RdfNode subjectNode;
@@ -104,6 +108,20 @@ public class SparqlEntity extends Entity {//TreeMap<String, Object>{
 		this.rdfEntityType = rdfEntityType;
 	}
 
+	public void assertTargetEntityType(RdfEntityType rdfEntityType) {
+		this.setTargetEntity(true);
+		if(this.getEntityType()!=null &&  rdfEntityType != this.getEntityType()) {
+			//This means that the same entity has been used in an expanded query but when it is off a different type
+			log.warn("Assert target type: " + rdfEntityType.getEDMEntityTypeName() + " of: " + this.getId());
+		}
+		this.rdfEntityType = rdfEntityType;
+	}
+	public void assertEntityType(RdfEntityType rdfEntityType) {
+		if(!this.isTargetEntity()) {
+			//Don't overwrite assertion of targetEntity
+			this.rdfEntityType = rdfEntityType;
+		}
+	}
 	public boolean isExpandedEntity() {
 		return isExpandedEntity;
 	}
