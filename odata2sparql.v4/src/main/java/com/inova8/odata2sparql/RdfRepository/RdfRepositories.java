@@ -37,6 +37,7 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.sail.SailReadOnlyException;
 import org.eclipse.rdf4j.sail.config.SailImplConfig;
 import org.eclipse.rdf4j.sail.memory.config.MemoryStoreConfig;
+import org.eclipse.rdf4j.sail.spin.config.SpinSailConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -460,6 +461,7 @@ public class RdfRepositories {
 		//Create a configuration for the system repository implementation which is a native store
 
 		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();
+		systemRepositoryImplConfig = new SpinSailConfig(systemRepositoryImplConfig);
 		RepositoryImplConfig systemRepositoryTypeSpec = new SailRepositoryConfig(systemRepositoryImplConfig);
 		RepositoryConfig systemRepositoryConfig = new RepositoryConfig(RdfConstants.systemId, systemRepositoryTypeSpec);
 		try {

@@ -85,10 +85,10 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
     <tr>
       <td>$repository.modelName</td>
       <td>
-        <a href="./$repository.modelName">./$repository.modelName</a>
+        <a href="./$repository.modelName?$format=json">./$repository.modelName</a>
       </td>
       <td>
-        <a href="./$repository.modelName/$metadata">./$repository.modelName/$metadata</a>
+        <a href="./$repository.modelName/$metadata?$format=json">./$repository.modelName/$metadata</a>
       </td>
       <td>
         <a href="./$reset/$repository.modelName/">./$reset/$repository.modelName</a>
