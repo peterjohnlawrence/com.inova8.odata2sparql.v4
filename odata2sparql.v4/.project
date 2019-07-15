@@ -3,6 +3,7 @@
 	<name>odata2sparql.v4</name>
 	<comment></comment>
 	<projects>
+		<project>olgap</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

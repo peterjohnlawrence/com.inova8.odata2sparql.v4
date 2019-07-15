@@ -291,6 +291,7 @@ public class RdfModel {
 		//		private final TreeMap<String, RdfModel.RdfComplexType> complexTypes = new TreeMap<String, RdfModel.RdfComplexType>();
 		private final TreeMap<String, RdfModel.RdfNavigationProperty> incomingNavigationProperties = new TreeMap<String, RdfModel.RdfNavigationProperty>();
 		final TreeMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new TreeMap<String, RdfModel.RdfPrimaryKey>();
+		private boolean isProxy=false;
 
 		public String getDeleteText() {
 			return deleteText;
@@ -306,6 +307,10 @@ public class RdfModel {
 
 		public void setInsertText(String insertText) {
 			this.insertText = insertText;
+		}
+
+		public boolean isProxy() {
+			return isProxy;
 		}
 
 		public String getUpdateText() {
@@ -676,18 +681,34 @@ public class RdfModel {
 		public void setRootClass(boolean rootClass) {
 			this.rootClass = rootClass;
 		}
+
+		public void setProxy(boolean isProxy) {
+			this.isProxy = isProxy;		
+		}
 	}
 
 	public class FunctionImportParameter {
 		private String name;
 		private String type;
 		private boolean nullable;
+		private Boolean isDataset=false;
+		private Boolean isPropertyPath=false;
 
-		private FunctionImportParameter(String name, String type, boolean nullable) {
+		private FunctionImportParameter(String name, String type, boolean nullable, boolean isDataset, boolean isPropertyPath) {
 			super();
 			this.name = name;
 			this.type = type;
 			this.nullable = nullable;
+			this.isDataset = isDataset;
+			this.isPropertyPath = isPropertyPath;
+		}
+
+		public Boolean isDataset() {
+			return isDataset;
+		}
+
+		public Boolean isPropertyPath() {
+			return isPropertyPath;
 		}
 
 		public String getName() {
@@ -1889,11 +1910,11 @@ public class RdfModel {
 	}
 
 	RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode) throws OData2SparqlException {
-		return getOrCreateOperationEntityType(queryNode, null, null, null, null, null, null);
+		return getOrCreateOperationEntityType(queryNode, null, null, null, null, null, null,null);
 	}
 
 	RdfEntityType getOrCreateOperationEntityType(RdfNode queryNode, RdfNode queryLabel, RdfNode queryText,
-			RdfNode deleteText, RdfNode insertText, RdfNode updateText, RdfNode updatePropertyText)
+			RdfNode deleteText, RdfNode insertText, RdfNode updateText, RdfNode updatePropertyText, RdfNode isProxy)
 			throws OData2SparqlException {
 		RdfEntityType operationEntityType = getOrCreateEntityType(queryNode, queryLabel);
 		if (queryText != null) {
@@ -1912,21 +1933,23 @@ public class RdfModel {
 			operationEntityType.updatePropertyText = updatePropertyText.getLiteral().getLexicalForm();
 		}
 		operationEntityType.setOperation(true);
+		if(isProxy!=null )	operationEntityType.setProxy(isProxy.getLiteralValue().booleanValue());
 		operationEntityType.setBaseType(null);
 
 		return operationEntityType;
 	}
 
-	void getOrCreateOperationArguments(RdfNode queryNode, RdfNode queryPropertyNode, RdfNode varName, RdfNode rangeNode)
+	void getOrCreateOperationArguments(RdfNode queryNode, RdfNode queryPropertyNode, RdfNode varName, RdfNode rangeNode, RdfNode isDatasetNode, RdfNode isPropertyPathNode)
 			throws OData2SparqlException {
 		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (operationEntityType.isOperation()) {
 			operationEntityType.setFunctionImport(true);
 
 			String propertyTypeName = rangeNode.getIRI().toString();
-
+			Boolean isDataset = (isDatasetNode !=null) ?isDatasetNode.getLiteralValue().booleanValue():false ;
+			boolean isPropertyPath =	(isPropertyPathNode!=null) ? isPropertyPathNode.getLiteralValue().booleanValue() : false;	
 			FunctionImportParameter functionImportParameter = new FunctionImportParameter(
-					varName.getLiteralValue().getLabel(), propertyTypeName, false);
+					varName.getLiteralValue().getLabel(), propertyTypeName, false, isDataset,isPropertyPath );
 			operationEntityType.getFunctionImportParameters().put(varName.getLiteralValue().getLabel(),
 					functionImportParameter);
 		} else {

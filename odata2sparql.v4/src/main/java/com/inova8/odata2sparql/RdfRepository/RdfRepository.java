@@ -14,6 +14,8 @@ import org.eclipse.rdf4j.model.Namespace;
 import com.inova8.odata2sparql.Constants.TextSearchType;
 
 public class RdfRepository {
+	private RdfRepositories repositories;
+
 
 	private RdfConnection dataEndPoint;
 	private RdfConnection modelEndPoint;
@@ -33,11 +35,16 @@ public class RdfRepository {
 	private boolean withMatching = true;
 	private String match;
 
-	RdfRepository(String modelName, Namespace defaultPrefix, TreeMap<String, Namespace> namespaces) {
+
+	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix, TreeMap<String, Namespace> namespaces) {
 		super();
+		this.repositories = repositories;
 		this.modelName = modelName;
 		this.defaultPrefix = defaultPrefix;
 		this.namespaces = namespaces;
+	}
+	public RdfRepositories getRepositories() {
+		return repositories;
 	}
 	/**
 	 * @param dataRepository

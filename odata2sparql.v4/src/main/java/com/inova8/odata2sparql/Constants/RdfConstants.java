@@ -58,6 +58,7 @@ public class RdfConstants {
 	public static String repositoryWorkingDirectory;
 	public static File repositoryManagerDir;
 	public static String odata4sparqlFile;
+	public static String olgapFile;
 	public static String rdfFile;
 	public static String rdfsFile;
 	public static String sailFile;
@@ -88,6 +89,9 @@ public class RdfConstants {
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
 	private static final String  ODATA_SUBTYPE ="subType";
+	private static final String  ODATA_ISPROXY ="isProxy";
+	private static final String  ODATA_ISDATASET ="isDataset";
+	private static final String  ODATA_ISPROPERTYPATH ="isPropertyPath";
 	
 	public static final String  MATCH ="{ ??key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* ??key2 }";
 
@@ -268,6 +272,9 @@ public class RdfConstants {
 	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public static final String ODATA_FK_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_FK;
 	public static final String ODATA_SUBTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_SUBTYPE;
+	public static final String ODATA_ISPROXY_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROXY;
+	public static final String ODATA_ISDATASET_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISDATASET;
+	public static final String ODATA_ISPROPERTYPATH_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROPERTYPATH;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
@@ -283,6 +290,9 @@ public class RdfConstants {
 	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
 	private final static CsdlTerm odataFK = new CsdlTerm().setName(RdfConstants.ODATA_FK).setType("Edm.String");
 	private final static CsdlTerm odataSubType = new CsdlTerm().setName(RdfConstants.ODATA_SUBTYPE).setType("Edm.String");
+	private final static CsdlTerm odataIsProxy = new CsdlTerm().setName(RdfConstants.ODATA_ISPROXY).setType("Edm.String");
+	private final static CsdlTerm odataIsDataset = new CsdlTerm().setName(RdfConstants.ODATA_ISDATASET).setType("Edm.String");
+	private final static CsdlTerm odataIsPropertyPath = new CsdlTerm().setName(RdfConstants.ODATA_ISPROPERTYPATH).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
@@ -334,6 +344,7 @@ public class RdfConstants {
 			repositoryWorkingDirectory = workingDirectory;
 
 			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
+			olgapFile = repositoryManagerDirPath + "ontologies/olgap.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
@@ -401,6 +412,9 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.ODATA_FK, odataFK);
 		TERMS.put(RdfConstants.ODATA_SUBTYPE, odataSubType);
+		TERMS.put(RdfConstants.ODATA_ISPROXY, odataIsProxy);
+		TERMS.put(RdfConstants.ODATA_ISDATASET, odataIsDataset);
+		TERMS.put(RdfConstants.ODATA_ISPROPERTYPATH, odataIsPropertyPath);
 		TERMS.put(RdfConstants.RDFS_CLASS_LABEL, rdfsClassTerm);
 		TERMS.put(RdfConstants.PROPERTY, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
@@ -414,6 +428,9 @@ public class RdfConstants {
 		ODATATERMS.add(odatabaseType);
 		ODATATERMS.add(odataFK);
 		ODATATERMS.add(odataSubType);
+		ODATATERMS.add(odataIsProxy);
+		ODATATERMS.add(odataIsDataset);
+		ODATATERMS.add(odataIsPropertyPath);
 		RDFTERMS.add(rdfPropertyTerm);
 		RDFSTERMS.add(rdfsClassTerm);
 		RDFSTERMS.add(rdfsDatatypeTerm);

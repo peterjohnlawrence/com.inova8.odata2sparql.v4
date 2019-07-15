@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.TreeMap;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -27,6 +29,7 @@ import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectItem;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
+import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrimaryKey;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfShapedNavigationProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
+import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.SparqlExpressionVisitor;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
@@ -341,7 +345,13 @@ public class SparqlQueryBuilder {
 	private HashSet<String> selectPropertyMap;
 
 	private static final boolean DEBUG = true;
-
+	
+	final String propertyPathRegex = "([!^]*)?\\(([^)]*)\\)";
+	final Pattern propertyPathPattern = Pattern.compile(propertyPathRegex, Pattern.MULTILINE);
+	
+	final String propertyRegex = "([^|~]*)~([^|]*)|(<[^|>]*>)";
+	final Pattern propertyPattern = Pattern.compile(propertyRegex, Pattern.MULTILINE);
+	
 	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
 			UriType uriType, RdfResourceParts rdfResourceParts)
 			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
@@ -942,6 +952,28 @@ public class SparqlQueryBuilder {
 			queryOptions = uriInfo.getCustomQueryOptions();
 		}
 		String queryText = rdfOperationType.queryText;
+		String dataset="";
+		RdfRepository datasetRepository =null;
+		if(rdfOperationType.isProxy() ) {
+			// Locate the service for which this function is a proxy
+			for (Entry<String, com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter> functionImportParameterEntry : rdfOperationType
+					.getFunctionImportParameters().entrySet()) {
+				com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
+						.getValue();
+				if(functionImportParameter.isDataset() ) {
+					dataset = getQueryOptionText(queryOptions, functionImportParameter);
+					dataset = dataset.substring(1,dataset.length()-1);
+					datasetRepository = this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(dataset);
+					if (datasetRepository == null)					
+						throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()
+					+ ") refers to dataset " + dataset + " that is not recognized");
+					break;
+				}
+			}
+			//Find the repository details of this service: endpoint and prefixes
+			
+			
+		}
 		for (Entry<String, com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter> functionImportParameterEntry : rdfOperationType
 				.getFunctionImportParameters().entrySet()) {
 			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
@@ -955,7 +987,8 @@ public class SparqlQueryBuilder {
 			default:
 				parameterValue = getQueryOptionText(queryOptions, functionImportParameter);
 			}
-
+			if(functionImportParameter.isPropertyPath() ) parameterValue = preprocessPropertyPath(datasetRepository,parameterValue);
+			if(functionImportParameter.isDataset() ) parameterValue = preprocessDataset(datasetRepository,parameterValue);
 			if (parameterValue != null) {
 				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
 			} else {
@@ -968,6 +1001,32 @@ public class SparqlQueryBuilder {
 			queryText += limitClause();
 		}
 		return queryText;
+	}
+
+	private String preprocessPropertyPath(RdfRepository datasetRepository, String propertyPath) {
+		String translatedPropertyPath = propertyPath;
+		final Matcher propertyPathMatcher = propertyPathPattern.matcher(propertyPath);
+		while (propertyPathMatcher.find()) {
+			propertyPathMatcher.group(2);
+			Matcher propertyMatcher = propertyPattern.matcher(propertyPathMatcher.group(2));
+			while (propertyMatcher.find()) {
+				String prefix= propertyMatcher.group(1).trim();
+				String name= propertyMatcher.group(2).trim();
+				if ( prefix !=null && name!=null){ // qname to be converted to URI
+					Namespace namespace = this.rdfModel.getRdfRepository().getNamespaces().get(prefix);
+					if(namespace == null) namespace = datasetRepository.getNamespaces().get(prefix);
+					if(namespace != null) {
+						String uri = "<" + namespace.getName() + name + ">" ;
+						translatedPropertyPath = translatedPropertyPath.replaceAll(prefix +"~"+ name, uri);
+					}
+				}				
+			}
+		}
+		return translatedPropertyPath;
+	}
+	private String preprocessDataset(RdfRepository datasetRepository, String parameterValue) {
+		datasetRepository.getDataRepository().getQueryEndpointUrl();
+		return "\"" + datasetRepository.getDataRepository().getQueryEndpointUrl() + "\"";
 	}
 
 	private StringBuilder clausesComplex()

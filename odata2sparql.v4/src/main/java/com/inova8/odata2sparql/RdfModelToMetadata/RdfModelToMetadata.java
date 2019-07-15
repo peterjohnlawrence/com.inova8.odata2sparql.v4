@@ -90,7 +90,11 @@ public class RdfModelToMetadata {
 							StringEscapeUtils.escapeXml11(text.replaceAll("\"", "\\\"")))));//StringEscapeUtils.escapeXml11(text) )));"
 		}
 	}
+	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, Boolean text) {
 
+			annotations.add(new CsdlAnnotation().setTerm(fqn)
+					.setExpression(new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.Bool, text.toString())));
+	}
 	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, List<String> textList) {
 
 		if (textList == null || textList.isEmpty()) {
@@ -229,12 +233,19 @@ public class RdfModelToMetadata {
 								.setType(
 										RdfEdmType.getEdmType(functionImportParameter.getType()).getFullQualifiedName())
 								.setNullable(false);
+						
+						List<CsdlAnnotation> functionParameterAnnotations = new ArrayList<CsdlAnnotation>();
+						addToAnnotations(functionParameterAnnotations, RdfConstants.ODATA_ISDATASET_FQN,functionImportParameter.isDataset());
+						addToAnnotations(functionParameterAnnotations, RdfConstants.ODATA_ISPROPERTYPATH_FQN,functionImportParameter.isPropertyPath());
+						edmFunctionParameter.setAnnotations(functionParameterAnnotations);
 						functionParameters.add(edmFunctionParameter);
 					}
 					final CsdlReturnType functionImportReturnType = (new CsdlReturnType())
 							.setType(RdfFullQualifiedName.getFullQualifiedName(rdfEntityType)).setCollection(true);
-					//List<CsdlAnnotation> functionImportAnnotations = new ArrayList<CsdlAnnotation>();
+					List<CsdlAnnotation> functionAnnotations = new ArrayList<CsdlAnnotation>();
+					addToAnnotations(functionAnnotations, RdfConstants.ODATA_ISPROXY_FQN,rdfEntityType.isProxy());
 					//functionImportAnnotations.add(new AnnotationAttribute().setName("IsBindable").setText("true"));
+					function.setAnnotations(functionAnnotations);
 					function.setComposable(true);
 					functionImport.setName(rdfEntityType.getEDMEntityTypeName() + RdfConstants.FUNCTION_POSTFIX)
 							.setEntitySet(rdfEntityType.getEDMEntitySetName())

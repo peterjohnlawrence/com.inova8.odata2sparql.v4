@@ -693,8 +693,9 @@ public class RdfModelProvider {
 						RdfNode insertText = soln.getRdfNode("insertText");
 						RdfNode updateText = soln.getRdfNode("updateText");
 						RdfNode updatePropertyText = soln.getRdfNode("updatePropertyText");
+						RdfNode isProxy = soln.getRdfNode("isProxy");
 						RdfEntityType operationEntityType = model.getOrCreateOperationEntityType(queryNode, queryLabel,
-								queryText, deleteText, insertText, updateText, updatePropertyText);
+								queryText, deleteText, insertText, updateText, updatePropertyText,isProxy);
 						if (soln.getRdfNode("description") != null) {
 							operationEntityType
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
@@ -825,7 +826,13 @@ public class RdfModelProvider {
 						RdfNode range = null;
 						if (soln.getRdfNode("range") != null)
 							range = soln.getRdfNode("range");
-						model.getOrCreateOperationArguments(query, queryProperty, varName, range);
+						RdfNode isDataset = null;
+						if (soln.getRdfNode("isDataset") != null)
+							isDataset = soln.getRdfNode("isDataset");
+						RdfNode isPropertyPath = null;
+						if (soln.getRdfNode("isPropertyPath") != null)
+							isPropertyPath = soln.getRdfNode("isPropertyPath");
+						model.getOrCreateOperationArguments(query, queryProperty, varName, range,isDataset, isPropertyPath);
 						count++;
 						debug.append(query.getIRI().toString()).append("\\")
 								.append(varName.getLiteralValue().stringValue()).append(";");
