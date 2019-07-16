@@ -351,6 +351,7 @@ public class SparqlQueryBuilder {
 	
 	final String propertyRegex = "([^|~]*)~([^|]*)|(<[^|>]*>)";
 	final Pattern propertyPattern = Pattern.compile(propertyRegex, Pattern.MULTILINE);
+
 	
 	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
 			UriType uriType, RdfResourceParts rdfResourceParts)
@@ -547,24 +548,21 @@ public class SparqlQueryBuilder {
 
 		StringBuilder prepareConstruct = new StringBuilder("");
 
-		prepareConstruct.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareConstruct.append(construct());
 		prepareConstruct.append("WHERE {\n");
 		prepareConstruct.append(where());
 		prepareConstruct.append("}");
 		prepareConstruct.append(defaultLimitClause());
-		return new SparqlStatement(prepareConstruct.toString());
+		return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareConstruct).toString());
 	}
-
 	public SparqlStatement prepareCountEntitySetSparql()
 			throws ODataApplicationException, EdmException, OData2SparqlException {
 
 		StringBuilder prepareCountEntitySet = new StringBuilder("");
-		prepareCountEntitySet.append(this.rdfModel.getRdfPrefixes().sparqlPrefixes());
 		prepareCountEntitySet.append("\t").append("SELECT ");
 		prepareCountEntitySet.append("(COUNT(DISTINCT *").append(") AS ?COUNT)").append("\n");
 		prepareCountEntitySet.append(selectExpandWhere(""));
-		return new SparqlStatement(prepareCountEntitySet.toString());
+		return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareCountEntitySet).toString());
 	}
 
 	private StringBuilder construct() throws EdmException {
@@ -963,6 +961,7 @@ public class SparqlQueryBuilder {
 				if(functionImportParameter.isDataset() ) {
 					dataset = getQueryOptionText(queryOptions, functionImportParameter);
 					dataset = dataset.substring(1,dataset.length()-1);
+					this.rdfModel.addProxy(dataset);
 					datasetRepository = this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(dataset);
 					if (datasetRepository == null)					
 						throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()

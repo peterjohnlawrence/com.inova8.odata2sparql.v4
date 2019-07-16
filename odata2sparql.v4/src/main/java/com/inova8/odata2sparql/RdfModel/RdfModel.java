@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
 import org.eclipse.rdf4j.model.BNode;
+import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -39,7 +40,7 @@ public class RdfModel {
 
 	private final RdfPrefixes rdfPrefixes = new RdfPrefixes();
 	private final RdfRepository rdfRepository;
-
+	private HashSet<String> proxies = new HashSet<String>();
 	public RdfModel(RdfRepository rdfRepository) {
 
 		rdfPrefixes.setStandardNsPrefixes();
@@ -60,6 +61,10 @@ public class RdfModel {
 
 		void log() {
 			log.info("Deduced prefixes: " + prefixToURI.toString());
+		}
+		
+		public Map<String, String> getPrefixes() {
+			return prefixToURI;
 		}
 
 		public StringBuilder sparqlPrefixes() {
@@ -2724,6 +2729,21 @@ public class RdfModel {
 		}
 		if (baseNodeShape.getBaseNodeShape() != null) {
 			inheritProperties(nodeShape, baseNodeShape.getBaseNodeShape());
+		}
+	}
+
+	public void addProxy(String proxyDataset) {
+		if(!this.proxies.contains(proxyDataset)) {
+			this.proxies.add(proxyDataset);	
+		
+			RdfRepository proxyRepository = this.getRdfRepository().getRepositories().getRdfRepository(proxyDataset);
+			for ( Namespace namespace: proxyRepository.getNamespaces().values()) {
+				try {
+					this.getRdfPrefixes().getOrCreatePrefix(namespace.getPrefix(), namespace.getName());
+				} catch (OData2SparqlException e) {
+					log.warn("Prefix "+namespace.getPrefix() +" cannot be created " + namespace.getName() );
+				}
+			}	
 		}
 	}
 
