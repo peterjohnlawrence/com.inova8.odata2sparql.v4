@@ -58,12 +58,13 @@ public class RdfConstants {
 	public static String repositoryWorkingDirectory;
 	public static File repositoryManagerDir;
 	public static String odata4sparqlFile;
-	public static String olgapFile;
 	public static String rdfFile;
 	public static String rdfsFile;
 	public static String sailFile;
 	public static String spFile;
 	public static String contextmenuFile;
+	public static String searchFile;
+	public static String olgapFile;
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
@@ -76,6 +77,8 @@ public class RdfConstants {
 	public static final String PROPERTY_POSTFIX = "_value";
 	public static final String PLURAL = "s";
 	public static final String SHAPE_POSTFIX = "_shape";//"";//
+
+	public static final String DEFAULTMATCH = "{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }";
 
 
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";
@@ -121,6 +124,7 @@ public class RdfConstants {
 	public static final String RDFS_RESOURCE_LABEL = "Resource";
 	public static final String RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
 	public static final String RDFS_CLASS_LABEL = "Class";
+	public static final String RDFS_CLASS_TERM = "class";
 	public static final String OWL_THING = "http://www.w3.org/2002/07/owl#Thing";
 	public static final String OWL_THING_LABEL = "Thing";
 	public static final String OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
@@ -275,7 +279,7 @@ public class RdfConstants {
 	public static final String ODATA_ISPROXY_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROXY;
 	public static final String ODATA_ISDATASET_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISDATASET;
 	public static final String ODATA_ISPROPERTYPATH_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROPERTYPATH;
-	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_LABEL;
+	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_TERM;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
 	public final static String INVERSEOF_FQN = RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
@@ -293,7 +297,7 @@ public class RdfConstants {
 	private final static CsdlTerm odataIsProxy = new CsdlTerm().setName(RdfConstants.ODATA_ISPROXY).setType("Edm.String");
 	private final static CsdlTerm odataIsDataset = new CsdlTerm().setName(RdfConstants.ODATA_ISDATASET).setType("Edm.String");
 	private final static CsdlTerm odataIsPropertyPath = new CsdlTerm().setName(RdfConstants.ODATA_ISPROPERTYPATH).setType("Edm.String");
-	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_LABEL).setType("Edm.String");
+	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
 	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF).setType("Edm.String");
@@ -308,7 +312,6 @@ public class RdfConstants {
 	public static final ArrayList< CsdlTerm> RDFTERMS = new ArrayList<CsdlTerm>();
 	public static final ArrayList< CsdlTerm> RDFSTERMS = new ArrayList<CsdlTerm>();
 	public static final ArrayList< CsdlTerm> OWLTERMS = new ArrayList<CsdlTerm>();
-
 
 
 	public static Hashtable<Value, String> getMetaQueries() {
@@ -343,13 +346,14 @@ public class RdfConstants {
 			repositoryManagerDir = new File(workingDirectory);
 			repositoryWorkingDirectory = workingDirectory;
 
-			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.rdf";
-			olgapFile = repositoryManagerDirPath + "ontologies/olgap.rdf";
+			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.2.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
 			spFile = repositoryManagerDirPath + "ontologies/sp.ttl";
-			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.contextmenu.v1.0.0.rdf";
+			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.0.rdf";
+			olgapFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.olgap.v2.0.0.rdf";
+			searchFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.lucenesearch.v3.0.0.rdf";
 
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());
@@ -415,7 +419,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.ODATA_ISPROXY, odataIsProxy);
 		TERMS.put(RdfConstants.ODATA_ISDATASET, odataIsDataset);
 		TERMS.put(RdfConstants.ODATA_ISPROPERTYPATH, odataIsPropertyPath);
-		TERMS.put(RdfConstants.RDFS_CLASS_LABEL, rdfsClassTerm);
+		TERMS.put(RdfConstants.RDFS_CLASS_TERM, rdfsClassTerm);
 		TERMS.put(RdfConstants.PROPERTY, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
 		TERMS.put(RdfConstants.INVERSEOF, owlInverseOfTerm);

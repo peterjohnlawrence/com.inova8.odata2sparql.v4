@@ -121,7 +121,7 @@ public class OData2SPARQLTest {
 	}
 
 	//@Parameters(name = "{0}:{1}/{2}:URI={3}?{4}")
-	@Parameters(name = "{2}:URI={5}/{6}?{7}")
+	@Parameters(name = "{3}/{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
 		return getTestData("src/test/resources/TestServlet.txt");
 	}
@@ -142,7 +142,7 @@ public class OData2SPARQLTest {
 	public void serviceRequest() throws ServletException, IOException {
 		request = new MockHttpServletRequest(servletContext);
 		request.setServerName("localhost:8080/odata2sparql/");
-		if (!(repository == null || repository.isEmpty()) ) {     // || requestURI == null || requestURI.isEmpty())) {
+		if (!(repository == null || repository.isEmpty()) ) {     
 			if (skip.isEmpty()) {
 				request.setMethod(method);
 				request.setPathInfo("/" + repository);

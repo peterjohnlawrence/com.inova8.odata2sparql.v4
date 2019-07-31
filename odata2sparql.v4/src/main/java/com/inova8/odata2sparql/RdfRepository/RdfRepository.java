@@ -7,10 +7,12 @@
  */
 package com.inova8.odata2sparql.RdfRepository;
 
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.rdf4j.model.Namespace;
 
+import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.TextSearchType;
 
 public class RdfRepository {
@@ -26,14 +28,14 @@ public class RdfRepository {
 	private final TreeMap<String, Namespace> namespaces;
 	private int defaultQueryLimit;
 	private final String modelName;
-	private Boolean withRdfAnnotations;
-	private Boolean withSapAnnotations;
-	private Boolean useBaseType;
+	private Boolean withRdfAnnotations=false;
+	private Boolean withSapAnnotations=false;
+	private Boolean useBaseType=false;
 	private Boolean expandOperations = false;
 	private TextSearchType textSearchType;
-	private boolean withFKProperties;
+	private boolean withFKProperties=false;
 	private boolean withMatching = true;
-	private String match;
+	private String match = RdfConstants.DEFAULTMATCH;
 
 
 	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix, TreeMap<String, Namespace> namespaces) {
@@ -93,6 +95,12 @@ public class RdfRepository {
 		return namespaces;
 	}
 
+	public TreeMap<String, Namespace> addNamespaces( TreeMap<String, Namespace> additionalNamespaces) {
+		for(Entry<String, Namespace> additionalNamespaceEntry:additionalNamespaces.entrySet() ) {
+			namespaces.put(additionalNamespaceEntry.getKey(), additionalNamespaceEntry.getValue());			
+		}
+		return namespaces;
+	}
 	public RdfConnection getDataEndpoint() {
 		return dataEndPoint;
 	}

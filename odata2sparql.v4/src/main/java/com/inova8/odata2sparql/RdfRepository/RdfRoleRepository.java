@@ -12,6 +12,7 @@ public /*static*/ class RdfRoleRepository {
 	private final String queryEndpointUrl;
 
 	private final String updateEndpointUrl;
+	private final String httpURL;
 
 	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile, String queryEndpointUrl,
 			String updateEndpointUrl) {
@@ -21,8 +22,28 @@ public /*static*/ class RdfRoleRepository {
 		this.profile = profile;
 		this.queryEndpointUrl = queryEndpointUrl;
 		this.updateEndpointUrl = updateEndpointUrl;
+		this.httpURL = null;
 	}
+	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile, String httpURL) {
+		super();
+		this.repository = repository;
+		this.defaultQueryLimit = defaultQueryLimit;
+		this.profile = profile;
+		this.queryEndpointUrl = null;
+		this.updateEndpointUrl = null;
+		this.httpURL = httpURL;
 
+	}
+	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile) {
+		super();
+		this.repository = repository;
+		this.defaultQueryLimit = defaultQueryLimit;
+		this.profile = profile;
+		this.queryEndpointUrl = null;
+		this.updateEndpointUrl = null;
+		this.httpURL = null;
+
+	}
 	/**
 	 * @return the repository
 	 */
@@ -41,11 +62,17 @@ public /*static*/ class RdfRoleRepository {
 		return profile;
 	}
 
+	public String getHttpURL() {
+		return httpURL==null?"":httpURL;
+	}
 	public String getQueryEndpointUrl() {
-		return queryEndpointUrl;
+		return queryEndpointUrl==null?"":queryEndpointUrl;
 	}
 
 	public String getUpdateEndpointUrl() {
-		return updateEndpointUrl;
+		return updateEndpointUrl==null?"":updateEndpointUrl;
+	}
+	public String getServiceUrl() {
+		return queryEndpointUrl==null?httpURL:queryEndpointUrl;
 	}
 }

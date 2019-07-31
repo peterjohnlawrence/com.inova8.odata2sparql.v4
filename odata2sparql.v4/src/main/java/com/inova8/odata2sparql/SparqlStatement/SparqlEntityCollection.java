@@ -281,7 +281,6 @@ class SparqlEntityCollection extends EntityCollection {
 						&& (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)) {
 					//Fixes #81 OK this is an operation that is returning a literal for a primaryKey so  use UNDEF 
 					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, RdfConstants.UNDEFVALUE);
-
 				} else {// Must be a property with a value, so put it into a
 						// TreeMap for processing the second time round when we
 						// know the property

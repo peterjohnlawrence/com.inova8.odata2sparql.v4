@@ -111,6 +111,11 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
             <th>Value</th>
           </tr>
           <tr>
+      		<td>Data URL</td>
+            <td>HTTP URL for the RDF4J server from where the data will be queried to satisfy OData queries</td>
+            <td><a href="$repository.dataRepository.httpURL">$repository.dataRepository.httpURL</a></td>
+          </tr>
+          <tr>
       		<td>Data query-endpoint</td>
             <td>SPARQL endpoint from where the data will be queried to satisfy OData queries</td>
             <td><a href="$repository.dataRepository.queryEndpointUrl">$repository.dataRepository.queryEndpointUrl</a></td>
@@ -129,6 +134,11 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
       		<td>Data endpoint defaultQueryLimit</td>
             <td>An integer value used to limit the queries. It can be overridden by a $top OData query option defines an instance of a prefix that will be used by the service of the dataset as the default prefix.</td>
             <td>$repository.dataRepository.defaultQueryLimit</td>
+          </tr>
+           <tr>
+      		<td>Model URL</td>
+            <td>HTTP URL for the RDF4J server from where the model metadata will be queried</td>
+      		<td><a href="$repository.modelRepository.httpURL">$repository.modelRepository.httpURL</a></td>
           </tr>
           <tr>
       		<td>Model query-endpoint</td>

@@ -352,6 +352,7 @@ public class SparqlQueryBuilder {
 	final String propertyRegex = "([^|~]*)~([^|]*)|(<[^|>]*>)";
 	final Pattern propertyPattern = Pattern.compile(propertyRegex, Pattern.MULTILINE);
 
+	RdfRepository proxyDatasetRepository;
 	
 	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
 			UriType uriType, RdfResourceParts rdfResourceParts)
@@ -951,7 +952,7 @@ public class SparqlQueryBuilder {
 		}
 		String queryText = rdfOperationType.queryText;
 		String dataset="";
-		RdfRepository datasetRepository =null;
+		//RdfRepository proxyDatasetRepository =null;
 		if(rdfOperationType.isProxy() ) {
 			// Locate the service for which this function is a proxy
 			for (Entry<String, com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter> functionImportParameterEntry : rdfOperationType
@@ -962,8 +963,8 @@ public class SparqlQueryBuilder {
 					dataset = getQueryOptionText(queryOptions, functionImportParameter);
 					dataset = dataset.substring(1,dataset.length()-1);
 					this.rdfModel.addProxy(dataset);
-					datasetRepository = this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(dataset);
-					if (datasetRepository == null)					
+					proxyDatasetRepository = this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(dataset);
+					if (proxyDatasetRepository == null)					
 						throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()
 					+ ") refers to dataset " + dataset + " that is not recognized");
 					break;
@@ -986,8 +987,8 @@ public class SparqlQueryBuilder {
 			default:
 				parameterValue = getQueryOptionText(queryOptions, functionImportParameter);
 			}
-			if(functionImportParameter.isPropertyPath() ) parameterValue = preprocessPropertyPath(datasetRepository,parameterValue);
-			if(functionImportParameter.isDataset() ) parameterValue = preprocessDataset(datasetRepository,parameterValue);
+			if(functionImportParameter.isPropertyPath() ) parameterValue = preprocessPropertyPath(proxyDatasetRepository,parameterValue);
+			if(functionImportParameter.isDataset() ) parameterValue = preprocessDataset(proxyDatasetRepository,parameterValue);
 			if (parameterValue != null) {
 				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
 			} else {
@@ -1024,8 +1025,13 @@ public class SparqlQueryBuilder {
 		return translatedPropertyPath;
 	}
 	private String preprocessDataset(RdfRepository datasetRepository, String parameterValue) {
-		datasetRepository.getDataRepository().getQueryEndpointUrl();
-		return "\"" + datasetRepository.getDataRepository().getQueryEndpointUrl() + "\"";
+		//return "\"" + datasetRepository.getDataRepository().getServiceUrl() + "\"";
+		try{
+			return "<" + datasetRepository.getDataRepository().getServiceUrl() + ">";
+		}catch(Exception e) {
+			log.error("Invalid datasetRepository for proxy operation");
+			return null;
+		}
 	}
 
 	private StringBuilder clausesComplex()
@@ -2072,14 +2078,14 @@ public class SparqlQueryBuilder {
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandItemWhere.append(indent).append("#expandItemWhere\n");
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
-			if (navProperty.getDomainClass().isOperation()) {
-				expandItemWhere.append(indent)
-						.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
-				if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
-					expandItemWhere.append("m");
-				}
-				expandItemWhere.append(")\n");
+			expandItemWhere.append(indent)
+					.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
+			if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
+				expandItemWhere.append("m");
 			}
+			expandItemWhere.append(")\n");
+			if(navProperty.getDomainClass().isProxy()) {	expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	}
+
 			expandItemWhere.append(indent).append("OPTIONAL");
 		} else {
 			expandItemWhere.append(indent).append("UNION");//.append("UNION");
@@ -2147,6 +2153,7 @@ public class SparqlQueryBuilder {
 			expandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
 					expandItem.getExpandOption().getExpandItems(), indent + "\t"));
 		}
+		if(navProperty.getDomainClass().isProxy()) {	expandItemWhere.append(indent).append("}\n");	}
 		expandItemWhere.append(indent).append("}\n");
 		return expandItemWhere;
 	}
