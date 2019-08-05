@@ -131,6 +131,7 @@ public class RdfConstants {
 	public static final String OWL_CLASS_LABEL = "Class";
 	public static final String RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
 	public static final String RDF_PROPERTY_LABEL = "Property";
+	public static final String RDF_PROPERTY_TERM = "property";
 	public static final String OWL_OBJECTPROPERTY = "http://www.w3.org/2002/07/owl#ObjectProperty";
 	public static final String OWL_OBJECTPROPERTY_LABEL = "ObjectProperty";
 	public static final String OWL_DATATYPEPROPERTY = "http://www.w3.org/2002/07/owl#DatatypeProperty";
@@ -280,7 +281,7 @@ public class RdfConstants {
 	public static final String ODATA_ISDATASET_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISDATASET;
 	public static final String ODATA_ISPROPERTYPATH_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROPERTYPATH;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_TERM;
-	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.PROPERTY;
+	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.RDF_PROPERTY_TERM;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
 	public final static String INVERSEOF_FQN = RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
 	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "."
@@ -298,7 +299,7 @@ public class RdfConstants {
 	private final static CsdlTerm odataIsDataset = new CsdlTerm().setName(RdfConstants.ODATA_ISDATASET).setType("Edm.String");
 	private final static CsdlTerm odataIsPropertyPath = new CsdlTerm().setName(RdfConstants.ODATA_ISPROPERTYPATH).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_TERM).setType("Edm.String");
-	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.PROPERTY).setType("Edm.String");
+	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.RDF_PROPERTY_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
 	private final static CsdlTerm owlInverseOfTerm = new CsdlTerm().setName(RdfConstants.INVERSEOF).setType("Edm.String");
 	private final static CsdlTerm owlOntologyTerm = new CsdlTerm().setName(RdfConstants.ONTOLOGY).setType("Edm.String");
@@ -420,7 +421,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.ODATA_ISDATASET, odataIsDataset);
 		TERMS.put(RdfConstants.ODATA_ISPROPERTYPATH, odataIsPropertyPath);
 		TERMS.put(RdfConstants.RDFS_CLASS_TERM, rdfsClassTerm);
-		TERMS.put(RdfConstants.PROPERTY, rdfPropertyTerm);
+		TERMS.put(RdfConstants.RDF_PROPERTY_TERM, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
 		TERMS.put(RdfConstants.INVERSEOF, owlInverseOfTerm);
 		TERMS.put(RdfConstants.ONTOLOGY, owlOntologyTerm);

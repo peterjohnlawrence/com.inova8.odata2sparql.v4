@@ -1026,11 +1026,10 @@ public class SparqlQueryBuilder {
 	}
 	private String preprocessDataset(RdfRepository datasetRepository, String parameterValue) {
 		//return "\"" + datasetRepository.getDataRepository().getServiceUrl() + "\"";
-		try{
+	 if(datasetRepository.getDataRepository().getServiceUrl() != null) {
 			return "<" + datasetRepository.getDataRepository().getServiceUrl() + ">";
-		}catch(Exception e) {
-			log.error("Invalid datasetRepository for proxy operation");
-			return null;
+		}else {
+			throw new EdmException("Invalid datasetRepository without SPARQL endpoint for proxy operation: " + parameterValue);
 		}
 	}
 
@@ -2084,7 +2083,11 @@ public class SparqlQueryBuilder {
 				expandItemWhere.append("m");
 			}
 			expandItemWhere.append(")\n");
-			if(navProperty.getDomainClass().isProxy()) {	expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	}
+			if(navProperty.getDomainClass().isProxy() && this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {	
+				expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	
+			}else {
+				expandItemWhere.append(indent).append("{\n");	
+			}
 
 			expandItemWhere.append(indent).append("OPTIONAL");
 		} else {
