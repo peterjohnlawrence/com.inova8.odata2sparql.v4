@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sb="http://www.openrdf.org/config/sail/base#"
+    xmlns:cgqi="http://www.openrdf.org/config/sail/customGraphQueryInferencer#"
+    xmlns:sail="http://www.openrdf.org/config/sail#"
+    xmlns:sparql="http://www.openrdf.org/config/repository/sparql#"
+    xmlns:ns="http://www.openrdf.org/config/sail/native#"
+    xmlns:http="http://www.openrdf.org/config/repository/http#"
+    xmlns:proxy="http://www.openrdf.org/config/repository/proxy#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:rep="http://www.openrdf.org/config/repository#"
+    xmlns:ms="http://www.openrdf.org/config/sail/memory#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:sl="http://www.openrdf.org/config/sail/lucene#"
+    xmlns:sr="http://www.openrdf.org/config/repository/sail#"
+    xmlns:openrdf="http://www.openrdf.org#"
+    xmlns:sp="http://spinrdf.org/sp#"
+    xmlns:sf="http://www.openrdf.org/config/sail/federation#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://www.openrdf.org/config/sail">
+  <owl:Ontology rdf:about="">
+    <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
+  </owl:Ontology>
+  <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryImpl">
+    <rdfs:label>Repository Implementation</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org#ProxyRepository">
+    <rdfs:subClassOf rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>Proxy repository</rdfs:label>
+    <rdf:type>
+      <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType"/>
+    </rdf:type>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org#SPARQLRepository">
+    <rdfs:subClassOf rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>SPARQLRepository</rdfs:label>
+    <rdf:type>
+      <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType"/>
+    </rdf:type>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org#HTTPRepository">
+    <rdfs:subClassOf rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>HTTPRepository</rdfs:label>
+    <rdf:type>
+      <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType"/>
+    </rdf:type>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org#SystemRepository">
+    <rdfs:subClassOf rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>System repository</rdfs:label>
+    <rdf:type>
+      <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType"/>
+    </rdf:type>
+  </owl:Class>
+  <owl:Class rdf:ID="SailType">
+    <rdfs:label>Sail type</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org#SailRepository">
+    <rdfs:subClassOf rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>Sail repository</rdfs:label>
+    <rdf:type>
+      <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType"/>
+    </rdf:type>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryContext">
+    <rdfs:label>Repository context</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org/config/repository#Repository">
+    <rdfs:label>Repository</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.openrdf.org/config/repository#RepositoryType">
+    <rdfs:label>Repository type</rdfs:label>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/repository#repositoryImpl">
+    <rdfs:range rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:domain rdf:resource="http://www.openrdf.org/config/repository#Repository"/>
+    <rdfs:label>repository impl</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/sail/federation#member">
+    <rdfs:range rdf:resource="http://www.openrdf.org#ProxyRepository"/>
+    <rdfs:domain>
+      <sail:SailType rdf:about="http://www.openrdf.org#Federation">
+        <rdfs:subClassOf rdf:resource="#SailType"/>
+        <rdfs:label>Federation</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+      </sail:SailType>
+    </rdfs:domain>
+    <rdfs:label>member</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="sailType">
+    <rdfs:domain rdf:resource="#SailType"/>
+    <rdfs:range rdf:resource="#SailType"/>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdfs:label>sail type</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/sail/customGraphQueryInferencer#ruleQuery">
+    <rdfs:range rdf:resource="http://spinrdf.org/sp#Query"/>
+    <rdfs:domain>
+      <sail:SailType rdf:about="http://www.openrdf.org#CustomGraphQueryInferencer">
+        <rdfs:subClassOf rdf:resource="#SailType"/>
+        <rdfs:label>Custom graph query inferencer</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+      </sail:SailType>
+    </rdfs:domain>
+    <rdfs:label>rule query</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/repository#repositoryType">
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+    <rdfs:domain rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>repository ID</rdfs:label>
+    <rdfs:range rdf:resource="http://www.openrdf.org/config/repository#RepositoryType"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/repository/sail#sailImpl">
+    <rdfs:range rdf:resource="#SailType"/>
+    <rdfs:domain rdf:resource="http://www.openrdf.org/config/repository#RepositoryImpl"/>
+    <rdfs:label>sail impl</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="delegate">
+    <rdfs:domain rdf:resource="#SailType"/>
+    <rdfs:range rdf:resource="#SailType"/>
+    <rdfs:label>delegate</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.openrdf.org/config/sail/customGraphQueryInferencer#matcherQuery">
+    <rdfs:domain rdf:resource="http://www.openrdf.org#CustomGraphQueryInferencer"/>
+    <rdfs:range rdf:resource="http://spinrdf.org/sp#Query"/>
+    <rdfs:label>matcher query</rdfs:label>
+  </owl:ObjectProperty>
+  <rdf:Property rdf:about="http://www.openrdf.org/config/sail/customGraphQueryInferencer#queryLanguage">
+    <rdfs:domain rdf:resource="http://www.openrdf.org#CustomGraphQueryInferencer"/>
+    <rdfs:label>query language</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://www.openrdf.org/config/repository/http#repositoryURL">
+    <rdfs:domain rdf:resource="http://www.openrdf.org#HTTPRepository"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label>repository URL</rdfs:label>
+  </rdf:Property>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/federation#distinct">
+    <rdfs:comment>If no two members contain the same statement.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label>distinct</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.openrdf.org#Federation"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/lucene#indexDir">
+    <rdfs:label>indexDir</rdfs:label>
+    <rdfs:domain>
+      <sail:SailType rdf:about="http://www.openrdf.org#LuceneSail">
+        <rdfs:subClassOf rdf:resource="#SailType"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+        <rdfs:label>LuceneSail</rdfs:label>
+      </sail:SailType>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment>Index directory for Lucene</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/repository/proxy#proxiedID">
+    <rdfs:domain rdf:resource="http://www.openrdf.org#ProxyRepository"/>
+    <rdfs:comment>ID of proxy within federation</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>proxiedID</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/native#tripleIndexes">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>triple indexes</rdfs:label>
+    <rdfs:domain>
+      <sail:SailType rdf:about="http://www.openrdf.org#NativeStore">
+        <rdfs:subClassOf rdf:resource="#SailType"/>
+        <rdfs:label>Native store</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+      </sail:SailType>
+    </rdfs:domain>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/repository/sparql#update-endpoint">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label>update-endpoint</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.openrdf.org#SPARQLRepository"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/memory#syncDelay">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#positiveInteger"/>
+    <rdfs:domain>
+      <rep:RepositoryType rdf:about="http://www.openrdf.org#MemoryStore">
+        <rdfs:label>MemoryStore</rdfs:label>
+        <rdf:type rdf:resource="#SailType"/>
+        <rdfs:subClassOf rdf:resource="#SailType"/>
+        <rdfs:label>Memory store</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+      </rep:RepositoryType>
+    </rdfs:domain>
+    <rdfs:label>sync delay</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/memory#persist">
+    <rdfs:domain rdf:resource="http://www.openrdf.org#MemoryStore"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label>persist</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/federation#localPropertySpace">
+    <rdfs:comment>For all triples with a predicate in this space, the container RDF store contains all triples with that subject and any predicate in this space.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:domain rdf:resource="http://www.openrdf.org#Federation"/>
+    <rdfs:label>local property space</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/repository#repositoryID">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label>repository ID</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.openrdf.org/config/repository#Repository"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/repository/sparql#query-endpoint">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label>query-endpoint</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.openrdf.org#SPARQLRepository"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://www.openrdf.org/config/sail/federation#readOnly">
+    <rdfs:comment>If no two members contain the same statement.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label>read only</rdfs:label>
+    <rdfs:domain rdf:resource="http://www.openrdf.org#Federation"/>
+  </owl:DatatypeProperty>
+  <sail:SailType rdf:about="http://www.openrdf.org#DirectTypeHierarchyInferencer">
+    <rdfs:subClassOf rdf:resource="#SailType"/>
+    <rdfs:label>Direct type hierarchy inferencer</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </sail:SailType>
+  <sail:SailType rdf:about="http://www.openrdf.org#ForwardChainingRDFSInferencer">
+    <rdfs:subClassOf rdf:resource="#SailType"/>
+    <rdfs:label>Forward chaining RDFSInferencer</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </sail:SailType>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->
