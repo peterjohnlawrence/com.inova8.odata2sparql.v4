@@ -2090,8 +2090,7 @@ public class SparqlQueryBuilder {
 				expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	
 				//No optional with service call because of performance 
 				//expandItemWhere.append(indent).append("OPTIONAL");
-			}else {
-				expandItemWhere.append(indent).append("{\n");	
+			}else {	
 				expandItemWhere.append(indent).append("OPTIONAL");
 			}
 		} else {
