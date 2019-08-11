@@ -101,6 +101,19 @@ public class RdfModel {
 				return encodeEntityKey;
 			else {
 				String uri = get(encodeEntityKey.substring(0, colon));
+				if(uri == null ) {
+					//Try and see if initail part of entityKey is prefix to which /ext has been added
+					String prefix = encodeEntityKey.substring(0, colon);
+					int underscore = prefix.indexOf("_");
+					if(underscore<0) {
+						
+					}else {
+						uri = get(prefix.substring(0, underscore));
+						if(uri!=null) {
+							uri = uri +prefix.substring(underscore+1).replace("_","/")+"/";						
+						}
+					}
+				}
 				return uri == null ? encodeEntityKey : uri + encodeEntityKey.substring(colon + 1);
 			}
 		}

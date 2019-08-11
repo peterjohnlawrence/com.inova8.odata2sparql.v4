@@ -924,7 +924,10 @@ public class SparqlQueryBuilder {
 		} else {
 			resource = UriUtils.odataToRdfQname(queryOption.getText());
 			//resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED,	RdfConstants.QNAME_SEPARATOR_RDF);
-			return UriUtils.encodeUri(resource);
+			String expandedKey = rdfModel.getRdfPrefixes()
+					.expandPrefix(queryOption.getText());
+			resource = "<" + expandedKey + ">";
+			return resource;// UriUtils.encodeUri(resource);
 		}
 	}
 
@@ -2085,11 +2088,12 @@ public class SparqlQueryBuilder {
 			expandItemWhere.append(")\n");
 			if(navProperty.getDomainClass().isProxy() && this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {	
 				expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	
+				//No optional with service call because of performance 
+				//expandItemWhere.append(indent).append("OPTIONAL");
 			}else {
 				expandItemWhere.append(indent).append("{\n");	
+				expandItemWhere.append(indent).append("OPTIONAL");
 			}
-
-			expandItemWhere.append(indent).append("OPTIONAL");
 		} else {
 			expandItemWhere.append(indent).append("UNION");//.append("UNION");
 		}
