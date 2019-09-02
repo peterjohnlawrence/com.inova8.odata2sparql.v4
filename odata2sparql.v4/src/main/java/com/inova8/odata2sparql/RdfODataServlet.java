@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.TimeZone;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -59,6 +61,8 @@ public class RdfODataServlet extends HttpServlet {
 				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
 						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
 						repositoryDir.getAbsolutePath());
+				//Set to UTC so string date bjects without assigned timnezone are assumed to be UTC.
+				TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 			}
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];

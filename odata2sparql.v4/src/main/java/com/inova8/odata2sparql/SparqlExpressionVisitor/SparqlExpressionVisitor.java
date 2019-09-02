@@ -227,13 +227,13 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		String sparqlmethod = "";
 		switch (methodCall) {
 		case ENDSWITH:
-			sparqlmethod = "STRENDS(" + parameters.get(1) + "," + parameters.get(0) + ")";
+			sparqlmethod = "STRENDS(" + parameters.get(0) + "," + parameters.get(1) + ")";
 			break;
 		case INDEXOF:
 			sparqlmethod = "";
 			break;
 		case STARTSWITH:
-			sparqlmethod = "STRSTARTS(" + parameters.get(1) + "," + parameters.get(0) + ")";
+			sparqlmethod = "STRSTARTS(" + parameters.get(0) + "," + parameters.get(1) + ")";
 			break;
 		case TOLOWER:
 			sparqlmethod = "LCASE(" + parameters.get(0) + ")";

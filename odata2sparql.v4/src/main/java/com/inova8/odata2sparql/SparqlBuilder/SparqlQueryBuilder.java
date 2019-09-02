@@ -1007,8 +1007,8 @@ public class SparqlQueryBuilder {
 	}
 
 	private String preprocessPropertyPath(RdfRepository datasetRepository, String propertyPath) {
-		String translatedPropertyPath = propertyPath;
-		final Matcher propertyPathMatcher = propertyPathPattern.matcher(propertyPath);
+		String translatedPropertyPath = propertyPath.replaceAll("\\s", "") ;
+		final Matcher propertyPathMatcher = propertyPathPattern.matcher(translatedPropertyPath);
 		while (propertyPathMatcher.find()) {
 			propertyPathMatcher.group(2);
 			Matcher propertyMatcher = propertyPattern.matcher(propertyPathMatcher.group(2));
@@ -1020,7 +1020,7 @@ public class SparqlQueryBuilder {
 					if(namespace == null) namespace = datasetRepository.getNamespaces().get(prefix);
 					if(namespace != null) {
 						String uri = "<" + namespace.getName() + name + ">" ;
-						translatedPropertyPath = translatedPropertyPath.replaceAll(prefix +"~"+ name, uri);
+						translatedPropertyPath = translatedPropertyPath.replaceFirst(prefix +"~"+ name , uri );
 					}
 				}				
 			}
