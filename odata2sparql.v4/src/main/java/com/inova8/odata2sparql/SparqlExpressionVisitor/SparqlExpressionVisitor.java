@@ -408,10 +408,10 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
 		switch (rdfProperty.getPropertyTypeName()) {
 		case RdfConstants.XSD_DATETIME:
-			visitProperty = "STRDT(" + visitProperty + ",<"+ RdfConstants.XSD_DATETIME + ">)";
+			visitProperty = "STRDT(xsd:string(" + visitProperty + "),<"+ RdfConstants.XSD_DATETIME + ">)";
 			break;
 		case RdfConstants.XSD_DATE:
-			visitProperty = "STRDT(" + visitProperty + ",<" + RdfConstants.XSD_DATE + ">)";
+			visitProperty = "STRDT(xsd:string(" + visitProperty + "),<" + RdfConstants.XSD_DATE + ">)";
 			break;
 		default:
 			break;
