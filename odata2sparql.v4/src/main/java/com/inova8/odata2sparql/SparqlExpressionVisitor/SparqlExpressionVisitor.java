@@ -227,13 +227,13 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		String sparqlmethod = "";
 		switch (methodCall) {
 		case ENDSWITH:
-			sparqlmethod = "STRENDS(" + parameters.get(0) + "," + parameters.get(1) + ")";
+			sparqlmethod = "STRENDS(xsd:string(" + parameters.get(0) + ")," + parameters.get(1) + ")";
 			break;
 		case INDEXOF:
 			sparqlmethod = "";
 			break;
 		case STARTSWITH:
-			sparqlmethod = "STRSTARTS(" + parameters.get(0) + "," + parameters.get(1) + ")";
+			sparqlmethod = "STRSTARTS(xsd:string(" + parameters.get(0) + ")," + parameters.get(1) + ")";
 			break;
 		case TOLOWER:
 			sparqlmethod = "LCASE(" + parameters.get(0) + ")";
@@ -252,7 +252,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			}
 			break;
 		case CONTAINS:
-			sparqlmethod = "regex(" + parameters.get(0) + "," + parameters.get(1) + ", \"i\")";
+			sparqlmethod = "regex(xsd:string(" + parameters.get(0) + ")," + parameters.get(1) + ", \"i\")";
 			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
 			break;
 		case CONCAT:

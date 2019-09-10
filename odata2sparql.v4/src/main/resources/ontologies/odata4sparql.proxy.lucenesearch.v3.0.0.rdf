@@ -5783,18 +5783,46 @@
     <rdfs:domain rdf:resource="http://inova8.com/odata4sparql/search/LinkedEntitySearch"/>
     <rdfs:domain>
       <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/EntitySearch">
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
+        <skos:prefLabel>Entity Search</skos:prefLabel>
+        <rdfs:label>Entity Search</rdfs:label>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/service"/>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+          </spl:Argument>
+        </spin:constraint>
         <spin:body>
           <sp:Select>
-            <sp:where rdf:parseType="Collection">
+            <sp:text>select ?entity ?type ?formattedValue
+{	service ?service
+	{	select ?entity ?type  (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValue)
+		{
+			{	select distinct ?entity ?type  ?labelProperty ?property ?snippet  
+				{ 	?entity a ?type .
+					?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
+						&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?string ; 
+						&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
+						&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
+						&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
+					OPTIONAL{?property  rdfs:label ?labelProperty}.
+				}
+			}
+		} GROUP BY ?entity ?type #having( count (?property)&lt;3) 
+	}
+}</sp:text> <sp:where rdf:parseType="Collection">
               <sp:SubQuery>
                 <sp:query>
                   <sp:Select>
                     <sp:where rdf:parseType="Collection">
                       <rdf:Description>
+                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
                         <sp:object rdf:parseType="Resource">
                           <sp:varName>type</sp:varName>
                         </sp:object>
-                        <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
                         <sp:subject rdf:parseType="Resource">
                           <sp:varName>entity</sp:varName>
                         </sp:subject>
@@ -5809,30 +5837,30 @@
                         </sp:subject>
                       </rdf:Description>
                       <rdf:Description>
-                        <sp:subject rdf:parseType="Resource">
-                          <sp:varName>?0</sp:varName>
-                        </sp:subject>
                         <sp:object rdf:parseType="Resource">
                           <sp:varName>string</sp:varName>
                         </sp:object>
                         <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#query"/>
+                        <sp:subject rdf:parseType="Resource">
+                          <sp:varName>?0</sp:varName>
+                        </sp:subject>
                       </rdf:Description>
                       <rdf:Description>
                         <sp:object rdf:parseType="Resource">
                           <sp:varName>property</sp:varName>
                         </sp:object>
-                        <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
                         <sp:subject rdf:parseType="Resource">
                           <sp:varName>?0</sp:varName>
                         </sp:subject>
+                        <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
                       </rdf:Description>
                       <rdf:Description>
+                        <sp:subject rdf:parseType="Resource">
+                          <sp:varName>?0</sp:varName>
+                        </sp:subject>
                         <sp:object rdf:parseType="Resource">
                           <sp:varName>score</sp:varName>
                         </sp:object>
-                        <sp:subject rdf:parseType="Resource">
-                          <sp:varName>?0</sp:varName>
-                        </sp:subject>
                         <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
                       </rdf:Description>
                       <rdf:Description>
@@ -5866,20 +5894,12 @@
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>property</sp:varName>
                 </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>labelProperty</sp:varName>
                 </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
               </rdf:Description>
             </sp:where>
-            <sp:groupBy rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:varName>entity</sp:varName>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:varName>type</sp:varName>
-              </rdf:Description>
-            </sp:groupBy>
             <sp:resultVariables rdf:parseType="Collection">
               <rdf:Description>
                 <sp:varName>entity</sp:varName>
@@ -5888,74 +5908,53 @@
                 </spl:predicate>
               </rdf:Description>
               <rdf:Description>
-                <sp:varName>type</sp:varName>
                 <spl:predicate>
                   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/type"/>
                 </spl:predicate>
+                <sp:varName>type</sp:varName>
               </rdf:Description>
               <rdf:Description>
+                <sp:varName>formattedValue</sp:varName>
                 <spl:predicate>
                   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/formattedValue"/>
                 </spl:predicate>
-                <sp:varName>formattedValue</sp:varName>
                 <sp:expression>
                   <sp:GroupConcat>
                     <sp:expression>
                       <sp:concat>
-                        <sp:arg5>&lt;/td&gt;&lt;/tr&gt;</sp:arg5>
+                        <sp:arg3>&lt;/td&gt;&lt;td&gt;</sp:arg3>
                         <sp:arg1>&lt;tr&gt;&lt;td&gt;</sp:arg1>
-                        <sp:arg4 rdf:parseType="Resource">
-                          <sp:varName>snippet</sp:varName>
-                        </sp:arg4>
                         <sp:arg2 rdf:parseType="Resource">
                           <sp:varName>labelProperty</sp:varName>
                         </sp:arg2>
-                        <sp:arg3>&lt;/td&gt;&lt;td&gt;</sp:arg3>
+                        <sp:arg5>&lt;/td&gt;&lt;/tr&gt;</sp:arg5>
+                        <sp:arg4 rdf:parseType="Resource">
+                          <sp:varName>snippet</sp:varName>
+                        </sp:arg4>
                       </sp:concat>
                     </sp:expression>
                   </sp:GroupConcat>
                 </sp:expression>
               </rdf:Description>
             </sp:resultVariables>
-            <sp:text>select ?entity ?type ?formattedValue
-{	service ?service
-	{	select ?entity ?type  (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValue)
-		{
-			{	select ?entity ?type  ?labelProperty ?property ?snippet  
-				{ 	?entity a ?type .
-					?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
-						&lt;http://www.openrdf.org/contrib/lucenesail#query&gt; ?string ; 
-						&lt;http://www.openrdf.org/contrib/lucenesail#property&gt; ?property ;
-						&lt;http://www.openrdf.org/contrib/lucenesail#score&gt; ?score;
-						&lt;http://www.openrdf.org/contrib/lucenesail#snippet&gt; ?snippet] .
-					OPTIONAL{?property  rdfs:label ?labelProperty}.
-				}
-			}
-		} GROUP BY ?entity ?type #having( count (?property)&lt;3) 
-	}
-}</sp:text>
+            <sp:groupBy rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:varName>entity</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>type</sp:varName>
+              </rdf:Description>
+            </sp:groupBy>
           </sp:Select>
         </spin:body>
         <spin:constraint>
           <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             <spl:predicate>
               <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/string"/>
             </spl:predicate>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
           </spl:Argument>
         </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/service"/>
-            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isDataset>
-            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
-          </spl:Argument>
-        </spin:constraint>
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
-        <skos:prefLabel>Entity Search</skos:prefLabel>
-        <rdfs:label>Entity Search</rdfs:label>
       </odata4sparql:Operation>
     </rdfs:domain>
     <rdfs:label>service</rdfs:label>
@@ -5963,22 +5962,6 @@
     <rdfs:range rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
     <rdfs:domain>
       <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/Search">
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/string"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
-            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isDataset>
-            <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/service"/>
-          </spl:Argument>
-        </spin:constraint>
         <spin:body>
           <sp:Select>
             <sp:resultVariables rdf:parseType="Collection">
@@ -5989,85 +5972,85 @@
                 <sp:varName>resource</sp:varName>
               </rdf:Description>
               <rdf:Description>
+                <sp:varName>type</sp:varName>
                 <spl:predicate>
                   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/type"/>
                 </spl:predicate>
-                <sp:varName>type</sp:varName>
               </rdf:Description>
               <rdf:Description>
+                <sp:varName>property</sp:varName>
                 <spl:predicate>
                   <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/property"/>
                 </spl:predicate>
-                <sp:varName>property</sp:varName>
               </rdf:Description>
               <rdf:Description>
-                <sp:varName>value</sp:varName>
                 <spl:predicate>
                   <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/value"/>
                 </spl:predicate>
+                <sp:varName>value</sp:varName>
               </rdf:Description>
             </sp:resultVariables>
             <sp:where rdf:parseType="Collection">
               <sp:Optional>
                 <sp:elements rdf:parseType="Collection">
                   <rdf:Description>
-                    <sp:subject rdf:parseType="Resource">
-                      <sp:varName>resource</sp:varName>
-                    </sp:subject>
                     <sp:object rdf:parseType="Resource">
                       <sp:varName>type</sp:varName>
                     </sp:object>
                     <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
+                    <sp:subject rdf:parseType="Resource">
+                      <sp:varName>resource</sp:varName>
+                    </sp:subject>
                   </rdf:Description>
                 </sp:elements>
               </sp:Optional>
               <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#matches"/>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>resource</sp:varName>
                 </sp:subject>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#matches"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:object>
               </rdf:Description>
               <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:subject>
                 <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#query"/>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>string</sp:varName>
                 </sp:object>
-              </rdf:Description>
-              <rdf:Description>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?0</sp:varName>
                 </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>property</sp:varName>
                 </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
                 <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#property"/>
               </rdf:Description>
               <rdf:Description>
-                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?0</sp:varName>
                 </sp:subject>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>score</sp:varName>
                 </sp:object>
+                <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#score"/>
               </rdf:Description>
               <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:subject>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>value</sp:varName>
                 </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
                 <sp:predicate rdf:resource="http://www.openrdf.org/contrib/lucenesail#snippet"/>
               </rdf:Description>
             </sp:where>
-            <sp:text>select ?resource ?type ?property ?value
+            <sp:text>select distinct ?resource ?type ?property ?value
 where{ service ?service {
 	  OPTIONAL {?resource a ?type }
 			?resource &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
@@ -6078,6 +6061,22 @@ where{ service ?service {
 }}</sp:text>
           </sp:Select>
         </spin:body>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/string"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/service"/>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+          </spl:Argument>
+        </spin:constraint>
         <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
         >true</odata4sparql:isProxy>
         <rdfs:label>Search</rdfs:label>
@@ -6094,38 +6093,10 @@ where{ service ?service {
       <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/PathSearch">
         <spin:constraint>
           <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-            <spl:predicate>
-              <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/subjectA"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
             <spl:predicate>
               <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/maxPath"/>
             </spl:predicate>
             <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <odata4sparql:isPropertyPath rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isPropertyPath>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/propertyPath"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringB"/>
-            </spl:predicate>
           </spl:Argument>
         </spin:constraint>
         <spin:constraint>
@@ -6136,8 +6107,6 @@ where{ service ?service {
             <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
           </spl:Argument>
         </spin:constraint>
-        <rdfs:label>Path Search</rdfs:label>
-        <skos:prefLabel>Linked Search</skos:prefLabel>
         <spin:body>
           <sp:Select>
             <sp:text>	select ?entityA ?typeA  ?edge ?subject ?property ?direct ?object ?entityB ?typeB ?formattedValueB 
@@ -8725,6 +8694,36 @@ where{ service ?service {
             </sp:resultVariables>
           </sp:Select>
         </spin:body>
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringB"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <odata4sparql:isPropertyPath rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isPropertyPath>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/propertyPath"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <rdfs:label>Path Search</rdfs:label>
+        <skos:prefLabel>Linked Search</skos:prefLabel>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+            <spl:predicate>
+              <owl:ObjectProperty rdf:about="http://inova8.com/odata4sparql/search/subjectA"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
       </odata4sparql:Operation>
     </rdfs:domain>
   </owl:ObjectProperty>
@@ -8959,6 +8958,7 @@ where{ service ?service {
     <rdfs:domain>
       <odata4sparql:Operation rdf:about="http://inova8.com/odata4sparql/search/PathEntitySearch">
         <rdfs:label>Linked Entity Search</rdfs:label>
+        <skos:prefLabel>Linked Entity Search</skos:prefLabel>
         <spin:constraint>
           <spl:Argument>
             <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
@@ -8967,22 +8967,11 @@ where{ service ?service {
             </spl:predicate>
           </spl:Argument>
         </spin:constraint>
-        <skos:prefLabel>Linked Entity Search</skos:prefLabel>
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
         <spin:constraint>
           <spl:Argument>
             <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
             <spl:predicate>
               <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/maxPath"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringA"/>
             </spl:predicate>
           </spl:Argument>
         </spin:constraint>
@@ -11702,6 +11691,16 @@ where{ service ?service {
             <odata4sparql:isPropertyPath rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
             >true</odata4sparql:isPropertyPath>
             <spl:predicate rdf:resource="http://inova8.com/odata4sparql/search/propertyPath"/>
+          </spl:Argument>
+        </spin:constraint>
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/odata4sparql/search/stringA"/>
+            </spl:predicate>
           </spl:Argument>
         </spin:constraint>
       </odata4sparql:Operation>

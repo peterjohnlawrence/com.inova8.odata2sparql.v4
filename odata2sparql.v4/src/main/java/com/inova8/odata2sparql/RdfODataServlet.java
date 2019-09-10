@@ -62,7 +62,7 @@ public class RdfODataServlet extends HttpServlet {
 						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
 						repositoryDir.getAbsolutePath());
 				//Set to UTC so string date bjects without assigned timnezone are assumed to be UTC.
-				TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+				//TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 			}
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];

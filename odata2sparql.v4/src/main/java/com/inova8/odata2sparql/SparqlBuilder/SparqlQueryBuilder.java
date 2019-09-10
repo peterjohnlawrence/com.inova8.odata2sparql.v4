@@ -2087,7 +2087,7 @@ public class SparqlQueryBuilder {
 			}
 			expandItemWhere.append(")\n");
 			if(navProperty.getDomainClass().isProxy() && this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {	
-				expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + ">{\n");	
+				expandItemWhere.append(indent).append("SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl() + "?distinct=true&infer=false>{\n");	//timeout=5&
 				//No optional with service call because of performance 
 				//expandItemWhere.append(indent).append("OPTIONAL");
 			}else {	
@@ -2238,6 +2238,7 @@ public class SparqlQueryBuilder {
 		}
 		if (selectPropertyMap != null && !selectPropertyMap.isEmpty()) {
 			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
+			selectPropertyMap.add(RdfConstants.RDF_TYPE);
 			for (String selectProperty : selectPropertyMap) {
 				hasProperties = true;
 				clausesSelect.append("(<" + selectProperty + ">)");
@@ -2401,12 +2402,11 @@ public class SparqlQueryBuilder {
 					RdfEntityType segmentEntityType = entityType;
 
 					if (property.isStar()) {
-						// TODO Does/should segmentEntityType.getProperties get inherited properties as well?
-						// TODO Why not get all
-						for (RdfProperty rdfProperty : segmentEntityType.getProperties()) {
+						//Need to include this to ensure that if the entity has no actual properties whatsoever then something is returned.
+						valueProperties.add(RdfConstants.RDF_TYPE);
+						for (RdfProperty rdfProperty : segmentEntityType.getInheritedProperties()){//getProperties()) {
 							if (rdfProperty.getPropertyURI() != null) {
 								valueProperties.add(rdfProperty.getPropertyURI());
-								// emptyClause = false;
 							}
 						}
 
@@ -2447,9 +2447,12 @@ public class SparqlQueryBuilder {
 					}
 				}
 				return valueProperties;
+			}else {
+				valueProperties.add(RdfConstants.RDF_TYPE);
+				return null;// valueProperties;
 			}
 		}
-		return null;
+		//return null;
 	}
 
 	public Boolean isPrimitiveValue() {
