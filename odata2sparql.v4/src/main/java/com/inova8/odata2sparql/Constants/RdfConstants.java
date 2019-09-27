@@ -168,12 +168,18 @@ public class RdfConstants {
 
 	private static final String ONTOLOGY = "Ontology";
 	private static final String DATATYPE = "Datatype";
-	private static final String PROPERTY = "Property";
+	public static final String PROPERTY = "Property";
 
 	public static final String LANGSTRING = "langString";
 	public static final String LANG = "lang";
 	public static final String VALUE = "value";
 
+	public static final String FACT = "fact";
+	public static final String FACTS = "facts";
+	public static final String DATAVALUES = "dataValues";
+	public static final String OBJECTVALUES = "objectValues";
+
+	
 	private static final String INVERSEOF = "inverseOf ";
 	public static final String SPARQL_MODEL = "SparqlModel";
 

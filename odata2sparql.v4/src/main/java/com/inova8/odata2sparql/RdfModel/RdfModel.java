@@ -510,9 +510,19 @@ public class RdfModel {
 			if (!this.getSuperTypes().isEmpty()) {
 				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
 				inheritedNavigationProperties.addAll(this.getSuperTypeNavigationProperties(visited));				
-//				for (RdfEntityType superType : this.getSuperTypes()) {
-//					inheritedNavigationProperties.addAll(superType.getInheritedNavigationProperties());
-//				}
+			}
+			return inheritedNavigationProperties;
+		}
+		public TreeMap<String, RdfModel.RdfNavigationProperty> getInheritedNavigationPropertiesMap() {
+			TreeMap<String, RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new TreeMap<String,RdfModel.RdfNavigationProperty>();		
+			for ( RdfNavigationProperty navigationProperty : this.navigationProperties.values()) {
+				inheritedNavigationProperties.put(navigationProperty.navigationPropertyName,navigationProperty);
+			}
+			if (!this.getSuperTypes().isEmpty()) {
+				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();		
+				for ( RdfNavigationProperty navigationProperty : this.getSuperTypeNavigationProperties(visited)) {
+					inheritedNavigationProperties.put(navigationProperty.navigationPropertyName,navigationProperty);
+				}
 			}
 			return inheritedNavigationProperties;
 		}
@@ -558,7 +568,8 @@ public class RdfModel {
 		}	
 		
 		public RdfNavigationProperty findNavigationProperty(String navigationPropertyName) {
-			return navigationProperties.get(navigationPropertyName);
+			//return navigationProperties.get(navigationPropertyName);
+			return getInheritedNavigationPropertiesMap().get(navigationPropertyName);
 		}
 
 		public RdfNavigationProperty findInverseNavigationProperty(String navigationPropertyName) {
@@ -577,7 +588,7 @@ public class RdfModel {
 			return findNavigationProperty(navigationPropertyName);
 		}
 
-		public RdfNavigationProperty findNavigationProperty(RdfNode navigationPropertyNode) {
+		public RdfNavigationProperty findNavigationProperty(RdfNode navigationPropertyNode) {	
 			for (RdfNavigationProperty navigationProperty : this.getInheritedNavigationProperties()) {
 				if (navigationProperty.navigationPropertyNode.getIRI().toString()
 						.equals(navigationPropertyNode.getIRI().toString()))
