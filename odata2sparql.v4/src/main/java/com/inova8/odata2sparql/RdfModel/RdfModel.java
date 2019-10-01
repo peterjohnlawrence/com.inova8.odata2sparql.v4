@@ -240,8 +240,8 @@ public class RdfModel {
 		private String schemaName;
 		private String schemaPrefix;
 		boolean isDefault = false;
-		public final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
-		public final List<RdfModel.RdfNavigationProperty> navigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
+		private final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
+		private final List<RdfModel.RdfNavigationProperty> navigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 		private final List<RdfModel.RdfDatatype> datatypes = new ArrayList<RdfModel.RdfDatatype>();
 		private final HashSet<RdfModel.RdfComplexType> complexTypes = new HashSet<RdfModel.RdfComplexType>();
 		private final HashSet<RdfModel.RdfNodeShape> nodeShapes = new HashSet<RdfModel.RdfNodeShape>();
@@ -279,6 +279,14 @@ public class RdfModel {
 
 		public HashSet<RdfModel.RdfNodeShape> getNodeShapes() {
 			return nodeShapes;
+		}
+
+		public List<RdfModel.RdfEntityType> getClasses() {
+			return classes;
+		}
+
+		public List<RdfModel.RdfNavigationProperty> getNavigationProperties() {
+			return navigationProperties;
 		}
 	}
 
@@ -1865,7 +1873,7 @@ public class RdfModel {
 	public RdfEntityType getOrCreateEntityTypeFromShape(RdfNode shapeNode) throws OData2SparqlException {
 		RdfURI classURI = new RdfURI(shapeNode);
 		String equivalentClassName = classURI.localName.replace(RdfConstants.SHAPE_POSTFIX, "");
-		RdfEntityType clazz = Enumerable.create(classURI.graph.classes)
+		RdfEntityType clazz = Enumerable.create(classURI.graph.getClasses())
 				.firstOrNull(classNameEquals(rdfToOdata(equivalentClassName)));
 		if (clazz == null) {
 			//Should never get here
@@ -1874,7 +1882,7 @@ public class RdfModel {
 			clazz.entityTypeName = rdfToOdata(equivalentClassName);
 
 			//clazz.entityTypeNode = entityTypeNode;
-			classURI.graph.classes.add(clazz);
+			classURI.graph.getClasses().add(clazz);
 		}
 		return clazz;
 	}
@@ -1887,7 +1895,7 @@ public class RdfModel {
 			throws OData2SparqlException {
 
 		RdfURI classURI = new RdfURI(entityTypeNode);
-		RdfEntityType clazz = Enumerable.create(classURI.graph.classes)
+		RdfEntityType clazz = Enumerable.create(classURI.graph.getClasses())
 				.firstOrNull(classNameEquals(rdfToOdata(classURI.localName)));
 		if (clazz == null) {
 			clazz = new RdfEntityType();
@@ -1895,7 +1903,7 @@ public class RdfModel {
 			clazz.entityTypeName = rdfToOdata(classURI.localName);
 
 			clazz.entityTypeNode = entityTypeNode;
-			classURI.graph.classes.add(clazz);
+			classURI.graph.getClasses().add(clazz);
 		}
 		//Fixes #90
 		if (entityTypeLabelNode != null) {
@@ -1906,7 +1914,7 @@ public class RdfModel {
 
 	RdfEntityType getOrCreateEntityType(RdfNodeShape nodeShape) throws OData2SparqlException {
 		RdfURI classURI = new RdfURI(nodeShape.getSchema(), nodeShape.getNodeShapeName().toString());
-		RdfEntityType clazz = Enumerable.create(nodeShape.getSchema().classes)
+		RdfEntityType clazz = Enumerable.create(nodeShape.getSchema().getClasses())
 				.firstOrNull(classNameEquals(rdfToOdata(classURI.localName)));
 		if (clazz == null) {
 			clazz = new RdfEntityType();
@@ -1914,7 +1922,7 @@ public class RdfModel {
 			clazz.entityTypeName = rdfToOdata(nodeShape.nodeShapeName);
 
 			clazz.entityTypeNode = nodeShape.nodeShapeNode;
-			nodeShape.getSchema().classes.add(clazz);
+			nodeShape.getSchema().getClasses().add(clazz);
 
 			clazz.setNodeShape(nodeShape);
 		}
@@ -2285,9 +2293,7 @@ public class RdfModel {
 		String navigationPropertyName = createNavigationPropertyName(multipleDomainNode, multipleRangeNode, domainURI,
 				propertyURI, rangeURI);
 
-//		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
-//				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
-		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
+		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.getNavigationProperties())
 				.firstOrNull(navigationPropertyEquals(navigationPropertyName,domainURI.toString()));
 		if (navigationProperty == null) {
 			navigationProperty = buildNavigationProperty(navigationPropertyName, propertyNode, propertyURI, domainNode,
@@ -2340,7 +2346,7 @@ public class RdfModel {
 
 //		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
 //				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
-		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
+		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.getNavigationProperties())
 				.firstOrNull(navigationPropertyEquals(navigationPropertyName,domainNode.getIRIString()));
 		if (navigationProperty == null) {
 			return false;
@@ -2385,7 +2391,7 @@ public class RdfModel {
 
 		navigationProperty.domainClass.navigationProperties.put(navigationPropertyName, navigationProperty);
 		navigationProperty.rangeClass.incomingNavigationProperties.put(navigationPropertyName, navigationProperty);
-		domainURI.graph.navigationProperties.add(navigationProperty);
+		domainURI.graph.getNavigationProperties().add(navigationProperty);
 		return navigationProperty;
 	}
 
@@ -2415,7 +2421,7 @@ public class RdfModel {
 		RdfEntityType rdfEntityType = null;
 		if (nodeShapeTargetClassNode != null) {
 			RdfURI nodeShapeTargetClassURI = new RdfURI(nodeShapeTargetClassNode);
-			rdfEntityType = Enumerable.create(nodeShapeTargetClassURI.graph.classes)
+			rdfEntityType = Enumerable.create(nodeShapeTargetClassURI.graph.getClasses())
 					.firstOrNull(classNameEquals(rdfToOdata(nodeShapeTargetClassURI.localName)));
 			if (rdfEntityType != null)
 				nodeShape.setTargetClass(rdfEntityType);

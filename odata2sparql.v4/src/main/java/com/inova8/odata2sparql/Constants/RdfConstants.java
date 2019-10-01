@@ -71,6 +71,7 @@ public class RdfConstants {
 	public static final String TARGETENTITY = "http://targetEntity";
 	public static final String ASSERTEDTYPE = "http://assertedType";
 	public static final String ASSERTEDSHAPE = "http://assertedShape";
+	public static final String ANONNODE = "http://anon#";
 	public static final String MATCHING = "http://matching";
 	public static final String COUNT = "http://count";
 	public static final String PREFIX = "j";
@@ -163,6 +164,31 @@ public class RdfConstants {
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
+	
+	
+	public static final String RDF_SUBJECTPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#SubjectPredicate";
+	public static final String RDF_OBJECTPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Fact";	
+	public static final String RDF_VALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Term";	
+	public static final String RDF_HASSUBJECTS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#subjects";
+	public static final String RDF_ISPREDICATEOF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#isPropertyOf";
+	public static final String RDF_ISOBJECTIVE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#isObjectOf";
+	public static final String RDF_HASDATAVALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf_literal";
+	public static final String RDF_HASOBJECTVALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#resource";
+	public static final String RDF_HASVALUES = "http://www.w3.org/1999/02/22-rdf-syntax-ns#terms";
+	public static final String RDF_HASPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#property";
+	public static final String RDF_HASFACTS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#facts";
+
+	public static final String RDF_SUBJECTPREDICATE_LABEL = "rdf_SubjectPredicate";
+	public static final String RDF_OBJECTPREDICATE_LABEL = "rdf_Fact";	
+	public static final String RDF_VALUE_LABEL = "rdf_Term";	
+	public static final String RDF_HASSUBJECTS_LABEL = "rdf_subjects";
+	public static final String RDF_ISPREDICATEOF_LABEL = "rdf_isPropertyOf";
+	public static final String RDF_ISOBJECTIVE_LABEL = "rdf_isObjectOf";
+	public static final String RDF_HASDATAVALUE_LABEL = "rdf_literal";
+	public static final String RDF_HASOBJECTVALUE_LABEL = "rdf_resource";
+	public static final String RDF_HASVALUES_LABEL = "rdf_terms";
+	public static final String RDF_HASPREDICATE_LABEL = "rdf_property";
+	public static final String RDF_HASFACTS_LABEL = "rdf_facts";
 
 	public static final String SPARQL_UNDEF = "UNDEF";
 

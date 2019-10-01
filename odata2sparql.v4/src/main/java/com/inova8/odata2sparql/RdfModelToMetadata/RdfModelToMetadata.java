@@ -123,6 +123,8 @@ public class RdfModelToMetadata {
 
 		CsdlEntityContainer entityContainer = initializeMetadata(rdfModel);
 		CsdlComplexType langLiteralType = createLangType();
+		
+		createRdfMetadata(rdfModel);
 	//	CsdlComplexType factType = createFactType();
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
@@ -174,7 +176,7 @@ public class RdfModelToMetadata {
 		if (!useBaseType) {
 			// Fourth pass to flatten navigationPropertyBinding if baseTypes not supported
 			for (RdfSchema rdfGraph : rdfModel.graphs) {
-				for (RdfEntityType rdfClass : rdfGraph.classes) {
+				for (RdfEntityType rdfClass : rdfGraph.getClasses()) {
 					if (!rdfClass.isNodeShape()) {
 						HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
 						inheritBasetypeNavigationProperties(globalEntityTypes, entitySets, rdfClass, visited);
@@ -220,6 +222,10 @@ public class RdfModelToMetadata {
 		langLiteralType.setProperties(langStringProperties);
 		return langLiteralType;
 	}
+	private void createRdfMetadata(RdfModel rdfModel) {
+		
+		
+	}
 	private CsdlComplexType createFactType() {
 		ArrayList<CsdlProperty> factProperties = new ArrayList<CsdlProperty>();
 		factProperties.add(new CsdlProperty().setName(RdfConstants.PROPERTY)
@@ -247,7 +253,7 @@ public class RdfModelToMetadata {
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// Final pass to add any functionImports
 			CsdlSchema modelSchema = this.getSchema(rdfModel.getModelNamespace(rdfGraph));
-			for (RdfEntityType rdfEntityType : rdfGraph.classes) {
+			for (RdfEntityType rdfEntityType : rdfGraph.getClasses()) {
 				if (rdfEntityType.isFunctionImport()) {
 					final CsdlFunctionImport functionImport = new CsdlFunctionImport();
 					final CsdlFunction function = new CsdlFunction();
@@ -292,7 +298,7 @@ public class RdfModelToMetadata {
 	}
 
 	private void locateNavigationPropertyBinding(TreeMap<String, CsdlEntitySet> entitySets, RdfSchema rdfGraph) {
-		for (RdfNavigationProperty rdfNavigationProperty : rdfGraph.navigationProperties) {
+		for (RdfNavigationProperty rdfNavigationProperty : rdfGraph.getNavigationProperties()) {
 			{
 				String path = rdfNavigationProperty.getEDMNavigationPropertyName();
 				String target = rdfNavigationProperty.getRangeClass().getEDMEntitySetName();//.getRangeName();
@@ -308,7 +314,7 @@ public class RdfModelToMetadata {
 			boolean withFKProperties, Map<String, CsdlEntityType> globalEntityTypes,
 			Map<String, CsdlEntitySet> entitySetsMapping, TreeMap<String, CsdlEntitySet> entitySets, RdfSchema rdfGraph,
 			Map<String, CsdlEntityType> entityTypes, Map<String, CsdlEntityType> entityTypeMapping) {
-		for (RdfEntityType rdfClass : rdfGraph.classes) {
+		for (RdfEntityType rdfClass : rdfGraph.getClasses()) {
 			String entityTypeName = rdfClass.getEDMEntityTypeName();
 			CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
 			entityTypes.put(entityTypeName, entityType);
@@ -398,7 +404,7 @@ public class RdfModelToMetadata {
 	private void locateNavigationProperties(boolean withRdfAnnotations, boolean withSapAnnotations,
 			Map<String, CsdlEntityType> globalEntityTypes, Map<String, RdfNavigationProperty> navigationPropertyLookup,
 			RdfSchema rdfGraph) {
-		for (RdfNavigationProperty rdfNavigationProperty : rdfGraph.navigationProperties) {
+		for (RdfNavigationProperty rdfNavigationProperty : rdfGraph.getNavigationProperties()) {
 			// if (!rdfAssociation.isInverse)
 			{
 				String navigationPropertyName = rdfNavigationProperty.getEDMNavigationPropertyName();
@@ -508,7 +514,7 @@ public class RdfModelToMetadata {
 
 	private void locateEntityTypes(boolean withRdfAnnotations, boolean withSapAnnotations, boolean useBaseType,
 			Map<String, CsdlEntityType> globalEntityTypes, RdfSchema rdfGraph) {
-		for (RdfEntityType rdfClass : rdfGraph.classes) {
+		for (RdfEntityType rdfClass : rdfGraph.getClasses()) {
 			String entityTypeName = rdfClass.getEDMEntityTypeName();
 			CsdlEntityType entityType = globalEntityTypes.get(rdfClass.getIRI());
 			if (entityType == null) {

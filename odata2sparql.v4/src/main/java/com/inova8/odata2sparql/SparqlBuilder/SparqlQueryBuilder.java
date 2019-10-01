@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.SparqlBuilder;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -321,6 +322,7 @@ import com.inova8.odata2sparql.uri.UriUtils;
 //		}
 
 public class SparqlQueryBuilder {
+
 
 	private final Logger log = LoggerFactory.getLogger(SparqlQueryBuilder.class);
 	private final RdfModel rdfModel;
@@ -2079,6 +2081,7 @@ public class SparqlQueryBuilder {
 
 		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandItemWhere.append(indent).append("#expandItemWhere\n");
+		boolean isImplicitNavigationProperty = isImplicitNavigationProperty(navProperty);
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
 			expandItemWhere.append(indent)
 					.append("BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
@@ -2093,15 +2096,19 @@ public class SparqlQueryBuilder {
 			}else {	
 				expandItemWhere.append(indent).append("OPTIONAL");
 			}
-		} else {
+		} else if (isImplicitNavigationProperty){
+			expandItemWhere.append(indent).append("OPTIONAL");
+		}else {
 			expandItemWhere.append(indent).append("UNION");//.append("UNION");
 		}
 		expandItemWhere.append("\t{\n");
-		expandItemWhere.append(indent);
-		expandItemWhere.append(indent).append("{\n");
+		//expandItemWhere.append(indent);
+		expandItemWhere.append(indent).append("\t{\n");
 		if (navProperty.getRangeClass().isOperation()) {
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
-		} else {
+		} else if( isImplicitNavigationProperty) {
+			expandItemWhere.append(expandImplicit(targetKey,navProperty,indent +"\t\t"));			
+		}	else {
 			HashSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
 					expandItem.getSelectOption());
 			if (selectedProperties != null && selectedProperties.isEmpty())
@@ -2151,6 +2158,8 @@ public class SparqlQueryBuilder {
 					navProperty.getRangeClass(), indent + "\t"));
 		}
 		expandItemWhere.append(indent).append("\t}\n");
+		
+		
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
 					nextTargetKey, nextTargetEntityType));
@@ -2159,11 +2168,96 @@ public class SparqlQueryBuilder {
 			expandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
 					expandItem.getExpandOption().getExpandItems(), indent + "\t"));
 		}
-		if(navProperty.getDomainClass().isProxy()) {	expandItemWhere.append(indent).append("}\n");	}
+		if(navProperty.getDomainClass().isProxy()) {	
+				expandItemWhere.append(indent).append("}\n");	
+		}
 		expandItemWhere.append(indent).append("}\n");
 		return expandItemWhere;
 	}
-
+	private static boolean isImplicitNavigationProperty(RdfNavigationProperty navProperty) {
+		String[] implicitNavigationProperties = new String[]{RdfConstants.RDF_HASFACTS_LABEL,RdfConstants.RDF_HASPREDICATE_LABEL,RdfConstants.RDF_HASVALUES_LABEL,RdfConstants.RDF_HASOBJECTVALUE_LABEL,RdfConstants.RDF_ISOBJECTIVE_LABEL,RdfConstants.RDF_ISPREDICATEOF_LABEL,RdfConstants.RDF_HASSUBJECTS_LABEL};
+		return Arrays.asList( implicitNavigationProperties).contains(navProperty.getEDMNavigationPropertyName());	
+	}
+ private StringBuilder expandImplicit(String targetKey, RdfNavigationProperty navProperty, String indent) {
+	 StringBuilder expandImplicit = null;
+	switch (navProperty.getEDMNavigationPropertyName()) {
+		case RdfConstants.RDF_HASFACTS_LABEL: return expandItemWhereHasFacts(targetKey,indent);
+		case RdfConstants.RDF_HASPREDICATE_LABEL: return expandItemWhereHasPredicate(targetKey,indent);
+		case RdfConstants.RDF_HASVALUES_LABEL: return expandItemWhereHasValues(targetKey,indent);
+		case RdfConstants.RDF_HASOBJECTVALUE_LABEL: return expandItemWhereHasObjectValue(targetKey,indent);
+		case RdfConstants.RDF_ISOBJECTIVE_LABEL: return expandItemWhereIsObjective(targetKey,indent);
+		case RdfConstants.RDF_ISPREDICATEOF_LABEL: return expandItemWhereIsPredicateOf(targetKey,indent);
+		case RdfConstants.RDF_HASSUBJECTS_LABEL: return expandItemWhereHasSubjects(targetKey,indent);
+		default:break;	
+	}	 
+	return expandImplicit; 
+ }
+	private StringBuilder expandItemWhereHasFacts(String targetKey, String indent) {
+		StringBuilder expandItemWhereHasFacts = new StringBuilder();
+//  	?Customer_s ?Customerrdf_hasFacts_ap ?Customerrdf_hasFacts_ao . 
+//  	BIND( IRI(CONCAT(STR(?Customer_s),"-",STR(?Customerrdf_hasFacts_ap))) as ?Customerrdf_hasFacts_s )
+		expandItemWhereHasFacts.append(indent).append("?").append(targetKey).append("_s ?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL).append("_ap ?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL).append("_ao .\n");
+		expandItemWhereHasFacts.append(indent).append("BIND( IRI(CONCAT(\"").append(RdfConstants.ANONNODE).append("\",MD5(STR(?").append(targetKey).append("_s)),\"-\",MD5(STR(?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL).append("_ap)))) as ?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL).append("_s )\n");
+		return expandItemWhereHasFacts;
+	}
+	private StringBuilder expandItemWhereHasPredicate(String targetKey, String indent) {
+		StringBuilder expandItemWhereHasPredicate = new StringBuilder();
+//		BIND( ?Customerrdf_hasFacts_ap    as ?Customerrdf_hasFactsrdf_hasPredicate_s  )
+//		VALUES(?Customerrdf_hasFactsrdf_hasPredicate_p){(<http://www.w3.org/2000/01/rdf-schema#label>)(<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>)}
+//		?Customerrdf_hasFactsrdf_hasPredicate_s ?Customerrdf_hasFactsrdf_hasPredicate_p ?Customerrdf_hasFactsrdf_hasPredicate_o .
+		expandItemWhereHasPredicate.append(indent).append("BIND( ?").append(targetKey).append("_ap as ?").append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_s  )\n");		
+		expandItemWhereHasPredicate.append(indent).append("VALUES(?").append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_p){(<").append(RdfConstants.RDFS_LABEL).append(">)(<").append(RdfConstants.RDF_TYPE).append(">)}\n");	
+		expandItemWhereHasPredicate.append(indent).append("?").append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_s ?").append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_p ?").append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_o .\n");
+		return expandItemWhereHasPredicate;
+	}
+	private StringBuilder expandItemWhereHasValues(String targetKey, String indent) {
+		StringBuilder expandItemWhereHasValues = new StringBuilder();
+//      BIND( IRI(CONCAT(STR(?Customerrdf_hasFacts_s),"-", MD5(STR(?Customerrdf_hasFacts_ao) ))) as ?Customerrdf_hasFactsrdf_hasValues_s)  
+//		BIND( ?Customerrdf_hasFacts_ao  as ?Customerrdf_hasFactsrdf_hasValues_o )
+//  	BIND( if(IsLiteral(?Customerrdf_hasFacts_ao), <http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf_hasDataValue>,<http://www.w3.org/1999/02/22-rdf-syntax-ns#hasObjectValue>) as ?Customerrdf_hasFactsrdf_hasValues_p )	
+		expandItemWhereHasValues.append(indent).append("BIND( IRI(CONCAT(STR(?").append(targetKey).append("_s),\"-\", MD5(STR(?").append(targetKey).append("_ao) ))) as ?").append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_s)\n");
+		expandItemWhereHasValues.append(indent).append("BIND( ?").append(targetKey).append("_ao  as ?").append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_o )\n");
+		expandItemWhereHasValues.append(indent).append("BIND( if(IsLiteral(?").append(targetKey).append("_ao), <").append(RdfConstants.RDF_HASDATAVALUE).append(">,<").append(RdfConstants.RDF_HASOBJECTVALUE).append(">) as ?").append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_p )\n");
+		return expandItemWhereHasValues;
+	}
+	private StringBuilder expandItemWhereHasObjectValue(String targetKey, String indent) {
+		StringBuilder expandItemWhereHasObjectValue = new StringBuilder();
+//		BIND(?Customerrdf_hasFactsrdf_hasValues_o  as ?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_s  )
+//		VALUES(?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_p){(<http://www.w3.org/2000/01/rdf-schema#label>)(<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>)}
+//		?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_s ?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_p ?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_o .	
+		expandItemWhereHasObjectValue.append(indent).append("BIND( ?").append(targetKey).append("_o  as ?").append(targetKey).append(RdfConstants.RDF_HASOBJECTVALUE_LABEL).append("_s  )\n");
+		expandItemWhereHasObjectValue.append(indent).append("VALUES(?").append(targetKey).append(RdfConstants.RDF_HASOBJECTVALUE_LABEL).append("_p){(<").append(RdfConstants.RDFS_LABEL).append(">)(<").append(RdfConstants.RDF_TYPE).append(">)}\n");
+		expandItemWhereHasObjectValue.append(indent).append("?").append(targetKey).append(RdfConstants.RDF_HASOBJECTVALUE_LABEL).append("_s ?").append(targetKey).append(RdfConstants.RDF_HASOBJECTVALUE_LABEL).append("_p ?").append(targetKey).append(RdfConstants.RDF_HASOBJECTVALUE_LABEL).append("_o .\n");
+		return expandItemWhereHasObjectValue;
+	}
+	private StringBuilder expandItemWhereIsObjective(String targetKey, String indent) {
+		StringBuilder expandItemWhereIsObjective = new StringBuilder();
+//		?Customerrdf_isObjective_as ?Customerrdf_isObjective_ap  ?Customer_s   .
+//		BIND( IRI(CONCAT(STR(?Customerrdf_isObjective_ap ),"-",STR(?Customer_s))) as ?Customerrdf_isObjective_s )
+		expandItemWhereIsObjective.append(indent).append("?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_as ?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_ap  ?").append(targetKey).append("_s .\n");
+		expandItemWhereIsObjective.append(indent).append("BIND( IRI(CONCAT(\"").append(RdfConstants.ANONNODE).append("\", MD5(STR(?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_ap )),\"-\",MD5(STR(?").append(targetKey).append("_s)))) as ?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_s )\n");
+		return expandItemWhereIsObjective;
+	}
+	private StringBuilder expandItemWhereIsPredicateOf(String targetKey, String indent) {
+		StringBuilder expandItemWhereIsPredicateOf = new StringBuilder();
+//		BIND(?Customerrdf_isObjective_ap  as    ?Customerrdf_isObjectiverdf_isPredicateOf_s)    
+//		VALUES(?Customerrdf_isObjectiverdf_isPredicateOf_p){(<http://www.w3.org/2000/01/rdf-schema#comment>)(<http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId>)(<http://www.w3.org/2000/01/rdf-schema#label>)}
+//		?Customerrdf_isObjectiverdf_isPredicateOf_s ?Customerrdf_isObjectiverdf_isPredicateOf_p ?Customerrdf_isObjectiverdf_isPredicateOf_o .	
+		expandItemWhereIsPredicateOf.append(indent).append("BIND(?").append(targetKey).append("_ap  as ?").append(targetKey).append(RdfConstants.RDF_ISPREDICATEOF_LABEL).append("_s)\n");
+		expandItemWhereIsPredicateOf.append(indent).append("VALUES(?").append(targetKey).append(RdfConstants.RDF_ISPREDICATEOF_LABEL).append("_p){(<").append(RdfConstants.RDFS_LABEL).append(">)}\n");
+		expandItemWhereIsPredicateOf.append(indent).append("?").append(targetKey).append(RdfConstants.RDF_ISPREDICATEOF_LABEL).append("_s ?").append(targetKey).append(RdfConstants.RDF_ISPREDICATEOF_LABEL).append("_p ?").append(targetKey).append(RdfConstants.RDF_ISPREDICATEOF_LABEL).append("_o .\n");
+		return expandItemWhereIsPredicateOf;
+	}
+	private StringBuilder expandItemWhereHasSubjects(String targetKey, String indent) {
+		StringBuilder expandItemWhereHasSubjects = new StringBuilder();
+//  	BIND(?Customerrdf_isObjective_as  as   ?Customerrdf_isObjectiverdf_hasSubjects_s )
+//		VALUES(?Customerrdf_isObjectiverdf_hasSubjects_p){(<http://www.w3.org/2000/01/rdf-schema#comment>)(<http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId>)(<http://www.w3.org/2000/01/rdf-schema#label>)}
+//		?Customerrdf_isObjectiverdf_hasSubjects_s ?Customerrdf_isObjectiverdf_hasSubjects_p ?Customerrdf_isObjectiverdf_hasSubjects_o .
+		expandItemWhereHasSubjects.append(indent).append("BIND(?").append(targetKey).append("_as  as ?").append(targetKey).append(RdfConstants.RDF_HASSUBJECTS_LABEL).append("_s )\n");
+		expandItemWhereHasSubjects.append(indent).append("VALUES(?").append(targetKey).append(RdfConstants.RDF_HASSUBJECTS_LABEL).append("_p){(<").append(RdfConstants.RDFS_LABEL).append(">)}\n");
+		expandItemWhereHasSubjects.append(indent).append("?").append(targetKey).append(RdfConstants.RDF_HASSUBJECTS_LABEL).append("_s ?").append(targetKey).append(RdfConstants.RDF_HASSUBJECTS_LABEL).append("_p ?").append(targetKey).append(RdfConstants.RDF_HASSUBJECTS_LABEL).append("_o .\n");
+		return expandItemWhereHasSubjects;
+	}
 	private StringBuilder expandItemWhereCount(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType)
@@ -2174,7 +2268,7 @@ public class SparqlQueryBuilder {
 		//TODO UNION or OPTIONAL, currently OPTIONAL improves performance
 		expandItemWhereCount.append(indent).append("\tUNION{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n").append(indent)
-				.append("\tWHERE {\n");
+				.append("\t\tWHERE {\n");
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
 
@@ -2182,7 +2276,7 @@ public class SparqlQueryBuilder {
 			for (RdfProperty property : navProperty.getDomainClass().getProperties()) {
 				if (property.getPropertyTypeName().equals(navProperty.getRangeClass().getURL()))
 					expandItemWhereCount.append(indent)
-							.append("BIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
+							.append("\t\tBIND(?" + property.getVarName() + " AS ?" + nextTargetKey + "_s)\n");
 			}
 		}
 
@@ -2207,23 +2301,23 @@ public class SparqlQueryBuilder {
 			if (navProperty.getDomainClass().isOperation()) {
 				// Nothing to add as BIND assumed to be created
 			} else if (navProperty.IsInverse()) {
-				expandItemWhereCount.append(indent).append("\t\t{\n");
-				expandItemWhereCount.append(indent).append("\t\t\t").append(
+				expandItemWhereCount.append(indent).append("\t\t\t{\n");
+				expandItemWhereCount.append(indent).append("\t\t\t\t").append(
 						nextKeyVar + " <" + navProperty.getInversePropertyOf().getIRI() + "> " + keyvar + " .\n");
-				expandItemWhereCount.append(indent).append("\t\t").append("}UNION{\n");
-				expandItemWhereCount.append(indent).append("\t\t\t")
+				expandItemWhereCount.append(indent).append("\t\t\t").append("}UNION{\n");
+				expandItemWhereCount.append(indent).append("\t\t\t\t")
 						.append(keyvar + " <" + navProperty.getNavigationPropertyIRI() + "> " + nextKeyVar + " .\n");
-				expandItemWhereCount.append(indent).append("\t\t").append("}\n");
+				expandItemWhereCount.append(indent).append("\t\t\t").append("}\n");
 
 			} else {
-				expandItemWhereCount.append(indent).append("\t")
+				expandItemWhereCount.append(indent).append("\t\t")
 						.append(keyvar + " <" + navProperty.getNavigationPropertyIRI() + "> " + nextKeyVar + " .\n");
 			}
 			if (this.rdfModel.getRdfRepository().isWithMatching())
 				expandItemWhereCount.append(clausesMatch("?" + nextTargetKey + "_s", nextKeyVar, indent + "\t\t"));
 		}
-		expandItemWhereCount.append(indent).append("\t} GROUP BY ?").append(targetKey).append("_s\n").append(indent)
-				.append("}\n");
+		expandItemWhereCount.append(indent).append("\t\t} GROUP BY ?").append(targetKey).append("_s\n").append(indent)
+				.append("\t}\n");
 		return expandItemWhereCount;
 	}
 
