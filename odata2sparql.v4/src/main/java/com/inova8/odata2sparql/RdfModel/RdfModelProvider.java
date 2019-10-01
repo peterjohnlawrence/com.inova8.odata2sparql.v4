@@ -155,57 +155,57 @@ public class RdfModelProvider {
 				unityNode, RdfConstants.Cardinality.ZERO_TO_ONE, RdfConstants.Cardinality.MANY);
 		
 		//RDF MetaModel
-				RdfNode rdfSubjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE);
-				RdfNode rdfSubjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_SUBJECTPREDICATE_LABEL);
-				model.getOrCreateEntityType(rdfSubjectPredicateNode, rdfSubjectPredicateLabelNode, rdfsResource);
-				RdfNode rdfObjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE);
-				RdfNode rdfObjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_OBJECTPREDICATE_LABEL);
-				model.getOrCreateEntityType(rdfObjectPredicateNode, rdfObjectPredicateLabelNode, rdfsResource);	
-				RdfNode rdfValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_VALUE);
-				RdfNode rdfValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_VALUE_LABEL);
-				model.getOrCreateEntityType(rdfValueNode, rdfValueLabelNode, rdfsResource);			
-				
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASFACTS),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASFACTS_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-						RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE), unityNode, unityNode,
-						RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);	
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASPREDICATE),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASPREDICATE_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
-						RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode,
-						RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);		
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASVALUES),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASVALUES_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
-						RdfNodeFactory.createURI(RdfConstants.RDF_VALUE), unityNode, unityNode,
-						RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);		
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASOBJECTVALUE),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASOBJECTVALUE_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDF_VALUE),
-						RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), unityNode, unityNode,
-						RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);	
-				model.getOrCreateProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASDATAVALUE), 
-						null, 
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASDATAVALUE_LABEL), 
-						rdfValueNode, 
-						rdfStringNode,
-						RdfConstants.Cardinality.ZERO_TO_ONE);
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISOBJECTIVE),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_ISOBJECTIVE_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-						RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE), unityNode, unityNode,
-						RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISPREDICATEOF),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_ISPREDICATEOF_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
-						RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode,
-						RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);
-				model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASSUBJECTS),
-						RdfNodeFactory.createLiteral(RdfConstants.RDF_HASSUBJECTS_LABEL),
-						RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
-						RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), unityNode, unityNode,
-						RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
+		RdfNode rdfSubjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE);
+		RdfNode rdfSubjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_SUBJECTPREDICATE_LABEL);
+		model.getOrCreateEntityType(rdfSubjectPredicateNode, rdfSubjectPredicateLabelNode, rdfsResource);
+		RdfNode rdfObjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE);
+		RdfNode rdfObjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_OBJECTPREDICATE_LABEL);
+		model.getOrCreateEntityType(rdfObjectPredicateNode, rdfObjectPredicateLabelNode, rdfsResource);	
+		RdfNode rdfValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_VALUE);
+		RdfNode rdfValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_VALUE_LABEL);
+		model.getOrCreateEntityType(rdfValueNode, rdfValueLabelNode, rdfsResource);			
+		
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASFACTS),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASFACTS_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
+				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE), unityNode, unityNode,
+				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);	
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASPREDICATE),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASPREDICATE_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
+				RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode,
+				RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);		
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASVALUES),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASVALUES_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
+				RdfNodeFactory.createURI(RdfConstants.RDF_VALUE), unityNode, unityNode,
+				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);		
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASOBJECTVALUE),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASOBJECTVALUE_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDF_VALUE),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), unityNode, unityNode,
+				RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);	
+		model.getOrCreateProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASDATAVALUE), 
+				null, 
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASDATAVALUE_LABEL), 
+				rdfValueNode, 
+				rdfStringNode,
+				RdfConstants.Cardinality.ZERO_TO_ONE);
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISOBJECTIVE),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_ISOBJECTIVE_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
+				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE), unityNode, unityNode,
+				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISPREDICATEOF),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_ISPREDICATEOF_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
+				RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode,
+				RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASSUBJECTS),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASSUBJECTS_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), unityNode, unityNode,
+				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
 		
 		return rdfsResource;
 	}

@@ -123,9 +123,6 @@ public class RdfModelToMetadata {
 
 		CsdlEntityContainer entityContainer = initializeMetadata(rdfModel);
 		CsdlComplexType langLiteralType = createLangType();
-		
-		createRdfMetadata(rdfModel);
-	//	CsdlComplexType factType = createFactType();
 
 		for (RdfSchema rdfGraph : rdfModel.graphs) {
 			// First pass to locate all classes (entitytypes) and datatypes (typedefinitions)
@@ -221,32 +218,6 @@ public class RdfModelToMetadata {
 		CsdlComplexType langLiteralType = new CsdlComplexType().setName(RdfConstants.LANGSTRING);
 		langLiteralType.setProperties(langStringProperties);
 		return langLiteralType;
-	}
-	private void createRdfMetadata(RdfModel rdfModel) {
-		
-		
-	}
-	private CsdlComplexType createFactType() {
-		ArrayList<CsdlProperty> factProperties = new ArrayList<CsdlProperty>();
-		factProperties.add(new CsdlProperty().setName(RdfConstants.PROPERTY)
-				.setType( new FullQualifiedName(RdfConstants.RDF, RdfConstants.PROPERTY)    // EdmPrimitiveTypeKind.String.getFullQualifiedName()
-						).setNullable(false));
-		factProperties.add(new CsdlProperty().setName(RdfConstants.DATAVALUES)
-				.setType(new FullQualifiedName(RdfConstants.RDF, RdfConstants.LANGSTRING) 							//EdmPrimitiveTypeKind.String.getFullQualifiedName()
-						).setCollection(true).setNullable(true));
-		factProperties.add(new CsdlProperty().setName(RdfConstants.OBJECTVALUES)
-				.setType(new FullQualifiedName(RdfConstants.RDFS, RdfConstants.RDFS_RESOURCE_LABEL) 							//EdmPrimitiveTypeKind.String.getFullQualifiedName()
-						).setCollection(true).setNullable(true));
-		CsdlComplexType factType = new CsdlComplexType().setName(RdfConstants.FACT);
-		factType.setProperties(factProperties);
-		return factType;
-	}
-	private CsdlProperty createFactsProperty() {
-		CsdlProperty factsProperty = new CsdlProperty().setName(RdfConstants.FACTS)
-				.setType( new FullQualifiedName(RdfConstants.RDF, RdfConstants.FACT)    // EdmPrimitiveTypeKind.String.getFullQualifiedName()
-						).setNullable(true);
-
-		return factsProperty;
 	}
 	private void locateFunctionImports(RdfModel rdfModel, CsdlEntityContainer entityContainer) {
 		List<CsdlFunctionImport> functionImports = new ArrayList<CsdlFunctionImport>();

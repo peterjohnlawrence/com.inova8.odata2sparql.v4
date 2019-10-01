@@ -2126,26 +2126,6 @@ public class RdfModel {
 		return property;
 	}
 
-	//	RdfProperty getOrCreateComplexProperty(RdfNodeShape nodeShape, RdfObjectPropertyShape objectPropertyNodeShape)
-	//			throws OData2SparqlException {
-	//		RdfNodeShape propertyNodeShape = objectPropertyNodeShape.getPropertyNode();
-	//		RdfEntityType clazz = nodeShape.getEntityType();
-	//		RdfProperty property = null;
-	//		if (clazz != null) {
-	//			property = Enumerable.create(clazz.getProperties())
-	//					.firstOrNull(propertyNameEquals(rdfToOdata(propertyNodeShape.getNodeShapeName())));
-	//		}
-	//		if (property == null) {
-	//			property = new RdfProperty();
-	//			property.propertyName = rdfToOdata(propertyNodeShape.getNodeShapeName());
-	//			property.propertyLabel = propertyNodeShape.getNodeShapeLabel();
-	//			property.propertyUri = objectPropertyNodeShape.getPath().getNavigationPropertyIRI();
-	//			//	property.propertyNode = propertyNode;
-	//			property.setOfClass(clazz);
-	//			//	clazz.properties.put(property.propertyName, property);
-	//		}
-	//		return property;
-	//	}
 
 	RdfComplexProperty getOrCreateComplexProperty(RdfNodeShape nodeShape,
 			RdfObjectPropertyShape objectPropertyNodeShape) throws OData2SparqlException {
@@ -2344,8 +2324,6 @@ public class RdfModel {
 		String navigationPropertyName = createNavigationPropertyName(multipleDomainNode, multipleRangeNode, domainURI,
 				propertyURI, rangeURI);
 
-//		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.navigationProperties)
-//				.firstOrNull(navigationPropertyNameEquals(navigationPropertyName));
 		RdfNavigationProperty navigationProperty = Enumerable.create(domainURI.graph.getNavigationProperties())
 				.firstOrNull(navigationPropertyEquals(navigationPropertyName,domainNode.getIRIString()));
 		if (navigationProperty == null) {
@@ -2356,21 +2334,6 @@ public class RdfModel {
 
 	private String createNavigationPropertyName(RdfNode multipleDomainNode, RdfNode multipleRangeNode, RdfURI domainURI,
 			RdfURI propertyURI, RdfURI rangeURI) throws OData2SparqlException {
-		//Removed for V4 as multiple ranges and domains do not matter any more as navigationProperties are directly associated with EntityType and EntitySet
-//				if (!(multipleDomainNode.getLiteralObject().equals(1) || multipleDomainNode.getLiteralObject().equals("1"))) {
-//					if (!(multipleRangeNode.getLiteralObject().equals(1) || multipleRangeNode.getLiteralObject().equals("1"))) {
-//						return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//								+ rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//								+ rdfToOdata(rangeURI.localName);
-//					} else {
-//						return rdfToOdata(domainURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//								+ rdfToOdata(propertyURI.localName);
-//					}
-//				} else if (!(multipleRangeNode.getLiteralObject().equals(1)
-//						|| multipleRangeNode.getLiteralObject().equals("1"))) {
-//					return rdfToOdata(propertyURI.localName) + RdfConstants.PREDICATE_SEPARATOR
-//							+ rdfToOdata(rangeURI.localName);
-//				}
 		return rdfToOdata(propertyURI.localName);
 	}
 
