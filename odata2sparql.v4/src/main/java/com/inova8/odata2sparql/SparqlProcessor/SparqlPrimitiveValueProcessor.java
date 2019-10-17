@@ -68,6 +68,9 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		}
 	}
 
@@ -82,11 +85,14 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		}
 	}
 
 	private void readPrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException {
+			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException, OData2SparqlException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();

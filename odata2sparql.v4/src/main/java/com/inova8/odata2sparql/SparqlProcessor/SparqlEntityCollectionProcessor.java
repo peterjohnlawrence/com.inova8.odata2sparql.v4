@@ -86,6 +86,9 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
 					Locale.ENGLISH); 
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NOT_FOUND.getStatusCode(),
+					Locale.ENGLISH); 
 		}
 		//if (rdfResourceParts.isFunction()) {
 		//	throw new ODataApplicationException("Calling FunctionImports directly not supported at present", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),

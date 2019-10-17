@@ -61,6 +61,9 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		}	
 		// 2. retrieve data from backend
 		// 2.1. retrieve the entityCollection data

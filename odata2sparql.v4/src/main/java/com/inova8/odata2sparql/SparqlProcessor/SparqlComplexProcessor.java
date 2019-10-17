@@ -66,6 +66,9 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		}
 
 	}
@@ -78,7 +81,7 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		RdfResourceParts rdfResourceParts = null;
 		try {
 			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
-		} catch (EdmException | ODataException e1) {
+		} catch (EdmException | ODataException | OData2SparqlException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -156,7 +159,7 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 	}
 
 	private void readComplexValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException {
+			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException, OData2SparqlException {
 		// 1. Retrieve info from URI
 		// 1.1. retrieve the info about the requested entity set
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);

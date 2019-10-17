@@ -57,6 +57,9 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 		} catch (ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
 		}	
 
 		// 2. retrieve data from backend

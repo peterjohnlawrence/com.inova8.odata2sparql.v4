@@ -7,6 +7,7 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 
+import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
@@ -35,7 +36,7 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 		}
 	}
 
-	public String getDecodedKey() {
+	public String getDecodedKey() throws OData2SparqlException {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
 			for (UriParameter entityKey : keyPredicates) {

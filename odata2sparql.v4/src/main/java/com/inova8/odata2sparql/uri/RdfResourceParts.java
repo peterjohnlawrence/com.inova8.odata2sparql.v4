@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
+import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -63,7 +64,7 @@ public class RdfResourceParts {
 	private UriType uriType;
 	private RdfResourceEntitySet entitySet;
 
-	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataException {
+	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataException, OData2SparqlException {
 		this.rdfEdmProvider = rdfEdmProvider;
 		this.uriInfo = uriInfo;
 		for (UriResource resourcePart : uriInfo.getUriResourceParts()) {
@@ -234,7 +235,7 @@ public class RdfResourceParts {
 
 	}
 
-	private void build() throws EdmException, ODataException {
+	private void build() throws EdmException, ODataException, OData2SparqlException {
 		uriType = _getUriType();
 		lastResourcePart = _getLastResourcePart();
 		lastPropertyName = _getLastPropertyName();
@@ -389,7 +390,7 @@ public class RdfResourceParts {
 		}
 	}
 
-	private String _getDecodedKey() {
+	private String _getDecodedKey() throws OData2SparqlException {
 		if (getAsEntitySet(0) != null)
 			return getAsEntitySet(0).getDecodedKey();
 		return null;

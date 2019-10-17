@@ -109,7 +109,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return updatePropertiesReplace;
 	}
 
-	private String insertValuesReplace(String group, RdfEntityType entityType, Entity entry) {
+	private String insertValuesReplace(String group, RdfEntityType entityType, Entity entry) throws OData2SparqlException {
 		String insertReplace = group;
 		for (Property prop : entry.getProperties()) {
 			if (prop.getValue() != null) {

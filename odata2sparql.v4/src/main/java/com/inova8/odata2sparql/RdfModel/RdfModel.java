@@ -1,7 +1,10 @@
 package com.inova8.odata2sparql.RdfModel;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -94,8 +97,8 @@ public class RdfModel {
 			return prefixToURI.get(sprefix);
 		}
 
-		public String expandPrefix(String decodedEntityKey) {
-			String encodeEntityKey = UriUtils.encodeUri(decodedEntityKey);//decodedEntityKey.replaceAll("\\(", "%28").replaceAll("\\)","%29").replaceAll("\\/", "%2F");
+		public String expandPrefix(String decodedEntityKey) throws OData2SparqlException {
+			String encodeEntityKey = UriUtils.encodeQName(decodedEntityKey);//decodedEntityKey.replaceAll("\\(", "%28").replaceAll("\\)","%29").replaceAll("\\/", "%2F");
 			int colon = encodeEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
 			if (colon < 0)
 				return encodeEntityKey;
@@ -114,7 +117,11 @@ public class RdfModel {
 						}
 					}
 				}
-				return uri == null ? encodeEntityKey : uri + encodeEntityKey.substring(colon + 1);
+				try {
+					return uri == null ? encodeEntityKey : uri + UriUtils.encodeUri(decodedEntityKey.substring(colon + 1));
+				} catch (UnsupportedEncodingException e) {
+					throw new OData2SparqlException("Unencodable key: " + decodedEntityKey, null);
+				}
 			}
 		}
 		public String expandPredicate(String entityKey) throws OData2SparqlException {

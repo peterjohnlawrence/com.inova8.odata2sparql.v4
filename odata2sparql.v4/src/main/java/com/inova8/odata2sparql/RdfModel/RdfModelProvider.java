@@ -130,6 +130,11 @@ public class RdfModelProvider {
 		model.getOrCreateProperty(rdfsLabelNode, null, rdfsLabelLabelNode, rdfsResourceNode, rdfStringNode,
 				RdfConstants.Cardinality.ZERO_TO_ONE);
 
+		RdfNode rdfsCommentNode = RdfNodeFactory.createURI(RdfConstants.RDFS_COMMENT);
+		RdfNode rdfsCommentLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDFS_COMMENT_LABEL);
+		model.getOrCreateProperty(rdfsCommentNode, null, rdfsCommentLabelNode, rdfsResourceNode, rdfStringNode,
+				RdfConstants.Cardinality.ZERO_TO_ONE);
+		
 		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_STATEMENT_LABEL),
 				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),

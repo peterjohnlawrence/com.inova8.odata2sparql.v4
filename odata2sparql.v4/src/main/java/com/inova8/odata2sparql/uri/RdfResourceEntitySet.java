@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.uri;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -7,6 +8,7 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 
+import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
@@ -44,7 +46,7 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		return keyPredicates;
 	}
 
-	public String getDecodedKey() {
+	public String getDecodedKey() throws OData2SparqlException {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
 			for (UriParameter entityKey : keyPredicates) {
@@ -68,7 +70,13 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		if (keyPredicates.size() > 1) {
 			return null;
 		} else if (!keyPredicates.isEmpty()) {
-			return keyPredicates.get(0).getText();
+			try {
+				String key = keyPredicates.get(0).getText();
+				key = key.substring(1, key.length() - 1);
+				return  "'" +  UriUtils.encodeUri( key) + "'";
+			} catch (UnsupportedEncodingException e) {
+				return null;
+			}
 		} else {
 			return null;
 		}
@@ -79,8 +87,14 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 			return null;
 		} else if (!keyPredicates.isEmpty()) {
 			String key = keyPredicates.get(0).getText();
-			key = UriUtils.encodeUri(key);
-			return key.substring(1, key.length() - 1);
+			key = key.substring(1, key.length() - 1);
+			try {
+				return key =UriUtils.encodeUri(key);
+			} catch (UnsupportedEncodingException e) {
+				return null;
+			}
+			//key = UriUtils.encodeQName(key);
+			//return key.substring(1, key.length() - 1);
 		} else {
 			return null;
 		}
