@@ -518,7 +518,7 @@ public class RdfModelToMetadata {
 			}
 			entityType.setAnnotations(entityTypeAnnotations);
 			//TODO testing openTypes
-			//entityType.setOpenType(true);
+			entityType.setOpenType(true);
 		}
 	}
 

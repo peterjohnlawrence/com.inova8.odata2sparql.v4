@@ -53,14 +53,14 @@ public class SparqlFilterClausesBuilder {
 		this.rdfModelToMetadata = rdfModelToMetadata;
 		this.uriType =rdfResourceParts.getUriType();// uriType;
 		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		//UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourceParts.get(0);
-		this.edmEntitySet = rdfResourceParts.getEntitySet().getEdmEntitySet(); //uriResourceEntitySet.getEntitySet();
-		this.rdfEntityType = rdfResourceParts.getEntitySet().getRdfEntityType();//rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
+		this.edmEntitySet = rdfResourceParts.getEntitySet().getEdmEntitySet(); 
+		this.rdfEntityType = rdfResourceParts.getEntitySet().getRdfEntityType();
 		// By default
 		this.edmTargetEntitySet = edmEntitySet;
 		this.rdfTargetEntityType = rdfEntityType;
 		
 		UriResource lastSegment;
+		if(uriInfo.getFilterOption()!=null) {
 		switch (this.uriType) {
 		case URI1: {
 			filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType, "");
@@ -121,6 +121,7 @@ public class SparqlFilterClausesBuilder {
 		case URI16: {
 		}
 		default:
+		}
 		}
 		filter = filterClause != null ? new StringBuilder(filterClause.getFilterClause()) : filter;
 		if (uriInfo.getExpandOption() != null)
@@ -232,10 +233,22 @@ public class SparqlFilterClausesBuilder {
 		filter.append(filterClause.getFilterClause());
 
 		clausesExpandFilter.append(indent).append("{\n");
-
-		if (navProperty.IsInverse()) {
-//			clausesExpandFilter.append(indent).append("\t").append("?" + nextTargetKey + "_s <"	+ navProperty.getInversePropertyOfURI() + "> ?" + targetKey + "_s .\n");
+		if (SparqlQueryBuilder.isImplicitNavigationProperty(navProperty)) {
+			switch (navProperty.getNavigationPropertyLabel()){
+			case "rdf_resource":
+				clausesExpandFilter.append(indent).append("\t").append("BIND(?Fact").append("_ao as ?").append(nextTargetKey).append("_s )\n");
+				break;
+			case "rdf_property":
+				clausesExpandFilter.append(indent).append("\t").append("BIND(?").append(targetKey).append("_ap as ?").append(nextTargetKey).append("_s )\n");
+				break;
+			case "rdf_terms":
+				clausesExpandFilter.append(indent).append("\t").append("BIND(?Fact").append("_ao as ?").append(nextTargetKey).append("rdf_literal_value )\n");
+				break;
+			default:
 			
+			}
+			
+		}else	if (navProperty.IsInverse()) {	
 			clausesExpandFilter.append(indent).append("\t").append("{\n");
 			clausesExpandFilter.append(indent).append("\t").append("\t").append("?" + nextTargetKey + "_s <"
 					+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
@@ -247,22 +260,25 @@ public class SparqlFilterClausesBuilder {
 			clausesExpandFilter.append(indent).append("\t").append(
 					"?" + targetKey + "_s <" + navProperty.getNavigationPropertyIRI() + "> ?" + nextTargetKey + "_s .\n");
 		}
-		//Check if there are any relevant filters before proceeding
+		//Check if there are any relevant literal filters before proceeding
 		if (!filterClause.getNavPropertyPropertyFilters().isEmpty()) {
-			TreeMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
-					.get(nextTargetEntityType.entityTypeName).getPropertyFilters();
-			clausesExpandFilter.append(indent).append("\t").append("{\n");
-			// Repeat for each filtered property associated with this navProperty
-			for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
-				PropertyFilter propertyFilter = propertyFilterEntry.getValue();
-				clausesExpandFilter.append(indent).append("\t").append("\t")
-						.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
-								+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
-				for (String filter : propertyFilter.getFilters()) {
-					clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
+			//If this is an implicit entityType (rdf core) then no need to add any clauses to the query to find the triples
+			if(!SparqlQueryBuilder.isImplicitEntityType(nextTargetEntityType)) {
+				TreeMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
+						.get(nextTargetEntityType.entityTypeName).getPropertyFilters();
+				clausesExpandFilter.append(indent).append("\t").append("{\n");
+				// Repeat for each filtered property associated with this navProperty
+				for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
+					PropertyFilter propertyFilter = propertyFilterEntry.getValue();
+					clausesExpandFilter.append(indent).append("\t").append("\t")
+							.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
+									+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
+					for (String filter : propertyFilter.getFilters()) {
+						clausesExpandFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
+					}
 				}
+				clausesExpandFilter.append(indent).append("\t").append("}\n");
 			}
-			clausesExpandFilter.append(indent).append("\t").append("}\n");
 		}
 
 		clausesExpandFilter.append(indent).append("}\n");

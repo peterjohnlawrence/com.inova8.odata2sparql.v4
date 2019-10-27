@@ -45,7 +45,37 @@ public class Util {
 
 		return navigationTargetEntitySet;
 	}
-    public static EdmEntitySet getEdmEntitySet(UriInfoResource uriInfo) throws ODataApplicationException {
+	public static EdmEntitySet getNavigationTargetEntitySet(List<EdmEntitySet> edmEntitySets, EdmEntityType startEdmEntityType,
+			EdmNavigationProperty edmNavigationProperty) throws ODataApplicationException {
+
+		EdmEntitySet navigationTargetEntitySet = null;
+
+		String navPropName = edmNavigationProperty.getName();
+		
+		EdmEntityType bindingTargetEntityType = startEdmEntityType;
+		EdmBindingTarget edmBindingTarget=null;
+		for(EdmEntitySet entitySet : edmEntitySets){		
+			if(entitySet.getEntityType().equals(bindingTargetEntityType) ){
+				edmBindingTarget = entitySet;
+				break;
+			}
+		}	
+		//edmBindingTarget = startEdmEntitySet.getRelatedBindingTarget(navPropName);
+		if (edmBindingTarget == null) {
+			throw new ODataApplicationException("Not supported.", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+					Locale.ROOT);
+		}
+
+		if (edmBindingTarget instanceof EdmEntitySet) {
+			navigationTargetEntitySet = (EdmEntitySet) edmBindingTarget;
+		} else {
+			throw new ODataApplicationException("Not supported.", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
+					Locale.ROOT);
+		}
+
+		return navigationTargetEntitySet;
+	}
+	public static EdmEntitySet getEdmEntitySet(UriInfoResource uriInfo) throws ODataApplicationException {
 
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
          // To get the entity set we have to interpret all URI segments
