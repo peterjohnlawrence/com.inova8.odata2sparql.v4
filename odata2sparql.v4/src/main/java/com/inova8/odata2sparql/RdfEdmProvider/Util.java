@@ -50,8 +50,6 @@ public class Util {
 
 		EdmEntitySet navigationTargetEntitySet = null;
 
-		String navPropName = edmNavigationProperty.getName();
-		
 		EdmEntityType bindingTargetEntityType = startEdmEntityType;
 		EdmBindingTarget edmBindingTarget=null;
 		for(EdmEntitySet entitySet : edmEntitySets){		

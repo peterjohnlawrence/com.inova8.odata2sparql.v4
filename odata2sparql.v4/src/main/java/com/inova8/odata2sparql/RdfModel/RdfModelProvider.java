@@ -196,6 +196,12 @@ public class RdfModelProvider {
 				rdfValueNode, 
 				rdfStringNode,
 				RdfConstants.Cardinality.ZERO_TO_ONE);
+		model.getOrCreateProperty(RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTVALUE), 
+				null, 
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_OBJECTVALUE_LABEL), 
+				rdfValueNode, 
+				rdfStringNode,
+				RdfConstants.Cardinality.ONE);
 		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISOBJECTIVE),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_ISOBJECTIVE_LABEL),
 				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),

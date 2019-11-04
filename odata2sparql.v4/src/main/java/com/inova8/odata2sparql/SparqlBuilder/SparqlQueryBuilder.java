@@ -401,7 +401,7 @@ public class SparqlQueryBuilder {
 			break;
 		case URI3:
 			edmTargetEntitySet = edmEntitySet;
-			rdfTargetEntityType = rdfEntityType;		
+			rdfTargetEntityType = rdfEntityType;
 			rdfComplexProperty = this.rdfResourceParts.getLastComplexProperty();
 			break;
 		case URI4:
@@ -446,14 +446,17 @@ public class SparqlQueryBuilder {
 					//could be a complexType
 					UriResource penultimateSegment = resourceParts.get(resourceParts.size() - 2);
 					if (penultimateSegment.getKind().equals(UriResourceKind.complexProperty)) {
-							EdmNavigationProperty navigationProperty = ((UriResourceComplexProperty)penultimateSegment).getComplexType()
-									.getNavigationProperty(edmNavigationProperty.getName());
-							edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet,
-									((UriResourceComplexProperty)penultimateSegment).getComplexType(), navigationProperty);
-							rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
-					}else{
-						EdmEntityType edmTargetType = ((UriResourceNavigation)uriResourceNavigation).getProperty().getType();					
-						edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet.getEntityContainer().getEntitySets(), edmTargetType, edmNavigationProperty);
+						EdmNavigationProperty navigationProperty = ((UriResourceComplexProperty) penultimateSegment)
+								.getComplexType().getNavigationProperty(edmNavigationProperty.getName());
+						edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet,
+								((UriResourceComplexProperty) penultimateSegment).getComplexType(), navigationProperty);
+						rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
+					} else {
+						EdmEntityType edmTargetType = ((UriResourceNavigation) uriResourceNavigation).getProperty()
+								.getType();
+						edmTargetEntitySet = Util.getNavigationTargetEntitySet(
+								edmEntitySet.getEntityContainer().getEntitySets(), edmTargetType,
+								edmNavigationProperty);
 						rdfTargetEntityType = rdfModelToMetadata.getRdfEntityTypefromEdmEntitySet(edmTargetEntitySet);
 					}
 				} else {
@@ -478,8 +481,11 @@ public class SparqlQueryBuilder {
 						edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmPathComplexType,
 								edmNavigationProperty);
 					} else {
-						EdmEntityType edmTargetType = ((UriResourceNavigation)uriResourceNavigation).getProperty().getType();					
-						edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet.getEntityContainer().getEntitySets(), edmTargetType, edmNavigationProperty);
+						EdmEntityType edmTargetType = ((UriResourceNavigation) uriResourceNavigation).getProperty()
+								.getType();
+						edmTargetEntitySet = Util.getNavigationTargetEntitySet(
+								edmEntitySet.getEntityContainer().getEntitySets(), edmTargetType,
+								edmNavigationProperty);
 					}
 				} else {
 					edmTargetEntitySet = Util.getNavigationTargetEntitySet(edmEntitySet, edmNavigationProperty);
@@ -717,6 +723,11 @@ public class SparqlQueryBuilder {
 			constructPath.append("\t#constructPath\n");
 		String key = edmTargetEntitySet.getEntityType().getName();
 		constructPath.append("\t").append("?" + key + "_s ?" + key + "_p ?" + key + "_o .\n");
+		if(key.equals("Term")) {
+			constructPath.append("\t").append("?" + key + "_s  <http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf_literal> ?" + key + "_literal .\n");
+			constructPath.append("\t").append("?" + key + "_s  <http://www.w3.org/1999/02/22-rdf-syntax-ns#resource> ?" + key + "_resource .\n");	
+			constructPath.append("\t").append("?" + key + "_s  <http://www.w3.org/1999/02/22-rdf-syntax-ns#rdf_object> ?" + key + "_o .\n");		
+		}
 		return constructPath;
 	}
 
@@ -765,7 +776,8 @@ public class SparqlQueryBuilder {
 			where.append(
 					clausesNodeShapeProperties(this.rdfTargetEntityType.getEntityTypeName(), this.rdfTargetEntityType));
 		} else if (isImplicitEntityType(edmTargetEntitySet.getEntityType())) {
-
+			//??????????????????
+			where.append(clausesPathProperties());
 		} else {
 			where.append(clausesPathProperties());
 		}
@@ -1112,7 +1124,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			selectExpandWhere.append(indent).append("#selectExpandWhere\n");
 		selectExpandWhere.append(indent).append("{\n");
-//		selectExpandWhere.append(filter(indent + "\t"));
+		//		selectExpandWhere.append(filter(indent + "\t"));
 		switch (uriType) {
 		case URI1:
 			// nothing required for any entitySet query
@@ -1593,8 +1605,49 @@ public class SparqlQueryBuilder {
 					String target = edmTargetEntitySet.getEntityType().getName();
 					clausesPathNavigation.append(indent).append(pathVariable).append(" ?").append(target)
 							.append("_ap ?").append(target).append("_ao .\n");
-					//clausesPathNavigation.append(indent).append("BIND(IRI(CONCAT(\"").append(RdfConstants.ANONNODE)	.append("\",MD5(STR(").append(pathVariable)	.append(")),\"-\",MD5(STR(?Fact_ap)))) as ?Fact_s)\n");
-					clausesPathNavigation.append(indent).append("BIND(?Fact_ap as ?Fact_s)\n");
+					if (index == segmentSize - 1) {
+						switch (navProperty.getEDMNavigationPropertyName()) {
+						case "rdf_facts":
+							clausesPathNavigation.append(indent).append("BIND(?").append(target).append("_ap as ?")
+									.append(target).append("_s)\n");
+							break;
+						case "rdf_terms":
+							clausesPathNavigation.append(indent).append("BIND(?").append(target).append("_ao as ?")
+									.append(target).append("_s)\n");
+							break;
+						default:
+							break;
+						}
+
+					}
+					if (uriResourceNavigation.getKeyPredicates().size() > 0) {
+						String navigationKey = "";
+						for (UriParameter entityKey : uriResourceNavigation.getKeyPredicates()) {
+
+							String expandedKey = rdfModel.getRdfPrefixes()
+									.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+							navigationKey = expandKey(expandedKey);
+						}
+						if (this.rdfModel.getRdfRepository().isWithMatching()) {
+							clausesPathNavigation
+									.append(clausesMatchNavigationKey(targetVariable, navigationKey, indent));
+						} else {
+							switch (navProperty.getEDMNavigationPropertyName()) {
+							case "rdf_facts":
+								clausesPathNavigation.append(indent).append("FILTER(?").append(target).append("_ap = ")
+										.append(navigationKey).append(")\n");
+								break;
+							case "rdf_terms":
+								clausesPathNavigation.append(indent).append("FILTER(?").append(target).append("_ao =")
+										.append(navigationKey).append(")\n");
+								break;
+							default:
+								break;
+							}
+						}
+					} else {
+
+					}
 
 				} else {
 					if (navProperty.IsInverse()) {
@@ -1730,13 +1783,13 @@ public class SparqlQueryBuilder {
 			selectPath.append("\t\t\t").append("{\n");
 			indent = "\t\t\t";
 		}
-//		selectPath.append(filter(indent + "\t"));
+		//		selectPath.append(filter(indent + "\t"));
 		selectPath.append(search(indent + "\t"));
 		selectPath.append(clausesPath(indent + "\t"));
-//It is assumed that following are not required  as they will be added prior to these statements so are superfluous
-//		selectPath.append(clausesFilter(indent + "\t"));
-//		selectPath.append(clausesExpandFilter(indent + "\t"));
-//		selectPath.append(filter(indent + "\t"));
+		//It is assumed that following are not required  as they will be added prior to these statements so are superfluous
+		//		selectPath.append(clausesFilter(indent + "\t"));
+		//		selectPath.append(clausesExpandFilter(indent + "\t"));
+		//		selectPath.append(filter(indent + "\t"));
 		if (limitSet()) {
 			selectPath.append(indent).append("}") // GROUP BY   ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 					.append(limitClause()).append("\n");
@@ -2226,11 +2279,13 @@ public class SparqlQueryBuilder {
 				RdfConstants.RDF_SUBJECTPREDICATE_LABEL, RdfConstants.RDF_VALUE_LABEL };
 		return Arrays.asList(implicitEntityTypes).contains(edmEntityType.getName());
 	}
+
 	public static boolean isImplicitEntityType(RdfEntityType rdfEntityType) {
 		String[] implicitEntityTypes = new String[] { RdfConstants.RDF_OBJECTPREDICATE_LABEL,
 				RdfConstants.RDF_SUBJECTPREDICATE_LABEL, RdfConstants.RDF_VALUE_LABEL };
 		return Arrays.asList(implicitEntityTypes).contains(rdfEntityType.getEntityTypeName());
 	}
+
 	private StringBuilder expandImplicit(String targetKey, RdfNavigationProperty navProperty, String indent,
 			StringBuilder clausesSelect) {
 		StringBuilder expandImplicit = null;
@@ -2262,10 +2317,14 @@ public class SparqlQueryBuilder {
 		expandItemWhereHasFacts.append(indent).append("?").append(targetKey).append("_s ?").append(targetKey)
 				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_ap ?").append(targetKey)
 				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_ao .\n");
-		expandItemWhereHasFacts.append(indent).append("BIND( IRI(CONCAT(\"").append(RdfConstants.ANONNODE)
-				.append("\",MD5(STR(?").append(targetKey).append("_s)),\"-\",MD5(STR(?").append(targetKey)
-				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_ap)))) as ?").append(targetKey)
-				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_s )\n");
+		//		expandItemWhereHasFacts.append(indent).append("BIND( IRI(CONCAT(\"").append(RdfConstants.ANONNODE)
+		//				.append("\",MD5(STR(?").append(targetKey).append("_s)),\"-\",MD5(STR(?").append(targetKey)
+		//				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_ap)))) as ?").append(targetKey)
+		//				.append(RdfConstants.RDF_HASFACTS_LABEL).append("_s )\n");
+
+		expandItemWhereHasFacts.append(indent).append("BIND( IRI(CONCAT(STR(?").append(targetKey)
+				.append("_s),\"-\",MD5(STR(?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL)
+				.append("_ap)))) as ?").append(targetKey).append(RdfConstants.RDF_HASFACTS_LABEL).append("_s )\n");
 		return expandItemWhereHasFacts;
 	}
 
@@ -2305,9 +2364,14 @@ public class SparqlQueryBuilder {
 				.append(RdfConstants.RDF_HASVALUES_LABEL).append("_s)\n");
 		expandItemWhereHasValues.append(indent).append("BIND( ?").append(targetKey).append("_ao  as ?")
 				.append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_o )\n");
-		expandItemWhereHasValues.append(indent).append("BIND( if(IsLiteral(?").append(targetKey).append("_ao), <")
+		expandItemWhereHasValues.append(indent).append("{\n");
+		expandItemWhereHasValues.append(indent).append("\tBIND( if(IsLiteral(?").append(targetKey).append("_ao), <")
 				.append(RdfConstants.RDF_HASDATAVALUE).append(">,<").append(RdfConstants.RDF_HASOBJECTVALUE)
 				.append(">) as ?").append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_p )\n");
+		expandItemWhereHasValues.append(indent).append("}UNION{\n");
+		expandItemWhereHasValues.append(indent).append("\tBIND( <").append(RdfConstants.RDF_OBJECTVALUE)
+				.append("> as ?").append(targetKey).append(RdfConstants.RDF_HASVALUES_LABEL).append("_p )\n");
+		expandItemWhereHasValues.append(indent).append("}\n");
 		return expandItemWhereHasValues;
 	}
 
@@ -2329,9 +2393,8 @@ public class SparqlQueryBuilder {
 		expandItemWhereIsObjective.append(indent).append("?").append(targetKey)
 				.append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_as ?").append(targetKey)
 				.append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_ap  ?").append(targetKey).append("_s .\n");
-		expandItemWhereIsObjective.append(indent).append("BIND( IRI(CONCAT(\"").append(RdfConstants.ANONNODE)
-				.append("\", MD5(STR(?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL)
-				.append("_ap )),\"-\",MD5(STR(?").append(targetKey).append("_s)))) as ?").append(targetKey)
+		expandItemWhereIsObjective.append(indent).append("BIND( IRI(CONCAT(STR(?").append(targetKey).append(RdfConstants.RDF_ISOBJECTIVE_LABEL)
+				.append("_ap ),\"-\",MD5(STR(?").append(targetKey).append("_s)))) as ?").append(targetKey)
 				.append(RdfConstants.RDF_ISOBJECTIVE_LABEL).append("_s )\n");
 		return expandItemWhereIsObjective;
 	}
@@ -2463,7 +2526,12 @@ public class SparqlQueryBuilder {
 					.append("FILTER(!isIRI(?" + nextTargetKey + "_o) && !isBLANK(?" + nextTargetKey + "_o))\n");
 		}
 		clausesSelect.append(indent)
-				.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
+		.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
+		if (targetEntityType.getEntityTypeName().equals("Term")) {
+			clausesSelect.append(indent).append("\tBIND( if(IsLiteral(?").append(nextTargetKey).append("_o), ?").append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_literal)\n");
+			clausesSelect.append(indent).append("\tBIND( if(!IsLiteral(?").append(nextTargetKey).append("_o), ?").append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_resource)\n");
+		}
+
 		if (hasProperties)
 			return clausesSelect;
 		else

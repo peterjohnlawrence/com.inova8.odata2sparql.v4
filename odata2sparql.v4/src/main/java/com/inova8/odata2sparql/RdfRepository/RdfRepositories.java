@@ -424,7 +424,7 @@ public class RdfRepositories {
 							if (valueOfMatch != null) {
 								repository.setMatch(valueOfMatch.stringValue());
 							} else {
-								repository.setMatch(RdfConstants.MATCH);
+								repository.setMatch(RdfConstants.DEFAULTMATCH);
 							}
 							if (valueOfExpandOperations != null) {
 								repository.setExpandOperations(

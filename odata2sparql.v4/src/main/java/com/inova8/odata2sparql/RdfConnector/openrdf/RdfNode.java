@@ -81,7 +81,11 @@ public class RdfNode {
 			case "http://www.w3.org/2001/XMLSchema#double":
 				return this.getLiteralValue().doubleValue();
 			case "http://www.w3.org/2001/XMLSchema#decimal":
-				return this.getLiteralValue().decimalValue();
+				if(this.getLiteralValue().getLabel().isEmpty()) {
+					return null;
+				}else{
+					return this.getLiteralValue().decimalValue();
+				}
 			case "http://www.w3.org/2001/XMLSchema#duration":
 				return this.getLiteralValue().intValue();
 			case "http://www.w3.org/2001/XMLSchema#dateTime":
