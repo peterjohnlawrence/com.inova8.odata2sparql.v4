@@ -130,11 +130,11 @@ public class OData2SPARQLTest {
 	public static void setUp() throws Exception {
 		servlet = new RdfODataServlet();
 		servletContext = new MockServletContext();
-		servletConfig = new MockServletConfig(servletContext);
 		servletContext.addInitParameter(ServletContext.TEMPDIR, "C:\\");
 		servletContext.addInitParameter("configFolder", "/var/opt/inova8/odata2sparql");
 		servletContext.addInitParameter("repositoryFolder", "V4");
 		servletContext.addInitParameter("repositoryUrl", "");
+		servletConfig = new MockServletConfig(servletContext);
 		servlet.init(servletConfig);
 	}
 

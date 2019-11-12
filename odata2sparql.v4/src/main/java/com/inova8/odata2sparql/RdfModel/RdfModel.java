@@ -5,11 +5,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
@@ -41,7 +40,7 @@ public class RdfModel {
 
 	private final RdfPrefixes rdfPrefixes = new RdfPrefixes();
 	private final RdfRepository rdfRepository;
-	private HashSet<String> proxies = new HashSet<String>();
+	private TreeSet<String> proxies = new TreeSet<String>();
 	public RdfModel(RdfRepository rdfRepository) {
 
 		rdfPrefixes.setStandardNsPrefixes();
@@ -248,8 +247,8 @@ public class RdfModel {
 		private final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
 		private final List<RdfModel.RdfNavigationProperty> navigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 		private final List<RdfModel.RdfDatatype> datatypes = new ArrayList<RdfModel.RdfDatatype>();
-		private final HashSet<RdfModel.RdfComplexType> complexTypes = new HashSet<RdfModel.RdfComplexType>();
-		private final HashSet<RdfModel.RdfNodeShape> nodeShapes = new HashSet<RdfModel.RdfNodeShape>();
+		private final TreeSet<RdfModel.RdfComplexType> complexTypes = new TreeSet<RdfModel.RdfComplexType>();
+		private final TreeSet<RdfModel.RdfNodeShape> nodeShapes = new TreeSet<RdfModel.RdfNodeShape>();
 
 		public RdfSchema() {
 			super();
@@ -278,11 +277,11 @@ public class RdfModel {
 			this.schemaPrefix = schemaPrefix;
 		}
 
-		public HashSet<RdfModel.RdfComplexType> getComplexTypes() {
+		public TreeSet<RdfModel.RdfComplexType> getComplexTypes() {
 			return complexTypes;
 		}
 
-		public HashSet<RdfModel.RdfNodeShape> getNodeShapes() {
+		public TreeSet<RdfModel.RdfNodeShape> getNodeShapes() {
 			return nodeShapes;
 		}
 
@@ -295,7 +294,7 @@ public class RdfModel {
 		}
 	}
 
-	public static class RdfEntityType {
+	public static class RdfEntityType implements Comparable<RdfEntityType>{
 
 		public String entityTypeName;
 		private String entityTypeLabel;
@@ -304,13 +303,13 @@ public class RdfModel {
 		private RdfNode entityTypeNode;
 		private RdfEntityType baseType;
 		private RdfNodeShape nodeShape;
-		private HashSet<RdfEntityType> superTypes = new HashSet<RdfEntityType>();
+		private TreeSet<RdfEntityType> superTypes = new TreeSet<RdfEntityType>();
 		private boolean rootClass = false;
 		private boolean isOperation = false;
 		private boolean isEntity = false;
 		private boolean functionImport = false;
 		private String description;
-		private HashSet<RdfEntityType> subTypes = new HashSet<RdfEntityType>();
+		private TreeSet<RdfEntityType> subTypes = new TreeSet<RdfEntityType>();
 		public String queryText;
 		private String deleteText;
 		private String insertText;
@@ -380,7 +379,7 @@ public class RdfModel {
 			return baseType;
 		}
 
-		public HashSet<RdfEntityType> getSuperTypes() {
+		public TreeSet<RdfEntityType> getSuperTypes() {
 			return superTypes;
 		}
 
@@ -388,7 +387,7 @@ public class RdfModel {
 			subTypes.add(subType);
 		}
 
-		public Set<RdfEntityType> getSubTypes() {
+		public TreeSet<RdfEntityType> getSubTypes() {
 			return subTypes;
 		}
 
@@ -404,8 +403,8 @@ public class RdfModel {
 			this.nodeShape = nodeShape;
 		}
 
-		public HashSet<RdfEntityType> getAllSubTypes() {
-			HashSet<RdfEntityType> allSubTypes = new HashSet<RdfEntityType>();
+		public TreeSet<RdfEntityType> getAllSubTypes() {
+			TreeSet<RdfEntityType> allSubTypes = new TreeSet<RdfEntityType>();
 			allSubTypes.addAll(subTypes);
 			for (RdfEntityType subType : subTypes) {
 				allSubTypes.addAll(subType.getAllSubTypes());
@@ -521,7 +520,7 @@ public class RdfModel {
 			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
 			if (!this.getSuperTypes().isEmpty()) {
-				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
+				TreeSet<RdfEntityType> visited = new TreeSet<RdfEntityType>();
 				inheritedNavigationProperties.addAll(this.getSuperTypeNavigationProperties(visited));				
 			}
 			return inheritedNavigationProperties;
@@ -532,14 +531,14 @@ public class RdfModel {
 				inheritedNavigationProperties.put(navigationProperty.navigationPropertyName,navigationProperty);
 			}
 			if (!this.getSuperTypes().isEmpty()) {
-				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();		
+				TreeSet<RdfEntityType> visited = new TreeSet<RdfEntityType>();		
 				for ( RdfNavigationProperty navigationProperty : this.getSuperTypeNavigationProperties(visited)) {
 					inheritedNavigationProperties.put(navigationProperty.navigationPropertyName,navigationProperty);
 				}
 			}
 			return inheritedNavigationProperties;
 		}
-		public Collection<RdfModel.RdfNavigationProperty> getSuperTypeNavigationProperties(HashSet<RdfEntityType> visited) {
+		public Collection<RdfModel.RdfNavigationProperty> getSuperTypeNavigationProperties(TreeSet<RdfEntityType> visited) {
 			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
 			if (!this.getSuperTypes().isEmpty()) {
@@ -556,18 +555,18 @@ public class RdfModel {
 			return properties.values();
 		}
 
-		public HashSet<RdfModel.RdfProperty> getInheritedProperties() {
-			HashSet <RdfModel.RdfProperty> inheritedProperties = new HashSet <RdfModel.RdfProperty>();
+		public TreeSet<RdfModel.RdfProperty> getInheritedProperties() {
+			TreeSet <RdfModel.RdfProperty> inheritedProperties = new TreeSet <RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
 			if (!this.getSuperTypes().isEmpty()) {
-				HashSet<RdfEntityType> visited = new HashSet<RdfEntityType>();
+				TreeSet<RdfEntityType> visited = new TreeSet<RdfEntityType>();
 				inheritedProperties.addAll(this.getSuperTypeProperties(visited));
 			}
 			return inheritedProperties;
 		}
 
-		public HashSet<RdfModel.RdfProperty> getSuperTypeProperties(HashSet<RdfEntityType> visited) {
-			HashSet <RdfModel.RdfProperty> inheritedProperties = new HashSet <RdfModel.RdfProperty>();
+		public TreeSet<RdfModel.RdfProperty> getSuperTypeProperties(TreeSet<RdfEntityType> visited) {
+			TreeSet <RdfModel.RdfProperty> inheritedProperties = new TreeSet <RdfModel.RdfProperty>();
 			inheritedProperties.addAll(properties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				for (RdfEntityType superType : this.getSuperTypes()) {
@@ -726,6 +725,11 @@ public class RdfModel {
 
 		public void setProxy(boolean isProxy) {
 			this.isProxy = isProxy;		
+		}
+
+		@Override
+		public int compareTo(RdfEntityType rdfEntityType) {
+			return getURL().compareTo( rdfEntityType.getURL());
 		}
 	}
 
@@ -894,7 +898,7 @@ public class RdfModel {
 	 * entityType. Represents a primitive attribute of a complexType.
 	 * 
 	 */
-	public static class RdfProperty {
+	public static class RdfProperty implements Comparable<RdfProperty>{
 
 		public String propertyName;
 		private String propertyLabel;
@@ -1058,6 +1062,11 @@ public class RdfModel {
 		public void setOfClass(RdfEntityType ofClass) {
 			this.ofClass = ofClass;
 		}
+
+		@Override
+		public int compareTo(RdfProperty rdfProperty) {
+			return propertyName.compareTo(rdfProperty.propertyName);
+		}
 	}
 
 	public static class RdfComplexTypePropertyPair {
@@ -1129,7 +1138,7 @@ public class RdfModel {
 
 	}
 
-	public static class RdfComplexType {
+	public static class RdfComplexType implements Comparable<RdfComplexType>{
 		private RdfNode complexTypeNode;
 		private String complexTypeName;
 		private String complexTypeLabel;
@@ -1226,6 +1235,11 @@ public class RdfModel {
 
 		public String getIRI() {
 			return schema.schemaName + complexTypeName;
+		}
+
+		@Override
+		public int compareTo(RdfComplexType rdfComplexType) {
+			return getIRI().compareTo(rdfComplexType.getIRI());
 		}
 
 	}
@@ -1558,14 +1572,17 @@ public class RdfModel {
 			this.graphName = graph.getSchemaName();
 			this.graphPrefix = graph.getSchemaPrefix();
 		}
-
+		public RdfSchema getSchema() {
+			return graph;
+		}
+		
 		@Override
 		public String toString() {
 			return graphName + localName;
 		}
 	}
 
-	public class RdfNodeShape {
+	public class RdfNodeShape implements Comparable<RdfNodeShape>{
 		private RdfNode nodeShapeNode;
 		private RdfEntityType entityType;
 		private RdfNodeShape baseNodeShape;
@@ -1707,6 +1724,11 @@ public class RdfModel {
 
 		public RdfComplexType getComplexType() {
 			return complexType;
+		}
+
+		@Override
+		public int compareTo(RdfNodeShape rdfNodeShape) {
+			return getIRI().compareTo(rdfNodeShape.getIRI());
 		}
 
 	}
@@ -2232,6 +2254,7 @@ public class RdfModel {
 				complexType.complexTypeLabel = complexTypeLabelNode.getLiteralObject().toString();
 			}
 			complexType.complexTypeNode = complexTypeNode;
+			complexType.setSchema(complexTypeURI.getSchema());
 			//clazz.complexTypes.put(complexType.complexTypeName, complexType);
 			clazz.getSchema().getComplexTypes().add(complexType);
 		}
@@ -2239,7 +2262,7 @@ public class RdfModel {
 		return complexType;
 	}
 
-	void setPropertyRange(RdfNode propertyNode, HashSet<RdfEntityType> classes, RdfNode rangeNode)
+	void setPropertyRange(RdfNode propertyNode, TreeSet<RdfEntityType> classes, RdfNode rangeNode)
 			throws OData2SparqlException {
 		if (classes.size() > 0) {
 			RdfURI propertyURI = new RdfURI(propertyNode);
@@ -2254,7 +2277,7 @@ public class RdfModel {
 		}
 	}
 
-	void setPropertyCardinality(RdfNode propertyNode, HashSet<RdfEntityType> classes, Cardinality cardinality)
+	void setPropertyCardinality(RdfNode propertyNode, TreeSet<RdfEntityType> classes, Cardinality cardinality)
 			throws OData2SparqlException {
 		if (classes.size() > 0) {
 			RdfURI propertyURI = new RdfURI(propertyNode);

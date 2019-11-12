@@ -56,9 +56,12 @@ public class RdfODataServlet extends HttpServlet {
 				ServletContext servletContext = getServletContext();
 				readVersion();
 				File repositoryDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
-				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
-						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
+				rdfEdmProviders = new RdfEdmProviders(servletContext.getInitParameter("configFolder"),
+						servletContext.getInitParameter("repositoryFolder"), servletContext.getInitParameter("repositoryUrl"),
 						repositoryDir.getAbsolutePath());
+//				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
+//						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
+//						repositoryDir.getAbsolutePath());
 				//Set to UTC so string date objects without assigned timnezone are assumed to be UTC.
 				//TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 			}

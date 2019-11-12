@@ -437,64 +437,12 @@ public class RdfRepositories {
 							} else {
 								repository.setTextSearchType(TextSearchType.DEFAULT);
 							}
-							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
-							
-//							//Now create federation dataset with ODATA2SPARQL
-//							if( !valueOfDatasetName.getLabel().equals( RdfConstants.systemId)) {
-//								try {
-//									String federationId = RdfConstants.systemId +"_" + valueOfDatasetName.getLabel();	
-//	
-//									FederationConfig federationConfig = new FederationConfig();
-//									federationConfig.isDistinct();
-//									federationConfig.setReadOnly(true);	
-//									federationConfig.setType("openrdf:Federation");
-//									federationConfig.addMember( new ProxyRepositoryConfig(valueOfDataRepositoryID.getLabel()));
-//									federationConfig.addMember( new ProxyRepositoryConfig(RdfConstants.systemId ));
-//									SpinSailConfig spinSailConfig = new SpinSailConfig(federationConfig);
-//									
-//									SailRepositoryConfig sailRepositoryConfig = new SailRepositoryConfig(spinSailConfig);
-//									
-//									RepositoryConfig federationRepositoryConfig = new RepositoryConfig(federationId, sailRepositoryConfig);	
-//								
-//									repositoryManager.addRepositoryConfig(federationRepositoryConfig);
-//									RdfRepository proxyRepository = new RdfRepository(this,federationId,
-//											defaultPrefix, namespaces);	
-//									
-////									proxyRepository.setDataRepository(new RdfRoleRepository(
-////											repositoryManager.getRepository(federationId),//valueOfDataRepositoryID.stringValue()),
-////											Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
-////											SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue())));
-////									proxyRepository.setModelRepository(new RdfRoleRepository(
-////											repositoryManager.getRepository(RdfConstants.systemId),//valueOfDataRepositoryID.stringValue()),
-////											Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
-////											SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue())));
-//									
-//									rdfRepositoryList.put(federationId, proxyRepository);
-//									rdfProxyRepositoryList.put(federationId, proxyRepository);
-//								} catch (RepositoryConfigException e) {
-//									log.warn("Failed to create federation dataset");							
-//								}
-//							}					
+							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);				
 						} catch (RepositoryConfigException e) {
 							log.warn("Failed to complete definition of dataset");
 						}
 					}
 				} finally {	
-					//Merge namespaces for proxyRepositories
-//					for (Entry<String, RdfRepository> rdfProxyRepositoryEntry:  rdfProxyRepositoryList.entrySet()) {
-//						
-//						rdfProxyRepositoryEntry.getValue().setDataRepository(new RdfRoleRepository(
-//								repositoryManager.getRepository(rdfProxyRepositoryEntry.getKey()),//valueOfDataRepositoryID.stringValue()),
-//								1000,//Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
-//								SPARQLProfile.RDF4J));
-//						rdfProxyRepositoryEntry.getValue().setModelRepository(new RdfRoleRepository(
-//								repositoryManager.getRepository(RdfConstants.systemId),//valueOfDataRepositoryID.stringValue()),
-//								1000,//Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
-//								SPARQLProfile.RDF4J));
-//						
-//						
-//						rdfProxyRepositoryEntry.getValue().addNamespaces(rdfRepositoryList.get(RdfConstants.systemId ).getNamespaces());						
-//					}
 					result.close();
 				}
 

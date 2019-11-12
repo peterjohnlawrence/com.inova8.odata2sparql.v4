@@ -772,7 +772,7 @@ class SparqlEntityCollection extends EntityCollection {
 				} else if (value instanceof Float) {
 					return ((Float) value).doubleValue();
 				} else {
-					return (Double) value;
+					return (Double) Double.parseDouble(value.toString());
 				}
 			case "Guid":
 				return (UUID) value;

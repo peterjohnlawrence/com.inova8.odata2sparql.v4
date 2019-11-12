@@ -1,11 +1,10 @@
 package com.inova8.odata2sparql.RdfModel;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfModelProvider {
 	private final Logger log = LoggerFactory.getLogger(RdfModelProvider.class);
 	private final RdfModel model;
-	private Set<RdfComplexType> complexTypes = new HashSet<RdfComplexType>();
+	private TreeSet<RdfComplexType> complexTypes = new TreeSet<RdfComplexType>();
 	private final RdfMetamodelProvider rdfMetamodelProvider;
 
 	public RdfModelProvider(RdfRepository rdfRepository) {
@@ -316,14 +315,14 @@ public class RdfModelProvider {
 	}
 
 	private void getDataTypeProperties() throws OData2SparqlException {
-		TreeMap<String, HashSet<RdfEntityType>> propertyClasses = new TreeMap<>();
+		TreeMap<String, TreeSet<RdfEntityType>> propertyClasses = new TreeMap<>();
 		getDataTypeProperties_Domains(propertyClasses);
 		getDataTypeProperties_Ranges(propertyClasses);
 		getDataTypeProperties_Cardinality(propertyClasses);
 		removeIncompleteProperties(propertyClasses);
 	}
 
-	private void getDataTypeProperties_Domains(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Domains(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -350,13 +349,15 @@ public class RdfModelProvider {
 								datatypeProperty
 										.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
 							}
-							HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
-							if (classes == null) {
-								classes = new HashSet<RdfEntityType>();
-								classes.add(datatypeProperty.getOfClass());
-								propertyClasses.put(propertyNode.getIRI().toString(), classes);
-							} else {
-								classes.add(datatypeProperty.getOfClass());
+							if(datatypeProperty.getOfClass()!=null) {
+								TreeSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
+								if (classes == null) {
+									classes = new TreeSet<RdfEntityType>();
+									classes.add(datatypeProperty.getOfClass());
+									propertyClasses.put(propertyNode.getIRI().toString(), classes);
+								} else {
+									classes.add(datatypeProperty.getOfClass());
+								}
 							}
 							count++;
 							debug.append(propertyNode.getIRI().toString()).append(";");
@@ -411,7 +412,7 @@ public class RdfModelProvider {
 		return datatypeProperty;
 	}
 
-	private void getDataTypeProperties_Ranges(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Ranges(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
@@ -427,7 +428,7 @@ public class RdfModelProvider {
 						soln = properties.nextSolution();
 						propertyNode = soln.getRdfNode("property");
 						rangeNode = soln.getRdfNode("range");
-						HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
+						TreeSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 						if (classes != null) {
 							model.setPropertyRange(propertyNode, classes, rangeNode);
 							count++;
@@ -452,7 +453,7 @@ public class RdfModelProvider {
 		}
 	}
 
-	private void getDataTypeProperties_Cardinality(TreeMap<String, HashSet<RdfEntityType>> propertyClasses)
+	private void getDataTypeProperties_Cardinality(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
 		try {
@@ -479,7 +480,7 @@ public class RdfModelProvider {
 								|| (soln.getRdfNode("cardinality") != null)) {
 							Cardinality cardinality = interpretCardinality(maxCardinalityNode, minCardinalityNode,
 									cardinalityNode, RdfConstants.Cardinality.ZERO_TO_ONE);
-							HashSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
+							TreeSet<RdfEntityType> classes = propertyClasses.get(propertyNode.getIRI().toString());
 							model.setPropertyCardinality(propertyNode, classes, cardinality);
 						}
 						count++;
@@ -501,8 +502,8 @@ public class RdfModelProvider {
 		}
 	}
 
-	private void removeIncompleteProperties(TreeMap<String, HashSet<RdfEntityType>> propertyClasses) {
-		for (HashSet<RdfEntityType> classes : propertyClasses.values()) {
+	private void removeIncompleteProperties(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses) {
+		for (TreeSet<RdfEntityType> classes : propertyClasses.values()) {
 			if (!classes.isEmpty()) {
 				for (RdfEntityType clazz : classes) {
 					if (clazz != null) {
