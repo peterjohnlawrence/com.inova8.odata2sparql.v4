@@ -167,7 +167,13 @@ public class RdfModelProvider {
 		model.getOrCreateEntityType(rdfObjectPredicateNode, rdfObjectPredicateLabelNode, rdfsResource);	
 		RdfNode rdfValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_VALUE);
 		RdfNode rdfValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_VALUE_LABEL);
-		model.getOrCreateEntityType(rdfValueNode, rdfValueLabelNode, rdfsResource);			
+		model.getOrCreateEntityType(rdfValueNode, rdfValueLabelNode, rdfsResource);		
+		
+		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_TYPE),
+				RdfNodeFactory.createLiteral(RdfConstants.RDF_TYPE_LABEL),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
+				RdfNodeFactory.createURI(RdfConstants.RDFS_CLASS), unityNode, unityNode,
+				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);	
 		
 		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASFACTS),
 				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASFACTS_LABEL),
