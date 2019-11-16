@@ -884,7 +884,9 @@ public class SparqlQueryBuilder {
 				edmTargetEntitySet.getEntityType().getName(), edmTargetEntitySet.getEntityType().getName(),
 				rdfTargetEntityType, "\t");
 		if (clausesSelect.length() > 0) {
-			clausesPathProperties.append("\t{\n").append(clausesSelect).append("\t}\n");
+			//#167 Add optional to ensure that properties without attributes are included
+			if(isImplicitEntityType(edmTargetEntitySet.getEntityType())) clausesPathProperties.append("OPTIONAL");
+			clausesPathProperties.append("{\n").append(clausesSelect).append("\t}\n");
 		}
 		return clausesPathProperties;
 	}
