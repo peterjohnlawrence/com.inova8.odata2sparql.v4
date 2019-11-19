@@ -819,8 +819,8 @@ public class SparqlQueryBuilder {
 			RdfComplexType complexType) {
 		for (RdfProperty complexProperty : complexType.getProperties().values()) {
 			if (complexProperty.isOptional())
-				clausesNodeShapeProperties.append("\tOPTIONAL{");
-			clausesNodeShapeProperties.append("\t?" + entityTypeName + "_s <" + complexProperty.getPropertyURI() + "> ?"
+				clausesNodeShapeProperties.append("\t\tOPTIONAL{");
+			clausesNodeShapeProperties.append("\t\t?" + entityTypeName + "_s <" + complexProperty.getPropertyURI() + "> ?"
 					+ entityTypeName + "_" + complexProperty.getEDMPropertyName());
 			if (complexProperty.isOptional())
 				clausesNodeShapeProperties.append(" }\n");
@@ -830,20 +830,20 @@ public class SparqlQueryBuilder {
 		for (RdfComplexProperty complexProperty : complexType.getComplexProperties().values()) {
 			RdfNavigationProperty complexNavigationProperty = complexProperty.getRdfObjectPropertyShape().getPath();
 			if (complexProperty.isOptional())
-				clausesNodeShapeProperties.append("\tOPTIONAL{");
+				clausesNodeShapeProperties.append("\t\tOPTIONAL{");
 			if (complexNavigationProperty.IsInverse()) {
-				clausesNodeShapeProperties.append("\t{\n");
+				clausesNodeShapeProperties.append("\t\t{\n");
 				clausesNodeShapeProperties
-						.append("\t\t?" + entityTypeName + "_s <" + complexNavigationProperty.getInversePropertyOfURI()
+						.append("\t\t\t?" + entityTypeName + "_s <" + complexNavigationProperty.getInversePropertyOfURI()
 								+ "> ?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s" + "\n");
-				clausesNodeShapeProperties.append("\t}UNION{\n");
+				clausesNodeShapeProperties.append("\t\t}UNION{\n");
 				clausesNodeShapeProperties
-						.append("\t\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s" + " <"
+						.append("\t\t\t?" + entityTypeName + complexProperty.getComplexPropertyName() + "_s" + " <"
 								+ complexNavigationProperty.getNavigationPropertyIRI() + "> ?" + entityTypeName + "_s");
-				clausesNodeShapeProperties.append("\n\t}\n");
+				clausesNodeShapeProperties.append("\n\t\t}\n");
 			} else {
 				clausesNodeShapeProperties
-						.append("\t?" + entityTypeName + "_s <" + complexNavigationProperty.getNavigationPropertyIRI()
+						.append("\t\t?" + entityTypeName + "_s <" + complexNavigationProperty.getNavigationPropertyIRI()
 								+ "> ?" + entityTypeName + "_s" + complexProperty.getComplexPropertyName());
 			}
 			clausesComplexType(entityTypeName + complexProperty.getComplexPropertyName(), clausesNodeShapeProperties,
@@ -857,14 +857,14 @@ public class SparqlQueryBuilder {
 				.values()) {
 
 			if (complexShapedNavigationProperty.isOptional())
-				clausesNodeShapeProperties.append("\tOPTIONAL{");
+				clausesNodeShapeProperties.append("\t\tOPTIONAL{");
 			//if(complexShapedNavigationProperty.getRdfNavigationProperty().IsInverse() ) {
 			//	clausesNodeShapeProperties
 			//	.append("\t?" + entityTypeName + "_" + complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName() + " <" + complexShapedNavigationProperty.getRdfNavigationProperty().getInversePropertyOfURI()
 			//			+ "> ?" + entityTypeName + "_s");
 			//}else 
 			{
-				clausesNodeShapeProperties.append("\t?" + entityTypeName + "_s <"
+				clausesNodeShapeProperties.append("\t\t?" + entityTypeName + "_s <"
 						+ complexShapedNavigationProperty.getRdfNavigationProperty().getNavigationPropertyIRI() + "> ?"
 						+ entityTypeName + "_"
 						+ complexShapedNavigationProperty.getRdfNavigationProperty().getEDMNavigationPropertyName());
@@ -885,8 +885,8 @@ public class SparqlQueryBuilder {
 				rdfTargetEntityType, "\t");
 		if (clausesSelect.length() > 0) {
 			//#167 Add optional to ensure that properties without attributes are included
-			if(isImplicitEntityType(edmTargetEntitySet.getEntityType())) clausesPathProperties.append("OPTIONAL");
-			clausesPathProperties.append("{\n").append(clausesSelect).append("\t}\n");
+			if(isImplicitEntityType(edmTargetEntitySet.getEntityType())) clausesPathProperties.append("\tOPTIONAL");
+			clausesPathProperties.append("\t{\n").append(clausesSelect).append("\t}\n");
 		}
 		return clausesPathProperties;
 	}
@@ -1085,7 +1085,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesExpandSelect.append("\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
-			clausesExpandSelect.append(expandItemsWhere(rdfTargetEntityType, rdfTargetEntityType.entityTypeName,
+			clausesExpandSelect/*.append("\t{}\n")*/.append(expandItemsWhere(rdfTargetEntityType, rdfTargetEntityType.entityTypeName,
 					this.expandOption.getExpandItems(), "\t"));
 		}
 		return clausesExpandSelect;
@@ -2125,7 +2125,7 @@ public class SparqlQueryBuilder {
 			List<ExpandItem> expandItems, String indent)
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder expandItemsWhere = new StringBuilder();
-
+		boolean firstExpandItem =true;
 		for (ExpandItem expandItem : expandItems) {
 			if (expandItem.isStar()) {
 				if (expandItem.getResourcePath() != null) {
@@ -2141,7 +2141,8 @@ public class SparqlQueryBuilder {
 							if (validateOperationCallable(navigationProperty.getRangeClass())) {
 								expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 										navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),
-										navigationProperty.getRangeClass()));
+										navigationProperty.getRangeClass(),firstExpandItem));
+								firstExpandItem=false;
 							}
 						}
 					}
@@ -2151,7 +2152,8 @@ public class SparqlQueryBuilder {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 									navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),
-									navigationProperty.getRangeClass()));
+									navigationProperty.getRangeClass(),firstExpandItem));
+							firstExpandItem=false;
 						}
 					}
 				}
@@ -2174,7 +2176,8 @@ public class SparqlQueryBuilder {
 				RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
 
 				expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem, navProperty,
-						nextTargetKey, nextTargetEntityType));
+						nextTargetKey, nextTargetEntityType,firstExpandItem));
+				firstExpandItem=false;
 			}
 		}
 		return expandItemsWhere;
@@ -2182,7 +2185,7 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder expandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType)
+			RdfEntityType nextTargetEntityType ,boolean firstExpandItem)
 			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 
 		StringBuilder expandItemWhere = new StringBuilder();
@@ -2210,10 +2213,14 @@ public class SparqlQueryBuilder {
 			} else {
 				expandItemWhere.append(indent).append("OPTIONAL");
 			}
-		} else if (isImplicitNavigationProperty) {
-			expandItemWhere.append(indent).append("OPTIONAL");
-		} else {
-			expandItemWhere.append(indent).append("UNION");//.append("UNION");
+		} else if (isImplicitNavigationProperty ) {
+			if( !firstExpandItem){
+				expandItemWhere.append(indent).append("OPTIONAL");//.append("OPTIONAL");
+			}else {
+				expandItemWhere.append(indent).append("OPTIONAL");//.append("OPTIONAL");
+			}		
+		} else {//if( !firstExpandItem){
+			expandItemWhere.append(indent).append("OPTIONAL");//.append("UNION");
 		}
 		expandItemWhere.append("\t{\n");
 		//expandItemWhere.append(indent);
@@ -2287,6 +2294,7 @@ public class SparqlQueryBuilder {
 		if (navProperty.getDomainClass().isProxy()) {
 			expandItemWhere.append(indent).append("}\n");
 		}
+		//if (isImplicitNavigationProperty ) expandItemWhere.append(indent).append("}\n");
 		expandItemWhere.append(indent).append("}\n");
 		return expandItemWhere;
 	}
