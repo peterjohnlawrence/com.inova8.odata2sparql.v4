@@ -697,7 +697,7 @@ public class RdfRepositories {
 					Value valueOfPrefix = bindingSet.getValue("prefix");
 					Value valueOfNamespace = bindingSet.getValue("namespace");
 					namespaces.put(valueOfPrefix.stringValue(),
-							new SimpleNamespace(valueOfPrefix.stringValue(), valueOfNamespace.stringValue()));
+							new SimpleNamespace(valueOfPrefix.stringValue(), valueOfNamespace.stringValue().trim()));
 				}
 			} finally {
 				result.close();
