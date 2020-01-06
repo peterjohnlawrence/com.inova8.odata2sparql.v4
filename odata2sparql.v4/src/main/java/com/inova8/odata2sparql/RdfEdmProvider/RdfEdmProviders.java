@@ -10,6 +10,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRepositories;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
+import com.inova8.odata2sparql.SparqlBuilder.SparqlDeltaManager;
 
 public class RdfEdmProviders {
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProviders.class);
@@ -31,6 +32,16 @@ public class RdfEdmProviders {
 	public  void reload() {
 		rdfRepositories.reload();
 		reset(RdfConstants.WILDCARD);
+	}
+	public  void deltas(String rdfRepositoryID, String option) throws OData2SparqlException {
+		switch (option){
+		case "clear": 
+			SparqlDeltaManager.clear(getRdfEdmProvider(rdfRepositoryID));	
+			break;
+		case "rollback": break;
+		case "commit": break;
+		default: break;
+		}
 	}
 	public RdfEdmProvider getRdfEdmProvider(String rdfRepositoryID) throws OData2SparqlException {
 

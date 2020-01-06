@@ -445,4 +445,11 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return null;
 	}
 
+	@Override
+	public Object visitBinaryOperator(BinaryOperatorKind operator, Object left, List<Object> right)
+			throws ExpressionVisitException, ODataApplicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

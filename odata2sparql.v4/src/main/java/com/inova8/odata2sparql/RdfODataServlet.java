@@ -67,17 +67,23 @@ public class RdfODataServlet extends HttpServlet {
 			}
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];
-				if (service.equals(RdfConstants.RESET)) {
+				if (service.equalsIgnoreCase(RdfConstants.RESET)) {
 					log.info(RdfConstants.RESET + " requested: " + req.getPathInfo().split("/")[2]);
 					rdfEdmProviders.reset(req.getPathInfo().split("/")[2]);
 					simpleResponse(req, resp, RdfConstants.RESET + ": " + req.getPathInfo().split("/")[2]);
-				} else if (service.equals(RdfConstants.RELOAD)) {
+				} else if (service.equalsIgnoreCase(RdfConstants.RELOAD)) {
 					log.info(RdfConstants.RELOAD + " requested");
 					rdfEdmProviders.reload();
 					simpleResponse(req, resp, RdfConstants.RELOAD + " complete");
-				} else if (service.equals(RdfConstants.LOGS)) {
+				} else if (service.equalsIgnoreCase(RdfConstants.LOGS)) {
 					//TODO #106
 					htmlResponse(req, resp, "/WEB-INF/classes/logs/odata2sparql.v4.log.html");
+				} else if (service.equalsIgnoreCase(RdfConstants.DELTAS)) {
+					log.info(RdfConstants.DELTAS + " requested");
+					//$delta/<service>/<option>, option = clear, rollback, commit
+					String segments[] = req.getRequestURI().split("/");
+					rdfEdmProviders.deltas(segments[segments.length-2],segments[segments.length-1]); 
+					simpleResponse(req, resp, RdfConstants.DELTAS + " on " + segments[segments.length-2] + " " + segments[segments.length-1] + "'ed");
 				} else {
 					//Find provider matching service name			
 					RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider(service);

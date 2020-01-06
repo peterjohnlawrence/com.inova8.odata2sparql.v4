@@ -117,6 +117,8 @@ public class SparqlEntityCollectionProcessor implements CountEntityCollectionPro
 				sortEntityCollection(entitySet, orderByOption);
 			}
 			// 4th: create a serializer based on the requested format (json)
+			//If deltas requested then a delta serializer should be used
+			//EdmDeltaSerializer edmDeltaSerializer = odata.createEdmDeltaSerializer(responseFormat, null);
 			ODataSerializer serializer = odata.createSerializer(responseFormat);
 			// Analyze the URI segments
 			int segmentCount = rdfResourceParts.size();

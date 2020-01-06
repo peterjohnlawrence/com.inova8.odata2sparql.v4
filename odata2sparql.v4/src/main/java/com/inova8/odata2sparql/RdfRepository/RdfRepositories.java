@@ -120,7 +120,7 @@ public class RdfRepositories {
 							updateEndpointUrl = queryEndpointUri.getScheme() + "://" + queryEndpointUri.getAuthority()
 									+ queryEndpointUri.getPath() + "/statements";
 							log.error(
-									"updateEndpointUrl for RDF4J must end with /statements. Modified queryEndpoinUrl instead to create: "
+									"updateEndpointUrl for RDF4J must end with /statements. Modified queryEndpointUrl instead to create: "
 											+ updateEndpointUrl);
 							return updateEndpointUrl;
 						} catch (URISyntaxException e) {
@@ -203,6 +203,13 @@ public class RdfRepositories {
 							Literal valueOfDataRepositoryImplQueryLimit = (Literal) bindingSet
 									.getValue("DataRepositoryImplQueryLimit");
 
+							Value valueOfDataRepositoryInsertGraph = bindingSet
+									.getValue("DataRepositoryInsertGraph");
+							Value valueOfDataRepositoryRemoveGraph = bindingSet
+									.getValue("DataRepositoryRemoveGraph");
+							Value valueOfDataRepositoryChangeGraph = bindingSet
+									.getValue("DataRepositoryChangeGraph");
+							
 							Literal valueOfVocabularyRepositoryID = (Literal) bindingSet
 									.getValue("VocabularyRepositoryID");
 							Value valueOfVocabularyRepositoryImplType = bindingSet
@@ -361,6 +368,9 @@ public class RdfRepositories {
 								log.error("Unrecognized repository implementatiomn type: ");
 								break;
 							}
+							if (valueOfDataRepositoryInsertGraph != null) repository.getDataRepository().setInsertGraphUrl(valueOfDataRepositoryInsertGraph.stringValue());
+							if (valueOfDataRepositoryRemoveGraph != null) repository.getDataRepository().setRemoveGraphUrl(valueOfDataRepositoryRemoveGraph.stringValue());
+							if (valueOfDataRepositoryChangeGraph != null) repository.getDataRepository().setChangeGraphUrl(valueOfDataRepositoryChangeGraph.stringValue());
 							
 							switch (valueOfVocabularyRepositoryImplType.toString()) {
 							case "http://www.openrdf.org#SPARQLRepository":

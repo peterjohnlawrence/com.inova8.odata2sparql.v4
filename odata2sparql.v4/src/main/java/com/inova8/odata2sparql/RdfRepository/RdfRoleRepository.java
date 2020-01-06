@@ -2,6 +2,7 @@ package com.inova8.odata2sparql.RdfRepository;
 
 import org.eclipse.rdf4j.repository.Repository;
 
+import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.SPARQLProfile;
 
 public /*static*/ class RdfRoleRepository {
@@ -14,6 +15,10 @@ public /*static*/ class RdfRoleRepository {
 	private final String updateEndpointUrl;
 	private final String httpURL;
 
+	private String insertGraphUrl;
+	private String removeGraphUrl;
+	private String changeGraphUrl;
+
 	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile, String queryEndpointUrl,
 			String updateEndpointUrl) {
 		super();
@@ -24,6 +29,7 @@ public /*static*/ class RdfRoleRepository {
 		this.updateEndpointUrl = updateEndpointUrl;
 		this.httpURL = null;
 	}
+
 	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile, String httpURL) {
 		super();
 		this.repository = repository;
@@ -34,6 +40,7 @@ public /*static*/ class RdfRoleRepository {
 		this.httpURL = httpURL;
 
 	}
+
 	RdfRoleRepository(Repository repository, int defaultQueryLimit, SPARQLProfile profile) {
 		super();
 		this.repository = repository;
@@ -44,6 +51,7 @@ public /*static*/ class RdfRoleRepository {
 		this.httpURL = null;
 
 	}
+
 	/**
 	 * @return the repository
 	 */
@@ -63,16 +71,49 @@ public /*static*/ class RdfRoleRepository {
 	}
 
 	public String getHttpURL() {
-		return httpURL==null?"":httpURL;
+		return httpURL == null ? "" : httpURL;
 	}
+
 	public String getQueryEndpointUrl() {
-		return queryEndpointUrl==null?"":queryEndpointUrl;
+		return queryEndpointUrl == null ? "" : queryEndpointUrl;
 	}
 
 	public String getUpdateEndpointUrl() {
-		return updateEndpointUrl==null?"":updateEndpointUrl;
+		return updateEndpointUrl == null ? "" : updateEndpointUrl;
 	}
+
 	public String getServiceUrl() {
-		return queryEndpointUrl==null?httpURL:queryEndpointUrl;
+		return queryEndpointUrl == null ? httpURL : queryEndpointUrl;
+	}
+
+	public String getInsertGraphUrl() {
+		return insertGraphUrl == null ? RdfConstants.DEFAULTINSERTGRAPH : insertGraphUrl;
+	}
+
+	public void setInsertGraphUrl(String insertGraphUrl) {
+		this.insertGraphUrl = insertGraphUrl;
+	}
+
+	public String getRemoveGraphUrl() {
+		return removeGraphUrl == null ? "" : removeGraphUrl;
+	}
+
+	public void setRemoveGraphUrl(String removeGraphUrl) {
+		this.removeGraphUrl = removeGraphUrl;
+	}
+
+	public String getChangeGraphUrl() {
+		return changeGraphUrl == null ? "" : changeGraphUrl;
+	}
+
+	public Boolean isChangeGraphUrl() {
+		if (changeGraphUrl != null)
+			return true;
+		else
+			return false;
+	}
+
+	public void setChangeGraphUrl(String changeGraphUrl) {
+		this.changeGraphUrl = changeGraphUrl;
 	}
 }

@@ -34,6 +34,8 @@ public class RdfConstants {
 		ZERO_TO_ONE, ONE, MANY, MULTIPLE
 	}
 
+	public static final String DEFAULTINSERTGRAPH = "http://insertGraph";
+	
 	public static final int DATE_PRECISION = 3;
 	public static final int DECIMAL_SCALE = 27;//10; Fixes #119
 	public static final String DEFAULTCONFIG = "/var/opt/inova8/odata2sparql/";
@@ -42,6 +44,7 @@ public class RdfConstants {
 	public static final String RESET = "$reset";
 	public static final String RELOAD = "$reload";
 	public static final String LOGS = "$logs";
+	public static final String DELTAS = "$deltas";
 	public static final String WILDCARD = "*";
 	public static final String UNDEFVALUE = "UNDEF";
 	
@@ -382,7 +385,7 @@ public class RdfConstants {
 			repositoryManagerDir = new File(workingDirectory);
 			repositoryWorkingDirectory = workingDirectory;
 
-			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.2.rdf";
+			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.3.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";

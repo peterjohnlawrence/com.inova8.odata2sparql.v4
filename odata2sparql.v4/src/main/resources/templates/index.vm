@@ -78,6 +78,7 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
       <th>Published Classes/EntitySets</th>
       <th>Metadata</th>
       <th>Reset</th> 
+      <th>Clear Deltas</th> 
 <!--       <th>Edit</th> -->
       <th>Show/Hide Configuration</th>
     </tr>
@@ -92,6 +93,9 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
       </td>
       <td>
         <a href="./$reset/$repository.modelName/">./$reset/$repository.modelName</a>
+      </td>
+        <td>
+        <a href="./$deltas/$repository.modelName/clear">./$deltas/$repository.modelName/clear</a>
       </td>
 <!--       <td> -->
 <!--         <a href="./$edit/$repository.modelName">./$edit/$repository.modelName</a> -->
@@ -124,6 +128,21 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
       		<td>Data update-endpoint</td>
             <td>SPARQL endpoint to where updates will be applied</td>
             <td><a href="$repository.dataRepository.updateEndpointUrl">$repository.dataRepository.updateEndpointUrl</a></td>
+          </tr>
+          <tr>
+      		<td>Data insert graph</td>
+            <td>Optional named graph URI to be used as the default graph for inserting statements. If not supplied data will be inserted into the default graph as defined by the endpoint URL. If that is not specified then RDF4J would use a context-less graph, so http://insertGraph will be used as a default.</td>
+            <td><a href="$repository.dataRepository.insertGraphUrl">$repository.dataRepository.insertGraphUrl</a></td>
+          </tr>
+         <tr>
+      		<td>Data remove graph</td>
+            <td>Optional named graph URI to be used as the default graph for removing statements.If not specified the triples will be removed from the graph within which they are located within the repository.</td>
+            <td><a href="$repository.dataRepository.removeGraphUrl">$repository.dataRepository.removeGraphUrl</a></td>
+          </tr>
+          <tr>
+      		<td>Data change graph</td>
+            <td>Optional named graph URI to be used as the default graph for tracking changes. changes will use an extended http://topbraid.org/teamwork TopBraid TeamWork Framework ontology. If no change-graph-uri is specified then it is assumed that changes will *not* be tracked.</td>
+            <td><a href="$repository.dataRepository.changeGraphUrl">$repository.dataRepository.changeGraphUrl</a></td>
           </tr>
           <tr>
       		<td>Data endpoint sparqlProfile</td>
