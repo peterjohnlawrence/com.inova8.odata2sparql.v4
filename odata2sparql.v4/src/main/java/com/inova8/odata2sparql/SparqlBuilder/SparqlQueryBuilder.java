@@ -2224,64 +2224,73 @@ public class SparqlQueryBuilder {
 		}
 		expandItemWhere.append("\t{\n");
 		//expandItemWhere.append(indent);
-		expandItemWhere.append(indent).append("\t{\n");
+
 		if (navProperty.getRangeClass().isOperation()) {
+			expandItemWhere.append(indent).append("\t{\n");
 			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
+			expandItemWhere.append(indent).append("\t}\n");
 		} else {
-			TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
-					expandItem.getSelectOption());
-			StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
-					navProperty.getRangeClass(), indent + "\t");
-			if (isImplicitNavigationProperty) {
-				expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
-			} else {
-				if (selectedProperties != null && selectedProperties.isEmpty())
-					return new StringBuilder();
-				if (navProperty.getDomainClass().isOperation()) {
-					expandItemWhere.append(indent).append("\t\t{").append(" {\n");
+			if((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
+					&& (expandItem.getCountOption().getValue())) {
+			
+			}else {
+				TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
+						expandItem.getSelectOption());
+				StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
+						navProperty.getRangeClass(), indent + "\t");
+				expandItemWhere.append(indent).append("\t{\n");
+				if (isImplicitNavigationProperty) {
+					expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
 				} else {
-					expandItemWhere.append(indent).append("\t\t{")
-							.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+					if (selectedProperties != null && selectedProperties.isEmpty())
+						return new StringBuilder();
+					if (navProperty.getDomainClass().isOperation()) {
+						expandItemWhere.append(indent).append("\t\t{").append(" {\n");
+					} else {
+						expandItemWhere.append(indent).append("\t\t{")
+								.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+					}
+					String matchingTargetKey = "?" + nextTargetKey + "_s";
+					if (this.rdfModel.getRdfRepository().isWithMatching()) {
+						matchingTargetKey = matchingTargetKey + "m";
+					}
+					if (navProperty.getDomainClass().isOperation()) {
+						// Nothing to add as BIND assumed to be created
+					} else if (navProperty.IsInverse()) {
+	
+						expandItemWhere.append(indent).append("\t\t\t\t{\n");
+						expandItemWhere.append(indent).append("\t\t\t\t\t").append(matchingTargetKey + " <"
+								+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
+						expandItemWhere.append(indent).append("\t\t\t\t").append("}UNION{\n");
+						expandItemWhere.append(indent).append("\t\t\t\t\t").append("?" + targetKey + "_s <"
+								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
+						expandItemWhere.append(indent).append("\t\t\t\t").append("}\n");
+	
+					} else {
+						expandItemWhere.append(indent).append("\t\t\t\t").append("?" + targetKey + "_s <"
+								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
+					}
+					if (this.rdfModel.getRdfRepository().isWithMatching())
+						expandItemWhere.append(clausesMatch("?" + nextTargetKey + "_s", indent + "\t\t\t\t"));
+					expandItemWhere.append(indent).append("\t\t\t}");
+	
+					if ((expandItem.getTopOption() != null)) {
+						expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
+					} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
+							&& (expandItem.getCountOption().getValue())) {
+						// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
+						expandItemWhere.append(" LIMIT 0");
+					}
+					if ((expandItem.getSkipOption() != null)) {
+						expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
+					}
+					expandItemWhere.append("\n" + indent).append("\t\t}\n");
+					expandItemWhere.append(clausesSelect);
 				}
-				String matchingTargetKey = "?" + nextTargetKey + "_s";
-				if (this.rdfModel.getRdfRepository().isWithMatching()) {
-					matchingTargetKey = matchingTargetKey + "m";
-				}
-				if (navProperty.getDomainClass().isOperation()) {
-					// Nothing to add as BIND assumed to be created
-				} else if (navProperty.IsInverse()) {
-
-					expandItemWhere.append(indent).append("\t\t\t\t{\n");
-					expandItemWhere.append(indent).append("\t\t\t\t\t").append(matchingTargetKey + " <"
-							+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
-					expandItemWhere.append(indent).append("\t\t\t\t").append("}UNION{\n");
-					expandItemWhere.append(indent).append("\t\t\t\t\t").append("?" + targetKey + "_s <"
-							+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
-					expandItemWhere.append(indent).append("\t\t\t\t").append("}\n");
-
-				} else {
-					expandItemWhere.append(indent).append("\t\t\t\t").append("?" + targetKey + "_s <"
-							+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
-				}
-				if (this.rdfModel.getRdfRepository().isWithMatching())
-					expandItemWhere.append(clausesMatch("?" + nextTargetKey + "_s", indent + "\t\t\t\t"));
-				expandItemWhere.append(indent).append("\t\t\t}");
-
-				if ((expandItem.getTopOption() != null)) {
-					expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
-				} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
-						&& (expandItem.getCountOption().getValue())) {
-					// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
-					expandItemWhere.append(" LIMIT 0");
-				}
-				if ((expandItem.getSkipOption() != null)) {
-					expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
-				}
-				expandItemWhere.append("\n" + indent).append("\t\t}\n");
-				expandItemWhere.append(clausesSelect);
+				expandItemWhere.append(indent).append("\t}\n");
 			}
 		}
-		expandItemWhere.append(indent).append("\t}\n");
+//		expandItemWhere.append(indent).append("\t}\n");
 
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
@@ -2462,7 +2471,7 @@ public class SparqlQueryBuilder {
 		StringBuilder expandItemWhereCount = new StringBuilder();
 		expandItemWhereCount.append(indent).append("\t#expandItemWhereCount\n");
 		//TODO UNION or OPTIONAL, currently OPTIONAL improves performance #174 suggest neither!!
-		expandItemWhereCount.append(indent).append("\tUNION{ SELECT ?").append(targetKey)
+		expandItemWhereCount.append(indent).append("\t{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n")
 				.append(indent).append("\t\tWHERE {\n");
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
