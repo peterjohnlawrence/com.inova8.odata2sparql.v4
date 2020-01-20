@@ -2276,6 +2276,18 @@ public class SparqlQueryBuilder {
 	
 					if ((expandItem.getTopOption() != null)) {
 						expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
+					} else if ((expandItem.getSelectOption() != null) && (expandItem.getTopOption() == null)) {
+						// Fixes #176 
+						if(this.rdfModel.getRdfRepository().getExpandOrderbyDefault()) {
+							expandItemWhere.append(" ORDER BY ?"+  nextTargetKey + "_s" );
+						}
+						if(this.rdfModel.getRdfRepository().getExpandTopDefault()!= null) {
+							expandItemWhere.append(" LIMIT "+ this.rdfModel.getRdfRepository().getExpandTopDefault());
+						}
+						if(this.rdfModel.getRdfRepository().getExpandSkipDefault()!= null) {
+							expandItemWhere.append(" OFFSET "+ this.rdfModel.getRdfRepository().getExpandSkipDefault());
+						}
+
 					} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
 							&& (expandItem.getCountOption().getValue())) {
 						// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
@@ -2290,7 +2302,6 @@ public class SparqlQueryBuilder {
 				expandItemWhere.append(indent).append("\t}\n");
 			}
 		}
-//		expandItemWhere.append(indent).append("\t}\n");
 
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,

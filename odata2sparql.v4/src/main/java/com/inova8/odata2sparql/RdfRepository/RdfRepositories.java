@@ -231,6 +231,9 @@ public class RdfRepositories {
 							Literal valueOfWithMatching = (Literal) bindingSet.getValue("withMatching");
 							Literal valueOfMatch = (Literal) bindingSet.getValue("match");
 							Literal valueOfExpandOperations = (Literal) bindingSet.getValue("expandOperations");
+							Literal valueOfExpandTopDefault = (Literal) bindingSet.getValue("expandTopDefault");
+							Literal valueOfExpandSkipDefault = (Literal) bindingSet.getValue("expandSkipDefault");
+							Literal valueOfExpandOrderbyDefault = (Literal) bindingSet.getValue("expandOrderbyDefault");
 							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
 							RepositoryConfig dataRepositoryConfig = repositoryManager
@@ -441,6 +444,24 @@ public class RdfRepositories {
 										Boolean.parseBoolean(valueOfExpandOperations.stringValue()));
 							} else {
 								repository.setExpandOperations(true);
+							}
+							if (valueOfExpandTopDefault != null) {
+								repository.setExpandTopDefault(
+										Integer.parseInt(valueOfExpandTopDefault.stringValue()));
+							} else {
+								repository.setExpandTopDefault(null);
+							}
+							if (valueOfExpandSkipDefault != null) {
+								repository.setExpandSkipDefault(
+										Integer.parseInt(valueOfExpandSkipDefault.stringValue()));
+							} else {
+								repository.setExpandTopDefault(null);
+							}
+							if (valueOfExpandOrderbyDefault != null) {
+								repository.setExpandOrderbyDefault(
+										Boolean.parseBoolean(valueOfExpandOrderbyDefault.stringValue()));
+							} else {
+								repository.setExpandOrderbyDefault(false);
 							}
 							if (valueOfTextSearchType != null) {
 								repository.setTextSearchType(TextSearchType.get(valueOfTextSearchType.stringValue()));

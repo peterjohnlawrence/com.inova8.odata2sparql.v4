@@ -18,7 +18,6 @@ import com.inova8.odata2sparql.Constants.TextSearchType;
 public class RdfRepository {
 	private RdfRepositories repositories;
 
-
 	private RdfConnection dataEndPoint;
 	private RdfConnection modelEndPoint;
 	private RdfConnection operationEndPoint;
@@ -28,26 +27,31 @@ public class RdfRepository {
 	private final TreeMap<String, Namespace> namespaces;
 	private int defaultQueryLimit;
 	private final String modelName;
-	private Boolean withRdfAnnotations=false;
-	private Boolean withSapAnnotations=false;
-	private Boolean useBaseType=false;
+	private Boolean withRdfAnnotations = false;
+	private Boolean withSapAnnotations = false;
+	private Boolean useBaseType = false;
 	private Boolean expandOperations = false;
+	private Boolean expandOrderbyDefault;
+	private Integer expandSkipDefault;
+	private Integer expandTopDefault;
 	private TextSearchType textSearchType;
-	private boolean withFKProperties=false;
+	private boolean withFKProperties = false;
 	private boolean withMatching = true;
 	private String match = RdfConstants.DEFAULTMATCH;
 
-
-	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix, TreeMap<String, Namespace> namespaces) {
+	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix,
+			TreeMap<String, Namespace> namespaces) {
 		super();
 		this.repositories = repositories;
 		this.modelName = modelName;
 		this.defaultPrefix = defaultPrefix;
 		this.namespaces = namespaces;
 	}
+
 	public RdfRepositories getRepositories() {
 		return repositories;
 	}
+
 	/**
 	 * @param dataRepository
 	 *            the dataRepository to set
@@ -81,6 +85,7 @@ public class RdfRepository {
 	public RdfRoleRepository getModelRepository() {
 		return modelRepository;
 	}
+
 	public String getModelName() {
 		return modelName;
 	}
@@ -95,12 +100,13 @@ public class RdfRepository {
 		return namespaces;
 	}
 
-	public TreeMap<String, Namespace> addNamespaces( TreeMap<String, Namespace> additionalNamespaces) {
-		for(Entry<String, Namespace> additionalNamespaceEntry:additionalNamespaces.entrySet() ) {
-			namespaces.put(additionalNamespaceEntry.getKey(), additionalNamespaceEntry.getValue());			
+	public TreeMap<String, Namespace> addNamespaces(TreeMap<String, Namespace> additionalNamespaces) {
+		for (Entry<String, Namespace> additionalNamespaceEntry : additionalNamespaces.entrySet()) {
+			namespaces.put(additionalNamespaceEntry.getKey(), additionalNamespaceEntry.getValue());
 		}
 		return namespaces;
 	}
+
 	public RdfConnection getDataEndpoint() {
 		return dataEndPoint;
 	}
@@ -155,6 +161,30 @@ public class RdfRepository {
 
 	public void setExpandOperations(boolean expandOperations) {
 		this.expandOperations = expandOperations;
+	}
+
+	public void setExpandTopDefault(Integer expandTopDefault) {
+		this.expandTopDefault = expandTopDefault;
+	}
+
+	public Integer getExpandTopDefault() {
+		return this.expandTopDefault;
+	}
+
+	public void setExpandSkipDefault(Integer expandSkipDefault) {
+		this.expandSkipDefault = expandSkipDefault;
+	}
+
+	public Integer getExpandSkipDefault() {
+		return this.expandSkipDefault;
+	}
+
+	public void setExpandOrderbyDefault(boolean expandOrderbyDefault) {
+		this.expandOrderbyDefault = expandOrderbyDefault;
+	}
+
+	public Boolean  getExpandOrderbyDefault() {
+		return this.expandOrderbyDefault;
 	}
 
 	public TextSearchType getTextSearchType() {
