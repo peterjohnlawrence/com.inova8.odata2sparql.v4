@@ -2237,7 +2237,7 @@ public class SparqlQueryBuilder {
 				TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
 						expandItem.getSelectOption());
 				StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
-						navProperty.getRangeClass(), indent + "\t");
+						navProperty.getRangeClass(), indent + "\t\t");
 				expandItemWhere.append(indent).append("\t{\n");
 				if (isImplicitNavigationProperty) {
 					expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
@@ -2546,6 +2546,8 @@ public class SparqlQueryBuilder {
 		} else {
 			clausesSelect.append("OPTIONAL");
 		}
+		//Fixes #178
+		clausesSelect.append(indent).append("{\n");
 		if (selectPropertyMap != null && !selectPropertyMap.isEmpty()) {
 			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			selectPropertyMap.add(RdfConstants.RDF_TYPE);
@@ -2586,7 +2588,11 @@ public class SparqlQueryBuilder {
 			clausesSelect.append(indent).append("\tBIND( if(!IsLiteral(?").append(nextTargetKey).append("_o), ?")
 					.append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_resource)\n");
 		}
-
+		//Fixes #178
+		clausesSelect.append(indent).append("} UNION {\n");
+		clausesSelect.append(indent).append("\tBIND(<http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId>  as ?" + nextTargetKey + "_p )\n");
+		clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
+		clausesSelect.append(indent).append("}\n");
 		if (hasProperties)
 			return clausesSelect;
 		else
