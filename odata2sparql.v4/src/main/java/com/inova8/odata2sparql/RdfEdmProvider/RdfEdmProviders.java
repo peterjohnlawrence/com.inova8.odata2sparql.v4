@@ -26,7 +26,7 @@ public class RdfEdmProviders {
 		if (rdfRepositoryID.equals(RdfConstants.WILDCARD)) {
 			rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 		} else {
-			rdfEdmProviders.remove(rdfRepositoryID.toUpperCase());
+			rdfEdmProviders.remove(rdfRepositoryID);
 		}
 	}
 	public  void reload() {

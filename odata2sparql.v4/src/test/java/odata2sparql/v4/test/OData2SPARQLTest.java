@@ -45,9 +45,10 @@ public class OData2SPARQLTest {
 	private String expected;
 	@SuppressWarnings("unused")
 	private String comments;
-
+	private String index;
+	
 	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String method, String repository,
-			String requestURI, String query, String options, String expected, String comments) {
+			String requestURI, String query, String options, String expected, String comments) {//,String index) {
 		this.group = group;
 		this.subgroup = subgroup;
 		this.test = test;
@@ -59,6 +60,7 @@ public class OData2SPARQLTest {
 		this.options = options;
 		this.expected = expected;
 		this.comments = comments;
+		this.index = "index";
 	}
 
 	public static Collection<String[]> getTestData(String fileName) throws IOException {
@@ -67,8 +69,10 @@ public class OData2SPARQLTest {
 		BufferedReader file = new BufferedReader(new FileReader(fileName));
 		Boolean titleRow = true;
 		int maxlength = 11;
+		int index = 0;
 		while ((record = file.readLine()) != null) {
 			// assume tab delimited
+			index++;
 			String fields[] = record.split("\t");
 			if (titleRow)
 				maxlength = fields.length;
@@ -89,12 +93,14 @@ public class OData2SPARQLTest {
 			} else {
 				fields[9] = "?";
 			}
+			fields[10]= Integer.toString(index);
 			if (!titleRow) {
 				if (fields[0] != null)
 					records.add(fields);
 			} else {
 				titleRow = false;
 			}
+
 		}
 		file.close();
 		return records;
@@ -121,7 +127,7 @@ public class OData2SPARQLTest {
 	}
 
 	//@Parameters(name = "{0}:{1}/{2}:URI={3}?{4}")
-	@Parameters(name = "{3}/{2}:URI={5}/{6}?{7}")
+	@Parameters(name = "{10}:{3}/{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
 		//return getTestData("src/test/resources/CRUDTests.txt");
 		return getTestData("src/test/resources/TestServlet.txt");
