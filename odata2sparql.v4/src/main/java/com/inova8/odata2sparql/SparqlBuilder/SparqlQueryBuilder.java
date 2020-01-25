@@ -2590,7 +2590,7 @@ public class SparqlQueryBuilder {
 		}
 		//Fixes #178
 		clausesSelect.append(indent).append("} UNION {\n");
-		clausesSelect.append(indent).append("\tBIND(<http://www.w3.org/1999/02/22-rdf-syntax-ns#subjectId>  as ?" + nextTargetKey + "_p )\n");
+		clausesSelect.append(indent).append("\tBIND(<" + RdfConstants.RDF_SUBJECT + ">  as ?" + nextTargetKey + "_p )\n");
 		clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
 		clausesSelect.append(indent).append("}\n");
 		if (hasProperties)
