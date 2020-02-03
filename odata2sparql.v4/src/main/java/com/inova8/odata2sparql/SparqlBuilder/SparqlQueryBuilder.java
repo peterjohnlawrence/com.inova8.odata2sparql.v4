@@ -3,6 +3,7 @@ package com.inova8.odata2sparql.SparqlBuilder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
+import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter;
@@ -325,6 +327,7 @@ import com.inova8.odata2sparql.uri.UriUtils;
 public class SparqlQueryBuilder {
 
 	private final Logger log = LoggerFactory.getLogger(SparqlQueryBuilder.class);
+	private final RdfEdmProvider rdfEdmProvider;
 	private final RdfModel rdfModel;
 	private final RdfModelToMetadata rdfModelToMetadata;
 
@@ -356,12 +359,29 @@ public class SparqlQueryBuilder {
 
 	RdfRepository proxyDatasetRepository;
 
-	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
+	private TreeMap<String, RdfEdmProvider> proxiedRdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
+	
+//	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
+//			UriType uriType, RdfResourceParts rdfResourceParts)
+//			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
+//		super();
+//		this.rdfEdmProvider = null;
+//		this.rdfModel = rdfModel;
+//		this.rdfModelToMetadata = rdfModelToMetadata;
+//		this.uriInfo = uriInfo;
+//		this.uriType = uriType;
+//		this.rdfResourceParts = rdfResourceParts;
+//		// Prepare what is required to create the SPARQL
+//		prepareBuilder();
+//		log.info("Builder for URIType: " + uriType.toString());
+//	}
+	public SparqlQueryBuilder(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
 			UriType uriType, RdfResourceParts rdfResourceParts)
 			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		super();
-		this.rdfModel = rdfModel;
-		this.rdfModelToMetadata = rdfModelToMetadata;
+		this.rdfEdmProvider =rdfEdmProvider;
+		this.rdfModel = rdfEdmProvider.getRdfModel();
+		this.rdfModelToMetadata = rdfEdmProvider.getEdmMetadata();
 		this.uriInfo = uriInfo;
 		this.uriType = uriType;
 		this.rdfResourceParts = rdfResourceParts;
@@ -369,7 +389,7 @@ public class SparqlQueryBuilder {
 		prepareBuilder();
 		log.info("Builder for URIType: " + uriType.toString());
 	}
-
+	
 	private void prepareBuilder()
 			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		// Prepare what is required to create the SPARQL
@@ -565,7 +585,8 @@ public class SparqlQueryBuilder {
 		prepareConstruct.append(where());
 		prepareConstruct.append("}");
 		prepareConstruct.append(defaultLimitClause());
-		return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareConstruct).toString());
+		//TODO return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareConstruct).toString());
+		return new SparqlStatement(sparqlPrefixes().append(prepareConstruct).toString());
 	}
 
 	public SparqlStatement prepareCountEntitySetSparql()
@@ -882,7 +903,7 @@ public class SparqlQueryBuilder {
 			clausesPathProperties.append("\t#clausesPathProperties\n");
 		StringBuilder clausesSelect = clausesSelect(this.selectPropertyMap,
 				edmTargetEntitySet.getEntityType().getName(), edmTargetEntitySet.getEntityType().getName(),
-				rdfTargetEntityType, "\t");
+				rdfTargetEntityType, "\t",!isImplicitEntityType(edmTargetEntitySet.getEntityType()) );
 		if (clausesSelect.length() > 0) {
 			//#167 Add optional to ensure that properties without attributes are included
 			if(isImplicitEntityType(edmTargetEntitySet.getEntityType())) clausesPathProperties.append("\tOPTIONAL");
@@ -908,8 +929,7 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder operationUUID(RdfEntityType rdfOperationType) {
 		StringBuilder operationUUID = new StringBuilder();
-		// IRI(CONCAT("urn:",MD5(CONCAT(STR(?entity),STR( ?property)))))
-		operationUUID.append("IRI(CONCAT(\"urn:\",MD5(CONCAT(");
+		operationUUID.append("IRI(CONCAT(\"" + RdfConstants.URN_NS+ "\",MD5(CONCAT(");
 		for (RdfPrimaryKey key : rdfOperationType.getPrimaryKeys()) {
 			operationUUID.append("COALESCE(STR(?").append(key.getPrimaryKeyName()).append("),\"\"),");
 		}
@@ -929,7 +949,7 @@ public class SparqlQueryBuilder {
 		return filter;
 	}
 
-	private String getQueryOptionText(List<CustomQueryOption> queryOptions,
+	private String getQueryOptionText(RdfRepository datasetRepository,List<CustomQueryOption> queryOptions,
 			FunctionImportParameter functionImportParameter) throws OData2SparqlException {
 
 		for (CustomQueryOption queryOption : queryOptions) {
@@ -937,7 +957,7 @@ public class SparqlQueryBuilder {
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
-					return encodeIRI(queryOption);
+					return encodeIRI(datasetRepository,queryOption);
 				default:
 					return queryOption.getText();
 				}
@@ -945,16 +965,16 @@ public class SparqlQueryBuilder {
 		return null;
 	}
 
-	private String encodeIRI(CustomQueryOption queryOption) throws OData2SparqlException {
+	private String encodeIRI(RdfRepository datasetRepository,CustomQueryOption queryOption) throws OData2SparqlException {
 		String resource = queryOption.getText().substring(1, queryOption.getText().length() - 1);
 		if (resource.startsWith(RdfConstants.BLANKNODE)) {
 			return "<" + resource.replace(RdfConstants.BLANKNODE, RdfConstants.BLANKNODE_RDF) + ">";
 		} else {
 			resource = UriUtils.odataToRdfQname(queryOption.getText());
-			//resource = queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED,	RdfConstants.QNAME_SEPARATOR_RDF);
+
 			String expandedKey = rdfModel.getRdfPrefixes().expandPrefix(queryOption.getText());
 			resource = "<" + expandedKey + ">";
-			return resource;// UriUtils.encodeUri(resource);
+			return resource;
 		}
 	}
 
@@ -966,7 +986,6 @@ public class SparqlQueryBuilder {
 				//Fixes #86
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
 					String resource = UriUtils.odataToRdfQname(queryOption.getText());
-					//queryOption.getText().replace("'", "").replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
 					return resource;
 				default:
 					return queryOption.getText();
@@ -990,9 +1009,11 @@ public class SparqlQueryBuilder {
 				com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 						.getValue();
 				if (functionImportParameter.isDataset()) {
-					dataset = getQueryOptionText(queryOptions, functionImportParameter);
+					dataset = getQueryOptionText(this.rdfModel.getRdfRepository(),queryOptions, functionImportParameter);
 					dataset = dataset.substring(1, dataset.length() - 1);
+					RdfEdmProvider proxiedRdfEdmProvider = this.rdfEdmProvider.getRdfEdmProviders().getRdfEdmProvider(dataset);
 					this.rdfModel.addProxy(dataset);
+					//this.addProxiedRdfEdmProvider(dataset,proxiedRdfEdmProvider);
 					proxyDatasetRepository = this.rdfModel.getRdfRepository().getRepositories()
 							.getRdfRepository(dataset);
 					if (proxyDatasetRepository == null)
@@ -1015,7 +1036,7 @@ public class SparqlQueryBuilder {
 						functionImportParameter);
 				break;
 			default:
-				parameterValue = getQueryOptionText(queryOptions, functionImportParameter);
+				parameterValue = getQueryOptionText(proxyDatasetRepository,queryOptions, functionImportParameter);
 			}
 			if (functionImportParameter.isPropertyPath())
 				parameterValue = preprocessPropertyPath(proxyDatasetRepository, parameterValue);
@@ -1941,7 +1962,7 @@ public class SparqlQueryBuilder {
 							.getFunctionImportParameters().entrySet()) {
 						com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
 								.getValue();
-						String parameterValue = getQueryOptionText(uriInfo.getCustomQueryOptions(),
+						String parameterValue = getQueryOptionText(this.rdfModel.getRdfRepository(),uriInfo.getCustomQueryOptions(),
 								functionImportParameter);
 						// null value so not set
 						if (parameterValue == null)
@@ -2237,7 +2258,7 @@ public class SparqlQueryBuilder {
 				TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
 						expandItem.getSelectOption());
 				StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
-						navProperty.getRangeClass(), indent + "\t\t");
+						navProperty.getRangeClass(), indent + "\t\t",!isImplicitNavigationProperty && !navProperty.getDomainClass().isProxy());
 				expandItemWhere.append(indent).append("\t{\n");
 				if (isImplicitNavigationProperty) {
 					expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
@@ -2314,7 +2335,6 @@ public class SparqlQueryBuilder {
 		if (navProperty.getDomainClass().isProxy()) {
 			expandItemWhere.append(indent).append("}\n");
 		}
-		//if (isImplicitNavigationProperty ) expandItemWhere.append(indent).append("}\n");
 		expandItemWhere.append(indent).append("}\n");
 		return expandItemWhere;
 	}
@@ -2390,12 +2410,12 @@ public class SparqlQueryBuilder {
 		expandItemWhereHasPredicate.append(indent).append("BIND( ?").append(targetKey).append("_ap as ?")
 				.append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_s  )\n");
 		expandItemWhereHasPredicate.append(clausesSelect.substring(0, clausesSelect.indexOf("}") + 1)).append("\n");
-		expandItemWhereHasPredicate.append(indent).append("OPTIONAL{?").append(targetKey)
+		expandItemWhereHasPredicate.append(indent).append("\tOPTIONAL{?").append(targetKey)
 				.append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_s ?").append(targetKey)
 				.append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_p ?").append(targetKey)
 				.append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_ao }\n");
 		//Special case to ensure, even when RDF and RDFS are not included, identities of properties are available.
-		expandItemWhereHasPredicate.append(indent).append("BIND(COALESCE(?").append(targetKey)
+		expandItemWhereHasPredicate.append(indent).append("\tBIND(COALESCE(?").append(targetKey)
 				.append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_ao,IF(?").append(targetKey)
 				.append(RdfConstants.RDF_HASPREDICATE_LABEL)
 				.append("_p = <http://www.w3.org/2000/01/rdf-schema#label>,STRAFTER(STR(?").append(targetKey)
@@ -2404,6 +2424,7 @@ public class SparqlQueryBuilder {
 				.append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL)
 				.append("_p = <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>,<http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>,\"\" ))) as ?")
 				.append(targetKey).append(RdfConstants.RDF_HASPREDICATE_LABEL).append("_o)\n");
+		//expandItemWhereHasPredicate.append(indent).append("\t}\n");
 		return expandItemWhereHasPredicate;
 	}
 
@@ -2538,7 +2559,7 @@ public class SparqlQueryBuilder {
 	}
 
 	private StringBuilder clausesSelect(TreeSet<String> selectPropertyMap, String nextTargetKey, String navPath,
-			RdfEntityType targetEntityType, String indent) {
+			RdfEntityType targetEntityType, String indent, boolean includeSubjectid) {
 		StringBuilder clausesSelect = new StringBuilder();
 		Boolean hasProperties = false;
 		// Case URI5 need to fetch only one property as given in resourceParts
@@ -2547,7 +2568,7 @@ public class SparqlQueryBuilder {
 			clausesSelect.append("OPTIONAL");
 		}
 		//Fixes #178
-		clausesSelect.append(indent).append("{\n");
+		//clausesSelect.append(indent).append("{\n");
 		if (selectPropertyMap != null && !selectPropertyMap.isEmpty()) {
 			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			selectPropertyMap.add(RdfConstants.RDF_TYPE);
@@ -2589,10 +2610,12 @@ public class SparqlQueryBuilder {
 					.append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_resource)\n");
 		}
 		//Fixes #178
-		clausesSelect.append(indent).append("} UNION {\n");
-		clausesSelect.append(indent).append("\tBIND(<" + RdfConstants.RDF_SUBJECT + ">  as ?" + nextTargetKey + "_p )\n");
-		clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
-		clausesSelect.append(indent).append("}\n");
+		if(includeSubjectid ){//!isImplicitEntityType(edmTargetEntitySet.getEntityType())) {
+			clausesSelect.append(indent).append("} UNION {\n");
+			clausesSelect.append(indent).append("\tBIND(<" + RdfConstants.RDF_SUBJECT + ">  as ?" + nextTargetKey + "_p )\n");
+			clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
+		}
+		//clausesSelect.append(indent).append("}\n");
 		if (hasProperties)
 			return clausesSelect;
 		else
@@ -2767,7 +2790,6 @@ public class SparqlQueryBuilder {
 								throw new EdmException("Failed to locate property:"
 										+ property.getResourcePath().getUriResourceParts().get(0).getSegmentValue());
 							}
-
 						}
 					}
 				}
@@ -2835,5 +2857,37 @@ public class SparqlQueryBuilder {
 		}
 		sparql.append("}");
 		return new SparqlStatement(sparql.toString());
+	}
+	public void addProxiedRdfEdmProvider(String proxyDataset, RdfEdmProvider proxiedRdfEdmProvider) {
+		if(!this.proxiedRdfEdmProviders.containsKey(proxyDataset)) {
+			this.proxiedRdfEdmProviders.put(proxyDataset,proxiedRdfEdmProvider);	
+		}
+	}
+	public StringBuilder sparqlPrefixes() {
+		StringBuilder sparqlPrefixes = new StringBuilder();
+		
+		TreeMap<String, String> modelPrefixes = (TreeMap<String, String>) this.rdfModel.getRdfPrefixes().getPrefixes();
+		TreeMap<String, String> corePrefixes =(TreeMap)modelPrefixes.clone();
+		
+//		for(String proxyDataset  :this.proxies) {
+//			corePrefixes.putAll(this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(proxyDataset).getNamespaces());
+//			
+//		}
+//
+//		for ( Namespace namespace: proxyRepository.getNamespaces().values()) {
+//			try {
+//				this.getRdfPrefixes().getOrCreatePrefix(namespace.getPrefix(), namespace.getName());
+//			} catch (OData2SparqlException e) {
+//				log.warn("Prefix "+namespace.getPrefix() +" cannot be created " + namespace.getName() );
+//			}
+//		}	
+	
+		for (Map.Entry<String, String> prefixEntry : corePrefixes.entrySet()) {
+			
+			String prefix = prefixEntry.getKey();
+			String url = prefixEntry.getValue();
+			sparqlPrefixes.append("PREFIX ").append(prefix).append(": <").append(url).append(">\n");
+		}
+		return sparqlPrefixes;
 	}
 }

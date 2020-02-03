@@ -57,14 +57,15 @@ public class RdfModel {
 			set(RdfConstants.DC, RdfConstants.DC_NS);
 			set(RdfConstants.OWL, RdfConstants.OWL_NS);
 			set(RdfConstants.XSD, RdfConstants.XSD_NS);
+			set(RdfConstants.URN, RdfConstants.URN_NS);
 		}
 
 		void log() {
 			log.info("Deduced prefixes: " + prefixToURI.toString());
 		}
 		
-		public Map<String, String> getPrefixes() {
-			return prefixToURI;
+		public TreeMap<String, String> getPrefixes() {
+			return (TreeMap<String, String>) prefixToURI;
 		}
 
 		public StringBuilder sparqlPrefixes() {
@@ -95,22 +96,22 @@ public class RdfModel {
 		}
 
 		public String expandPrefix(String decodedEntityKey) throws OData2SparqlException {
-			String encodeEntityKey = UriUtils.encodeQName(decodedEntityKey);//decodedEntityKey.replaceAll("\\(", "%28").replaceAll("\\)","%29").replaceAll("\\/", "%2F");
+			String encodeEntityKey = UriUtils.encodeQName(decodedEntityKey);
 			int colon = encodeEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
 			if (colon < 0)
 				return encodeEntityKey;
 			else {
 				String uri = get(encodeEntityKey.substring(0, colon));
 				if(uri == null ) {
-					//Try and see if initail part of entityKey is prefix to which /ext has been added
+					//Try and see if initial part of entityKey is prefix to which /ext has been added
 					String prefix = encodeEntityKey.substring(0, colon);
-					int underscore = prefix.indexOf("_");
-					if(underscore<0) {
+					int priorSeparator = prefix.indexOf(RdfConstants.PREFIXSEPARATOR);
+					if(priorSeparator<0) {
 						
 					}else {
-						uri = get(prefix.substring(0, underscore));
+						uri = get(prefix.substring(0, priorSeparator));
 						if(uri!=null) {
-							uri = uri +prefix.substring(underscore+1).replace("_","/")+"/";						
+							uri = uri +prefix.substring(priorSeparator+1).replace(RdfConstants.PREFIXSEPARATOR,"/")+"/";						
 						}
 					}
 				}
@@ -155,29 +156,7 @@ public class RdfModel {
 				if (!uri.substring(uri.length() - 1).equals("#")) {
 					String sprefix = this.getNsURIPrefix(uri);
 					if (sprefix == null || sprefix.equals("")) {
-
-						//If the URI is of the form:    http://rootpath/xxxx/yyyyyy
-						//where http://rootpath/ is already a prefix 'root'
-						//then we should create a prefix with name rootprefix_xxxx
-
-						String[] parts = uri.split("/");
-						if (parts.length > 3) {
-							String rootUri = "";
-							for (int i = 0; i < parts.length - 1; i++) {
-								rootUri += parts[i] + "/";
-							}
-							sprefix = this.getNsURIPrefix(rootUri);
-							if (sprefix == null || sprefix.equals("")) {
-								return generateNextPrefix(uri);
-							} else {
-								String sNewPrefix = sprefix + "_" + parts[parts.length - 1];
-								this.setNsPrefix(sNewPrefix, uri);
-								return sNewPrefix;
-							}
-						} else {
-							//Create a new prefix of the form jn
-							return generateNextPrefix(uri);
-						}
+						return extendExistingPrefix(uri);
 					} else {
 						return sprefix;
 					}
@@ -195,13 +174,55 @@ public class RdfModel {
 			}
 		}
 
+		protected String extendExistingPrefix(String uri) throws OData2SparqlException {
+			String sprefix;
+			//If the URI is of the form:    http://rootpath/xxxx/yyyyyy
+			//where http://rootpath/ is already a prefix 'root'
+			//then we should create a prefix with name rootprefix_xxxx
+
+			String[] parts = uri.split("/");
+			if (parts.length > 3) {						
+				for(int j=1;j < parts.length - 3;j++) {
+					String rootUri = "";
+					for (int i = 0; i < parts.length - j; i++) {
+						rootUri += parts[i] + "/";
+					}
+					sprefix = this.getNsURIPrefix(rootUri);
+					if(sprefix!=null) {
+						String sNewPrefix = sprefix ;
+						for ( int k=1;k<=j;k++) {							
+							sNewPrefix += RdfConstants.PREFIXSEPARATOR + parts[parts.length - k];
+						}
+						this.setNsPrefix(sNewPrefix, uri);
+						log.info("New prefix added to " +  RdfModel.this.rdfRepository.getModelName() +':' + sNewPrefix + "~ for URI " + uri);
+						return sNewPrefix;
+					}
+				}
+				//String rootUri = "";
+				//for (int i = 0; i < parts.length - 1; i++) {
+				//	rootUri += parts[i] + "/";
+				//}
+				//sprefix = this.getNsURIPrefix(rootUri);
+				//if (sprefix == null || sprefix.equals("")) {
+				return generateNextPrefix(uri);
+				//} else {
+				//	String sNewPrefix = sprefix + RdfConstants.PREFIXSEPARATOR + parts[parts.length - 1];
+				//	this.setNsPrefix(sNewPrefix, uri);
+				//	return sNewPrefix;
+				//}
+			} else {
+				//Create a new prefix of the form jn
+				return generateNextPrefix(uri);
+			}
+		}
+
 		private String generateNextPrefix(String uri) {
 			int i = 0;
 			String sprefix = "";
 			while (true) {
 				sprefix = RdfConstants.PREFIX + i;
-				if (this.getNsPrefixURI(sprefix) == null) {
-					log.info("New prefix added: " + sprefix + "~ for URI " + uri);
+				if (this.getNsPrefixURI(sprefix) == null) { 
+					log.info("New prefix added to " +  RdfModel.this.rdfRepository.getModelName() +':' + sprefix + "~ for URI " + uri);
 					this.set(sprefix, uri);
 					return sprefix;
 				}
@@ -2625,22 +2646,6 @@ public class RdfModel {
 		};
 	}
 
-//	private static final Predicate1<RdfNavigationProperty> navigationPropertyNameEquals(
-//			final String navigationPropertyName) {
-//		return new Predicate1<RdfNavigationProperty>() {
-//			public boolean apply(RdfNavigationProperty navigationProperty) {
-//				return navigationProperty.navigationPropertyName.equals(navigationPropertyName);
-//			}
-//		};
-//	}
-//	private static final Predicate1<RdfNavigationProperty> navigationPropertyDomainEquals(
-//			final String navigationPropertyDomain) {
-//		return new Predicate1<RdfNavigationProperty>() {
-//			public boolean apply(RdfNavigationProperty navigationProperty) {
-//				return navigationProperty.domainName.equals(navigationPropertyDomain);
-//			}
-//		};
-//	}
 	private static final Predicate1<RdfNavigationProperty> navigationPropertyEquals(
 			final String navigationPropertyName, final String navigationPropertyDomainURI) {
 		return new Predicate1<RdfNavigationProperty>() {
@@ -2756,7 +2761,7 @@ public class RdfModel {
 	public void addProxy(String proxyDataset) {
 		if(!this.proxies.contains(proxyDataset)) {
 			this.proxies.add(proxyDataset);	
-		
+			//TODO This should not be called when the proxy is added because more namespace prefixes could be added to the proxied dataset after it is added
 			RdfRepository proxyRepository = this.getRdfRepository().getRepositories().getRdfRepository(proxyDataset);
 			for ( Namespace namespace: proxyRepository.getNamespaces().values()) {
 				try {

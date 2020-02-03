@@ -432,7 +432,8 @@ class SparqlEntityCollection extends EntityCollection {
 				rdfSubjectEntity.getNavigationLinks().add(link);
 			}
 		}
-		if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY)) {
+		//Fixes #182 by adding MULTIPLE cardinality as well as MANY
+		if (rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MANY) || rdfNavigationProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
 			// to MANY, MULTIPLE
 			EntityCollection inlineEntitySet = link.getInlineEntitySet();
 			if (inlineEntitySet == null) {

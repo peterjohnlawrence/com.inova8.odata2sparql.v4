@@ -239,6 +239,7 @@ public class RdfRepositories {
 							RepositoryConfig dataRepositoryConfig = repositoryManager
 									.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
 							if (dataRepositoryConfig == null) {
+								//repositoryManager.removeRepository(valueOfDataRepositoryID.stringValue());
 								switch (valueOfDataRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig sparqlDataRepositoryTypeSpec = new SPARQLRepositoryConfig();
@@ -251,6 +252,7 @@ public class RdfRepositories {
 											valueOfDataRepositoryImplProfile.toString()));
 									dataRepositoryConfig = new RepositoryConfig(valueOfDataRepositoryID.stringValue(),
 											sparqlDataRepositoryTypeSpec);
+
 									repositoryManager.addRepositoryConfig(dataRepositoryConfig);
 									break;
 								case "http://www.openrdf.org#SystemRepository":
@@ -281,6 +283,7 @@ public class RdfRepositories {
 							RepositoryConfig vocabularyRepositoryConfig = repositoryManager
 									.getRepositoryConfig(valueOfVocabularyRepositoryID.getLabel());
 							if (vocabularyRepositoryConfig == null) {
+								//repositoryManager.removeRepository(valueOfVocabularyRepositoryID.stringValue());
 								switch (valueOfVocabularyRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig sparqlVocabularyRepositoryTypeSpec = new SPARQLRepositoryConfig();
@@ -292,6 +295,7 @@ public class RdfRepositories {
 											valueOfVocabularyRepositoryImplProfile.toString()));
 									vocabularyRepositoryConfig = new RepositoryConfig(
 											valueOfVocabularyRepositoryID.stringValue(), sparqlVocabularyRepositoryTypeSpec);
+									
 									repositoryManager.addRepositoryConfig(vocabularyRepositoryConfig);
 									break;
 								case "http://www.openrdf.org#SystemRepository":
@@ -470,7 +474,7 @@ public class RdfRepositories {
 							}
 							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);				
 						} catch (RepositoryConfigException e) {
-							log.warn("Failed to complete definition of dataset");
+							log.warn("Failed to complete definition of dataset\n" + e.getLocalizedMessage());
 						}
 					}
 				} finally {	

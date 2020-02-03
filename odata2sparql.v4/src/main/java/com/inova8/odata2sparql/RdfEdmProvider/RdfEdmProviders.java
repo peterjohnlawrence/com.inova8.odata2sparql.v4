@@ -14,7 +14,7 @@ import com.inova8.odata2sparql.SparqlBuilder.SparqlDeltaManager;
 
 public class RdfEdmProviders {
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProviders.class);
-	private static  Map<String, RdfEdmProvider> rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
+	private static  TreeMap<String, RdfEdmProvider> rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 	private final RdfRepositories rdfRepositories;
 
 	public RdfEdmProviders(String configFolder,String repositoryFolder,String repositoryUrl, String repositoryDir ) {
@@ -53,13 +53,17 @@ public class RdfEdmProviders {
 		RdfEdmProvider rdfEdmProvider = rdfEdmProviders.get( rdfRepositoryID);
 
 		if (rdfEdmProvider == null) {
-			rdfEdmProvider = new RdfEdmProvider(rdfRepository);
-			rdfEdmProviders.put(rdfRepositoryID, rdfEdmProvider);
+			rdfEdmProvider = new RdfEdmProvider(this,rdfRepository);
+	//		rdfEdmProviders.put(rdfRepositoryID, rdfEdmProvider);
 		}
 		return rdfEdmProvider;
 	}
 	public RdfRepositories getRepositories() {
 		
 		return rdfRepositories;
+	}
+	public TreeMap<String, RdfEdmProvider> getRdfEdmProviders () {
+		
+		return rdfEdmProviders;
 	}
 }

@@ -32,11 +32,13 @@ import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProvider.class);
 	private final RdfEdmModelProvider rdfEdmModelProvider;
+	private final RdfEdmProviders rdfEdmProviders;
 	
 
-	RdfEdmProvider( RdfRepository rdfRepository) throws OData2SparqlException {
+	RdfEdmProvider( RdfEdmProviders rdfEdmProviders, RdfRepository rdfRepository) throws OData2SparqlException {
 		this.rdfEdmModelProvider = new RdfEdmModelProvider(rdfRepository);
-		
+		this.rdfEdmProviders =rdfEdmProviders;
+		rdfEdmProviders.getRdfEdmProviders().put(rdfRepository.getModelName(), this);
 	}
 
 	public RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
@@ -223,6 +225,10 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 			}
 		}	
 		return null;
+	}
+
+	public RdfEdmProviders getRdfEdmProviders() {
+		return rdfEdmProviders;
 	}
 
 

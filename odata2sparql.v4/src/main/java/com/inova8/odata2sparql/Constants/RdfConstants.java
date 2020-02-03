@@ -47,6 +47,8 @@ public class RdfConstants {
 	public static final String DELTAS = "$deltas";
 	public static final String WILDCARD = "*";
 	public static final String UNDEFVALUE = "UNDEF";
+	public static final String PREFIXSEPARATOR = ".";
+	
 	
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();
 	static private Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
@@ -81,6 +83,7 @@ public class RdfConstants {
 	public static final String PLURAL = "s";
 	public static final String SHAPE_POSTFIX = "_shape";//"";//
 
+	
 	public static final String DEFAULTMATCH = "{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }";
 
 
@@ -111,7 +114,9 @@ public class RdfConstants {
 	public static final String XSD_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 	public static final String XSD_NS = "http://www.w3.org/2001/XMLSchema#";
 	public static final String XSD = "xsd";
-
+	public static final String URN_NS = "urn:";
+	public static final String URN = "urn";
+	
 	public static final String DC_NS = "http://purl.org/dc/elements/1.1/";
 	public static final String DC = "dc";
 
