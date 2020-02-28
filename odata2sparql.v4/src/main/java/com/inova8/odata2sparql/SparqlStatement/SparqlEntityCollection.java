@@ -780,18 +780,24 @@ class SparqlEntityCollection extends EntityCollection {
 			case "Int16":
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).shortValue();
+				} else if (value instanceof java.lang.String) {
+					return Integer.parseInt(((String)value).trim());
 				} else {
 					return (Short) value;
 				}
 			case "Int32":
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).intValue();
+				} else if (value instanceof java.lang.String) {
+					return Integer.parseInt(((String)value).trim());
 				} else {
 					return (Integer) value;
 				}
 			case "Int64":
 				if (value instanceof java.math.BigDecimal) {
 					return ((BigDecimal) value).longValue();
+				} else if (value instanceof java.lang.String) {
+					return Integer.parseInt(((String)value).trim());
 				} else {
 					return (Long) value;
 				}

@@ -26,7 +26,16 @@ public class RdfSelectQuery extends RdfQuery{
 		} catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
 			log.error( super.query);
 			log.error(e.toString());
-			throw new OData2SparqlException("RdfSelectQuery execSelect failure with message:\n"+ e.getMessage(),e);
+			switch(e.getCause().getClass().toString()) {
+			case "class.org.eclipse.rdf4j.repository.RepositoryException" :
+				throw new OData2SparqlException("Connection failure: Make sure SPARQL service is available",e);
+			case "class.org.eclipse.rdf4j.repository.MalformedQueryException" :
+				throw new OData2SparqlException("Issued query malformed",e);				
+				 
+			default:
+				throw new OData2SparqlException("RdfSelectQuery execSelect failure with message:\n"+ e.getMessage(),e);
+			}
+
 		}
 		return rdfResultSet;
 	}	

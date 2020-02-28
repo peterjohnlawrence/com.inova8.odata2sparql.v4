@@ -709,6 +709,18 @@ public class RdfRepositories {
 			} finally {
 
 			}
+			try {
+				log.info("Loading change from " + RdfConstants.changeFile);
+				modelsConnection.add(new File(RdfConstants.changeFile), RdfConstants.systemId, RDFFormat.RDFXML);
+			} catch (RDFParseException e) {
+				log.error("Cannot parse " + RdfConstants.changeFile, e);
+				throw new OData2SparqlException();
+			} catch (IOException e) {
+				log.error("Cannot access " + RdfConstants.changeFile, e);
+				throw new OData2SparqlException();
+			} finally {
+
+			}
 		} catch (RepositoryException e) {
 			log.error("Cannot connect to local system repository", e);
 			throw new OData2SparqlException();

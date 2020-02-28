@@ -64,4 +64,12 @@ public class RdfEdmType {
 		return EdmPrimitiveTypeKind.String;
 		return SIMPLE_TYPE_MAPPING.get(propertyTypeName);
 	}
+	public static boolean isAnyUri(String propertyTypeName) {
+		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
+		return false;
+		return  propertyTypeName.equals("http://www.w3.org/2001/XMLSchema#anyURI");
+	};
+	public static String anyUri() {
+		return "Edm.anyURI";
+	};
 }

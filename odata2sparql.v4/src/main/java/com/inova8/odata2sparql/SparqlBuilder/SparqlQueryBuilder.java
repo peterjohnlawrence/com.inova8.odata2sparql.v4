@@ -635,6 +635,9 @@ public class SparqlQueryBuilder {
 		String type = rdfEntityType.getURL();
 		targetEntityIdentifier.append(indent)
 				.append("?" + key + "_s <" + RdfConstants.TARGETENTITY + "> <" + type + "> .\n");
+		//Fixes #178
+		targetEntityIdentifier.append(indent)
+		.append("?" + key + "_s <" + RdfConstants.RDF_SUBJECT  + "> ?" + key + "_s .\n");
 		return targetEntityIdentifier;
 	}
 
@@ -644,7 +647,7 @@ public class SparqlQueryBuilder {
 			constructType.append(indent).append("#constructType\n");
 		String type = rdfEntityType.getURL();
 		constructType.append(indent).append("?" + key + "_s <" + RdfConstants.ASSERTEDTYPE + "> <" + type + "> .\n");
-
+		constructType.append(indent).append("?" + key + "_s <" + RdfConstants.RDF_SUBJECT  + "> ?" + key + "_s .\n");
 		return constructType;
 	}
 
@@ -1010,16 +1013,21 @@ public class SparqlQueryBuilder {
 						.getValue();
 				if (functionImportParameter.isDataset()) {
 					dataset = getQueryOptionText(this.rdfModel.getRdfRepository(),queryOptions, functionImportParameter);
-					dataset = dataset.substring(1, dataset.length() - 1);
-					RdfEdmProvider proxiedRdfEdmProvider = this.rdfEdmProvider.getRdfEdmProviders().getRdfEdmProvider(dataset);
-					this.rdfModel.addProxy(dataset);
-					//this.addProxiedRdfEdmProvider(dataset,proxiedRdfEdmProvider);
-					proxyDatasetRepository = this.rdfModel.getRdfRepository().getRepositories()
-							.getRdfRepository(dataset);
-					if (proxyDatasetRepository == null)
+					if(dataset==null) {
 						throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()
-								+ ") refers to dataset " + dataset + " that is not recognized");
-					break;
+						+ ") requires dataset");
+					}else {
+						dataset = dataset.substring(1, dataset.length() - 1);
+						RdfEdmProvider proxiedRdfEdmProvider = this.rdfEdmProvider.getRdfEdmProviders().getRdfEdmProvider(dataset);
+						this.rdfModel.addProxy(dataset);
+						//this.addProxiedRdfEdmProvider(dataset,proxiedRdfEdmProvider);
+						proxyDatasetRepository = this.rdfModel.getRdfRepository().getRepositories()
+								.getRdfRepository(dataset);
+						if (proxyDatasetRepository == null)
+							throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()
+									+ ") refers to dataset " + dataset + " that is not recognized");
+						break;
+					}
 				}
 			}
 			//Find the repository details of this service: endpoint and prefixes
@@ -1081,7 +1089,7 @@ public class SparqlQueryBuilder {
 
 	private String preprocessDataset(RdfRepository datasetRepository, String parameterValue) {
 		//return "\"" + datasetRepository.getDataRepository().getServiceUrl() + "\"";
-		if (datasetRepository.getDataRepository().getServiceUrl() != null) {
+		if (datasetRepository!= null && datasetRepository.getDataRepository().getServiceUrl() != null) {
 			return "<" + datasetRepository.getDataRepository().getServiceUrl() + ">";
 		} else {
 			throw new EdmException(
@@ -2610,11 +2618,11 @@ public class SparqlQueryBuilder {
 					.append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_resource)\n");
 		}
 		//Fixes #178
-		if(includeSubjectid ){//!isImplicitEntityType(edmTargetEntitySet.getEntityType())) {
-			clausesSelect.append(indent).append("} UNION {\n");
-			clausesSelect.append(indent).append("\tBIND(<" + RdfConstants.RDF_SUBJECT + ">  as ?" + nextTargetKey + "_p )\n");
-			clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
-		}
+//		if(includeSubjectid ){//!isImplicitEntityType(edmTargetEntitySet.getEntityType())) {
+//			clausesSelect.append(indent).append("} UNION {\n");
+//			clausesSelect.append(indent).append("\tBIND(<" + RdfConstants.RDF_SUBJECT + ">  as ?" + nextTargetKey + "_p )\n");
+//			clausesSelect.append(indent).append("\tBIND(?" + nextTargetKey + "_s as ?" + nextTargetKey + "_o )\n");
+//		}
 		//clausesSelect.append(indent).append("}\n");
 		if (hasProperties)
 			return clausesSelect;

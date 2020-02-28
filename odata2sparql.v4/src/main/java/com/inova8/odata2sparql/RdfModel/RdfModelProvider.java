@@ -284,7 +284,7 @@ public class RdfModelProvider {
 			}
 		} catch (OData2SparqlException e) {
 			log.error("Failed to execute Class query. Check availability of triple store. Exception " + e.getMessage());
-			throw new OData2SparqlException("Classes query exception", e);
+			throw new OData2SparqlException("Classes query exception. Check availability of triple store.", e);
 		}
 	}
 

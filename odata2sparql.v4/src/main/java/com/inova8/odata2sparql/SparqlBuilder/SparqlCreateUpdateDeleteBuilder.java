@@ -133,7 +133,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			Entity entry) throws OData2SparqlException {
 		String entityName = entityType.getEntityTypeName();
 		StringBuilder insertProperties = new StringBuilder("DELETE {\n");
-		insertProperties.append("\tGRAPH ?deleteGraph\n");
+		insertProperties.append("\tGRAPH ?deletedGraph\n");
 		insertProperties.append("\t{\n");
 		insertProperties.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
 				.append(entityName).append("_o\n");
@@ -141,7 +141,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("}\n");		
 		
 		insertProperties.append("INSERT {\n");
-		insertProperties.append("\tGRAPH ?insertGraph\n");
+		insertProperties.append("\tGRAPH ?addedGraph\n");
 		insertProperties.append("\t{\n");
 		insertProperties.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
 				.append(entityName).append("_no\n");
@@ -150,22 +150,20 @@ public class SparqlCreateUpdateDeleteBuilder {
 		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) {
 			insertProperties.append("\t##Changes\n");
 			insertProperties.append("\tGRAPH <").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">\n");
-			insertProperties.append("\t{?insertChange a <http://topbraid.org/teamwork#Change> ;\n");
-			insertProperties.append("\t\t<http://purl.org/dc/terms/created>  ?now;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#added> ?insertedChange .\n");
-			insertProperties.append("\t?insertedChange \n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#graph> ?insertGraph  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#subject> ?").append(entityName).append("_s  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#predicate>  ?").append(entityName).append("_p  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#object>  ?").append(entityName).append("_no .\n");
-			insertProperties.append("\t?deleteChange a <http://topbraid.org/teamwork#Change> ; \n");
-			insertProperties.append("\t\t<http://purl.org/dc/terms/created>  ?now; \n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#deleted> ?deletedChange .\n");
+			insertProperties.append("\t{?change a <http://inova8.com/odata4sparql#Change> ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#created>  ?now;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#added> ?addedChange ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#deleted> ?deletedChange .\n");
+			insertProperties.append("\t?addedChange \n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#graph> ?addedGraph  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_no .\n");
 			insertProperties.append("\t?deletedChange \n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#graph> ?deleteGraph  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#subject> ?").append(entityName).append("_s  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#predicate>  ?").append(entityName).append("_p  ;\n");
-			insertProperties.append("\t\t<http://topbraid.org/teamwork#object>  ?").append(entityName).append("_o .\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#graph> ?deletedGraph  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
+			insertProperties.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_o .\n");
 			insertProperties.append("\t}\n");
 		}
 		insertProperties.append("}\n");
@@ -227,12 +225,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("\tBIND( IF(?").append(entityName).append("_o=?").append(entityName).append("_no,FALSE,TRUE) as ?updated)\n");
 		insertProperties.append("\tBIND(IF(BOUND(?updated),?updated,TRUE) as ?revisedUpdated)\n");
 		insertProperties.append("\tBIND(IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");			
-		insertProperties.append("\tBIND( IF(!?revisedUpdated,\"\",IF(BOUND(?").append(entityName).append("_no),?change,?").append(entityName).append("_no )) as ?insertChange)\n");
+		insertProperties.append("\tBIND( IF(!?revisedUpdated,\"\",IF(BOUND(?").append(entityName).append("_no),?change,?").append(entityName).append("_no )) as ?addChange)\n");
 		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\", IF(BOUND(?currentGraph),?change,?currentGraph)) as ?deleteChange)\n");
-		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/insert/\",SHA1(CONCAT(STR(?insertChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?insertedChange)\n");
-		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/delete/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
-		insertProperties.append("\tBIND( IF(isIRI(?insertedChange),COALESCE(?deleteGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),\"\") as ?insertGraph)\n");
-		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deleteGraph)\n");		
+		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/added/\",SHA1(CONCAT(STR(?addChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?addedChange)\n");
+		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/deleted/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
+		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),\"\") as ?addedGraph)\n");
+		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
 
 		insertProperties.append("}\n");
 		return insertProperties;

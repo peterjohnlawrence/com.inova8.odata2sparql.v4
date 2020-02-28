@@ -60,7 +60,7 @@
 	?node5 ?type5 ?p56 ?i65
 	?entityB ?typeB ?formattedValueB 
 { service ?service {
-	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
+	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 		{
 			?entity a ?type .
 			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
@@ -72,7 +72,7 @@
 		}
 		GROUP BY ?entity ?type
 	}
-	{	select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
+	{	select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
 		{
 			?entity a ?type .
 			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
@@ -5655,7 +5655,7 @@
 	?node5 ?type5 ?p56 ?i65
 	?entityB ?typeB ?formattedValueB
 { service ?service {
-	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)) , ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
+	{	select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 		{
 			?entity a ?type .
 			?entity &lt;http://www.openrdf.org/contrib/lucenesail#matches&gt; [
@@ -5799,7 +5799,7 @@
           <sp:Select>
             <sp:text>select ?entity ?type ?formattedValue
 {	service ?service
-	{	select ?entity ?type  (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValue)
+	{	select ?entity ?type  (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValue)
 		{
 			{	select distinct ?entity ?type  ?labelProperty ?property ?snippet  
 				{ 	?entity a ?type .
@@ -6111,7 +6111,7 @@ where{ service ?service {
           <sp:Select>
             <sp:text>	select ?entityA ?typeA  ?edge ?subject ?property ?direct ?object ?entityB ?typeB ?formattedValueB 
 	{ 	
-		{select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
+		{select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty,STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 			{	service ?service 
 				{	select ?entity ?type  ?labelProperty ?property ?snippet 
           			{
@@ -11637,7 +11637,7 @@ where{ service ?service {
             </sp:resultVariables>
             <sp:text>	select ?entityA ?typeA ?formattedValueA ?edge ?subject ?property ?direct ?object ?entityB ?typeB ?formattedValueB 
 	{ 	
-		{select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
+		{select (?entity as ?entityB) (?type as ?typeB) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueB)
 			{	service ?service 
 				{	select ?entity ?type  ?labelProperty ?property ?snippet 
           			{
@@ -11654,7 +11654,7 @@ where{ service ?service {
 			}
 			GROUP BY ?entity ?type
     	}
-		{select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, str(?property)), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
+		{select (?entity as ?entityA) (?type as ?typeA) (GROUP_CONCAT( concat("&lt;tr&gt;&lt;td&gt;&lt;i&gt;", COALESCE(?labelProperty, STRAFTER(STR(?property),(replace(str(?property), "(.+[/#])(.+)$", "$1")))), ":&lt;/i&gt;&lt;/td&gt;&lt;td&gt;" ,?snippet,"&lt;/td&gt;&lt;/tr&gt;") ) as ?formattedValueA)
 			{	service ?service 
 				{	select ?entity ?type  ?labelProperty ?property ?snippet 
           			{

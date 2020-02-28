@@ -87,7 +87,7 @@ public class RdfModelToMetadata {
 		} else {
 			annotations.add(new CsdlAnnotation().setTerm(fqn)
 					.setExpression(new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.String,
-							StringEscapeUtils.escapeXml11(text.replaceAll("\"", "\\\"")))));//StringEscapeUtils.escapeXml11(text) )));"
+							StringEscapeUtils.escapeXml11(text.replaceAll("\"", "\\\"")))));
 		}
 	}
 	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, Boolean text) {
@@ -529,6 +529,10 @@ public class RdfModelToMetadata {
 			if (rdfProperty.isFK()) {
 				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_FK_FQN,
 						rdfProperty.getFkProperty().getNavigationPropertyName());
+			}
+			if(RdfEdmType.isAnyUri(rdfProperty.getPropertyTypeName())) {
+				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_RDFTYPE_FQN,
+						RdfEdmType.anyUri());
 			}
 			if (withRdfAnnotations) {
 				addToAnnotations(propertyAnnotations, RdfConstants.PROPERTY_FQN,

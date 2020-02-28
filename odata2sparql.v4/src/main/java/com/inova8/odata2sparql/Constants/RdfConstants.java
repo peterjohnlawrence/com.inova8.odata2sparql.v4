@@ -70,6 +70,7 @@ public class RdfConstants {
 	public static String contextmenuFile;
 	public static String searchFile;
 	public static String olgapFile;
+	public static String changeFile;
 
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
@@ -101,6 +102,7 @@ public class RdfConstants {
 	private static final String  ODATA_ISPROXY ="isProxy";
 	private static final String  ODATA_ISDATASET ="isDataset";
 	private static final String  ODATA_ISPROPERTYPATH ="isPropertyPath";
+	private static final String  ODATA_RDFTYPE ="rdfType";
 	
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -323,6 +325,7 @@ public class RdfConstants {
 	public static final String ODATA_ISPROXY_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROXY;
 	public static final String ODATA_ISDATASET_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISDATASET;
 	public static final String ODATA_ISPROPERTYPATH_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROPERTYPATH;
+	public static final String ODATA_RDFTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_RDFTYPE;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_TERM;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.RDF_PROPERTY_TERM;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
@@ -341,6 +344,7 @@ public class RdfConstants {
 	private final static CsdlTerm odataIsProxy = new CsdlTerm().setName(RdfConstants.ODATA_ISPROXY).setType("Edm.String");
 	private final static CsdlTerm odataIsDataset = new CsdlTerm().setName(RdfConstants.ODATA_ISDATASET).setType("Edm.String");
 	private final static CsdlTerm odataIsPropertyPath = new CsdlTerm().setName(RdfConstants.ODATA_ISPROPERTYPATH).setType("Edm.String");
+	private final static CsdlTerm odataRdfType = new CsdlTerm().setName(RdfConstants.ODATA_RDFTYPE).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.RDF_PROPERTY_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
@@ -398,6 +402,7 @@ public class RdfConstants {
 			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.0.rdf";
 			olgapFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.olgap.v2.0.0.rdf";
 			searchFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.lucenesearch.v3.0.0.rdf";
+			changeFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.change.v1.0.0.rdf";
 
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());
@@ -463,6 +468,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.ODATA_ISPROXY, odataIsProxy);
 		TERMS.put(RdfConstants.ODATA_ISDATASET, odataIsDataset);
 		TERMS.put(RdfConstants.ODATA_ISPROPERTYPATH, odataIsPropertyPath);
+		TERMS.put(RdfConstants.ODATA_RDFTYPE, odataRdfType);
 		TERMS.put(RdfConstants.RDFS_CLASS_TERM, rdfsClassTerm);
 		TERMS.put(RdfConstants.RDF_PROPERTY_TERM, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
@@ -479,6 +485,7 @@ public class RdfConstants {
 		ODATATERMS.add(odataIsProxy);
 		ODATATERMS.add(odataIsDataset);
 		ODATATERMS.add(odataIsPropertyPath);
+		ODATATERMS.add(odataRdfType);
 		RDFTERMS.add(rdfPropertyTerm);
 		RDFSTERMS.add(rdfsClassTerm);
 		RDFSTERMS.add(rdfsDatatypeTerm);
