@@ -327,7 +327,7 @@ import com.inova8.odata2sparql.uri.UriUtils;
 public class SparqlQueryBuilder {
 
 	private final Logger log = LoggerFactory.getLogger(SparqlQueryBuilder.class);
-	private final RdfEdmProvider rdfEdmProvider;
+	//private final RdfEdmProvider rdfEdmProvider;
 	private final RdfModel rdfModel;
 	private final RdfModelToMetadata rdfModelToMetadata;
 
@@ -379,7 +379,7 @@ public class SparqlQueryBuilder {
 			UriType uriType, RdfResourceParts rdfResourceParts)
 			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		super();
-		this.rdfEdmProvider =rdfEdmProvider;
+//		this.rdfEdmProvider =rdfEdmProvider;
 		this.rdfModel = rdfEdmProvider.getRdfModel();
 		this.rdfModelToMetadata = rdfEdmProvider.getEdmMetadata();
 		this.uriInfo = uriInfo;
@@ -1018,7 +1018,7 @@ public class SparqlQueryBuilder {
 						+ ") requires dataset");
 					}else {
 						dataset = dataset.substring(1, dataset.length() - 1);
-						RdfEdmProvider proxiedRdfEdmProvider = this.rdfEdmProvider.getRdfEdmProviders().getRdfEdmProvider(dataset);
+						//RdfEdmProvider proxiedRdfEdmProvider = this.rdfEdmProvider.getRdfEdmProviders().getRdfEdmProvider(dataset);
 						this.rdfModel.addProxy(dataset);
 						//this.addProxiedRdfEdmProvider(dataset,proxiedRdfEdmProvider);
 						proxyDatasetRepository = this.rdfModel.getRdfRepository().getRepositories()
@@ -2875,21 +2875,9 @@ public class SparqlQueryBuilder {
 		StringBuilder sparqlPrefixes = new StringBuilder();
 		
 		TreeMap<String, String> modelPrefixes = (TreeMap<String, String>) this.rdfModel.getRdfPrefixes().getPrefixes();
-		TreeMap<String, String> corePrefixes =(TreeMap)modelPrefixes.clone();
+		@SuppressWarnings("unchecked")
+		TreeMap<String, String> corePrefixes =(TreeMap<String, String>)modelPrefixes.clone();
 		
-//		for(String proxyDataset  :this.proxies) {
-//			corePrefixes.putAll(this.rdfModel.getRdfRepository().getRepositories().getRdfRepository(proxyDataset).getNamespaces());
-//			
-//		}
-//
-//		for ( Namespace namespace: proxyRepository.getNamespaces().values()) {
-//			try {
-//				this.getRdfPrefixes().getOrCreatePrefix(namespace.getPrefix(), namespace.getName());
-//			} catch (OData2SparqlException e) {
-//				log.warn("Prefix "+namespace.getPrefix() +" cannot be created " + namespace.getName() );
-//			}
-//		}	
-	
 		for (Map.Entry<String, String> prefixEntry : corePrefixes.entrySet()) {
 			
 			String prefix = prefixEntry.getKey();

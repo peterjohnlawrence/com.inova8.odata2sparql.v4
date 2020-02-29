@@ -78,12 +78,12 @@ public class RdfODataServlet extends HttpServlet {
 				} else if (service.equalsIgnoreCase(RdfConstants.LOGS)) {
 					//TODO #106
 					htmlResponse(req, resp, "/WEB-INF/classes/logs/odata2sparql.v4.log.html");
-				} else if (service.equalsIgnoreCase(RdfConstants.DELTAS)) {
-					log.info(RdfConstants.DELTAS + " requested");
+				} else if (service.equalsIgnoreCase(RdfConstants.CHANGES)) {
+					log.info(RdfConstants.CHANGES + " requested");
 					//$delta/<service>/<option>, option = clear, rollback, commit
 					String segments[] = req.getRequestURI().split("/");
-					rdfEdmProviders.deltas(segments[segments.length-2],segments[segments.length-1]); 
-					simpleResponse(req, resp, RdfConstants.DELTAS + " on " + segments[segments.length-2] + " " + segments[segments.length-1] + "'ed");
+					rdfEdmProviders.changes(segments[segments.length-2],segments[segments.length-1]); 
+					simpleResponse(req, resp, RdfConstants.CHANGES + " on " + segments[segments.length-2] + " " + segments[segments.length-1] + "'ed");
 				} else {
 					//Find provider matching service name			
 					RdfEdmProvider rdfEdmProvider = rdfEdmProviders.getRdfEdmProvider(service);

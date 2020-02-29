@@ -1,6 +1,5 @@
 package com.inova8.odata2sparql.RdfEdmProvider;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -10,7 +9,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRepositories;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
-import com.inova8.odata2sparql.SparqlBuilder.SparqlDeltaManager;
+import com.inova8.odata2sparql.SparqlBuilder.SparqlChangeManager;
 
 public class RdfEdmProviders {
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProviders.class);
@@ -33,13 +32,17 @@ public class RdfEdmProviders {
 		rdfRepositories.reload();
 		reset(RdfConstants.WILDCARD);
 	}
-	public  void deltas(String rdfRepositoryID, String option) throws OData2SparqlException {
+	public  void changes(String rdfRepositoryID, String option) throws OData2SparqlException {
 		switch (option){
 		case "clear": 
-			SparqlDeltaManager.clear(getRdfEdmProvider(rdfRepositoryID));	
+			SparqlChangeManager.clear(getRdfEdmProvider(rdfRepositoryID));	
 			break;
-		case "rollback": break;
-		case "commit": break;
+		case "rollback": 
+			SparqlChangeManager.rollback(getRdfEdmProvider(rdfRepositoryID));	
+			break;
+		case "archive": 
+			SparqlChangeManager.archive(getRdfEdmProvider(rdfRepositoryID));	
+			break;
 		default: break;
 		}
 	}

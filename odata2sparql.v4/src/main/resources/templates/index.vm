@@ -71,14 +71,16 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
         </table>
   <br /><br />
   <table style="width:100%">
-  	<tr><th colspan="6">Repositories</th>
+  	<tr><th colspan="8">Repositories</th>
   	</tr>
       <tr>
       <th>Repository</th>
       <th>Published Classes/EntitySets</th>
-      <th>Metadata</th>
-      <th>Reset</th> 
-      <th>Clear Deltas</th> 
+      <th>$metadata</th>
+      <th>$reset Model </th> 
+      <th>Clear $changes</th> 
+      <th>Rollback $changes</th> 
+      <th>Archive $changes</th> 
 <!--       <th>Edit</th> -->
       <th>Show/Hide Configuration</th>
     </tr>
@@ -95,7 +97,13 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
         <a href="./$reset/$repository.modelName/">./$reset/$repository.modelName</a>
       </td>
         <td>
-        <a href="./$deltas/$repository.modelName/clear">./$deltas/$repository.modelName/clear</a>
+        <a href="./$changes/$repository.modelName/clear">./$changes/$repository.modelName/clear</a>
+      </td>
+               <td>
+        <a href="./$changes/$repository.modelName/rollback">./$changes/$repository.modelName/rollback</a>
+      </td>
+         <td>
+        <a href="./$changes/$repository.modelName/archive">./$changes/$repository.modelName/archive</a>
       </td>
 <!--       <td> -->
 <!--         <a href="./$edit/$repository.modelName">./$edit/$repository.modelName</a> -->
@@ -106,7 +114,7 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
     </tr>
     <tr style="display: none">
       <td></td>
-      <td colspan="4">
+      <td colspan="7">
         <table style="width:100%">
            <tr> <th colspan="3">$repository.modelName Repository Configuration Properties</th></tr>
           <tr>
