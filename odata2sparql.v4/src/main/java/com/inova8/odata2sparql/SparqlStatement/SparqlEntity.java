@@ -55,6 +55,8 @@ public class SparqlEntity extends Entity {
 							+ propertyValue.getValue().toString()
 									.replace(RdfConstants.QNAME_SEPARATOR, RdfConstants.QNAME_SEPARATOR_ENCODED)
 									.replace(":", RdfConstants.QNAME_SEPARATOR_ENCODED)
+									// added to handle literals that might contain illegal characters
+									.replace(" ", RdfConstants.QNAME_SEPARATOR_ENCODED)
 							+ "'";
 					first = false;
 				}

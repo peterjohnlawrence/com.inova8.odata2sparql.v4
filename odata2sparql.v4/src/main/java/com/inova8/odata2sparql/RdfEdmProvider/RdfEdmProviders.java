@@ -35,13 +35,13 @@ public class RdfEdmProviders {
 	public  void changes(String rdfRepositoryID, String option) throws OData2SparqlException {
 		switch (option){
 		case "clear": 
-			SparqlChangeManager.clear(getRdfEdmProvider(rdfRepositoryID));	
+			SparqlChangeManager.clear(rdfRepositoryID, getRdfEdmProvider(rdfRepositoryID));	
 			break;
 		case "rollback": 
-			SparqlChangeManager.rollback(getRdfEdmProvider(rdfRepositoryID));	
+			SparqlChangeManager.rollback(rdfRepositoryID, getRdfEdmProvider(rdfRepositoryID));	
 			break;
 		case "archive": 
-			SparqlChangeManager.archive(getRdfEdmProvider(rdfRepositoryID));	
+			SparqlChangeManager.archive(rdfRepositoryID, getRdfEdmProvider(rdfRepositoryID));	
 			break;
 		default: break;
 		}

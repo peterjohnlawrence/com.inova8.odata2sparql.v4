@@ -278,7 +278,9 @@ class SparqlEntityCollection extends EntityCollection {
 					findOrCreateLinkCount(rdfSubjectEntity, rdfNavigationProperty,
 							(Integer) objectNode.getLiteralObject());
 				} else if (rdfSubjectEntity.getEntityType().isOperation()
-						&& (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)) {
+						&& (rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode) != null)
+						//Fixes returning a Literal value when rdf:Property with both data and object values
+						&& !rdfSubjectEntity.getEntityType().findNavigationProperty(propertyNode).getRangeName().equals(RdfConstants.LITERAL)) {
 					//Fixes #81 OK this is an operation that is returning a literal for a primaryKey so  use UNDEF 
 					rdfSubjectEntity.getDatatypeProperties().put(propertyNode, RdfConstants.UNDEFVALUE);
 				} else {// Must be a property with a value, so put it into a
@@ -642,7 +644,7 @@ class SparqlEntityCollection extends EntityCollection {
 								&& !propertyNode.getIRI().equals(RdfConstants.RDF_TYPE)) {
 							RdfNavigationProperty rdfNavigationProperty = rdfSubjectEntityType
 									.findNavigationProperty(rdfPropertyLocalName);
-							if (rdfNavigationProperty != null) {
+							if (rdfNavigationProperty != null && rdfNavigationProperty.getRelatedKey() != null) {
 								rdfProperty = rdfSubjectEntityType.findProperty(rdfNavigationProperty.getRelatedKey());
 							} else {
 								rdfProperty = rdfSubjectEntityType.findProperty(rdfPropertyLocalName);

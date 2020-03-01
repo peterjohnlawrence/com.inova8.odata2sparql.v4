@@ -2074,11 +2074,12 @@ public class RdfModel {
 	}
 
 	RdfNavigationProperty getOrCreateOperationNavigationProperty(RdfNode queryNode, RdfNode propertyNode,
-			RdfNode propertyLabelNode, RdfNode rangeNode, RdfNode varName) throws OData2SparqlException {
+			RdfNode propertyLabelNode, RdfNode rangeNode, RdfNode varName,RdfNode optionalNode) throws OData2SparqlException {
 
 		RdfURI propertyURI = new RdfURI(propertyNode);
 		RdfURI operationURI = new RdfURI(queryNode);
 		RdfURI rangeURI = new RdfURI(rangeNode);
+		Boolean optional = optionalNode.getLiteralValue().booleanValue();
 
 		RdfEntityType operationEntityType = this.getOrCreateOperationEntityType(queryNode);
 		if (!operationEntityType.isEntity()) {
@@ -2100,7 +2101,11 @@ public class RdfModel {
 
 			if (navigationProperty.IsInverse()) { // is it the inverse of something?
 				RdfNavigationProperty inverseNavigationProperty = navigationProperty.getInverseNavigationProperty();
-				inverseNavigationProperty.rangeCardinality = RdfConstants.Cardinality.ONE;
+				if(!optional) {
+					inverseNavigationProperty.rangeCardinality = RdfConstants.Cardinality.ONE;
+				}else {
+					inverseNavigationProperty.rangeCardinality = RdfConstants.Cardinality.ZERO_TO_ONE;
+				}
 				inverseNavigationProperty.domainCardinality = RdfConstants.Cardinality.MANY;
 
 			} else {
@@ -2108,14 +2113,19 @@ public class RdfModel {
 			}
 
 			navigationProperty.rangeCardinality = RdfConstants.Cardinality.MANY;
-			navigationProperty.domainCardinality = RdfConstants.Cardinality.ONE;
-
+			if(!optional) {
+				navigationProperty.domainCardinality = RdfConstants.Cardinality.ONE;
+			}else {
+				navigationProperty.rangeCardinality = RdfConstants.Cardinality.ZERO_TO_ONE;
+			}
 			//Since this is not a primary entity we need to add the keys of the navigation properties as properties, as well as adding them as primarykeys.
 			RdfProperty property = getOrCreateOperationProperty(queryNode, propertyNode, propertyLabelNode, rangeNode,
 					varName);
-			property.isKey = true;
-			operationEntityType.primaryKeys.put(property.propertyName,
-					new RdfPrimaryKey(property.propertyName, property.propertyName));
+			if(!optional) {
+				property.isKey = true;
+				operationEntityType.primaryKeys.put(property.propertyName,
+						new RdfPrimaryKey(property.propertyName, property.propertyName));
+			}
 			navigationProperty.setRelatedKey(property.propertyName);
 			return navigationProperty;
 		} else

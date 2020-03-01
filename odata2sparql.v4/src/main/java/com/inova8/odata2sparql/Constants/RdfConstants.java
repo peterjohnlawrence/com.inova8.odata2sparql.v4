@@ -126,6 +126,7 @@ public class RdfConstants {
 	public static final String XSD_DATE = "http://www.w3.org/2001/XMLSchema#date";
 	public static final String XSD_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 	public static final String RDF_PLAIN_LITERAL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral";
+	public static final String LITERAL = "Literal";
 	public static final String RDF_LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
 
 	public static final String RDFS_RESOURCE = "http://www.w3.org/2000/01/rdf-schema#Resource";

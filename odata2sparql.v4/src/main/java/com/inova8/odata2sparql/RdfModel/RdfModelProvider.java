@@ -809,9 +809,9 @@ public class RdfModelProvider {
 							queryPropertyLabel = soln.getRdfNode("propertyLabel");
 						}
 						RdfNode queryPropertyRange = soln.getRdfNode("range");
-
+						RdfNode queryPropertyOptional = soln.getRdfNode("optional");
 						RdfNavigationProperty operationAssociation = model.getOrCreateOperationNavigationProperty(query,
-								queryProperty, queryPropertyLabel, queryPropertyRange, varName);
+								queryProperty, queryPropertyLabel, queryPropertyRange, varName,queryPropertyOptional);
 						if (soln.getRdfNode("description") != null) {
 							operationAssociation
 									.setDescription(soln.getRdfNode("description").getLiteralValue().getLabel());
