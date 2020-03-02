@@ -231,7 +231,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/deleted/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
 		insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
 		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
-
+		insertProperties.append("\tFILTER(?revisedUpdated)\n");	
 		insertProperties.append("}\n");
 		return insertProperties;
 	}
