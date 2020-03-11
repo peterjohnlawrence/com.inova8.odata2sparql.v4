@@ -92,7 +92,6 @@ public class RdfResourceParts {
 			case function:
 				UriResourceFunction function = (UriResourceFunction) resourcePart;
 				EdmEntitySet edmEntitySet = function.getFunctionImport().getReturnedEntitySet();
-				//UriResource function = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
 				rdfResourceParts
 						.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet, function.getParameters()));
 				isFunction = true;
@@ -196,8 +195,6 @@ public class RdfResourceParts {
 				 * instances
 				 */
 				contextUrl = ContextURL.with()
-						//.entitySet(rdfResourceParts.getEntitySet().getEdmEntitySet())
-						//.keyPath(rdfResourceParts.getLocalKey())
 						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
 						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();

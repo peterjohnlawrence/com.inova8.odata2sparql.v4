@@ -34,7 +34,6 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
-import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 
@@ -61,16 +60,10 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		RdfResourceParts rdfResourceParts = null; 
 		try {
 			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
-		} catch (EdmException e) {
+		} catch (EdmException|ODataException|OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
-		} catch (ODataException e) {
-			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
-					Locale.ENGLISH);
-		} catch (OData2SparqlException e) {
-			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
-					Locale.ENGLISH);
-		}		
+		} 
 		EdmEntitySet responseEdmEntitySet =  rdfResourceParts.getResponseEntitySet();
 		SelectOption selectOption = uriInfo.getSelectOption();
 		ExpandOption expandOption = uriInfo.getExpandOption();
@@ -104,6 +97,13 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	public void updateEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity set which belongs to the requested entity
+		RdfResourceParts rdfResourceParts =null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
 		// Note: only in our example we can assume that the first segment is the EntitySet
 		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
@@ -120,7 +120,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		HttpMethod httpMethod = request.getMethod();
 
 		try {
-			SparqlBaseCommand.updateEntity(rdfEdmProvider, uriInfo, requestEntity, httpMethod);
+			SparqlBaseCommand.updateEntity(rdfEdmProvider, rdfResourceParts, uriInfo, requestEntity, httpMethod);
 		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
@@ -134,7 +134,15 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	public void createEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity type from the URI
-		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
+		RdfResourceParts rdfResourceParts =null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		
+		EdmEntitySet edmEntitySet = rdfResourceParts.getEntitySet().getEdmEntitySet();
 		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
 		// 2. create the data in backend
@@ -147,10 +155,10 @@ public class SparqlEntityProcessor implements EntityProcessor {
 
 		Entity createdEntity = null;
 		try {
-			createdEntity = SparqlBaseCommand.writeEntity(rdfEdmProvider, uriInfo, requestEntity);
+			createdEntity = SparqlBaseCommand.writeEntity(rdfEdmProvider, rdfResourceParts, requestEntity);
 			if (createdEntity == null)
 				throw new OData2SparqlException("Entity not created");
-		} catch (EdmException | OData2SparqlException e) {
+		} catch (EdmException | OData2SparqlException | ODataException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
 		}
@@ -172,9 +180,15 @@ public class SparqlEntityProcessor implements EntityProcessor {
 	@Override
 	public void deleteEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
-
+		RdfResourceParts rdfResourceParts =null;
 		try {
-			SparqlBaseCommand.deleteEntity(rdfEdmProvider, uriInfo);
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		try {
+			SparqlBaseCommand.deleteEntity(rdfEdmProvider, rdfResourceParts, uriInfo);
 		} catch (OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);

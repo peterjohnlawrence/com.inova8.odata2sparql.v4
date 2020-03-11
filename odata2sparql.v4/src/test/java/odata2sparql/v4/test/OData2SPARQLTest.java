@@ -129,8 +129,8 @@ public class OData2SPARQLTest {
 	//@Parameters(name = "{0}:{1}/{2}:URI={3}?{4}")
 	@Parameters(name = "{10}:{3}/{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
-		//return getTestData("src/test/resources/CRUDTests.txt");
-		return getTestData("src/test/resources/TestServlet.txt");
+		//return getTestData("src/test/resources/CRUDTests.csv");
+		return getTestData("src/test/resources/TestServlet.csv");
 	}
 
 	@BeforeClass

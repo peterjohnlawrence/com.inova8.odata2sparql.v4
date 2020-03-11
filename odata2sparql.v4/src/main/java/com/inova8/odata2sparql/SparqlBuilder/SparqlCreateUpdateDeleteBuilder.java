@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +23,23 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
+import com.inova8.odata2sparql.uri.RdfResourceNavigationProperty;
+import com.inova8.odata2sparql.uri.RdfResourceParts;
 
 public class SparqlCreateUpdateDeleteBuilder {
 	@SuppressWarnings("unused")
 	private final Logger log = LoggerFactory.getLogger(SparqlStatement.class);
 	private final RdfModel rdfModel;
-
+	//private final RdfEdmProvider rdfEdmProvider;
 	public SparqlCreateUpdateDeleteBuilder(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfModel = rdfEdmProvider.getRdfModel();
+	//	this.rdfEdmProvider = rdfEdmProvider;
 	}
 
-	public SparqlStatement generateInsertEntity(RdfEntityType entityType, Entity entry) throws Exception {
+	public SparqlStatement generateInsertEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType, Entity entry) throws Exception {
+		
+		
 		if (entityType.isOperation()) {
 			String insertText = entityType.getInsertText();
 			if (insertText != null) {
@@ -43,7 +49,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				throw new OData2SparqlException("No insertBody for insertQuery of " + entityType.entityTypeName, null);
 			}
 		} else {
-			StringBuilder insertQuery = generateInsertProperties(entityType, null, entry);
+			StringBuilder insertQuery = generateInsertProperties(rdfResourceParts, entityType, null, entry);
 			return new SparqlStatement(insertQuery.toString());
 		}
 	}
@@ -103,7 +109,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		updatePropertiesReplace = updatePropertiesReplace.replaceAll("\\?predicate",
 				"<" + rdfProperty.getPropertyURI() + ">");
 		if (value != null)
-			updatePropertiesReplace = updatePropertiesReplace.replaceAll("\\?value", "\"" + value.toString() + "\"");
+			updatePropertiesReplace = updatePropertiesReplace.replaceAll("\\?value", "'''" + value.toString() + "'''");
 		else
 			updatePropertiesReplace = updatePropertiesReplace.replaceAll("\\?value", "UNDEF");
 		return updatePropertiesReplace;
@@ -129,111 +135,162 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return insertReplace;
 	}
 
-	private StringBuilder generateInsertProperties(RdfEntityType entityType, List<UriParameter> entityKeys,
+	private StringBuilder generateInsertProperties(RdfResourceParts rdfResourceParts, RdfEntityType entityType, List<UriParameter> entityKeys,
 			Entity entry) throws OData2SparqlException {
-		String entityName = entityType.getEntityTypeName();
-		StringBuilder insertProperties = new StringBuilder("DELETE {\n");
-		insertProperties.append("\tGRAPH ?deletedGraph\n");
-		insertProperties.append("\t{\n");
-		insertProperties.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
-				.append(entityName).append("_o\n");
-		insertProperties.append("\t}\n");		
-		insertProperties.append("}\n");		
-		
-		insertProperties.append("INSERT {\n");
-		insertProperties.append("\tGRAPH ?addedGraph\n");
-		insertProperties.append("\t{\n");
-		insertProperties.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
-				.append(entityName).append("_no\n");
-		insertProperties.append("\t}\n");
-		
-		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) {
-			insertProperties.append("\t##Changes\n");
-			insertProperties.append("\tGRAPH <").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">\n");
-			insertProperties.append("\t{?change a <http://inova8.com/odata4sparql#Change> ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#created>  ?now;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#added> ?addedChange ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#deleted> ?deletedChange .\n");
-			insertProperties.append("\t?addedChange \n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#graph> ?addedGraph  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_no .\n");
-			insertProperties.append("\t?deletedChange \n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#graph> ?deletedGraph  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
-			insertProperties.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_o .\n");
-			insertProperties.append("\t}\n");
+		String entityName = rdfResourceParts.getEntitySet().getRdfEntityType().getEntityTypeName();
+		if(rdfResourceParts.getNavPathString()!=null ) {
+			entityName = entityName + rdfResourceParts.getNavPathString();
 		}
-		insertProperties.append("}\n");
-		insertProperties.append("WHERE {\n");
-		insertProperties.append("\tVALUES(?").append(entityName).append("_p ?")
-				.append(entityName).append("_no){\n");
+		entityType= rdfResourceParts.getResponseRdfEntityType();
+		StringBuilder insertProperties = new StringBuilder();
+		
+		addDelete(entityName, insertProperties);		
 
+		insertProperties.append("INSERT {\n");
+		addAdded(entityName, insertProperties);	
+		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) 
+			addChangeLogging(entityName, insertProperties);
+		insertProperties.append("}\n");
 		
-		String entityKey = (entityKeys != null)
-				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
-				: null;
-		for (Property prop : entry.getProperties()) {
-			RdfProperty property = entityType.findProperty(prop.getName());
-			insertProperties.append("\t\t(");
-			if (property != null) {
-				if (property.getIsKey()) {
-					insertProperties.append(
-							"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getURL() + ">");
-					entityKey = prop.getValue().toString();
-				} else {
-					insertProperties.append("<" + property.getPropertyURI() + "> ");
-					if (prop.getValue() != null) {
-						insertProperties.append(castObjectToXsd(prop.getValue()));
-					}else {
-						insertProperties.append("UNDEF");
-					}
-				}
-			} else {
-				RdfNavigationProperty association = entityType
-						.findNavigationPropertyByEDMNavigationPropertyName(prop.getName());
-				insertProperties.append("<" + association.getNavigationPropertyIRI() + "> ");
-				insertProperties.append(castObjectToXsd(prop.getValue()));
-			}
-			insertProperties.append(")\n");
-		}
-		insertProperties.append("\t}\n");
-		insertProperties.append("\tVALUES(?").append(entityName).append("_s)");
-		if (entityKey == null) {
-			throw new OData2SparqlException("No keys " + entityType.getPrimaryKeys().toString() + " specified for "
-					+ entityType.getEntityTypeName(), null);
-		} else {
-			String expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
-			UrlValidator urlValidator = new UrlValidator();
-			if (urlValidator.isValid(expandedKey)) {
-				insertProperties.append("{(<" + expandedKey + ">)}\n");
-			} else {
-				throw new OData2SparqlException(
-						"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
-			}
-		}
+		insertProperties.append("WHERE {\n");
+		addInsertPropertyValues(entityType, entityKeys, entry, entityName, insertProperties,rdfResourceParts);
+		addCurrentCurrentGraphQuery(entityName, insertProperties);	
+				
+		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, insertProperties);
+		
+		insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+		insertProperties.append("}\n");
+		
+		return insertProperties;
+	}
+
+	protected void addCurrentCurrentGraphQuery(String entityName, StringBuilder insertProperties) {
 		insertProperties.append("\tOPTIONAL{\n");
 		insertProperties.append("\t\tGRAPH ?currentGraph \n");
 		insertProperties.append("\t\t{\n");
 		insertProperties.append("\t\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?").append(entityName).append("_o .\n");
 		insertProperties.append("\t\t} \n");
-		insertProperties.append("\t}\n");
-			
-		insertProperties.append("\tBIND(NOW() as ?now)\n");
+		insertProperties.append("\t}\n");	
 		insertProperties.append("\tBIND( IF(?").append(entityName).append("_o=?").append(entityName).append("_no,FALSE,TRUE) as ?updated)\n");
 		insertProperties.append("\tBIND(IF(BOUND(?updated),?updated,TRUE) as ?revisedUpdated)\n");
-		insertProperties.append("\tBIND(IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");			
-		insertProperties.append("\tBIND( IF(!?revisedUpdated,\"\",IF(BOUND(?").append(entityName).append("_no),?change,?").append(entityName).append("_no )) as ?addChange)\n");
-		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\", IF(BOUND(?currentGraph),?change,?currentGraph)) as ?deleteChange)\n");
-		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/added/\",SHA1(CONCAT(STR(?addChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?addedChange)\n");
-		insertProperties.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/deleted/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
-		insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
-		insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
-		insertProperties.append("\tFILTER(?revisedUpdated)\n");	
-		insertProperties.append("}\n");
-		return insertProperties;
+		insertProperties.append("\tFILTER(?revisedUpdated)\n");
+	}
+
+	protected void addInsertPropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
+			String entityName, StringBuilder insertPropertyValues,RdfResourceParts rdfResourceParts) throws OData2SparqlException {
+		insertPropertyValues.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
+				.append(entityName).append("_no){\n");
+		String entityKey = (entityKeys != null)
+				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
+				: null;
+		String expandedKey = null;
+
+		if(entityKeys!=null && entityKeys.size()>0) {
+			//Use supplied key
+			entityKey = entityKeys.get(0).getText().replace("'", "");
+			expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);		
+		}else {
+			//First find key within properties
+			for (Property prop : entry.getProperties()) {	
+				RdfProperty property = entityType.findProperty(prop.getName());
+				if (property != null) {
+					if (property.getIsKey()) {
+						entityKey = prop.getValue().toString();
+						expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
+						UrlValidator urlValidator = new UrlValidator();
+						if (!urlValidator.isValid(expandedKey)) {
+							throw new OData2SparqlException(
+									"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
+						}
+						break;
+					} 
+				}
+			}
+		}
+		//Create insert for any navigation property that is included:
+		if(rdfResourceParts.size()>1 ) {
+			//(<entityKey> <navigationproperty> <expandedKey>)
+			String localKey = rdfResourceParts.getLocalKey().replace("'", "");
+			String expandedLocalKey = rdfModel.getRdfPrefixes().expandPredicate(localKey);	
+			EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
+			String navigationPropertyKey = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI();
+			insertPropertyValues.append("\t\t(<").append(expandedLocalKey).append("> <").append(navigationPropertyKey).append("> <").append(expandedKey).append(">)\n");
+		}
+
+		//Now create VALUES statement for all properties
+		for (Property prop : entry.getProperties()) {
+			RdfProperty property = entityType.findProperty(prop.getName());
+			insertPropertyValues.append("\t\t(");
+			if (property != null) {
+				if (property.getIsKey()) {
+					insertPropertyValues.append("<").append(expandedKey).append(
+							"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getURL() + ">");
+				} else {
+					insertPropertyValues.append("<").append(expandedKey).append("> <" + property.getPropertyURI() + "> ");
+					if (prop.getValue() != null) {
+						insertPropertyValues.append(castObjectToXsd(prop.getValue()));
+					}else {
+						insertPropertyValues.append("UNDEF");
+					}
+				}
+			} else {
+				RdfNavigationProperty association = entityType
+						.findNavigationPropertyByEDMNavigationPropertyName(prop.getName());
+				insertPropertyValues.append("<").append(expandedKey).append("> <" + association.getNavigationPropertyIRI() + "> ");
+				insertPropertyValues.append(castObjectToXsd(prop.getValue()));
+			}
+			insertPropertyValues.append(")\n");
+		}
+		insertPropertyValues.append("\t}\n");
+	}
+
+	protected void addChangeLoggingParameters(String entityName, StringBuilder changeLoggingParameters) {
+		changeLoggingParameters.append("\tBIND(NOW() as ?now)\n");		
+		changeLoggingParameters.append("\tBIND(IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");			
+		changeLoggingParameters.append("\tBIND( IF(!?revisedUpdated,\"\",IF(BOUND(?").append(entityName).append("_no),?change,?").append(entityName).append("_no )) as ?addChange)\n");
+		changeLoggingParameters.append("\tBIND(IF(!?revisedUpdated,\"\", IF(BOUND(?currentGraph),?change,?currentGraph)) as ?deleteChange)\n");
+		changeLoggingParameters.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/added/\",SHA1(CONCAT(STR(?addChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?addedChange)\n");
+		changeLoggingParameters.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/deleted/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?").append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
+	}
+
+
+	protected void addAdded(String entityName, StringBuilder insert) {
+		insert.append("\tGRAPH ?addedGraph\n");
+		insert.append("\t{\n");
+		insert.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
+				.append(entityName).append("_no\n");
+		insert.append("\t}\n");
+	}
+
+	protected void addDelete(String entityName, StringBuilder delete) {
+		delete.append("DELETE {\n");
+		delete.append("\tGRAPH ?deletedGraph\n");
+		delete.append("\t{\n");
+		delete.append("\t\t?").append(entityName).append("_s ?").append(entityName).append("_p ?")
+				.append(entityName).append("_o\n");
+		delete.append("\t}\n");		
+		delete.append("}\n");
+	}
+
+	protected void addChangeLogging(String entityName, StringBuilder changelogging) {
+		changelogging.append("\t##Changes\n");
+		changelogging.append("\tGRAPH <").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">\n");
+		changelogging.append("\t{?change a <http://inova8.com/odata4sparql#Change> ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#created>  ?now;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#added> ?addedChange ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#deleted> ?deletedChange .\n");
+		changelogging.append("\t?addedChange \n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#graph> ?addedGraph  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_no .\n");
+		changelogging.append("\t?deletedChange \n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#graph> ?deletedGraph  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#subject> ?").append(entityName).append("_s  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#predicate>  ?").append(entityName).append("_p  ;\n");
+		changelogging.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_o .\n");
+		changelogging.append("\t}\n");
 	}
 
 	private String castObjectToXsd(Object object) throws OData2SparqlException {
@@ -243,10 +300,6 @@ public class SparqlCreateUpdateDeleteBuilder {
 		case "java.util.GregorianCalendar":
 			return "\"" + ((java.util.GregorianCalendar) object).toZonedDateTime().toLocalDateTime().toString()
 					+ "\"^^xsd:dateTime";
-		//		case "org.apache.olingo.odata2.core.ep.entry.ODataEntryImpl":
-		//			String odataUrl= ((org.apache.olingo.odata2.core.ep.entry.ODataEntryImpl)object).getMetadata().getUri();
-		//			String entityUrl= RdfEntity.URLDecodeEntityKey(getExpandedMetadaEntitykey( odataUrl));
-		//			return "<" + entityUrl + ">";
 		case "Edm.DateTimeOffset":
 		case "java.lang.String":
 			return "'''" + object.toString() + "'''";
@@ -259,7 +312,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
-	public SparqlStatement generateDeleteEntity(RdfEntityType entityType, List<UriParameter> entityKeys)
+	public SparqlStatement generateDeleteEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType, List<UriParameter> entityKeys)
 			throws OData2SparqlException {
 		if (entityType.isOperation()) {
 			String deleteText = entityType.getDeleteText();
@@ -271,23 +324,49 @@ public class SparqlCreateUpdateDeleteBuilder {
 			}
 		} else {
 
-			String key = entityType.entityTypeName;
-			StringBuilder deleteQuery = new StringBuilder(
-					"DELETE {?" + key + "_s ?" + key + "_p ?" + key + "_o .}WHERE {");
-			//Only need one key for a RDF entity
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText());
+			String entityName = entityType.getEntityTypeName();
+			StringBuilder insertProperties = new StringBuilder();
+			
+			addDelete(entityName, insertProperties);
 
-			deleteQuery.append("{?" + key + "_s ?" + key + "_p ?" + key + "_o .{VALUES(?" + key + "_s ){(<"
-					+ expandedKey + ">)}}}");
-			deleteQuery.append("UNION");
-			deleteQuery.append("{?" + key + "_s ?" + key + "_p ?" + key + "_o .{VALUES(?" + key + "_o ){(<"
-					+ expandedKey + ">)}}}");
-			deleteQuery.append("}");
-			return new SparqlStatement(deleteQuery.toString());
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) {
+				insertProperties.append("INSERT {\n");
+				addChangeLogging(entityName, insertProperties);
+				insertProperties.append("}\n");
+			}			
+			insertProperties.append("WHERE {\n");
+			insertProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?").append(entityName).append("_o").append("){");
+			//Create insert for any navigation property that is included:
+	
+			//(<entityKey> <navigationproperty> <expandedKey>)
+			expandedKey = " <" + expandedKey + "> ";	
+			String navigationPropertyKey =" UNDEF ";
+			String expandedNavPropKey =" UNDEF ";
+			if(rdfResourceParts.size()>1 ) {
+				EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
+				navigationPropertyKey =  " <" +  rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI()+"> ";
+				
+				if( rdfResourceParts.getTargetSubjectId() !="" ) {
+				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
+				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
+				}		
+			}
+			insertProperties.append("(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")");
+			insertProperties.append("}\n");
+			addCurrentCurrentGraphQuery(entityName, insertProperties);	
+					
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, insertProperties);
+			
+			insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+			insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+			insertProperties.append("}\n");
+			
+			return new SparqlStatement(insertProperties.toString());	
 		}
 	}
 
-	public SparqlStatement generateUpdateEntity(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry)
+	public SparqlStatement generateUpdateEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry)
 			throws Exception {
 		if (entityType.isOperation()) {
 			String updateText = entityType.getUpdateText();
@@ -299,7 +378,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			}
 		} else {
 			StringBuilder sparql = new StringBuilder();
-			sparql.append(generateInsertProperties(entityType, entityKeys, entry));
+			sparql.append(generateInsertProperties(rdfResourceParts,entityType, entityKeys, entry));
 			return new SparqlStatement(sparql.toString());
 		}
 	}
@@ -316,27 +395,38 @@ public class SparqlCreateUpdateDeleteBuilder {
 						"No updatePropertyBody for updatePropertyQuery of " + entityType.entityTypeName, null);
 			}
 		} else {
-			//Only need one key for an RDF entity
+			
+			String entityName = entityType.getEntityTypeName();
+			StringBuilder insertProperties = new StringBuilder();
+			
+			addDelete(entityName, insertProperties);
+			insertProperties.append("INSERT {\n");
+			addAdded(entityName, insertProperties);	
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) 
+				addChangeLogging(entityName, insertProperties);
+			insertProperties.append("}\n");
+			
+			insertProperties.append("WHERE {\n");
+			
 			String entityKey = entityKeys.get(0).getText();
-			String key = entityType.entityTypeName;
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);
 			String expandedProperty = entityType.findProperty(property).getPropertyURI();
 			String value = entry.toString();
-			//
-			//			if (urlValidator.isValid(expandedProperty)) {
-			//
-			//			} else {
-			//				throw new OData2SparqlException("Invalid property: " + property, null);
-			//			}
-
-			StringBuilder sparql = new StringBuilder("DELETE {?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
-			sparql.append("INSERT{<" + expandedKey + "> " + "<" + expandedProperty + "> \"" + value + "\"}");
-			sparql.append("WHERE {OPTIONAL { ?" + key + "_s ?" + key + "_p ?" + key + "_o . VALUES(?" + key + "_s ?"
-					+ key + "_p){(");
-			sparql.append("<" + expandedKey + "> ");
-			sparql.append("<" + expandedProperty + ">)}}}");
-
-			return new SparqlStatement(sparql.toString());
+			
+			insertProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?").append(entityName).append("_no){(");
+			insertProperties.append("<").append(expandedKey).append(">");
+			insertProperties.append(" <").append(expandedProperty).append(">");
+			insertProperties.append(" '''" + value + "'''");
+			insertProperties.append(")}\n");
+			addCurrentCurrentGraphQuery(entityName, insertProperties);	
+					
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, insertProperties);
+			
+			insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+			insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+			insertProperties.append("}\n");
+			
+			return new SparqlStatement(insertProperties.toString());	
 		}
 	}
 
@@ -359,21 +449,35 @@ public class SparqlCreateUpdateDeleteBuilder {
 						"No updatePropertyBody for updatePropertyQuery of " + entityType.entityTypeName, null);
 			}
 		} else {
-			String entityKey = entityKeys.get(0).getText();
-			String key = entityType.entityTypeName;
-			StringBuilder sparql = new StringBuilder("DELETE {?" + key + "_s ?" + key + "_p ?" + key + "_o .}WHERE { ?"
-					+ key + "_s ?" + key + "_p ?" + key + "_o . VALUES(?" + key + "_s ?" + key + "_p){(");
-			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);
-			sparql.append("<" + expandedKey + "> ");
+	
+			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText());
+			String entityName = entityType.getEntityTypeName();
 			String expandedProperty = entityType.findProperty(property).getPropertyURI();
-			//			UrlValidator urlValidator = new UrlValidator();
-			//			if (urlValidator.isValid(expandedProperty)) {
-			sparql.append("<" + expandedProperty + ">)}}");
-			//			} else {
-			//				throw new OData2SparqlException("Invalid property: " + property, null);
-			//			}
-			return new SparqlStatement(sparql.toString());
+			StringBuilder insertProperties = new StringBuilder();
+			
+			addDelete(entityName, insertProperties);
 
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) {
+				insertProperties.append("INSERT {\n");
+				addChangeLogging(entityName, insertProperties);
+				insertProperties.append("}\n");
+			}			
+			insertProperties.append("WHERE {\n");
+
+			insertProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p){(");
+			insertProperties.append("<").append(expandedKey).append(">");
+			insertProperties.append(" <").append(expandedProperty).append(">");
+			insertProperties.append(")}\n");
+			
+			addCurrentCurrentGraphQuery(entityName, insertProperties);	
+					
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, insertProperties);
+			
+			insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+			insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+			insertProperties.append("}\n");		
+			return new SparqlStatement(insertProperties.toString());	
+			
 		}
 	}
 

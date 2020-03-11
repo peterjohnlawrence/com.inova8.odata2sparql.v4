@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
@@ -14,13 +13,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfQuerySolution;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfResultSet;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfSelectQuery;
-import com.inova8.odata2sparql.RdfConnector.openrdf.RdfUpdate;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 
@@ -31,10 +24,10 @@ public class SparqlChangeManager {
 		SparqlStatement sparqlStatement = null;
 		StringBuilder clear = new StringBuilder();
 		try {
-			//clear.append("DELETE {GRAPH <").append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">{?s ?p ?o}	}WHERE { GRAPH <").append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">{ ?s ?p ?o }}");
-			clear.append("CLEAR SILENT GRAPH <")
-					.append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl())
-					.append(">");
+			clear.append("DELETE {GRAPH <").append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">{?s ?p ?o}	}WHERE { GRAPH <").append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl()).append(">{ ?s ?p ?o }}");
+			//clear.append("CLEAR SILENT GRAPH <")
+			//		.append(rdfEdmProvider.getRdfModel().getRdfRepository().getDataRepository().getChangeGraphUrl())
+			//		.append(">");
 			sparqlStatement = new SparqlStatement(clear.toString());
 		} catch (Exception e) {
 			log.error(e.getMessage());
