@@ -23,7 +23,6 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
-import com.inova8.odata2sparql.uri.RdfResourceNavigationProperty;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 
 public class SparqlCreateUpdateDeleteBuilder {

@@ -2721,7 +2721,7 @@ public class SparqlQueryBuilder {
 	private StringBuilder defaultLimitClause() {
 		StringBuilder defaultLimitClause = new StringBuilder();
 		int defaultLimit = rdfModel.getRdfRepository().getModelRepository().getDefaultQueryLimit();
-		defaultLimitClause.append(" LIMIT ").append(defaultLimit);
+		if(defaultLimit>0)	defaultLimitClause.append(" LIMIT ").append(defaultLimit);
 		return defaultLimitClause;
 	}
 
