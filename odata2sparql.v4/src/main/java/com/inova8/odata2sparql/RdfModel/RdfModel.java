@@ -133,8 +133,13 @@ public class RdfModel {
 			}
 		}
 		public String expandPredicateKey(String predicateKey) throws OData2SparqlException {
-			String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
-			return expandPredicate(entityKey);
+			
+			if(predicateKey.endsWith("'")) {
+				String entityKey = predicateKey.substring(1, predicateKey.length() - 1);
+				return expandPredicate(entityKey);
+			}else {
+				return expandPredicate(predicateKey);
+			}
 		}
 
 		private void checkLegal(String prefix) throws OData2SparqlException {

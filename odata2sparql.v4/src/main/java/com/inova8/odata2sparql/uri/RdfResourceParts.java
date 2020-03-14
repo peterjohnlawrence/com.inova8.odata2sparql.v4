@@ -46,6 +46,7 @@ public class RdfResourceParts {
 	final RdfEdmProvider rdfEdmProvider;
 	private RdfResourcePart lastResourcePart;
 	private String lastPropertyName;
+	private String lastNavPropertyName;
 	private EdmComplexType lastComplexType;
 	private RdfProperty lastComplexProperty;
 	private RdfEntityType responseRdfEntityType;
@@ -236,6 +237,7 @@ public class RdfResourceParts {
 		uriType = _getUriType();
 		lastResourcePart = _getLastResourcePart();
 		lastPropertyName = _getLastPropertyName();
+		lastNavPropertyName = _getLastNavPropertyName();
 		lastComplexType = _getLastComplexType();
 		lastComplexProperty = _getLastComplexProperty();
 		responseEntitySet = _getResponseEntitySet();
@@ -266,7 +268,9 @@ public class RdfResourceParts {
 	public String getLastPropertyName() {
 		return lastPropertyName;
 	}
-
+	public String getLastNavPropertyName() {
+		return lastNavPropertyName;
+	}
 	public EdmComplexType getLastComplexType() {
 		return lastComplexType;
 	}
@@ -339,7 +343,17 @@ public class RdfResourceParts {
 		}
 		return null;
 	}
-
+	private String _getLastNavPropertyName() {
+		RdfResourcePart lastResourcePart = _getLastResourcePart();
+		if (lastResourcePart != null) {
+			if (lastResourcePart.uriResourceKind.equals(UriResourceKind.navigationProperty)) {
+				return ((RdfResourceNavigationProperty) lastResourcePart).getEdmNavigationProperty().getName();
+			} else if (lastResourcePart.uriResourceKind.equals(UriResourceKind.complexProperty)) {
+				return ((RdfResourceComplexProperty) lastResourcePart).getComplexType().getName();
+			}
+		}
+		return null;
+	}
 	private EdmComplexType _getLastComplexType() {
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {

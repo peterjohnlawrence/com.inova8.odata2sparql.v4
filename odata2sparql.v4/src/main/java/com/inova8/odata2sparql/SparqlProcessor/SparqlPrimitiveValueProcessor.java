@@ -207,7 +207,7 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
+		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(resourcePaths.size()-1);
 		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
 
 		InputStream requestInputStream = request.getBody();
@@ -223,7 +223,7 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 			throws ODataApplicationException, ODataLibraryException {
 		// 1. Retrieve the entity set which belongs to the requested entity
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(1);
+		UriResourcePrimitiveProperty uriResourcePrimitiveProperty = (UriResourcePrimitiveProperty) resourcePaths.get(resourcePaths.size()-1);
 		EdmProperty edmProperty = uriResourcePrimitiveProperty.getProperty();
 
 		InputStream requestInputStream = request.getBody();

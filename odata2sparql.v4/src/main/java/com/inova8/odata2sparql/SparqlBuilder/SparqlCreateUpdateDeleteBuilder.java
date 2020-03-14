@@ -138,7 +138,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			Entity entry) throws OData2SparqlException {
 		String entityName = rdfResourceParts.getEntitySet().getRdfEntityType().getEntityTypeName();
 		if(rdfResourceParts.getNavPathString()!=null ) {
-			entityName = entityName + rdfResourceParts.getNavPathString();
+			entityName = entityName + rdfResourceParts.getLastNavPropertyName();//.getNavPathString();
 		}
 		entityType= rdfResourceParts.getResponseRdfEntityType();
 		StringBuilder insertProperties = new StringBuilder();
@@ -163,7 +163,35 @@ public class SparqlCreateUpdateDeleteBuilder {
 		
 		return insertProperties;
 	}
+	private StringBuilder generateUpdateProperties(RdfResourceParts rdfResourceParts, RdfEntityType entityType, List<UriParameter> entityKeys,
+			Entity entry) throws OData2SparqlException {
+		String entityName = rdfResourceParts.getEntitySet().getRdfEntityType().getEntityTypeName();
+		if(rdfResourceParts.getNavPathString()!=null ) {
+			entityName = entityName + rdfResourceParts.getLastNavPropertyName();//.getNavPathString();
+		}
+		entityType= rdfResourceParts.getResponseRdfEntityType();
+		StringBuilder updateProperties = new StringBuilder();
+		
+		addDelete(entityName, updateProperties);		
 
+		updateProperties.append("INSERT {\n");
+		addAdded(entityName, updateProperties);	
+		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) 
+			addChangeLogging(entityName, updateProperties);
+		updateProperties.append("}\n");
+		
+		updateProperties.append("WHERE {\n");
+		addUpdatePropertyValues(entityType, entityKeys, entry, entityName, updateProperties,rdfResourceParts);
+		addCurrentCurrentGraphQuery(entityName, updateProperties);	
+				
+		if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, updateProperties);
+		
+		updateProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+		updateProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+		updateProperties.append("}\n");
+		
+		return updateProperties;
+	}
 	protected void addCurrentCurrentGraphQuery(String entityName, StringBuilder insertProperties) {
 		insertProperties.append("\tOPTIONAL{\n");
 		insertProperties.append("\t\tGRAPH ?currentGraph \n");
@@ -210,7 +238,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 		//Create insert for any navigation property that is included:
 		if(rdfResourceParts.size()>1 ) {
 			//(<entityKey> <navigationproperty> <expandedKey>)
-			String localKey = rdfResourceParts.getLocalKey().replace("'", "");
+			String localKey = rdfResourceParts.getSubjectId();
 			String expandedLocalKey = rdfModel.getRdfPrefixes().expandPredicate(localKey);	
 			EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
 			String navigationPropertyKey = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI();
@@ -243,7 +271,125 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 		insertPropertyValues.append("\t}\n");
 	}
+	protected void addUpdatePropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
+			String entityName, StringBuilder updatePropertyValues,RdfResourceParts rdfResourceParts) throws OData2SparqlException {
+		updatePropertyValues.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
+				.append(entityName).append("_no){\n");
+		String entityKey = (entityKeys != null)
+				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
+				: null;
+		String expandedKey = null;
 
+		if(entityKeys!=null && entityKeys.size()>0) {
+			//Use supplied key
+			entityKey = entityKeys.get(0).getText().replace("'", "");
+			expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);		
+		}else {
+			//First find key within properties
+			for (Property prop : entry.getProperties()) {	
+				RdfProperty property = entityType.findProperty(prop.getName());
+				if (property != null) {
+					if (property.getIsKey()) {
+						entityKey = prop.getValue().toString();
+						expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
+						UrlValidator urlValidator = new UrlValidator();
+						if (!urlValidator.isValid(expandedKey)) {
+							throw new OData2SparqlException(
+									"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
+						}
+						break;
+					} 
+				}
+			}
+		}
+		//Create insert for any navigation property that is included:
+		
+		//(<entityKey> <navigationproperty> <expandedKey>)
+		expandedKey = " <" + expandedKey + "> ";	
+		String navigationPropertyKey =" UNDEF ";
+		String expandedNavPropKey =" UNDEF ";
+		
+		if(rdfResourceParts.size()>1 ) {
+			
+//			String localKey = rdfResourceParts.getSubjectId();
+//			String expandedLocalKey = rdfModel.getRdfPrefixes().expandPredicate(localKey);	
+//			EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
+//			String navigationPropertyKey = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI();
+//			updatePropertyValues.append("\t\t(<").append(expandedLocalKey).append("> <").append(navigationPropertyKey).append("> <").append(expandedKey).append(">)\n");
+			
+			EdmNavigationProperty edmNavigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
+			RdfNavigationProperty navProperty = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
+			navigationPropertyKey =  " <" +  navProperty.getNavigationPropertyIRI()+"> ";
+			
+			if( rdfResourceParts.getTargetSubjectId() !="" ) {
+				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
+				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
+				updatePropertyValues.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")\n");
+				if(navProperty.IsInverse() ) {					
+					String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
+					updatePropertyValues.append("\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")\n");
+				}
+			}	
+			//change because now the properties refer to the navigationEntity
+			expandedKey= expandedNavPropKey;
+		}
+
+		//Now create VALUES statement for all properties
+		for (Property prop : entry.getProperties()) {
+			RdfProperty property = entityType.findProperty(prop.getName());
+			updatePropertyValues.append("\t\t(");
+			if (property != null) {
+				if (property.getIsKey()) {
+					updatePropertyValues.append(expandedKey).append(
+							" <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getURL() + ">");
+				} else {
+					updatePropertyValues.append(expandedKey).append(" <" + property.getPropertyURI() + "> ");
+					if (prop.getValue() != null) {
+						updatePropertyValues.append(castObjectToXsd(prop.getValue()));
+					}else {
+						updatePropertyValues.append("UNDEF");
+					}
+				}
+			} else {
+				RdfNavigationProperty association = entityType
+						.findNavigationPropertyByEDMNavigationPropertyName(prop.getName());
+				updatePropertyValues.append("<").append(expandedKey).append("> <" + association.getNavigationPropertyIRI() + "> ");
+				updatePropertyValues.append(castObjectToXsd(prop.getValue()));
+			}
+			updatePropertyValues.append(")\n");
+		}
+		updatePropertyValues.append("\t}\n");
+	}
+	protected void addDeletePropertyValues(String expandedKey, String entityName, StringBuilder deleteProperties,
+			RdfResourceParts rdfResourceParts) throws OData2SparqlException {
+		deleteProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?").append(entityName).append("_o").append("){\n");
+		//Create insert for any navigation property that is included:
+
+		//(<entityKey> <navigationproperty> <expandedKey>)
+		expandedKey = " <" + expandedKey + "> ";	
+		String navigationPropertyKey =" UNDEF ";
+		String expandedNavPropKey =" UNDEF ";
+		if(rdfResourceParts.size()>1 ) {
+			EdmNavigationProperty edmNavigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
+			RdfNavigationProperty navProperty = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
+			navigationPropertyKey =  " <" +  navProperty.getNavigationPropertyIRI()+"> ";
+			
+			if( rdfResourceParts.getTargetSubjectId() !="" ) {
+				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
+				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
+				deleteProperties.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")");
+				if(navProperty.IsInverse() ) {					
+					String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
+					deleteProperties.append("\n\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")");
+				}
+			}	
+		}else {
+			deleteProperties.append("\t\t(").append(expandedKey).append(" UNDEF ").append(" UNDEF ").append(")\n");
+			deleteProperties.append("\t\t(").append(" UNDEF ").append(navigationPropertyKey).append(" UNDEF ").append(")\n");
+			deleteProperties.append("\t\t(").append(" UNDEF ").append(" UNDEF ").append(expandedKey).append(")");
+		}
+		deleteProperties.append("}\n");
+	}
 	protected void addChangeLoggingParameters(String entityName, StringBuilder changeLoggingParameters) {
 		changeLoggingParameters.append("\tBIND(NOW() as ?now)\n");		
 		changeLoggingParameters.append("\tBIND(IRI(CONCAT(\"").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl()).append("/\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");			
@@ -325,45 +471,30 @@ public class SparqlCreateUpdateDeleteBuilder {
 
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText());
 			String entityName = entityType.getEntityTypeName();
-			StringBuilder insertProperties = new StringBuilder();
+			StringBuilder deleteProperties = new StringBuilder();
 			
-			addDelete(entityName, insertProperties);
+			addDelete(entityName, deleteProperties);
 
 			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl()) {
-				insertProperties.append("INSERT {\n");
-				addChangeLogging(entityName, insertProperties);
-				insertProperties.append("}\n");
+				deleteProperties.append("INSERT {\n");
+				addChangeLogging(entityName, deleteProperties);
+				deleteProperties.append("}\n");
 			}			
-			insertProperties.append("WHERE {\n");
-			insertProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?").append(entityName).append("_o").append("){");
-			//Create insert for any navigation property that is included:
-	
-			//(<entityKey> <navigationproperty> <expandedKey>)
-			expandedKey = " <" + expandedKey + "> ";	
-			String navigationPropertyKey =" UNDEF ";
-			String expandedNavPropKey =" UNDEF ";
-			if(rdfResourceParts.size()>1 ) {
-				EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
-				navigationPropertyKey =  " <" +  rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI()+"> ";
-				
-				if( rdfResourceParts.getTargetSubjectId() !="" ) {
-				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
-				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
-				}		
-			}
-			insertProperties.append("(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")");
-			insertProperties.append("}\n");
-			addCurrentCurrentGraphQuery(entityName, insertProperties);	
+			deleteProperties.append("WHERE {\n");
+			addDeletePropertyValues(expandedKey, entityName, deleteProperties, rdfResourceParts);
+			addCurrentCurrentGraphQuery(entityName, deleteProperties);	
 					
-			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, insertProperties);
+			if (rdfModel.getRdfRepository().getDataRepository().isChangeGraphUrl())  addChangeLoggingParameters(entityName, deleteProperties);
 			
-			insertProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
-			insertProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
-			insertProperties.append("}\n");
+			deleteProperties.append("\tBIND( IF(BOUND(?deletedChange),COALESCE(?deletedGraph,<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append("> ),<").append(rdfModel.getRdfRepository().getDataRepository().getInsertGraphUrl()).append(">) as ?addedGraph)\n");
+			deleteProperties.append("\tBIND( IF(isIRI(?deletedChange),?currentGraph,<http://fake>) as ?deletedGraph)\n");		
+			deleteProperties.append("}\n");
 			
-			return new SparqlStatement(insertProperties.toString());	
+			return new SparqlStatement(deleteProperties.toString());	
 		}
 	}
+
+
 
 	public SparqlStatement generateUpdateEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry)
 			throws Exception {
@@ -377,12 +508,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 			}
 		} else {
 			StringBuilder sparql = new StringBuilder();
-			sparql.append(generateInsertProperties(rdfResourceParts,entityType, entityKeys, entry));
+			sparql.append(generateUpdateProperties(rdfResourceParts,entityType, entityKeys, entry));
 			return new SparqlStatement(sparql.toString());
 		}
 	}
 
-	public SparqlStatement generateUpdateEntitySimplePropertyValue(RdfEntityType entityType,
+	public SparqlStatement generateUpdateEntitySimplePropertyValue(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, String property, Object entry) throws OData2SparqlException {
 		if (entityType.isOperation()) {
 			String updatePropertyText = entityType.getDeleteText();
@@ -407,7 +538,8 @@ public class SparqlCreateUpdateDeleteBuilder {
 			
 			insertProperties.append("WHERE {\n");
 			
-			String entityKey = entityKeys.get(0).getText();
+			String entityKey = rdfResourceParts.getTargetSubjectId();//entityKeys.get(0).getText();
+			if(entityKey==null)entityKey = rdfResourceParts.getSubjectId();
 			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);
 			String expandedProperty = entityType.findProperty(property).getPropertyURI();
 			String value = entry.toString();
@@ -436,7 +568,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 				entityKeys, null, property, entry).toString());
 	}
 
-	public SparqlStatement generateDeleteEntitySimplePropertyValue(RdfEntityType entityType,
+	public SparqlStatement generateDeleteEntitySimplePropertyValue(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, String property) throws OData2SparqlException {
 		if (entityType.isOperation()) {
 			String updatePropertyText = entityType.getUpdatePropertyText();
@@ -448,8 +580,11 @@ public class SparqlCreateUpdateDeleteBuilder {
 						"No updatePropertyBody for updatePropertyQuery of " + entityType.entityTypeName, null);
 			}
 		} else {
-	
-			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText());
+			
+			String entityKey = rdfResourceParts.getTargetSubjectId();//entityKeys.get(0).getText();
+			if(entityKey==null)entityKey = rdfResourceParts.getSubjectId();
+			String expandedKey = rdfModel.getRdfPrefixes().expandPredicateKey(entityKey);//rdfModel.getRdfPrefixes().expandPredicateKey(entityKeys.get(0).getText());
+			
 			String entityName = entityType.getEntityTypeName();
 			String expandedProperty = entityType.findProperty(property).getPropertyURI();
 			StringBuilder insertProperties = new StringBuilder();
