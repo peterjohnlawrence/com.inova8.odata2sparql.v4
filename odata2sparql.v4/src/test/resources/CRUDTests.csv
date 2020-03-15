@@ -1,0 +1,239 @@
+Group	SubGroup	Test		Method	Repository	RequestURI	Query	Options	Expected	Comments
+changes	changes	Delta Clear		GET	$changes	northwind/clear			$changes on northwind clear'ed	
+Create  'NWD~Customer-TEST1'	CRUD	SimpleCRUD.1		POST	northwind	Customer	"{""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Eugene"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":null,""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""97403"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	application/json	"{""@odata.context"":""$metadata#Customer"",""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Eugene"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":null,""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""97403"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	yet to be migrated to V15
+	CRUD	SimpleCRUD.1.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer/$entity"",""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Eugene"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":null,""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""97403"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	
+(new phone and fax numbers)	CRUD	SimpleCRUD.2		PUT	northwind	Customer('NWD~Customer-Test1')	"{""@odata.context"":""$metadata#Customer"",""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Eugene"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":""(newfax)"",""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""123456"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	application/json		
+	CRUD	SimpleCRUD.2.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer/$entity"",""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Eugene"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":""(newfax)"",""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""123456"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	
+customerAddress -> Köln	CRUD	SimpleCRUD.3		PATCH	northwind	Customer('NWD~Customer-Test1')	"{""customerCity"":""Koln""}"	application/json		
+	CRUD	SimpleCRUD.3.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer/$entity"",""comment"":null,""customerAddress"":""2732 Baker Blvd."",""customerCity"":""Koln"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":""(newfax)"",""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""123456"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	
+customerAddress/$value -> 2733	CRUD	SimpleCRUD.4		PUT	northwind	Customer('NWD~Customer-Test1')/customerAddress/$value	2733 Baker Blvd.	text/plain		
+	CRUD	SimpleCRUD.4.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer/$entity"",""comment"":null,""customerAddress"":""2733 Baker Blvd."",""customerCity"":""Koln"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":""(newfax)"",""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""123456"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	
+delete customerAddress/$value 	CRUD	SimpleCRUD.5		DELETE	northwind	Customer('NWD~Customer-Test1')/customerAddress/$value		text/plain		
+	CRUD	SimpleCRUD.5.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer/$entity"",""comment"":null,""customerAddress"":null,""customerCity"":""Koln"",""customerCompanyName"":""Great Lakes Food Market"",""customerContactName"":""Howard Snyder"",""customerContactTitle"":""Marketing Manager"",""customerCountry"":""USA"",""customerFax"":""(newfax)"",""customerPhone"":""(503) 555-7555"",""customerPostalCode"":""123456"",""customerWebsite"":null,""label"":null,""lat"":44.0284944,""lat_long"":""44.0284944,-123.0731791"",""long"":-123.0731791,""regionDescription"":null,""subjectId"":""NWD~Customer-Test1""}"	
+Delete  'NWD~Customer-TEST1'	CRUD	SimpleCRUD.6		DELETE	northwind	Customer('NWD~Customer-Test1')		text/plain		
+	CRUD	SimpleCRUD.6.test		GET	northwind	Customer('NWD~Customer-Test1')		&$format=application/json;charset=UTF-8	"{""error"":{""code"":null,""message"":""No data found""}}"	
+	CRUD	OperationCRUD.1		POST	northwind	Customer_Order	"{""customer"": ""NWD~Customer-ALFKI"",""customer_Order_customerCity"": ""Berlin"",""customer_Order_customerCompanyName"": ""Alfreds Futterkiste"",""customer_Order_shipCity"": ""Berlin"",""order"": ""NWD~Order-New""}"	application/json	"{""@odata.context"":""$metadata#Customer_Order"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":""Berlin"",""customer_Order_customerCompanyName"":""Alfreds Futterkiste"",""customer_Order_shipCity"":""Berlin"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.1.test		GET	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer_Order/$entity"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":""Berlin"",""customer_Order_customerCompanyName"":""Alfreds Futterkiste"",""customer_Order_shipCity"":""Berlin"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.2		POST	northwind	Customer_Order	"{""customer"": ""NWD~Customer-ALFKI"",""customer_Order_customerCity"": ""Berlin"",""customer_Order_customerCompanyName"": ""(new customerCompanyName)"",""customer_Order_shipCity"": ""(new shipCity)"",""order"": ""NWD~Order-New""}"	application/json	"{""@odata.context"":""$metadata#Customer_Order"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":""Berlin"",""customer_Order_customerCompanyName"":""(new customerCompanyName)"",""customer_Order_shipCity"":""(new shipCity)"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.2.test		GET	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer_Order/$entity"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":""Berlin"",""customer_Order_customerCompanyName"":""Alfreds Futterkiste"",""customer_Order_shipCity"":""Berlin"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.3		PUT	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')/customer_Order_customerCity/$value	(new customerCity)	text/plain		
+	CRUD	OperationCRUD.3.test		GET	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer_Order/$entity"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":""(new customerCity)"",""customer_Order_customerCompanyName"":""Alfreds Futterkiste"",""customer_Order_shipCity"":""Berlin"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.4		DELETE	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')/customer_Order_customerCity/$value				
+	CRUD	OperationCRUD.4.test		GET	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#Customer_Order/$entity"",""customer"":""NWD~Customer-ALFKI"",""customer_Order_customerCity"":null,""customer_Order_customerCompanyName"":""Alfreds Futterkiste"",""customer_Order_shipCity"":""Berlin"",""order"":""NWD~Order-New""}"	
+	CRUD	OperationCRUD.5		DELETE	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8		
+	CRUD	OperationCRUD.5.test		GET	northwind	Customer_Order(customer='NWD~Customer-ALFKI',order='NWD~Order-New')		&$format=application/json;charset=UTF-8	"{""error"":{""code"":null,""message"":""No data found""}}"	
+Reset	CRUD	OperationCRUD.reset		PUT	northwind	Customer('NWD~Customer-ALFKI')/customerCity/$value	Berlin	text/plain		
+delete customerAddress/$value 	CRUD	SimpleCRUD.5		DELETE	northwind	Customer('NWD~Customer-ALFKI')/customerCompanyName/$value		text/plain		
+Patch value	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""stateName"":""Floridapq""} "	application/json		
+Add new  navProperty	CRUD	SimpleCRUD.6		POST	northwind	Category('NWD~Category-1')/isCategoryOf 	"{""subjectId"":""NWD~AProduct1"",""comment"":""a product1"",""label"":""aproduct1""}"	application/json		
+Add navProperty	CRUD	SimpleCRUD.6		POST	northwind	Category('NWD~Category-1')/isCategoryOf 	"{""subjectId"":""NWD~Product-3""}"			
+Delete navProperty	CRUD	SimpleCRUD.6		DELETE	northwind	Category('NWD~Category-1')/isCategoryOf 	"{""subjectId"":""NWD~AProduct1"",""comment"":""a product1"",""label"":""aproduct1""}"			
+Delete navProperty	CRUD	SimpleCRUD.6		DELETE	northwind	Category('NWD~Category-1')/isCategoryOf (‘NWD~AProduct1’)				
+Update navProperty	CRUD	SimpleCRUD.6		PATCH	northwind	Category('NWD~Category-1')/isCategoryOf (‘NWD~AProduct1’)	"{""subjectId"":""NWD~Product-3""}"			
+Patch value	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')		&$format=application/json;charset=UTF-8	"{""@odata.context"":""http://localhost:8080/odata2sparql/northwind/$metadata#USState/$entity"",""comment"":null,""label"":""Florida"",""regionDescription"":null,""regionNotation"":null,""stateAbbr"":""FL"",""stateName"":""Floridapq"",""subjectId"":""NWD~USState-10""}"	
+Patch value	CRUD	Patch.reset		PATCH	northwind	USState('NWD~USState-10')	"{""stateName"":""Florida""} "	application/json		
+	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""regionDescription"":""The sunshine state""} "	application/json		
+	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')/regionDescription/$value			The sunshine state	
+	CRUD	Patch.update		PATCH	northwind	USState('NWD~USState-10')	"{""regionDescription"":null} "	application/json		
+	CRUD	Patch.test		GET	northwind	USState('NWD~USState-10')/regionDescription/$value				
+EntitySet	General REST	EntitySet/GET		GET	northwind	Category	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+EntitySet	General REST	EntitySet/POST		POST	northwind	Category	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+EntitySet	General REST	EntitySet/DELETE		DELETE	northwind	Category	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+EntitySet	General REST	Entityset/PATCH		PATCH	northwind	Category	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+EntitySet	General REST	EntitySet/PUT		PUT	northwind	Category	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+Entity	General REST	Entity/GET		GET	northwind	Category('NWD~Category-A')	"{,""label"":""a new label""}"	application/json		
+Entity	General REST	Entity/POST		POST	northwind	Category('NWD~Category-A')	"{,""label"":""a new label""}"	application/json		
+Entity	General REST	Entity/DELETE		DELETE	northwind	Category('NWD~Category-A')	"{,""label"":""a new label""}"	application/json		
+Entity	General REST	Entity/PATCH		PATCH	northwind	Category('NWD~Category-A')	"{,""label"":""a new label""}"	application/json		
+Entity	General REST	Entity/PUT		PUT	northwind	Category('NWD~Category-A')	"{,""label"":""a new label""}"	application/json		
+"Entity
+/NavigationSet"	General REST	"Entity
+/NavigationSet/GET"		GET	northwind	"Category('NWD~Category-A')
+/isCategoryOf"	"{""comment"":""a product comment""
+,""label"":""a product label""
+,""subjectId"":""NWD~Product-A""}"	application/json		
+"Entity
+/NavigationSet"	General REST	"Entity
+/NavigationSet/POST"		POST	northwind	"Category('NWD~Category-A')
+/isCategoryOf"	"{""comment"":""a product comment""
+,""label"":""a product label""
+,""subjectId"":""NWD~Product-A""}"	application/json		
+"Entity
+/NavigationSet"	General REST	"Entity
+/NavigationSet/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/isCategoryOf"	"{""comment"":""a product comment""
+,""label"":""a product label""
+,""subjectId"":""NWD~Product-A""}"	application/json		
+"Entity
+/NavigationSet"	General REST	"Entity
+/NavigationSet/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/isCategoryOf"	"{""comment"":""a product comment""
+,""label"":""a product label""
+,""subjectId"":""NWD~Product-A""}"	application/json		
+"Entity
+/NavigationSet"	General REST	"Entity
+/NavigationSet/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/isCategoryOf"	"{""comment"":""a product comment""
+,""label"":""a product label""
+,""subjectId"":""NWD~Product-A""}"	application/json		
+"Entity
+/NavigationEntity"	General REST	"Entity
+/NavigationEntity/GET"		GET	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-A')"	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+"Entity
+/NavigationEntity"	General REST	"Entity
+/NavigationEntity/POST"		POST	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-A')"	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+"Entity
+/NavigationEntity"	General REST	"Entity
+/NavigationEntity/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-A')"	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+"Entity
+/NavigationEntity"	General REST	"Entity
+/NavigationEntity/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-A')"	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+"Entity
+/NavigationEntity"	General REST	"Entity
+/NavigationEntity/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-A')"	"{""comment"":""a comment"",""label"":""a label"",""subjectId"":""NWD~Category-A""}"	application/json		
+"Entity
+/Property"	General REST	"Entity
+/Property/GET"		GET	northwind	"Category('NWD~Category-A')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/Property"	General REST	"Entity
+/Property/POST"		POST	northwind	"Category('NWD~Category-A')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/Property"	General REST	"Entity
+/Property/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/Property"	General REST	"Entity
+/Property/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/Property"	General REST	"Entity
+/Property/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/Property
+/$value"	General REST	"Entity
+/Property
+/$value/GET"		GET	northwind	"Category('NWD~Category-A')
+/comment
+/$value"	"""a changed comment"""	text/plain		
+"Entity
+/Property
+/$value"	General REST	"Entity
+/Property
+/$value/POST"		POST	northwind	"Category('NWD~Category-A')
+/comment
+/$value"	"""a changed comment"""	text/plain		
+"Entity
+/Property
+/$value"	General REST	"Entity
+/Property
+/$value/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/comment
+/$value"	"""a changed comment"""	text/plain		
+"Entity
+/Property
+/$value"	General REST	"Entity
+/Property
+/$value/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/comment
+/$value"	"""a changed comment"""	text/plain		
+"Entity
+/Property
+/$value"	General REST	"Entity
+/Property
+/$value/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/comment
+/$value"	"""a changed comment"""	text/plain		
+"Entity
+/NavigationEntity
+/Property"	General REST	"Entity
+/NavigationEntity
+/Property/GET"		GET	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property"	General REST	"Entity
+/NavigationEntity
+/Property/POST"		POST	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property"	General REST	"Entity
+/NavigationEntity
+/Property/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property"	General REST	"Entity
+/NavigationEntity
+/Property/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property"	General REST	"Entity
+/NavigationEntity
+/Property/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/comment"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property
+/$value"	General REST	"Entity
+/NavigationEntity
+/Property
+/$value/GET"		GET	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/label
+/$value"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property
+/$value"	General REST	"Entity
+/NavigationEntity
+/Property
+/$value/POST"		POST	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/label
+/$value"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property
+/$value"	General REST	"Entity
+/NavigationEntity
+/Property
+/$value/DELETE"		DELETE	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/label
+/$value"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property
+/$value"	General REST	"Entity
+/NavigationEntity
+/Property
+/$value/PATCH"		PATCH	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/label
+/$value"	"{""value"": ""a changed comment""}"	application/json		
+"Entity
+/NavigationEntity
+/Property
+/$value"	General REST	"Entity
+/NavigationEntity
+/Property
+/$value/PUT"		PUT	northwind	"Category('NWD~Category-A')
+/isCategoryOf('NWD~Product-1')
+/label
+/$value"	"{""value"": ""a changed comment""}"	application/json		
+changes	changes	Change Rollback		GET	$changes	northwind/rollback			$changes on northwind rollback'ed	

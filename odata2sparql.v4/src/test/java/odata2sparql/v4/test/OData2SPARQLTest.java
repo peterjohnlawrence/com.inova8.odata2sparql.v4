@@ -130,7 +130,7 @@ public class OData2SPARQLTest {
 	@Parameters(name = "{10}:{3}/{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
 		//return getTestData("src/test/resources/CRUDTests.csv");
-		return getTestData("src/test/resources/TestServlet.csv");
+		return getTestData("src/test/resources/GetTests.csv");
 	}
 
 	@BeforeClass
