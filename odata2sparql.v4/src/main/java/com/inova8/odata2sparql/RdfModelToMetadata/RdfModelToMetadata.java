@@ -385,7 +385,8 @@ public class RdfModelToMetadata {
 								rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
 								rdfNavigationProperty.getRangeName()))
 						.setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
-								|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE));
+								|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE))
+						.setNullable(rdfNavigationProperty.getDomainCardinality() == Cardinality.ZERO_TO_ONE ||rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY  );
 
 				List<CsdlAnnotation> navigationPropertyAnnotations = new ArrayList<CsdlAnnotation>();
 				if (withRdfAnnotations)
@@ -429,7 +430,8 @@ public class RdfModelToMetadata {
 				if (rdfProperty.getIsComplex()) {
 					complexProperty.setType(rdfProperty.getComplexType().getFullQualifiedName())
 							.setCollection((rdfProperty.getCardinality() == Cardinality.MANY)
-									|| (rdfProperty.getCardinality() == Cardinality.MULTIPLE));
+									|| (rdfProperty.getCardinality() == Cardinality.MULTIPLE))
+							.setNullable(rdfProperty.getCardinality() == Cardinality.ZERO_TO_ONE||rdfProperty.getCardinality() == Cardinality.MANY  );
 				} else {
 					complexProperty.setType(RdfEdmType.getEdmType(rdfProperty.propertyTypeName).getFullQualifiedName());
 				}
@@ -442,7 +444,8 @@ public class RdfModelToMetadata {
 						.setAnnotations(complexPropertyAnnotations);
 				complexProperty.setType(rdfComplexProperty.getComplexType().getFullQualifiedName())
 						.setCollection((rdfComplexProperty.getCardinality() == Cardinality.MANY)
-								|| (rdfComplexProperty.getCardinality() == Cardinality.MULTIPLE));
+								|| (rdfComplexProperty.getCardinality() == Cardinality.MULTIPLE))
+						.setNullable(rdfComplexProperty.getCardinality() == Cardinality.ZERO_TO_ONE||rdfComplexProperty.getCardinality() == Cardinality.MANY);
 
 				csdlComplexType.getProperties().add(complexProperty);
 
@@ -460,7 +463,8 @@ public class RdfModelToMetadata {
 										rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
 										rdfNavigationProperty.getRangeName()))
 								.setCollection((rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY)
-										|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE)));
+										|| (rdfNavigationProperty.getDomainCardinality() == Cardinality.MULTIPLE))
+								.setNullable(rdfNavigationProperty.getDomainCardinality() == Cardinality.ZERO_TO_ONE||rdfNavigationProperty.getDomainCardinality() == Cardinality.MANY));
 			}
 			for (RdfShapedNavigationProperty rdfShapedNavigationProperty : rdfComplexType
 					.getShapedNavigationProperties().values()) {
@@ -477,7 +481,8 @@ public class RdfModelToMetadata {
 										rdfNavigationProperty.getRangeClass().getSchema().getSchemaPrefix(),
 										rdfNavigationProperty.getRangeName()))
 								.setCollection((rdfShapedNavigationProperty.getCardinality() == Cardinality.MANY)
-										|| (rdfShapedNavigationProperty.getCardinality() == Cardinality.MULTIPLE)));
+										|| (rdfShapedNavigationProperty.getCardinality() == Cardinality.MULTIPLE))
+								.setNullable(rdfShapedNavigationProperty.getCardinality() == Cardinality.ZERO_TO_ONE||rdfShapedNavigationProperty.getCardinality()== Cardinality.MANY));
 			}
 			complexTypes.put(rdfComplexType.getComplexTypeName(), csdlComplexType);
 		}
