@@ -14,6 +14,7 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
@@ -280,6 +281,11 @@ public class SparqlCreateUpdateDeleteBuilder {
 				: null;
 		String expandedKey = null;
 
+		for (Property prop : entry.getProperties()) {
+			if(prop.getName().equals(RdfConstants.SUBJECT) &&  !prop.getValue().toString().equals(rdfResourceParts.getTargetSubjectId()))
+			throw new OData2SparqlException(
+					"Key in body, " + prop.getValue().toString() +  ", must match key in target: "+ rdfResourceParts.getTargetSubjectId(), null);
+		}
 		if(entityKeys!=null && entityKeys.size()>0) {
 			//Use supplied key
 			entityKey = entityKeys.get(0).getText().replace("'", "");

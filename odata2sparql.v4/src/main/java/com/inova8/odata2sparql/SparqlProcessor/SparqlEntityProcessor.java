@@ -122,7 +122,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		try {
 			SparqlBaseCommand.updateEntity(rdfEdmProvider, rdfResourceParts, uriInfo, requestEntity, httpMethod);
 		} catch (EdmException | OData2SparqlException e) {
-			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		}
 
