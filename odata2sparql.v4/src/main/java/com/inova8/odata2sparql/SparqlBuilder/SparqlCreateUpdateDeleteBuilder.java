@@ -25,6 +25,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
+import com.inova8.odata2sparql.uri.UriType;
 
 public class SparqlCreateUpdateDeleteBuilder {
 	@SuppressWarnings("unused")
@@ -280,11 +281,26 @@ public class SparqlCreateUpdateDeleteBuilder {
 				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
 				: null;
 		String expandedKey = null;
-
+		String bodyKey = null;
+		String expandedBodyKey = " UNDEF ";
+		//Find body key
 		for (Property prop : entry.getProperties()) {
-			if(prop.getName().equals(RdfConstants.SUBJECT) &&  !prop.getValue().toString().equals(rdfResourceParts.getTargetSubjectId()))
-			throw new OData2SparqlException(
-					"Key in body, " + prop.getValue().toString() +  ", must match key in target: "+ rdfResourceParts.getTargetSubjectId(), null);
+			if(prop.getName().equals(RdfConstants.SUBJECT) ) {
+				bodyKey= prop.getValue().toString();
+				expandedBodyKey = rdfModel.getRdfPrefixes().expandPredicate(bodyKey);
+				UrlValidator urlValidator = new UrlValidator();
+				if (!urlValidator.isValid(expandedBodyKey)) {
+					throw new OData2SparqlException(
+							"Invalid key: " + bodyKey + " in body", null);
+				}
+				expandedBodyKey = " <" + expandedBodyKey + "> ";
+				break;
+			}
+		}
+		if((rdfResourceParts.getUriType() == UriType.URI6B) && (bodyKey!=null) ) {
+				if(!bodyKey.equals(rdfResourceParts.getTargetSubjectId()))
+				throw new OData2SparqlException(
+						"Key in body, " + bodyKey +  ", must match key in target: "+ rdfResourceParts.getTargetSubjectId(), null);
 		}
 		if(entityKeys!=null && entityKeys.size()>0) {
 			//Use supplied key
@@ -313,29 +329,26 @@ public class SparqlCreateUpdateDeleteBuilder {
 		//(<entityKey> <navigationproperty> <expandedKey>)
 		expandedKey = " <" + expandedKey + "> ";	
 		String navigationPropertyKey =" UNDEF ";
-		String expandedNavPropKey =" UNDEF ";
+		String expandedNavPropKey = expandedBodyKey;
 		
-		if(rdfResourceParts.size()>1 ) {
-			
-//			String localKey = rdfResourceParts.getSubjectId();
-//			String expandedLocalKey = rdfModel.getRdfPrefixes().expandPredicate(localKey);	
-//			EdmNavigationProperty navigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
-//			String navigationPropertyKey = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(navigationProperty.getName()).getNavigationPropertyIRI();
-//			updatePropertyValues.append("\t\t(<").append(expandedLocalKey).append("> <").append(navigationPropertyKey).append("> <").append(expandedKey).append(">)\n");
+		if(rdfResourceParts.getUriType() == UriType.URI6A || rdfResourceParts.getUriType() == UriType.URI6B ) {
 			
 			EdmNavigationProperty edmNavigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
 			RdfNavigationProperty navProperty = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
 			navigationPropertyKey =  " <" +  navProperty.getNavigationPropertyIRI()+"> ";
 			
-			if( rdfResourceParts.getTargetSubjectId() !="" ) {
+			if( rdfResourceParts.getUriType() == UriType.URI6B ) {
 				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
 				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
-				updatePropertyValues.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")\n");
-				if(navProperty.IsInverse() ) {					
-					String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
-					updatePropertyValues.append("\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")\n");
-				}
-			}	
+			}	else if(rdfResourceParts.getUriType() == UriType.URI6A ){
+				
+			}
+
+			if(navProperty.IsInverse() ) {					
+				String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
+				updatePropertyValues.append("\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")\n");
+			}
+			updatePropertyValues.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")\n");
 			//change because now the properties refer to the navigationEntity
 			expandedKey= expandedNavPropKey;
 		}
@@ -375,26 +388,33 @@ public class SparqlCreateUpdateDeleteBuilder {
 		expandedKey = " <" + expandedKey + "> ";	
 		String navigationPropertyKey =" UNDEF ";
 		String expandedNavPropKey =" UNDEF ";
-		if(rdfResourceParts.size()>1 ) {
+		
+		//URI1 entitySet
+		//URI2 entity
+		//URI6A entity/navigationProperty, so no entity allowed
+		//URI6B entity/navigationEntitySet optionally with an entitykey specified
+		
+		if(rdfResourceParts.getUriType() == UriType.URI6A ||rdfResourceParts.getUriType() == UriType.URI6B  ||((rdfResourceParts.getUriType() == UriType.URI2)  &&  rdfResourceParts.size()>1) ) {
 			EdmNavigationProperty edmNavigationProperty = rdfResourceParts.getAsNavigationProperty(1).getEdmNavigationProperty();
 			RdfNavigationProperty navProperty = rdfResourceParts.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
 			navigationPropertyKey =  " <" +  navProperty.getNavigationPropertyIRI()+"> ";
 			
-			if( rdfResourceParts.getTargetSubjectId() !="" ) {
+			if( rdfResourceParts.getUriType() == UriType.URI6B ||  rdfResourceParts.getUriType() == UriType.URI2 ) {
 				String navPropKey = rdfResourceParts.getTargetSubjectId().replace("'", "");
 				expandedNavPropKey = " <" + rdfModel.getRdfPrefixes().expandPredicate(navPropKey) +"> " ;
-				deleteProperties.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")");
-				if(navProperty.IsInverse() ) {					
-					String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
-					deleteProperties.append("\n\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")");
-				}
-			}	
+			}
+			if(navProperty.IsInverse() ) {					
+				String inverseNavigationPropertyKey = " <" +  navProperty.getInverseNavigationProperty().getNavigationPropertyIRI()+"> ";
+				deleteProperties.append("\t\t(").append(expandedNavPropKey).append(inverseNavigationPropertyKey).append(expandedKey).append(")\n");
+			}
+			deleteProperties.append("\t\t(").append(expandedKey).append(navigationPropertyKey).append(expandedNavPropKey).append(")\n");
+
 		}else {
 			deleteProperties.append("\t\t(").append(expandedKey).append(" UNDEF ").append(" UNDEF ").append(")\n");
-			deleteProperties.append("\t\t(").append(" UNDEF ").append(navigationPropertyKey).append(" UNDEF ").append(")\n");
+	//		deleteProperties.append("\t\t(").append(" UNDEF ").append(navigationPropertyKey).append(" UNDEF ").append(")\n");
 			deleteProperties.append("\t\t(").append(" UNDEF ").append(" UNDEF ").append(expandedKey).append(")");
 		}
-		deleteProperties.append("}\n");
+		deleteProperties.append("\t}\n");
 	}
 	protected void addChangeLoggingParameters(String entityName, StringBuilder changeLoggingParameters) {
 		changeLoggingParameters.append("\tBIND(NOW() as ?now)\n");		

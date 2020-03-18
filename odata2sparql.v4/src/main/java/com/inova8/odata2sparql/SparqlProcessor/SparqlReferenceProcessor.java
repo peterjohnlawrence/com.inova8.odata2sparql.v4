@@ -83,7 +83,7 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		ContextURL contextUrl = rdfResourceParts.contextUrl(request,odata) ;
 		ReferenceSerializerOptions opts = ReferenceSerializerOptions.with().contextURL(contextUrl).build();
 
-		SerializerResult serializerResult = serializer.reference(serviceMetadata, rdfResourceParts.getEntitySet().getEdmEntitySet(),
+		SerializerResult serializerResult = serializer.reference(serviceMetadata, rdfResourceParts.getResponseEntitySet(),
 				entityCollection.getEntities().get(0), opts);
 		InputStream serializedContent = serializerResult.getContent();
 		// Finally: configure the response object: set the body, headers and status code
