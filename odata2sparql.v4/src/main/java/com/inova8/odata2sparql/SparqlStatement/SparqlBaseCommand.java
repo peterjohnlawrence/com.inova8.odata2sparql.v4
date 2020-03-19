@@ -399,7 +399,7 @@ public class SparqlBaseCommand {
 		sparqlStatement.executeInsert(rdfEdmProvider);
 	}
 
-	public static void deleteEntityReference(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo)
+	public static void deleteEntityReference(RdfEdmProvider rdfEdmProvider,RdfResourceParts rdfResourceParts , UriInfo uriInfo)
 			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
@@ -409,17 +409,16 @@ public class SparqlBaseCommand {
 		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
 		RdfEntityType entityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
-
-		List<UriParameter> entityKeyPredicates = uriResourceEntitySet.getKeyPredicates();
-		UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
-		RdfNavigationProperty navigationProperty = entityType
-				.findNavigationPropertyByEDMNavigationPropertyName(uriResourceNavigation.getProperty().getName());
-		List<UriParameter> navigationKeyPredicates = uriResourceNavigation.getKeyPredicates();
+//		if( rdfResourceParts.getUriType().equals(UriType.URI2)) {
+//			List<UriParameter> entityKeyPredicates = uriResourceEntitySet.getKeyPredicates();
+//			UriResourceNavigation uriResourceNavigation = (UriResourceNavigation) resourcePaths.get(1);
+//			RdfNavigationProperty navigationProperty = entityType
+//					.findNavigationPropertyByEDMNavigationPropertyName(uriResourceNavigation.getProperty().getName());
+//		}
 		SparqlCreateUpdateDeleteBuilder sparqlCreateUpdateDeleteBuilder = new SparqlCreateUpdateDeleteBuilder(
 				rdfEdmProvider);
 		try {
-			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteLinkQuery(entityType, entityKeyPredicates,
-					navigationProperty, navigationKeyPredicates);
+			sparqlStatement = sparqlCreateUpdateDeleteBuilder.generateDeleteEntityReference(rdfResourceParts, entityType);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new OData2SparqlException(e.getMessage());

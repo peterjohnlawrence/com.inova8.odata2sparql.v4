@@ -45,6 +45,7 @@ public class OData2SPARQLTest {
 	private String expected;
 	@SuppressWarnings("unused")
 	private String comments;
+	@SuppressWarnings("unused")
 	private String index;
 	
 	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String method, String repository,

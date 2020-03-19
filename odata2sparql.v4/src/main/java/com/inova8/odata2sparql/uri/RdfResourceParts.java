@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlFunction;
 import org.apache.olingo.commons.api.edm.provider.CsdlFunctionImport;
 import org.apache.olingo.commons.api.edm.provider.CsdlReturnType;
@@ -38,6 +40,7 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.Util;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 
 public class RdfResourceParts {
@@ -49,6 +52,7 @@ public class RdfResourceParts {
 	private String lastNavPropertyName;
 	private EdmComplexType lastComplexType;
 	private RdfProperty lastComplexProperty;
+	private RdfNavigationProperty lastNavProperty;
 	private RdfEntityType responseRdfEntityType;
 	private RdfResourcePart penultimateResourcePart;
 	private boolean isRef;
@@ -64,7 +68,7 @@ public class RdfResourceParts {
 	private UriInfo uriInfo;
 	private UriType uriType;
 	private RdfResourceEntitySet entitySet;
-
+	private static UrlValidator urlValidator = new UrlValidator();
 	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataException, OData2SparqlException {
 		this.rdfEdmProvider = rdfEdmProvider;
 		this.uriInfo = uriInfo;
@@ -250,6 +254,7 @@ public class RdfResourceParts {
 		entitySet = _getEntitySet();
 		entityString = _getEntityString();
 		navPathString = _getNavPathString();
+		lastNavProperty = _getLastNavProperty();
 		size = _size();
 	}
 
@@ -298,7 +303,9 @@ public class RdfResourceParts {
 	public String getSubjectId() {
 		return subjectId;
 	}
-
+	public String getValidatedSubjectIdUrl() throws OData2SparqlException {
+		return validatedId(subjectId);
+	}
 	public String getLocalKey() {
 		return localKey;
 	}
@@ -306,7 +313,22 @@ public class RdfResourceParts {
 	public String getTargetSubjectId() {
 		return targetSubjectId;
 	}
+	public String getValidatedTargetSubjectIdUrl() throws OData2SparqlException {
+		return validatedId(targetSubjectId);
+	}
 
+	private String validatedId(String id) throws OData2SparqlException {
+		if (id != null) {
+			String expandedKey = rdfEdmProvider.getRdfModel().getRdfPrefixes().expandPredicateKey(id);
+			if (urlValidator.isValid(expandedKey)) {
+				return expandedKey;
+			} else {
+				throw new EdmException("Invalid key: " + id, null);
+			}
+		} else {
+			return null;
+		}
+	}
 	public RdfResourceEntitySet getEntitySet() {
 		return entitySet;
 	}
@@ -342,6 +364,20 @@ public class RdfResourceParts {
 			}
 		}
 		return null;
+	}
+	private RdfNavigationProperty _getLastNavProperty() {
+		RdfResourcePart lastResourcePart = _getLastResourcePart();
+		if (lastResourcePart != null) {
+			if (lastResourcePart.uriResourceKind.equals(UriResourceKind.navigationProperty)) {
+				EdmNavigationProperty edmNavigationProperty =  ((RdfResourceNavigationProperty) lastResourcePart).getEdmNavigationProperty();
+				RdfNavigationProperty navProperty = this.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
+				return navProperty;
+			} else if (lastResourcePart.uriResourceKind.equals(UriResourceKind.complexProperty)) {
+				return null;//TODO
+			}
+		}
+		return null;
+
 	}
 	private String _getLastNavPropertyName() {
 		RdfResourcePart lastResourcePart = _getLastResourcePart();
@@ -676,6 +712,10 @@ public class RdfResourceParts {
 
 	public boolean isFunction() {
 		return isFunction;
+	}
+
+	public RdfNavigationProperty getLastNavProperty() {
+		return lastNavProperty;
 	}
 
 }

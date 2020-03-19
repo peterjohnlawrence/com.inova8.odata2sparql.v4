@@ -142,12 +142,15 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 	@Override
 	public void deleteReference(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
-		// 1. Retrieve the entity type from the URI
-		//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
-		//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
-
+		RdfResourceParts rdfResourceParts =null;
 		try {
-			SparqlBaseCommand.deleteEntityReference(rdfEdmProvider, uriInfo);
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
+		try {
+			SparqlBaseCommand.deleteEntityReference(rdfEdmProvider, rdfResourceParts, uriInfo);
 		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);

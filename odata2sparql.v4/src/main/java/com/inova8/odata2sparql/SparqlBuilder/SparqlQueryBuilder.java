@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -2820,50 +2819,40 @@ public class SparqlQueryBuilder {
 
 	public SparqlStatement prepareEntityLinksSparql()
 			throws EdmException, ODataApplicationException, OData2SparqlException {
-		List<UriResource> resourceParts = uriInfo.getUriResourceParts();
-		UriResource lastResourcePart = resourceParts.get(resourceParts.size() - 1);
-		int minSize = 1;
-		if (lastResourcePart.getSegmentValue().equals("$ref")) { // which it should do
-			minSize++;
+		String expandedKey =    rdfResourceParts.getValidatedSubjectIdUrl();
+		String expandedProperty;
+		StringBuilder sparql = new StringBuilder();
+	
+		if(!rdfResourceParts.getUriType().equals(UriType.URI2)) {
+			String key = rdfEntityType.entityTypeName;
+			String targetKey;
+			if(!rdfResourceParts.getUriType().equals(UriType.URI7B) ) {
+				if(rdfResourceParts.getValidatedTargetSubjectIdUrl()!= null) {
+					targetKey = "<"+rdfResourceParts.getValidatedTargetSubjectIdUrl()+">";
+				}else {
+					targetKey = "?" + key + "_o";
+				}
+			}else {
+				targetKey = "?" + key + "_o";
+			}
+			sparql.append("CONSTRUCT { " + targetKey + "  <" + RdfConstants.TARGETENTITY + "><"
+					+ rdfResourceParts.getResponseRdfEntityType().getURL() + "> ;");
+			RdfNavigationProperty rdfNavigationProperty =  rdfResourceParts.getLastNavProperty();
+			expandedProperty = rdfNavigationProperty.getNavigationPropertyIRI();
+			
+			sparql.append("<" + RdfConstants.ASSERTEDTYPE + "> <" + rdfResourceParts.getResponseRdfEntityType().getURL() + "> .}\n");
+			sparql.append("WHERE { { <" + expandedKey + ">  <" + expandedProperty + "> " + targetKey + " .}");
+			if (rdfNavigationProperty.IsInverse()) {
+				String expandedInverseProperty = rdfNavigationProperty.getInversePropertyOfURI().toString();
+				sparql.append(" \nUNION { " + targetKey+ " <" + expandedInverseProperty + "> <" + expandedKey + ">.}");
+			}
+			sparql.append("}");
+		}else {
+			sparql.append("CONSTRUCT { <" + expandedKey + ">  <" + RdfConstants.TARGETENTITY + "><"
+					+ rdfResourceParts.getResponseRdfEntityType().getURL() + "> ;");	
+			sparql.append("<" + RdfConstants.ASSERTEDTYPE + "> <" +  rdfResourceParts.getResponseRdfEntityType().getURL()+ "> .}WHERE{}\n");
 		}
-		UriResourceNavigation uriNavigation = (UriResourceNavigation) resourceParts.get(resourceParts.size() - minSize);
-		EdmNavigationProperty edmNavigationProperty = uriNavigation.getProperty();
 
-		UrlValidator urlValidator = new UrlValidator();
-		String expandedKey = rdfModel.getRdfPrefixes()
-				.expandPredicateKey(((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText());
-
-		String key = rdfEntityType.entityTypeName;
-
-		if (urlValidator.isValid(expandedKey)) {
-		} else {
-			throw new EdmException(
-					"Invalid key: " + ((UriResourceEntitySet) resourceParts.get(0)).getKeyPredicates().get(0).getText(),
-					null);
-		}
-		RdfNavigationProperty rdfProperty = rdfEntityType
-				.findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
-		String expandedProperty = rdfProperty.getNavigationPropertyIRI();
-		StringBuilder sparql = new StringBuilder("CONSTRUCT { ?" + key + "_o <" + RdfConstants.TARGETENTITY + "><"
-				+ rdfProperty.getRangeClass().getURL() + "> ;");
-		sparql.append("<" + RdfConstants.ASSERTEDTYPE + "> <" + rdfProperty.getRangeClass().getURL() + "> .}\n");
-		//		if (rdfProperty.IsInverse()) {
-		//			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
-		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
-		//			sparql.append("<" + expandedKey + "> ");
-		//			sparql.append("<" + expandedInverseProperty + ">)}\n?" + key + "_o ?" + key + "_p ?" + key + "_s .}");
-		//		} else {
-		//			sparql.append("WHERE {VALUES(?" + key + "_s ?" + key + "_p){(");
-		//			sparql.append("<" + expandedKey + "> ");
-		//			sparql.append("<" + expandedProperty + ">)}\n?" + key + "_s ?" + key + "_p ?" + key + "_o .}");
-		//		}
-
-		sparql.append("WHERE { { <" + expandedKey + ">  <" + expandedProperty + "> ?" + key + "_o .}");
-		if (rdfProperty.IsInverse()) {
-			String expandedInverseProperty = rdfProperty.getInversePropertyOfURI().toString();
-			sparql.append(" \nUNION { ?" + key + "_o " + " <" + expandedInverseProperty + "> <" + expandedKey + ">.}");
-		}
-		sparql.append("}");
 		return new SparqlStatement(sparql.toString());
 	}
 	public void addProxiedRdfEdmProvider(String proxyDataset, RdfEdmProvider proxiedRdfEdmProvider) {
