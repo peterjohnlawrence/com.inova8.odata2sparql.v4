@@ -158,8 +158,11 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			createdEntity = SparqlBaseCommand.writeEntity(rdfEdmProvider, rdfResourceParts, requestEntity);
 			if (createdEntity == null)
 				throw new OData2SparqlException("Entity not created");
-		} catch (EdmException | OData2SparqlException | ODataException e) {
+		} catch (EdmException | OData2SparqlException  e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		} catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.METHOD_NOT_ALLOWED.getStatusCode(),
 					Locale.ENGLISH);
 		}
 

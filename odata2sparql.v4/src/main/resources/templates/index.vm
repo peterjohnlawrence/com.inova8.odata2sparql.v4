@@ -11,6 +11,10 @@ table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
 }
+body {
+   font-family: Roboto !important;
+   font-size: small;
+}
 </style>
     <script>
 function toggleRow(e){

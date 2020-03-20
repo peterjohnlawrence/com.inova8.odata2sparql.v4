@@ -96,8 +96,13 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 	@Override
 	public void createReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
-		// 2. create the data in backend 
-		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
+		RdfResourceParts rdfResourceParts =null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
 		InputStream requestInputStream = request.getBody();
 		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
 		DeserializerResult result = deserializer.entityReferences(requestInputStream);
@@ -105,24 +110,27 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		// 2.2 do the creation in backend, 
 
 		try {
-			SparqlBaseCommand.writeEntityReference(rdfEdmProvider, uriInfo, requestEntityReferences);
+			SparqlBaseCommand.writeEntityReference(rdfEdmProvider, rdfResourceParts, uriInfo, requestEntityReferences);
 		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
 					Locale.ENGLISH);
+		} catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.METHOD_NOT_ALLOWED.getStatusCode(),
+					Locale.ENGLISH);
 		}
-		// 3. serialize the response
 		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
 	@Override
 	public void updateReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
-		// 1. Retrieve the entity type from the URI
-		//		EdmEntitySet edmEntitySet = Util.getEdmEntitySet(uriInfo);
-		//		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
-
-		// 2. create the data in backend
-		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
+		RdfResourceParts rdfResourceParts =null;
+		try {
+			rdfResourceParts = new RdfResourceParts(this.rdfEdmProvider, uriInfo);
+		} catch (EdmException | ODataException | OData2SparqlException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
+					Locale.ENGLISH);
+		}
 		InputStream requestInputStream = request.getBody();
 		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
 		DeserializerResult result = deserializer.entityReferences(requestInputStream);
@@ -130,9 +138,12 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		// 2.2 do the creation in backend, 
 
 		try {
-			SparqlBaseCommand.updateEntityReference(rdfEdmProvider, uriInfo, requestEntityReferences);
+			SparqlBaseCommand.updateEntityReference(rdfEdmProvider,rdfResourceParts, uriInfo, requestEntityReferences);
 		} catch (EdmException | OData2SparqlException e) {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.NO_CONTENT.getStatusCode(),
+					Locale.ENGLISH);
+		}catch (ODataException e) {
+			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.METHOD_NOT_ALLOWED.getStatusCode(),
 					Locale.ENGLISH);
 		}
 		// 3. serialize the response
