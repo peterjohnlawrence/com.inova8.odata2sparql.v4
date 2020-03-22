@@ -96,6 +96,7 @@ public class RdfConstants {
 	
 	private static final String  ODATA_NS ="odata";
 	private static final String  ODATA_DEFAULTNAMESPACE ="defaultNamespace";
+	private static final String  ODATA_NAMESPACES ="namespaces";
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
 	private static final String  ODATA_SUBTYPE ="subType";
@@ -320,6 +321,7 @@ public class RdfConstants {
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
 	public final static String ODATA_DEFAULTNAMESPACE_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_DEFAULTNAMESPACE;
+	public final static String ODATA_NAMESPACES_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_NAMESPACES;
 	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public static final String ODATA_FK_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_FK;
 	public static final String ODATA_SUBTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_SUBTYPE;
@@ -339,6 +341,7 @@ public class RdfConstants {
 	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING).setType("Edm.String");
 	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO).setType("Edm.String");
 	private final static CsdlTerm odataDefaultNamespace = new CsdlTerm().setName(RdfConstants.ODATA_DEFAULTNAMESPACE).setType("Edm.String");
+	private final static CsdlTerm odataNamespaces = new CsdlTerm().setName(RdfConstants.ODATA_NAMESPACES).setType("Edm.String");
 	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
 	private final static CsdlTerm odataFK = new CsdlTerm().setName(RdfConstants.ODATA_FK).setType("Edm.String");
 	private final static CsdlTerm odataSubType = new CsdlTerm().setName(RdfConstants.ODATA_SUBTYPE).setType("Edm.String");
@@ -463,6 +466,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.SAP_HEADING, sapheadingTerm);
 		TERMS.put(RdfConstants.SAP_QUICKINFO, sapquickinfoTerm);
 		TERMS.put(RdfConstants.ODATA_DEFAULTNAMESPACE, odataDefaultNamespace);
+		TERMS.put(RdfConstants.ODATA_NAMESPACES, odataNamespaces);
 		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.ODATA_FK, odataFK);
 		TERMS.put(RdfConstants.ODATA_SUBTYPE, odataSubType);
@@ -480,6 +484,7 @@ public class RdfConstants {
 		SAPTERMS.add(sapheadingTerm);
 		SAPTERMS.add(sapquickinfoTerm);
 		ODATATERMS.add(odataDefaultNamespace);
+		ODATATERMS.add(odataNamespaces);
 		ODATATERMS.add(odatabaseType);
 		ODATATERMS.add(odataFK);
 		ODATATERMS.add(odataSubType);

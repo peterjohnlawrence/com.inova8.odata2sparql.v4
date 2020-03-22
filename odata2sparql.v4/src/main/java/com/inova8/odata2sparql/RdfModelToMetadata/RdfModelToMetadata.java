@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
@@ -204,8 +205,29 @@ public class RdfModelToMetadata {
 		List<CsdlAnnotation> instanceSchemaAnnotations = new ArrayList<CsdlAnnotation>();
 		addToAnnotations(instanceSchemaAnnotations, RdfConstants.ODATA_DEFAULTNAMESPACE_FQN,
 				rdfModel.getRdfRepository().getDefaultPrefix());
+		
+		addNamespacesAnnotation(rdfModel, instanceSchemaAnnotations);
+
 		instanceSchema.setAnnotations(instanceSchemaAnnotations);
 		return entityContainer;
+	}
+
+	private void addNamespacesAnnotation(RdfModel rdfModel, List<CsdlAnnotation> instanceSchemaAnnotations) {
+		CsdlCollection prefixes = new CsdlCollection();
+		ArrayList<CsdlExpression> prefixAnnotations = new ArrayList<CsdlExpression>();
+		
+		for(  Entry<String, String> rdfPrefixEntry: rdfModel.getRdfPrefixes().getPrefixes().entrySet()) {
+			prefixAnnotations.add(
+					new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.String,
+					(rdfPrefixEntry.getKey() + ": <"+rdfPrefixEntry.getValue()+">")
+					//StringEscapeUtils.escapeXml11(("@prefix " + RdfConstants.XSD + ": <"+RdfConstants.XSD_SCHEMA+">").replaceAll("\"", "\\\""))
+					)
+					)
+			;
+		}
+		prefixes.setItems(prefixAnnotations);
+		
+		instanceSchemaAnnotations.add(new CsdlAnnotation().setTerm(RdfConstants.ODATA_NAMESPACES_FQN).setExpression(prefixes));
 	}
 
 	private CsdlComplexType createLangType() {

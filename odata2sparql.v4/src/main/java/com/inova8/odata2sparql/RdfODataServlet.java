@@ -121,7 +121,8 @@ public class RdfODataServlet extends HttpServlet {
 			}
 		} catch (RuntimeException | OData2SparqlException e) {
 			log.error("Server Error occurred in RdfODataServlet", e);
-			throw new ServletException(e);
+			//throw new ServletException(e);
+			resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, e.getMessage());
 		}
 	}
 
