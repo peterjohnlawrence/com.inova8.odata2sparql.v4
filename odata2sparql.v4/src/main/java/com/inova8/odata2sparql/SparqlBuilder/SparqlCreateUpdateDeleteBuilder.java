@@ -237,8 +237,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 	protected void addInsertPropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
 			String entityName, StringBuilder insertPropertyValues, RdfResourceParts rdfResourceParts)
 			throws OData2SparqlException, ODataException {
-		insertPropertyValues.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
-				.append(entityName).append("_no){\n");
+
 		String entityKey = (entityKeys != null)
 				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
 				: null;
@@ -267,6 +266,14 @@ public class SparqlCreateUpdateDeleteBuilder {
 			}
 		}
 		if(expandedKey==null) throw new ODataException("Body must included subjectId of the new entity");
+		
+		//Add check to disable updates if key already exists
+		//{FILTER NOT EXISTS {<http://northwind.com/ACategory> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://northwind.com/model/Category1>}}
+		insertPropertyValues.append("{FILTER NOT EXISTS {<").append(expandedKey).append("> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + entityType.getURL()  +">}}\n");
+		
+		insertPropertyValues.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
+		.append(entityName).append("_no){\n");	
+		
 		//Create insert for any navigation property that is included:
 		if (rdfResourceParts.size() > 1) {
 			//(<entityKey> <navigationproperty> <expandedKey>)

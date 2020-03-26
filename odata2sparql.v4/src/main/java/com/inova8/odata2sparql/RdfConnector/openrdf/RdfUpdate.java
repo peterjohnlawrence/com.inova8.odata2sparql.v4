@@ -25,6 +25,7 @@ public class RdfUpdate extends RdfQuery{
 			super.connection.begin();
 			updateQuery = connection.prepareUpdate(QueryLanguage.SPARQL, super.query);
 			updateQuery.execute();
+			//Should check if the update caused any changes or not, otherwise can given the appearance of being successful when not. Should raise an HTTP 422 error
 			super.connection.commit();
 
 		} catch (RepositoryException | MalformedQueryException |UpdateExecutionException e) {
