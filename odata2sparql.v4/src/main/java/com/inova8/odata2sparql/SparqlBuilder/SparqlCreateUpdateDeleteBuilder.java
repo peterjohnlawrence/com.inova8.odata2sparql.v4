@@ -513,18 +513,18 @@ public class SparqlCreateUpdateDeleteBuilder {
 		changeLoggingParameters.append("\tBIND(NOW() as ?now)\n");
 		changeLoggingParameters.append("\tBIND(IRI(CONCAT(\"")
 				.append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl())
-				.append("/\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");
+				.append("/C-\",SHA1(CONCAT(STR(?").append(entityName).append("_s))),\"-\",STR(?now))) as ?change)\n");
 		changeLoggingParameters.append("\tBIND( IF(!?revisedUpdated,\"\",IF(BOUND(?").append(entityName)
 				.append("_no),?change,?").append(entityName).append("_no )) as ?addChange)\n");
 		changeLoggingParameters.append(
 				"\tBIND(IF(!?revisedUpdated,\"\", IF(BOUND(?currentGraph),?change,?currentGraph)) as ?deleteChange)\n");
 		changeLoggingParameters.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"")
 				.append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl())
-				.append("/added/\",SHA1(CONCAT(STR(?addChange),STR(?").append(entityName).append("_s),STR(?")
+				.append("/A-\",SHA1(CONCAT(STR(?addChange),STR(?").append(entityName).append("_s),STR(?")
 				.append(entityName).append("_p))),\"-\",STR(?now)))) as ?addedChange)\n");
 		changeLoggingParameters.append("\tBIND(IF(!?revisedUpdated,\"\",IRI(CONCAT(\"")
 				.append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl())
-				.append("/deleted/\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?")
+				.append("/D-\",SHA1(CONCAT(STR(?deleteChange),STR(?").append(entityName).append("_s),STR(?")
 				.append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
 	}
 

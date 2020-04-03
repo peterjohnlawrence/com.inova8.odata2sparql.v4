@@ -125,7 +125,7 @@ public class RdfModel {
 		public String expandPredicate(String entityKey) throws OData2SparqlException {
 			UrlValidator urlValidator = new UrlValidator();
 			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey);
-			String expandedEntityKey = expandPrefix(decodedEntityKey);
+			String expandedEntityKey = expandPrefix(decodedEntityKey);//decodedEntityKey
 			if (urlValidator.isValid(expandedEntityKey)) {
 				return expandedEntityKey;
 			} else {
@@ -348,6 +348,7 @@ public class RdfModel {
 		private final TreeMap<String, RdfModel.RdfNavigationProperty> incomingNavigationProperties = new TreeMap<String, RdfModel.RdfNavigationProperty>();
 		final TreeMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new TreeMap<String, RdfModel.RdfPrimaryKey>();
 		private boolean isProxy=false;
+		private Boolean isReified=false;
 
 		public String getDeleteText() {
 			return deleteText;
@@ -757,6 +758,15 @@ public class RdfModel {
 		public int compareTo(RdfEntityType rdfEntityType) {
 			return getURL().compareTo( rdfEntityType.getURL());
 		}
+
+		public Boolean isReified() {
+			return isReified;
+		}
+
+		public void setReified(Boolean isReified) {
+			this.isReified = isReified;
+		}
+
 	}
 
 	public class FunctionImportParameter {
@@ -1339,9 +1349,26 @@ public class RdfModel {
 		private Cardinality domainCardinality;
 		private RdfProperty fkProperty = null;
 		public RdfSchema navigationPropertySchema;
-
+		private Boolean reifiedSubjectPredicate =false;
+		private Boolean reifiedObjectPredicate =false;
 		public String getNavigationPropertyName() {
 			return navigationPropertyName;
+		}
+
+		public Boolean isReifiedSubjectPredicate() {
+			return reifiedSubjectPredicate;
+		}
+
+		public void setReifiedSubjectPredicate(Boolean reifiedSubjectPredicate) {
+			this.reifiedSubjectPredicate = reifiedSubjectPredicate;
+		}
+
+		public Boolean isReifiedObjectPredicate() {
+			return reifiedObjectPredicate;
+		}
+
+		public void setReifiedObjectPredicate(Boolean reifiedObjectPredicate) {
+			this.reifiedObjectPredicate = reifiedObjectPredicate;
 		}
 
 		public RdfNode getNavigationPropertyNode() {
@@ -1554,6 +1581,7 @@ public class RdfModel {
 				return true;
 			}
 		}
+
 	}
 
 	private class RdfURI {
@@ -1981,7 +2009,12 @@ public class RdfModel {
 		}
 		return clazz;
 	}
-
+	RdfEntityType findEntityType(RdfNode entityTypeNode) throws OData2SparqlException {
+		RdfURI classURI = new RdfURI(entityTypeNode);
+		RdfEntityType clazz = Enumerable.create(classURI.getSchema().getClasses())
+				.firstOrNull(classNameEquals(rdfToOdata(classURI.localName)));
+		return clazz;
+	}
 	RdfEntityType getOrCreateEntityType(RdfNode entityTypeNode, RdfNode entityTypeLabelNode, RdfEntityType baseType)
 			throws OData2SparqlException {
 		RdfEntityType clazz = getOrCreateEntityType(entityTypeNode, entityTypeLabelNode);
@@ -2342,6 +2375,11 @@ public class RdfModel {
 		if (navigationProperty == null) {
 			navigationProperty = buildNavigationProperty(navigationPropertyName, propertyNode, propertyURI, domainNode,
 					domainURI, rangeNode, rangeURI);
+		}else {
+			//Duplicate navigationproperty with different range?
+			if( navigationProperty.getDomainName().equals(domainNode.getLocalName()) && !navigationProperty.getRangeName().equals(rangeNode.getLocalName())){
+				log.error("Model contains navigationProperty (" + navigationProperty.getNavigationPropertyName() +") with multiple ranges for the same domain:" + rangeNode.getLocalName() + " vs " + navigationProperty.getRangeName()+ " Consider creating a super class restriction instead");
+			}		
 		}
 		if (propertyLabelNode == null) {
 			if (navigationProperty.navigationPropertyLabel == null

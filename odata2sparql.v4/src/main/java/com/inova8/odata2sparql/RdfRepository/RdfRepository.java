@@ -27,6 +27,8 @@ public class RdfRepository {
 	private final TreeMap<String, Namespace> namespaces;
 	private int defaultQueryLimit;
 	private final String modelName;
+
+
 	private Boolean withRdfAnnotations = false;
 	private Boolean withSapAnnotations = false;
 	private Boolean useBaseType = false;
@@ -37,6 +39,7 @@ public class RdfRepository {
 	private TextSearchType textSearchType;
 	private boolean withFKProperties = false;
 	private boolean withMatching = true;
+	private boolean includeImplicitRDF = false;
 	private String match = RdfConstants.DEFAULTMATCH;
 
 	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix,
@@ -217,5 +220,12 @@ public class RdfRepository {
 
 	public void setMatch(String match) {
 		this.match = match;
+	}
+	public boolean isIncludeImplicitRDF() {
+		return includeImplicitRDF;
+	}
+
+	public void setIncludeImplicitRDF(boolean includeImplicitRDF) {
+		this.includeImplicitRDF = includeImplicitRDF;
 	}
 }
