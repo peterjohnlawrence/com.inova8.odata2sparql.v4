@@ -5,6 +5,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
+import com.inova8.odata2sparql.Exception.OData2SparqlException;
+import com.inova8.odata2sparql.RdfModel.RdfModel.RdfPrefixes;
 
 public class UriUtils {
 public static String encodeQName(String uri) {
@@ -16,5 +18,12 @@ public static String encodeUri(String uri) throws UnsupportedEncodingException {
 public static String odataToRdfQname(String odataQname ) {
 	return odataQname.replace("'", "")
 			.replaceAll(RdfConstants.QNAME_SEPARATOR_ENCODED, RdfConstants.QNAME_SEPARATOR_RDF);
+}
+public static String objectToSubjectId(String objectId ) {
+	String subjectId = objectId.split("\\(",0)[1].split("\\)",0)[0];
+	return subjectId.substring(1,subjectId.length()-1);
+}
+public static String objectToSubjectUri(String objectId, RdfPrefixes rdfPrefixes  ) throws OData2SparqlException {
+	return rdfPrefixes.expandPredicate(objectToSubjectId(objectId));
 }
 }

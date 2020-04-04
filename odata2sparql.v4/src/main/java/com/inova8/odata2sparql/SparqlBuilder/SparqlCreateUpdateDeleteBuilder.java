@@ -8,7 +8,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.Link;
 import org.apache.olingo.commons.api.data.Property;
+import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.server.api.uri.UriParameter;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
+import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 
@@ -27,16 +30,18 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
+import com.inova8.odata2sparql.uri.UriUtils;
 
 public class SparqlCreateUpdateDeleteBuilder {
 	@SuppressWarnings("unused")
 	private final Logger log = LoggerFactory.getLogger(SparqlStatement.class);
 	private final RdfModel rdfModel;
-
+	private final RdfEdmProvider rdfEdmProvider;
 	//private final RdfEdmProvider rdfEdmProvider;
 	public SparqlCreateUpdateDeleteBuilder(RdfEdmProvider rdfEdmProvider) {
 		super();
-		this.rdfModel = rdfEdmProvider.getRdfModel();
+		this.rdfEdmProvider = rdfEdmProvider;
+		this.rdfModel = this.rdfEdmProvider.getRdfModel();
 		//	this.rdfEdmProvider = rdfEdmProvider;
 	}
 
@@ -234,11 +239,11 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("\tFILTER(?revisedUpdated)\n");
 	}
 
-	protected void addInsertPropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
+	protected void addInsertPropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entity,
 			String entityName, StringBuilder insertPropertyValues, RdfResourceParts rdfResourceParts)
 			throws OData2SparqlException, ODataException {
 
-		String entityKey = (entityKeys != null)
+	String entityKey = (entityKeys != null)
 				? entityKeys.get(0).getText().substring(1, entityKeys.get(0).getText().length() - 1)
 				: null;
 		String expandedKey = null;
@@ -249,21 +254,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
 		} else {
 			//First find key within properties
-			for (Property prop : entry.getProperties()) {
-				RdfProperty property = entityType.findProperty(prop.getName());
-				if (property != null) {
-					if (property.getIsKey()) {
-						entityKey = prop.getValue().toString();
-						expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
-						UrlValidator urlValidator = new UrlValidator();
-						if (!urlValidator.isValid(expandedKey)) {
-							throw new OData2SparqlException(
-									"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
-						}
-						break;
-					}
-				}
-			}
+			expandedKey = findKey(entityType, entity);
 		}
 		if(expandedKey==null) throw new ODataException("Body must included subjectId of the new entity");
 		
@@ -288,8 +279,35 @@ public class SparqlCreateUpdateDeleteBuilder {
 					.append("> <").append(expandedKey).append(">)\n");
 		}
 
-		//Now create VALUES statement for all properties
-		for (Property prop : entry.getProperties()) {
+		buildEntityStatements(entityType, entity, insertPropertyValues, expandedKey);
+		insertPropertyValues.append("\t}\n");
+	}
+
+	protected String findKey(RdfEntityType entityType, Entity entity) throws OData2SparqlException {
+		String entityKey;
+		String expandedKey = null;
+		for (Property prop : entity.getProperties()) {
+			RdfProperty property = entityType.findProperty(prop.getName());
+			if (property != null) {
+				if (property.getIsKey()) {
+					entityKey = prop.getValue().toString();
+					expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
+					UrlValidator urlValidator = new UrlValidator();
+					if (!urlValidator.isValid(expandedKey)) {
+						throw new OData2SparqlException(
+								"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
+					}
+					break;
+				}
+			}
+		}
+		return expandedKey;
+	}
+
+	protected void buildEntityStatements(RdfEntityType entityType, Entity entity, StringBuilder insertPropertyValues,
+			String expandedKey) throws OData2SparqlException {
+		//Now create VALUES statement for all dataproperties
+		for (Property prop : entity.getProperties()) {
 			RdfProperty property = entityType.findProperty(prop.getName());
 			insertPropertyValues.append("\t\t(");
 			if (property != null) {
@@ -314,7 +332,48 @@ public class SparqlCreateUpdateDeleteBuilder {
 			}
 			insertPropertyValues.append(")\n");
 		}
-		insertPropertyValues.append("\t}\n");
+		//Now create VALUES statement for all navigation property bindings
+		for ( Link  navigationBinding : entity.getNavigationBindings()) {
+			RdfNavigationProperty navigationProperty = entityType.findNavigationProperty(navigationBinding.getTitle());
+			if (navigationProperty != null) {
+				insertPropertyValues.append("\t\t(");
+				insertPropertyValues.append("<").append(expandedKey)
+						.append("> <" + navigationProperty.getNavigationPropertyIRI() + "> ");
+				String expandedSubjectKey =UriUtils.objectToSubjectUri(navigationBinding.getBindingLink(), rdfModel.getRdfPrefixes());
+				insertPropertyValues.append("<").append(expandedSubjectKey).append(">");
+				insertPropertyValues.append(")\n");
+			}
+		}	
+		//Now create VALUES statement for all navigation property links
+		for ( Link  navigationLink : entity.getNavigationLinks()) {
+			RdfNavigationProperty navigationProperty = entityType.findNavigationProperty(navigationLink.getTitle());
+			if (navigationProperty != null) {
+
+				if(navigationProperty.getDomainCardinality().equals(Cardinality.MANY)||navigationProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)){
+					//Iterate through array of entities
+					for(Entity dependentEntity: navigationLink.getInlineEntitySet()) {
+						buildDependentEntityStatements(insertPropertyValues, navigationProperty, dependentEntity);
+					}
+				}else {
+					//Process single entity
+					Entity dependentEntity=	navigationLink.getInlineEntity();
+					buildDependentEntityStatements(insertPropertyValues, navigationProperty, dependentEntity);
+				}
+			}
+		}
+	}
+
+	protected void buildDependentEntityStatements(StringBuilder insertPropertyValues,
+			RdfNavigationProperty navigationProperty, Entity dependentEntity) throws OData2SparqlException {
+		String dependentKey = findKey(navigationProperty.getRangeClass(), dependentEntity);
+		if(dependentKey!=null) {
+			buildEntityStatements(navigationProperty.getRangeClass(),dependentEntity,insertPropertyValues,dependentKey);
+		}else {
+			log.error("Failed to locate dependent entitykey within dependent entity:"
+					+ dependentEntity.toString());
+			throw new EdmException("Failed to locate dependent entitykey within dependent entity:"
+					+  dependentEntity.toString());
+		}
 	}
 
 	protected void addUpdatePropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
@@ -351,22 +410,7 @@ public class SparqlCreateUpdateDeleteBuilder {
 			entityKey = entityKeys.get(0).getText().replace("'", "");
 			expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
 		} else {
-			//First find key within properties
-			for (Property prop : entry.getProperties()) {
-				RdfProperty property = entityType.findProperty(prop.getName());
-				if (property != null) {
-					if (property.getIsKey()) {
-						entityKey = prop.getValue().toString();
-						expandedKey = rdfModel.getRdfPrefixes().expandPredicate(entityKey);
-						UrlValidator urlValidator = new UrlValidator();
-						if (!urlValidator.isValid(expandedKey)) {
-							throw new OData2SparqlException(
-									"Invalid key: " + entityKey + " for " + entityType.getEntityTypeName(), null);
-						}
-						break;
-					}
-				}
-			}
+			expandedKey = findKey(entityType, entry);
 		}
 		//Create insert for any navigation property that is included:
 

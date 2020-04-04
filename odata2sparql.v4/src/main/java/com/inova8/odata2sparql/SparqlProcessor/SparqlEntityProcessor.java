@@ -1,13 +1,11 @@
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
-import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.format.ContentType;
@@ -27,8 +25,6 @@ import org.apache.olingo.server.api.serializer.EntitySerializerOptions;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
@@ -104,17 +100,12 @@ public class SparqlEntityProcessor implements EntityProcessor {
 			throw new ODataApplicationException(e.getMessage(), HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(),
 					Locale.ENGLISH);
 		}
-		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-		// Note: only in our example we can assume that the first segment is the EntitySet
-		UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-		EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
-
 		// 2. update the data in backend
 		// 2.1. retrieve the payload from the PUT request for the entity to be updated
 		InputStream requestInputStream = request.getBody();
 		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
-		DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
+
+		DeserializerResult result = deserializer.entity(requestInputStream, rdfResourceParts.getResponseEntitySet().getEntityType());
 		Entity requestEntity = result.getEntity();
 		// Note that this updateEntity()-method is invoked for both PUT or PATCH operations
 		HttpMethod httpMethod = request.getMethod();
@@ -143,13 +134,12 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		}
 		
 		EdmEntitySet edmEntitySet = rdfResourceParts.getEntitySet().getEdmEntitySet();
-		EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
 		// 2. create the data in backend
 		// 2.1. retrieve the payload from the POST request for the entity to create and deserialize it
 		InputStream requestInputStream = request.getBody();
 		ODataDeserializer deserializer = this.odata.createDeserializer(requestFormat);
-		DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
+		DeserializerResult result = deserializer.entity(requestInputStream,rdfResourceParts.getResponseEntitySet().getEntityType());
 		Entity requestEntity = result.getEntity();
 		// 2.2 do the creation in backend, which returns the newly created entity
 
@@ -172,7 +162,7 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
 
 		ODataSerializer serializer = this.odata.createSerializer(responseFormat);
-		SerializerResult serializedResponse = serializer.entity(serviceMetadata, edmEntityType, createdEntity, options);
+		SerializerResult serializedResponse = serializer.entity(serviceMetadata, rdfResourceParts.getResponseEntitySet().getEntityType(), createdEntity, options);
 
 		//4. configure the response object
 		response.setContent(serializedResponse.getContent());

@@ -2378,7 +2378,7 @@ public class RdfModel {
 		}else {
 			//Duplicate navigationproperty with different range?
 			if( navigationProperty.getDomainName().equals(domainNode.getLocalName()) && !navigationProperty.getRangeName().equals(rangeNode.getLocalName())){
-				log.error("Model contains navigationProperty (" + navigationProperty.getNavigationPropertyName() +") with multiple ranges for the same domain:" + rangeNode.getLocalName() + " vs " + navigationProperty.getRangeName()+ " Consider creating a super class restriction instead");
+				log.error("Model contains navigationProperty (" + navigationProperty.getNavigationPropertyName() +") with multiple ranges for the same domain:" + rangeNode.getLocalName() + " vs " + navigationProperty.getRangeName()+ " Consider creating a super class restriction instead, or check consistency between property and inverse property ranges");
 			}		
 		}
 		if (propertyLabelNode == null) {
