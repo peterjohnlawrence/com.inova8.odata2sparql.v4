@@ -8,7 +8,6 @@
 package com.inova8.odata2sparql.RdfRepository;
 
 import com.inova8.odata2sparql.Constants.SPARQLProfile;
-import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;
 
 class RdfConnection {
 

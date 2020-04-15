@@ -387,7 +387,7 @@ public class RdfModelToMetadata {
 			//addToAnnotations(entitySetAnnotations, RdfConstants.SAP_QUICKINFO_FQN, rdfClass.getDescription());
 		}
 		if (rdfClass.isReified()) {
-			addToAnnotations(entitySetAnnotations, RdfConstants.ODATA_ISREIFIEDPREDICATE_FQN, rdfClass.isReified().toString());
+			addToAnnotations(entitySetAnnotations, RdfConstants.ODATA_ISREIFIEDSTATEMENT_FQN, rdfClass.isReified().toString());
 		}
 		entitySet.setAnnotations(entitySetAnnotations);
 
@@ -427,9 +427,13 @@ public class RdfModelToMetadata {
 					addToAnnotations(navigationPropertyAnnotations, RdfConstants.SAP_QUICKINFO_FQN,
 							rdfNavigationProperty.getNavigationPropertyLabel());
 				if (rdfNavigationProperty.IsInverse()) {
-					if (withRdfAnnotations)
+					if (withRdfAnnotations) {
 						addToAnnotations(navigationPropertyAnnotations, RdfConstants.INVERSEOF_FQN,
 								rdfNavigationProperty.getInversePropertyOfURI().toString());
+					}
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_INVERSEOF_FQN,
+							rdfNavigationProperty.getInverseNavigationProperty().getDomainName().toString() +"/"+
+					rdfNavigationProperty.getInverseNavigationProperty().getEDMNavigationPropertyName().toString());
 				}
 				if (rdfNavigationProperty.isReifiedSubjectPredicate()) {
 					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE_FQN,
@@ -438,6 +442,10 @@ public class RdfModelToMetadata {
 				if (rdfNavigationProperty.isReifiedObjectPredicate()) {
 					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE_FQN,
 							rdfNavigationProperty.isReifiedObjectPredicate().toString());
+				}
+				if (rdfNavigationProperty.isReifiedPredicate()) {
+					addToAnnotations(navigationPropertyAnnotations, RdfConstants.ODATA_ISREIFIEDPREDICATE_FQN,
+							rdfNavigationProperty.isReifiedPredicate().toString());
 				}
 				navigationProperty.setAnnotations(navigationPropertyAnnotations);
 				//TODO should not add duplicates to the same entity, even though Olingo accepts them							
@@ -555,7 +563,7 @@ public class RdfModelToMetadata {
 				addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_BASETYPE_FQN, superTypes);
 			}
 			if(rdfClass.isReified()) {
-				addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_ISREIFIEDPREDICATE_FQN, rdfClass.isReified().toString());
+				addToAnnotations(entityTypeAnnotations, RdfConstants.ODATA_ISREIFIEDSTATEMENT_FQN, rdfClass.isReified().toString());
 			}
 			entityType.setAnnotations(entityTypeAnnotations);
 			//TODO testing openTypes

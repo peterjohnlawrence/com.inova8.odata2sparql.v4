@@ -958,6 +958,7 @@ public class SparqlQueryBuilder {
 			if (queryOption.getName().equals(functionImportParameter.getName()))
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
+				case "http://www.w3.org/2000/01/rdf-schema#Class":
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
 					return encodeIRI(datasetRepository,queryOption);
 				default:
@@ -986,6 +987,7 @@ public class SparqlQueryBuilder {
 			if (queryOption.getName().equals(functionImportParameter.getName()))
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
+				case "http://www.w3.org/2000/01/rdf-schema#Class":
 				case "http://www.w3.org/2000/01/rdf-schema#Resource":
 					String resource = UriUtils.odataToRdfQname(queryOption.getText());
 					return resource;
@@ -2238,19 +2240,26 @@ public class SparqlQueryBuilder {
 								+ "?distinct=true&infer=false>{\n"); //timeout=5&
 				//No optional with service call because of performance 
 				//expandItemWhere.append(indent).append("OPTIONAL");
+				expandItemWhere.append("\t{\n");
 			} else {
-				expandItemWhere.append(indent).append("OPTIONAL");
+				expandItemWhere.append(indent).append("UNION");
+				expandItemWhere.append("\t{OPTIONAL\n");
 			}
 		} else if (isImplicitNavigationProperty ) {
 			if( !firstExpandItem){
-				expandItemWhere.append(indent).append("OPTIONAL");//.append("OPTIONAL");
+				expandItemWhere.append(indent).append("UNION");//.append("OPTIONAL");
+				expandItemWhere.append("\t{OPTIONAL\n");
 			}else {
-				expandItemWhere.append(indent).append("OPTIONAL");//.append("OPTIONAL");
+				expandItemWhere.append(indent).append("UNION");//.append("OPTIONAL");
+				expandItemWhere.append("\t{OPTIONAL\n");
 			}		
 		} else {//if( !firstExpandItem){
-			expandItemWhere.append(indent).append("OPTIONAL");//.append("UNION");
+			expandItemWhere.append(indent).append("UNION");
+			expandItemWhere.append("\t{OPTIONAL\n");
+//			expandItemWhere.append(indent).append("OPTIONAL");
+//			expandItemWhere.append("\t{\n");
 		}
-		expandItemWhere.append("\t{\n");
+		//expandItemWhere.append("\t{\n");
 		//expandItemWhere.append(indent);
 
 		if (navProperty.getRangeClass().isOperation()) {
@@ -2306,15 +2315,15 @@ public class SparqlQueryBuilder {
 						expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
 					} else if ((expandItem.getSelectOption() != null) && (expandItem.getTopOption() == null)) {
 						// Fixes #176 
-						if(this.rdfModel.getRdfRepository().getExpandOrderbyDefault()) {
-							expandItemWhere.append(" ORDER BY ?"+  nextTargetKey + "_s" );
-						}
-						if(this.rdfModel.getRdfRepository().getExpandTopDefault()!= null) {
-							expandItemWhere.append(" LIMIT "+ this.rdfModel.getRdfRepository().getExpandTopDefault());
-						}
-						if(this.rdfModel.getRdfRepository().getExpandSkipDefault()!= null) {
-							expandItemWhere.append(" OFFSET "+ this.rdfModel.getRdfRepository().getExpandSkipDefault());
-						}
+//						if(this.rdfModel.getRdfRepository().getExpandOrderbyDefault()) {
+//							expandItemWhere.append(" ORDER BY ?"+  nextTargetKey + "_s" );
+//						}
+//						if(this.rdfModel.getRdfRepository().getExpandTopDefault()!= null) {
+//							expandItemWhere.append(" LIMIT "+ this.rdfModel.getRdfRepository().getExpandTopDefault());
+//						}
+//						if(this.rdfModel.getRdfRepository().getExpandSkipDefault()!= null) {
+//							expandItemWhere.append(" OFFSET "+ this.rdfModel.getRdfRepository().getExpandSkipDefault());
+//						}
 
 					} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
 							&& (expandItem.getCountOption().getValue())) {

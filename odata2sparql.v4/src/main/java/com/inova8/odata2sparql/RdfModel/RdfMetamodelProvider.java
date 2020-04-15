@@ -111,18 +111,8 @@ class RdfMetamodelProvider {
 		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
 		return  rdfQuery.execSelect(false);
 	}
-	public RdfResultSet getReifiedPredicates() throws OData2SparqlException{
-		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_REIFIEDPREDICATEQUERY);
-		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
-		return  rdfQuery.execSelect(false);
-	}
-	public RdfResultSet getReifiedSubjectPredicates() throws OData2SparqlException{
-		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_REIFIEDSUBJECTPREDICATEQUERY);
-		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
-		return  rdfQuery.execSelect(false);
-	}
-	public RdfResultSet getReifiedObjectPredicates() throws OData2SparqlException{
-		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_REIFIEDOBJECTPREDICATEQUERY);
+	public RdfResultSet getReifiedStatements() throws OData2SparqlException{
+		String query = RdfConstants.getMetaQueries().get(RdfConstants.URI_REIFIEDSTATEMENTQUERY);
 		RdfSelectQuery rdfQuery= new RdfSelectQuery(rdfRepository.getModelRepository(),query);
 		return  rdfQuery.execSelect(false);
 	}

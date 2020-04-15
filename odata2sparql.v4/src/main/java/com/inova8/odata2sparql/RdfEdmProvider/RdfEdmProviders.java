@@ -26,6 +26,7 @@ public class RdfEdmProviders {
 			rdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 		} else {
 			rdfEdmProviders.remove(rdfRepositoryID);
+			System.gc();
 		}
 	}
 	public  void reload() {

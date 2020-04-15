@@ -1,6 +1,7 @@
 package com.inova8.odata2sparql.RdfModel;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -53,9 +54,7 @@ public class RdfModelProvider {
 		getOperationArguments();
 		getNodeShapes();
 		getPropertyShapes();
-		getReifiedPredicates();
-		getReifiedSubjectPredicates();
-		getReifiedObjectPredicates();
+		getReifiedStatements();
 		cleanupReifiedPredicates();
 		cleanupOrphanClasses(rdfsResource);
 		if (rdfMetamodelProvider.getRdfRepository().getWithFKProperties())
@@ -598,128 +597,165 @@ public class RdfModelProvider {
 			throw new OData2SparqlException("ObjectProperties query exception ", e);
 		}
 	}
-	private void getReifiedObjectPredicates() throws OData2SparqlException {
-		// Reified objectPredicates
+//	private void getReifiedObjectPredicates() throws OData2SparqlException {
+//		// Reified objectPredicates
+//		try {
+//			int count = 0;
+//			StringBuilder debug = new StringBuilder();
+//			RdfResultSet reifiedObjectPredicates = rdfMetamodelProvider.getReifiedObjectPredicates();
+//			try {
+//				while (reifiedObjectPredicates.hasNext()) {
+//					RdfNode reifiedPredicateNode = null;
+//					RdfQuerySolution soln = null;
+//					try {
+//						soln = reifiedObjectPredicates.nextSolution();
+//						reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
+//						RdfEntityType rdfEntityType = model.findEntityType(reifiedPredicateNode);
+//
+//						if (rdfEntityType != null) {
+//							RdfNode reifiedObjectPredicateNode = soln.getRdfNode("reifiedObjectPredicate");
+//							RdfNavigationProperty reifiedObjectPredicate = rdfEntityType.findNavigationProperty(reifiedObjectPredicateNode);
+//							if(reifiedObjectPredicate!=null) {
+//									reifiedObjectPredicate.setReifiedObjectPredicate(true);
+//									count++;
+//									debug.append(reifiedObjectPredicateNode.getIRI().toString()).append(";");
+//							}
+//						} else {
+//							log.info("Failed to create ReifiedObjectPredicates:" + reifiedPredicateNode.getIRI().toString()
+//									+ " since no corresponding classes");
+//						}
+//					} catch (Exception e) {
+//						log.info("Failed to find ReifiedObjectPredicates:" + reifiedPredicateNode.getIRI().toString()
+//								+ " with exception " + e.getMessage());
+//					}
+//				}
+//			} finally {
+//				log.info(count + " ReifiedfObjectPredicate properties found [" + debug + "]");
+//				reifiedObjectPredicates.close();
+//			}
+//		} catch (OData2SparqlException e) {
+//			log.error("Failed to execute reified objectpredicates. Check availability of triple store. Exception "
+//					+ e.getMessage());
+//			throw new OData2SparqlException("ReifiedObjectfPredicatesquery exception ", e);
+//		}
+//		
+//	}
+//
+//	private void getReifiedSubjectPredicates() throws OData2SparqlException {
+//		// Reified subjectPredicates
+//		try {
+//			int count = 0;
+//			StringBuilder debug = new StringBuilder();
+//			RdfResultSet reifiedSubjectPredicates = rdfMetamodelProvider.getReifiedSubjectPredicates();
+//			try {
+//				while (reifiedSubjectPredicates.hasNext()) {
+//					RdfNode reifiedPredicateNode = null;
+//					RdfQuerySolution soln = null;
+//					try {
+//						soln = reifiedSubjectPredicates.nextSolution();
+//						reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
+//						RdfEntityType rdfEntityType = model.findEntityType(reifiedPredicateNode);
+//
+//						if (rdfEntityType != null) {
+//							RdfNode reifiedSubjectPredicateNode = soln.getRdfNode("reifiedSubjectPredicate");
+//							RdfNavigationProperty reifiedSubjectPredicate = rdfEntityType.findNavigationProperty(reifiedSubjectPredicateNode);
+//							if(reifiedSubjectPredicate!=null) {
+//								reifiedSubjectPredicate.setReifiedSubjectPredicate(true);
+//								count++;
+//								debug.append(reifiedSubjectPredicateNode.getIRI().toString()).append(";");
+//							}
+//							
+//						} else {
+//							log.info("Failed to create ReifiedSubjectPredicates:" + reifiedPredicateNode.getIRI().toString()
+//									+ " since no corresponding classes");
+//						}
+//					} catch (Exception e) {
+//						log.info("Failed to find ReifiedPredicate class:" + reifiedPredicateNode.getIRI().toString()
+//								+ " with exception " + e.getMessage());
+//					}
+//				}
+//			} finally {
+//				log.info(count + " ReifiedfSubjectPredicate properties found [" + debug + "]");
+//				reifiedSubjectPredicates.close();
+//			}
+//		} catch (OData2SparqlException e) {
+//			log.error("Failed to execute reified subjectpredicates. Check availability of triple store. Exception "
+//					+ e.getMessage());
+//			throw new OData2SparqlException("ReifiedSubjectfPredicatesquery exception ", e);
+//		}
+//	}
+
+	private void getReifiedStatements() throws OData2SparqlException {
+		// Reified Classes
 		try {
-			int count = 0;
-			StringBuilder debug = new StringBuilder();
-			RdfResultSet reifiedObjectPredicates = rdfMetamodelProvider.getReifiedObjectPredicates();
+			int statementCount = 0;
+			int subjectCount = 0;
+			int objectCount = 0;
+			int predicateCount = 0;
+			StringBuilder statementDebug = new StringBuilder();
+			StringBuilder subjectDebug = new StringBuilder();
+			StringBuilder objectDebug = new StringBuilder();
+			StringBuilder predicateDebug = new StringBuilder();
+			RdfResultSet reifiedStatements = rdfMetamodelProvider.getReifiedStatements();
 			try {
-				while (reifiedObjectPredicates.hasNext()) {
-					RdfNode reifiedPredicateNode = null;
+				while (reifiedStatements.hasNext()) {
+					RdfNode reifiedStatementNode = null;
 					RdfQuerySolution soln = null;
 					try {
-						soln = reifiedObjectPredicates.nextSolution();
-						reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
-						RdfEntityType rdfEntityType = model.findEntityType(reifiedPredicateNode);
+						soln = reifiedStatements.nextSolution();
+						reifiedStatementNode = soln.getRdfNode("reifiedStatement");
+						RdfEntityType rdfEntityType = model.findEntityType(reifiedStatementNode);
 
 						if (rdfEntityType != null) {
+							rdfEntityType.setReified(true);
+							statementCount++;
+							statementDebug.append(reifiedStatementNode.getIRI().toString()).append(";");
 							RdfNode reifiedObjectPredicateNode = soln.getRdfNode("reifiedObjectPredicate");
 							RdfNavigationProperty reifiedObjectPredicate = rdfEntityType.findNavigationProperty(reifiedObjectPredicateNode);
 							if(reifiedObjectPredicate!=null) {
 									reifiedObjectPredicate.setReifiedObjectPredicate(true);
-									count++;
-									debug.append(reifiedObjectPredicateNode.getIRI().toString()).append(";");
-							}
-						} else {
-							log.info("Failed to create ReifiedObjectPredicates:" + reifiedPredicateNode.getIRI().toString()
-									+ " since no corresponding classes");
-						}
-					} catch (Exception e) {
-						log.info("Failed to find ReifiedObjectPredicates:" + reifiedPredicateNode.getIRI().toString()
-								+ " with exception " + e.getMessage());
-					}
-				}
-			} finally {
-				log.info(count + " ReifiedfObjectPredicate properties found [" + debug + "]");
-				reifiedObjectPredicates.close();
-			}
-		} catch (OData2SparqlException e) {
-			log.error("Failed to execute reified objectpredicates. Check availability of triple store. Exception "
-					+ e.getMessage());
-			throw new OData2SparqlException("ReifiedObjectfPredicatesquery exception ", e);
-		}
-		
-	}
-
-	private void getReifiedSubjectPredicates() throws OData2SparqlException {
-		// Reified subjectPredicates
-		try {
-			int count = 0;
-			StringBuilder debug = new StringBuilder();
-			RdfResultSet reifiedSubjectPredicates = rdfMetamodelProvider.getReifiedSubjectPredicates();
-			try {
-				while (reifiedSubjectPredicates.hasNext()) {
-					RdfNode reifiedPredicateNode = null;
-					RdfQuerySolution soln = null;
-					try {
-						soln = reifiedSubjectPredicates.nextSolution();
-						reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
-						RdfEntityType rdfEntityType = model.findEntityType(reifiedPredicateNode);
-
-						if (rdfEntityType != null) {
+									//reifiedObjectPredicate.setDomainCardinality(Cardinality.ONE);
+									//if(reifiedObjectPredicate.getInverseNavigationProperty()!=null)reifiedObjectPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
+									objectCount++;
+									objectDebug.append(reifiedObjectPredicateNode.getIRI().toString()).append(";");
+							}							
 							RdfNode reifiedSubjectPredicateNode = soln.getRdfNode("reifiedSubjectPredicate");
 							RdfNavigationProperty reifiedSubjectPredicate = rdfEntityType.findNavigationProperty(reifiedSubjectPredicateNode);
 							if(reifiedSubjectPredicate!=null) {
 								reifiedSubjectPredicate.setReifiedSubjectPredicate(true);
-								count++;
-								debug.append(reifiedSubjectPredicateNode.getIRI().toString()).append(";");
+								//reifiedSubjectPredicate.setDomainCardinality(Cardinality.ONE);
+								//if(reifiedSubjectPredicate.getInverseNavigationProperty()!=null)reifiedSubjectPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
+								subjectCount++;
+								subjectDebug.append(reifiedSubjectPredicateNode.getIRI().toString()).append(";");
 							}
-							
+							RdfNode reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
+							RdfNavigationProperty reifiedPredicate = rdfEntityType.findNavigationProperty(reifiedPredicateNode);
+							if(reifiedPredicate!=null) {
+								reifiedPredicate.setReifiedPredicate(true);
+								//reifiedPredicate.setDomainCardinality(Cardinality.ONE);
+								//if(reifiedPredicate.getInverseNavigationProperty()!=null)reifiedPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
+								predicateCount++;
+								predicateDebug.append(reifiedPredicateNode.getIRI().toString()).append(";");
+								
+							}						
 						} else {
-							log.info("Failed to create ReifiedSubjectPredicates:" + reifiedPredicateNode.getIRI().toString()
+							log.info("Failed to create reifiedStatements:" + reifiedStatementNode.getIRI().toString()
 									+ " since no corresponding classes");
 						}
 					} catch (Exception e) {
-						log.info("Failed to find ReifiedPredicate class:" + reifiedPredicateNode.getIRI().toString()
+						log.info("Failed to find ReifiedStatement class:" + reifiedStatementNode.getIRI().toString()
 								+ " with exception " + e.getMessage());
 					}
 				}
 			} finally {
-				log.info(count + " ReifiedfSubjectPredicate properties found [" + debug + "]");
-				reifiedSubjectPredicates.close();
+				log.info(statementCount + " ReifiedStatement classes found [" + statementDebug + "]");
+				log.info(subjectCount + " ReifiedSubjectPredicate properties found [" + subjectDebug + "]");
+				log.info(objectCount + " ReifiedfObjectPredicate properties found [" + objectDebug + "]");
+				log.info(predicateCount + " ReifiedPredicate properties found [" + predicateDebug + "]");
+				reifiedStatements.close();
 			}
 		} catch (OData2SparqlException e) {
-			log.error("Failed to execute reified subjectpredicates. Check availability of triple store. Exception "
-					+ e.getMessage());
-			throw new OData2SparqlException("ReifiedSubjectfPredicatesquery exception ", e);
-		}
-	}
-
-	private void getReifiedPredicates() throws OData2SparqlException {
-		// Reified Classes
-		try {
-			int count = 0;
-			StringBuilder debug = new StringBuilder();
-			RdfResultSet reifiedPredicates = rdfMetamodelProvider.getReifiedPredicates();
-			try {
-				while (reifiedPredicates.hasNext()) {
-					RdfNode reifiedPredicateNode = null;
-					RdfQuerySolution soln = null;
-					try {
-						soln = reifiedPredicates.nextSolution();
-						reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
-						RdfEntityType rdfEntityType = model.findEntityType(reifiedPredicateNode);
-
-						if (rdfEntityType != null) {
-							rdfEntityType.setReified(true);
-							count++;
-							debug.append(reifiedPredicateNode.getIRI().toString()).append(";");
-						} else {
-							log.info("Failed to create reifiedpredicates:" + reifiedPredicateNode.getIRI().toString()
-									+ " since no corresponding classes");
-						}
-					} catch (Exception e) {
-						log.info("Failed to find ReifiedPredicate class:" + reifiedPredicateNode.getIRI().toString()
-								+ " with exception " + e.getMessage());
-					}
-				}
-			} finally {
-				log.info(count + " ReifiedfPredicate classes found [" + debug + "]");
-				reifiedPredicates.close();
-			}
-		} catch (OData2SparqlException e) {
-			log.error("Failed to execute reified predicates. Check availability of triple store. Exception "
+			log.error("Failed to execute reified statements. Check availability of triple store. Exception "
 					+ e.getMessage());
 			throw new OData2SparqlException("ReifiedfPredicatesquery exception ", e);
 		}
@@ -776,10 +812,19 @@ public class RdfModelProvider {
 					
 					RdfNavigationProperty reifiedObjectPredicate=null;
 					RdfNavigationProperty reifiedSubjectPredicate=null;
-					for(RdfNavigationProperty navigationProperty:entityType.getInheritedNavigationProperties()) {
-						if(navigationProperty.isReifiedObjectPredicate())reifiedObjectPredicate=navigationProperty;
-						if(navigationProperty.isReifiedSubjectPredicate())reifiedSubjectPredicate=navigationProperty;
-						if(reifiedObjectPredicate!=null && reifiedSubjectPredicate !=null) break;
+					RdfNavigationProperty reifiedPredicate=null;
+					HashSet<RdfNavigationProperty> navigationProperties = entityType.getNavigationProperties();//.getInheritedNavigationProperties();
+					for(RdfNavigationProperty navigationProperty: navigationProperties) {
+						if(navigationProperty.isReifiedObjectPredicate()) {
+							reifiedObjectPredicate=navigationProperty;
+						}
+						if(navigationProperty.isReifiedSubjectPredicate()) {
+							reifiedSubjectPredicate=navigationProperty;
+						}
+						if(navigationProperty.isReifiedPredicate()) {
+							reifiedPredicate=navigationProperty;
+						}
+						if(reifiedObjectPredicate!=null && reifiedSubjectPredicate !=null && reifiedPredicate !=null) break;
 					}
 					if(reifiedObjectPredicate!=null && reifiedSubjectPredicate !=null) {
 						if(reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MANY)||reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
@@ -791,9 +836,16 @@ public class RdfModelProvider {
 							reifiedSubjectPredicate.setDomainCardinality(Cardinality.ONE);
 							if(reifiedSubjectPredicate.getInverseNavigationProperty()!=null)reifiedSubjectPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
 							log.warn(reifiedSubjectPredicate.getNavigationPropertyIRI().toString()+ " declared reifiedSubject but cardinality MANY, set to ONE");							
-						}			
+						}	
+						if(reifiedPredicate!=null ) {
+							if(reifiedPredicate.getDomainCardinality().equals(Cardinality.MANY)||reifiedPredicate.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
+								reifiedPredicate.setDomainCardinality(Cardinality.ONE);
+								if(reifiedPredicate.getInverseNavigationProperty()!=null)reifiedPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
+								log.warn(reifiedPredicate.getNavigationPropertyIRI().toString()+ " declared reifiedPredicate but cardinality MANY, set to ONE");							
+							}	
+						}
 					}else {
-						log.warn(entityType.getIRI().toString()+ " decalred reified but not subject and object predicates");	
+						log.warn(entityType.getIRI().toString()+ " declared reified but no subject and object predicates");	
 						entityType.setReified(false);
 					}
 				}

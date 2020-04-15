@@ -104,10 +104,12 @@ public class RdfConstants {
 	private static final String  ODATA_ISDATASET ="isDataset";
 	private static final String  ODATA_ISPROPERTYPATH ="isPropertyPath";
 	private static final String  ODATA_RDFTYPE ="rdfType";
-	private static final String  ODATA_ISREIFIEDPREDICATE ="isReified";
+	private static final String  ODATA_ISREIFIEDSTATEMENT ="isReifiedStatement";
+	private static final String  ODATA_ISREIFIEDPREDICATE ="isReifiedPredicate";
 	private static final String  ODATA_ISREIFIEDSUBJECTPREDICATE ="isReifiedSubject";
 	private static final String  ODATA_ISREIFIEDOBJECTPREDICATE ="isReifiedObject";
-	
+	private static final String  ODATA_INVERSEOF ="inverseOf";
+		
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 	public static final String RDF = "rdf";
@@ -313,12 +315,8 @@ public class RdfConstants {
 			.createIRI("http://inova8.com/odata4sparql#nodeShapesQuery");
 	public static final Value URI_PROPERTYSHAPESQUERY = valueFactoryImpl
 			.createIRI("http://inova8.com/odata4sparql#propertyShapesQuery");
-	public static final Value URI_REIFIEDPREDICATEQUERY = valueFactoryImpl
-			.createIRI("http://inova8.com/odata4sparql#reifiedPredicateQuery");
-	public static final Value URI_REIFIEDSUBJECTPREDICATEQUERY = valueFactoryImpl
-			.createIRI("http://inova8.com/odata4sparql#reifiedSubjectPredicateQuery");
-	public static final Value URI_REIFIEDOBJECTPREDICATEQUERY = valueFactoryImpl
-			.createIRI("http://inova8.com/odata4sparql#reifiedObjectPredicateQuery");
+	public static final Value URI_REIFIEDSTATEMENTQUERY = valueFactoryImpl
+			.createIRI("http://inova8.com/odata4sparql#reifiedStatementQuery");
 	public static final Value URI_HALYARD_SEARCH = valueFactoryImpl
 			.createIRI("http://merck.github.io/Halyard/ns#search");
 	public static final Value URI_LUCENE_MATCHES = valueFactoryImpl
@@ -338,13 +336,16 @@ public class RdfConstants {
 	public static final String ODATA_ISDATASET_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISDATASET;
 	public static final String ODATA_ISPROPERTYPATH_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISPROPERTYPATH;
 	public static final String ODATA_RDFTYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_RDFTYPE;
+	public static final String ODATA_ISREIFIEDSTATEMENT_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDSTATEMENT;
 	public static final String ODATA_ISREIFIEDPREDICATE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDPREDICATE;
 	public static final String ODATA_ISREIFIEDSUBJECTPREDICATE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE;
 	public static final String ODATA_ISREIFIEDOBJECTPREDICATE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE;
+	public static final String ODATA_INVERSEOF_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_INVERSEOF;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_TERM;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.RDF_PROPERTY_TERM;
 	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
 	public final static String INVERSEOF_FQN = RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
+	
 	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "."
 			+ RdfConstants.OWL_EQUIVALENTPROPERTY_LABEL;
 	public final static String ONTOLOGY_FQN = RdfConstants.OWL + "." + RdfConstants.ONTOLOGY;
@@ -361,9 +362,11 @@ public class RdfConstants {
 	private final static CsdlTerm odataIsDataset = new CsdlTerm().setName(RdfConstants.ODATA_ISDATASET).setType("Edm.String");
 	private final static CsdlTerm odataIsPropertyPath = new CsdlTerm().setName(RdfConstants.ODATA_ISPROPERTYPATH).setType("Edm.String");
 	private final static CsdlTerm odataRdfType = new CsdlTerm().setName(RdfConstants.ODATA_RDFTYPE).setType("Edm.String");
+	private final static CsdlTerm odataIsReifiedStatement = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDSTATEMENT).setType("Edm.String");
 	private final static CsdlTerm odataIsReifiedPredicate = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDPREDICATE).setType("Edm.String");
 	private final static CsdlTerm odataIsReifiedSubjectPredicate = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE).setType("Edm.String");
 	private final static CsdlTerm odataIsReifiedObjectPredicate = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE).setType("Edm.String");
+	private final static CsdlTerm odataInverseOf = new CsdlTerm().setName(RdfConstants.ODATA_INVERSEOF).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.RDF_PROPERTY_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
@@ -418,7 +421,7 @@ public class RdfConstants {
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
 			spFile = repositoryManagerDirPath + "ontologies/sp.ttl";
-			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.0.rdf";
+			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.1.rdf";
 			olgapFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.olgap.v2.0.0.rdf";
 			searchFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.lucenesearch.v3.0.0.rdf";
 			changeFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.change.v1.0.0.rdf";
@@ -489,9 +492,11 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.ODATA_ISDATASET, odataIsDataset);
 		TERMS.put(RdfConstants.ODATA_ISPROPERTYPATH, odataIsPropertyPath);
 		TERMS.put(RdfConstants.ODATA_RDFTYPE, odataRdfType);
+		TERMS.put(RdfConstants.ODATA_ISREIFIEDSTATEMENT, odataIsReifiedStatement);
 		TERMS.put(RdfConstants.ODATA_ISREIFIEDPREDICATE, odataIsReifiedPredicate);
 		TERMS.put(RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE, odataIsReifiedSubjectPredicate);
 		TERMS.put(RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE, odataIsReifiedObjectPredicate);
+		TERMS.put(RdfConstants.ODATA_INVERSEOF, odataInverseOf);
 		TERMS.put(RdfConstants.RDFS_CLASS_TERM, rdfsClassTerm);
 		TERMS.put(RdfConstants.RDF_PROPERTY_TERM, rdfPropertyTerm);
 		TERMS.put(RdfConstants.DATATYPE, rdfsDatatypeTerm);
@@ -510,9 +515,11 @@ public class RdfConstants {
 		ODATATERMS.add(odataIsDataset);
 		ODATATERMS.add(odataIsPropertyPath);
 		ODATATERMS.add(odataRdfType);
+		ODATATERMS.add(odataIsReifiedStatement);
 		ODATATERMS.add(odataIsReifiedPredicate);
 		ODATATERMS.add(odataIsReifiedSubjectPredicate);
 		ODATATERMS.add(odataIsReifiedObjectPredicate);
+		ODATATERMS.add(odataInverseOf);
 		RDFTERMS.add(rdfPropertyTerm);
 		RDFSTERMS.add(rdfsClassTerm);
 		RDFSTERMS.add(rdfsDatatypeTerm);

@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -539,12 +540,12 @@ public class RdfModel {
 			}
 		}
 
-		public Collection<RdfModel.RdfNavigationProperty> getNavigationProperties() {
-			return navigationProperties.values();
+		public HashSet<RdfModel.RdfNavigationProperty> getNavigationProperties() {
+			return new HashSet<RdfModel.RdfNavigationProperty>(navigationProperties.values());
 		}
 
-		public Collection<RdfModel.RdfNavigationProperty> getInheritedNavigationProperties() {
-			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
+		public HashSet<RdfModel.RdfNavigationProperty> getInheritedNavigationProperties() {
+			HashSet<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new HashSet<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				TreeSet<RdfEntityType> visited = new TreeSet<RdfEntityType>();
@@ -566,7 +567,7 @@ public class RdfModel {
 			return inheritedNavigationProperties;
 		}
 		public Collection<RdfModel.RdfNavigationProperty> getSuperTypeNavigationProperties(TreeSet<RdfEntityType> visited) {
-			Collection<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
+			HashSet<RdfModel.RdfNavigationProperty> inheritedNavigationProperties = new HashSet<RdfModel.RdfNavigationProperty>();
 			inheritedNavigationProperties.addAll(navigationProperties.values());
 			if (!this.getSuperTypes().isEmpty()) {
 				for (RdfEntityType superType : this.getSuperTypes()) {
@@ -1351,6 +1352,7 @@ public class RdfModel {
 		public RdfSchema navigationPropertySchema;
 		private Boolean reifiedSubjectPredicate =false;
 		private Boolean reifiedObjectPredicate =false;
+		private Boolean reifiedPredicate =false;
 		public String getNavigationPropertyName() {
 			return navigationPropertyName;
 		}
@@ -1370,7 +1372,13 @@ public class RdfModel {
 		public void setReifiedObjectPredicate(Boolean reifiedObjectPredicate) {
 			this.reifiedObjectPredicate = reifiedObjectPredicate;
 		}
+		public Boolean isReifiedPredicate() {
+			return reifiedPredicate;
+		}
 
+		public void setReifiedPredicate(Boolean reifiedPredicate) {
+			this.reifiedPredicate = reifiedPredicate;
+		}
 		public RdfNode getNavigationPropertyNode() {
 			return navigationPropertyNode;
 		}
@@ -1581,6 +1589,8 @@ public class RdfModel {
 				return true;
 			}
 		}
+
+
 
 	}
 
