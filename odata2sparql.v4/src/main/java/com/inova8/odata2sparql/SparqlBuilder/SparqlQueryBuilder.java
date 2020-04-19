@@ -1217,7 +1217,7 @@ public class SparqlQueryBuilder {
 			clausesExpandSelect.append("\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
 			clausesExpandSelect/*.append("\t{}\n")*/.append(expandItemsWhere(rdfTargetEntityType,
-					rdfTargetEntityType.entityTypeName, this.expandOption.getExpandItems(), "\t"));
+					rdfTargetEntityType.entityTypeName, this.expandOption.getExpandItems(), "\t", false));
 		}
 		return clausesExpandSelect;
 	}
@@ -2290,7 +2290,7 @@ public class SparqlQueryBuilder {
 	}
 
 	private StringBuilder expandItemsWhere(RdfEntityType targetEntityType, String targetKey,
-			List<ExpandItem> expandItems, String indent)
+			List<ExpandItem> expandItems, String indent, Boolean withinService)
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder expandItemsWhere = new StringBuilder();
 		boolean firstExpandItem = true;
@@ -2309,7 +2309,7 @@ public class SparqlQueryBuilder {
 							if (validateOperationCallable(navigationProperty.getRangeClass())) {
 								expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 										navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),
-										navigationProperty.getRangeClass(), firstExpandItem));
+										navigationProperty.getRangeClass(), firstExpandItem,withinService));
 								firstExpandItem = false;
 							}
 						}
@@ -2320,7 +2320,7 @@ public class SparqlQueryBuilder {
 						if (validateOperationCallable(navigationProperty.getRangeClass())) {
 							expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem,
 									navigationProperty, targetKey + navigationProperty.getNavigationPropertyName(),
-									navigationProperty.getRangeClass(), firstExpandItem));
+									navigationProperty.getRangeClass(), firstExpandItem,withinService));
 							firstExpandItem = false;
 						}
 					}
@@ -2344,7 +2344,7 @@ public class SparqlQueryBuilder {
 				RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
 
 				expandItemsWhere.append(expandItemWhere(targetEntityType, targetKey, indent, expandItem, navProperty,
-						nextTargetKey, nextTargetEntityType, firstExpandItem));
+						nextTargetKey, nextTargetEntityType, firstExpandItem,withinService));
 				firstExpandItem = false;
 			}
 		}
@@ -2353,27 +2353,27 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder expandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
+			RdfEntityType nextTargetEntityType, Boolean firstExpandItem, Boolean withinService)
 			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 
 		StringBuilder expandItemWhere = new StringBuilder();
 		//expandItemWhere.append(indent).append("#expandItemWhere\n");
 		if (navProperty.getDomainClass().isOperation()) {
 			expandItemWhere.append(operationExpandItemWhere(targetEntityType, targetKey, indent, expandItem,
-					navProperty, nextTargetKey, nextTargetEntityType, firstExpandItem));
+					navProperty, nextTargetKey, nextTargetEntityType, firstExpandItem,withinService));
 		} else if (isImplicitNavigationProperty(navProperty)) {
 			expandItemWhere.append(implicitExpandItemWhere(targetEntityType, targetKey, indent, expandItem, navProperty,
-					nextTargetKey, nextTargetEntityType, firstExpandItem));
+					nextTargetKey, nextTargetEntityType, firstExpandItem,withinService));
 		} else {
 			expandItemWhere.append(standardExpandItemWhere(targetEntityType, targetKey, indent, expandItem, navProperty,
-					nextTargetKey, nextTargetEntityType, firstExpandItem));
+					nextTargetKey, nextTargetEntityType, firstExpandItem,withinService));
 		}
 		return expandItemWhere;
 	}
 
 	private StringBuilder operationExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem) throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
+			RdfEntityType nextTargetEntityType, Boolean firstExpandItem ,Boolean withinService) throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder operationExpandItemWhere = new StringBuilder();
 		operationExpandItemWhere.append(indent).append("#operationExpandItemWhere\n");
 		
@@ -2384,23 +2384,29 @@ public class SparqlQueryBuilder {
 			operationExpandItemWhere.append("m");
 			}
 		operationExpandItemWhere.append(")\n");
-		operationExpandItemWhere.append(indent)	.append("\tSERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl()+ "?distinct=true&infer=false>{\n"); 
-
+		if (navProperty.getDomainClass().isProxy()
+				&& this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {
+			operationExpandItemWhere.append(indent)	.append("\tSERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl()+ "?distinct=true&infer=false>{\n"); 
+			withinService=true;
+		}
 		operationExpandItemWhere.append(indent).append("\t\t{\n");		
 		operationExpandItemWhere.append(indent)	.append(selectObjectPropertyValues(targetKey, indent+"\t", expandItem, navProperty, nextTargetKey));
 		operationExpandItemWhere.append(indent).append("\t\t}\n");
 		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 			operationExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t\t"));
-		}		
-		operationExpandItemWhere.append(indent).append("\t}\n");			
+					expandItem.getExpandOption().getExpandItems(), indent + "\t\t",true));
+		}	
+		if (withinService) {
+			operationExpandItemWhere.append(indent).append("\t}\n");	
+			withinService=false;
+		}
 		operationExpandItemWhere.append(indent).append("}\n");
 		return operationExpandItemWhere;
 	}
 
 	private StringBuilder implicitExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem) throws ODataApplicationException, ExpressionVisitException, OData2SparqlException {
+			RdfEntityType nextTargetEntityType, boolean firstExpandItem,Boolean withinService) throws ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder implicitExpandItemWhere = new StringBuilder();
 		implicitExpandItemWhere.append(indent).append("#implicitExpandItemWhere\n");
 		implicitExpandItemWhere.append(indent).append("OPTIONAL{\n");
@@ -2425,7 +2431,7 @@ public class SparqlQueryBuilder {
 		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 			//implicitExpandItemWhere.append(indent).append("\tUNION\n");
 			implicitExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t"));
+					expandItem.getExpandOption().getExpandItems(), indent + "\t", withinService));
 		}
 		implicitExpandItemWhere.append(indent).append("}\n");
 		return implicitExpandItemWhere;
@@ -2433,13 +2439,13 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder standardExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
+			RdfEntityType nextTargetEntityType, boolean firstExpandItem,Boolean withinService)
 			throws ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder standardExpandItemWhere = new StringBuilder();
 		standardExpandItemWhere.append(indent).append("#standardExpandItemWhere\n");
 		standardExpandItemWhere.append(indent).append("UNION{\n");
 		StringBuilder selectExpandProperties = selectExpandProperties(targetEntityType, targetKey, indent, expandItem,
-				navProperty, nextTargetKey, nextTargetEntityType, firstExpandItem);
+				navProperty, nextTargetKey, nextTargetEntityType, firstExpandItem,withinService);
 		if (selectExpandProperties.length() > 0) {
 			standardExpandItemWhere.append(indent).append(selectExpandProperties);
 			if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
@@ -2455,7 +2461,7 @@ public class SparqlQueryBuilder {
 		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 			//standardExpandItemWhere.append(indent).append("\tUNION\n");
 			standardExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t"));
+					expandItem.getExpandOption().getExpandItems(), indent + "\t",withinService));
 			//standardExpandItemWhere.append(indent).append("}\n");
 		}
 		standardExpandItemWhere.append(indent).append("}\n");
@@ -2480,7 +2486,7 @@ public class SparqlQueryBuilder {
 	}
 	private StringBuilder selectExpandProperties(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem) {
+			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService) {
 		StringBuilder selectExpandProperties = new StringBuilder();
 		selectExpandProperties.append(indent).append("#selectExpandProperties\n");
 		selectExpandProperties.append(indent).append("\t{\n");
@@ -2491,7 +2497,7 @@ public class SparqlQueryBuilder {
 			selectExpandProperties.append(indent).append("\t\tOPTIONAL{\n");
 		}
 		selectExpandProperties.append(indent)
-				.append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey));
+				.append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey,withinService));
 		selectExpandProperties.append(indent).append("\t\t}\n");
 		selectExpandProperties.append(indent)
 				.append(selectObjectPropertyValues(targetKey, indent, expandItem, navProperty, nextTargetKey));
@@ -2500,12 +2506,15 @@ public class SparqlQueryBuilder {
 	}
 
 	private StringBuilder selectObjectProperties(String targetKey, String indent, ExpandItem expandItem,
-			RdfNavigationProperty navProperty, String nextTargetKey) {
+			RdfNavigationProperty navProperty, String nextTargetKey, Boolean withinService) {
 
-		StringBuilder selectObjectProperties = new StringBuilder();
-		selectObjectProperties.append(indent).append("\t\t")
-				.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
-
+		StringBuilder selectObjectProperties = new StringBuilder();		
+		//Should not use a subselect within a service call
+		if (withinService) {
+			selectObjectProperties.append(indent).append("{\n");
+		}else {
+			selectObjectProperties.append(indent).append("\t\t").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+		}
 		String matchingTargetKey = "?" + nextTargetKey + "_s";
 		if (this.rdfModel.getRdfRepository().isWithMatching()) {
 			matchingTargetKey = matchingTargetKey + "m";
@@ -2567,7 +2576,6 @@ public class SparqlQueryBuilder {
 		return clausesSelect;
 	}
 
-	@SuppressWarnings("unused")
 	private StringBuilder expandItemWhere_old(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
@@ -2714,7 +2722,7 @@ public class SparqlQueryBuilder {
 		}
 		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 			expandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t"));
+					expandItem.getExpandOption().getExpandItems(), indent + "\t",false));
 			expandItemWhere.append(indent).append("}\n");
 		}
 		if (navProperty.getDomainClass().isProxy()) {
