@@ -40,7 +40,7 @@
   odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
   odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
   odata4sparql:withFKProperties "true"^^xsd:boolean ;
-  odata4sparql:withMatching "true"^^xsd:boolean ;
+  odata4sparql:withMatching "false"^^xsd:boolean ;
   odata4sparql:match "{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }"^^xsd:string ;
   odata4sparql:useBaseType "false"^^xsd:boolean ;
   odata4sparql:expandOperations "false"^^xsd:boolean ;

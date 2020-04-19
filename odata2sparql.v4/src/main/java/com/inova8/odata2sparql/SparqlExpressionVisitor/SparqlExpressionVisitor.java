@@ -252,8 +252,12 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			}
 			break;
 		case CONTAINS:
-			sparqlmethod = "regex(xsd:string(" + parameters.get(0) + ")," + parameters.get(1) + ", \"i\")";
 			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
+			if(parameters.get(0).toString().startsWith("?")) {
+				sparqlmethod = "regex(xsd:string(" + parameters.get(0) + "),xsd:string(" + parameters.get(1) + "), \"i\")";
+			}else {
+				sparqlmethod = "regex(xsd:string(" + parameters.get(1) + "),xsd:string(" + parameters.get(0) + "), \"i\")";
+			}
 			break;
 		case CONCAT:
 			sparqlmethod = "concat(" + parameters.get(0) + "," + parameters.get(1) + ")";
