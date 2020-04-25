@@ -629,10 +629,12 @@ public class RdfModel {
 		}
 
 		public RdfNavigationProperty findNavigationProperty(RdfNode navigationPropertyNode) {	
-			for (RdfNavigationProperty navigationProperty : this.getInheritedNavigationProperties()) {
-				if (navigationProperty.navigationPropertyNode.getIRI().toString()
-						.equals(navigationPropertyNode.getIRI().toString()))
-					return navigationProperty;
+			if(navigationPropertyNode!=null) {
+				for (RdfNavigationProperty navigationProperty : this.getInheritedNavigationProperties()) {
+					if (navigationProperty.navigationPropertyNode.getIRI().toString()
+							.equals(navigationPropertyNode.getIRI().toString()))
+						return navigationProperty;
+				}
 			}
 			return null;
 		}

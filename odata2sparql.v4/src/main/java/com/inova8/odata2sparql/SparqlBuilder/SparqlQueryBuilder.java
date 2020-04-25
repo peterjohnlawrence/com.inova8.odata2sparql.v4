@@ -1216,7 +1216,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesExpandSelect.append("\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
-			clausesExpandSelect/*.append("\t{}\n")*/.append(expandItemsWhere(rdfTargetEntityType,
+			clausesExpandSelect.append("\tUNION\n").append(expandItemsWhere(rdfTargetEntityType,
 					rdfTargetEntityType.entityTypeName, this.expandOption.getExpandItems(), "\t", false));
 		}
 		return clausesExpandSelect;
@@ -1281,14 +1281,15 @@ public class SparqlQueryBuilder {
 		default:
 			selectExpandWhere.append("#Unhandled URIType: " + this.uriType + "\n");
 		}
-		selectExpandWhere.append(search(indent + "\t"));
-		selectExpandWhere.append(clausesFilter(indent + "\t"));
-		selectExpandWhere.append(clausesExpandFilter(indent + "\t"));
-		selectExpandWhere.append(filter(indent + "\t"));
+		StringBuilder searchAndFilter = new StringBuilder();
+		searchAndFilter.append(search(indent + "\t\t\t"));
+		searchAndFilter.append(clausesFilter(indent + "\t\t\t"));
+		searchAndFilter.append(clausesExpandFilter(indent + "\t\t\t"));
+		searchAndFilter.append(filter(indent + "\t\t\t"));
 
 		switch (uriType) {
 		case URI1:
-			selectExpandWhere.append(selectPath());
+			selectExpandWhere.append(selectPath(searchAndFilter));
 			selectExpandWhere.append(indent).append("}\n");
 			break;
 		case URI2:
@@ -1299,10 +1300,12 @@ public class SparqlQueryBuilder {
 		case URI11:
 		case URI15:
 		case URI16:
+			selectExpandWhere.append(searchAndFilter);
 			selectExpandWhere.append(indent).append("}\n");
 			break;
 		case URI6B:
 			//selectExpandWhere.append(indent).append("} ").append(limitClause()).append("\n");
+			selectExpandWhere.append(searchAndFilter);
 			selectExpandWhere.append(indent).append("} ").append("\n");
 			break;
 		default:
@@ -1959,7 +1962,7 @@ public class SparqlQueryBuilder {
 		return search;
 	}
 
-	private StringBuilder selectPath() throws EdmException, OData2SparqlException {
+	private StringBuilder selectPath(StringBuilder searchAndFilter) throws EdmException, OData2SparqlException {
 		StringBuilder selectPath = new StringBuilder();
 		String indent;
 		if (DEBUG)
@@ -1977,12 +1980,9 @@ public class SparqlQueryBuilder {
 			indent = "\t\t\t";
 		}
 		//		selectPath.append(filter(indent + "\t"));
-		selectPath.append(search(indent + "\t"));
+		//selectPath.append(search(indent + "\t"));
 		selectPath.append(clausesPath(indent + "\t"));
-		//It is assumed that following are not required  as they will be added prior to these statements so are superfluous
-		//		selectPath.append(clausesFilter(indent + "\t"));
-		//		selectPath.append(clausesExpandFilter(indent + "\t"));
-		//		selectPath.append(filter(indent + "\t"));
+		selectPath.append(searchAndFilter);
 		if (limitSet()) {
 			selectPath.append(indent).append("}") // GROUP BY   ?" + edmTargetEntitySet.getEntityType().getName() + "_s")
 					.append(limitClause()).append("\n");
@@ -2443,11 +2443,16 @@ public class SparqlQueryBuilder {
 			throws ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder standardExpandItemWhere = new StringBuilder();
 		standardExpandItemWhere.append(indent).append("#standardExpandItemWhere\n");
-		standardExpandItemWhere.append(indent).append("UNION{\n");
+		if(firstExpandItem) {
+			standardExpandItemWhere.append(indent).append("{\n");
+		}else {
+			standardExpandItemWhere.append(indent).append("UNION{\n");
+		}
+
 		StringBuilder selectExpandProperties = selectExpandProperties(targetEntityType, targetKey, indent, expandItem,
 				navProperty, nextTargetKey, nextTargetEntityType, firstExpandItem,withinService);
 		if (selectExpandProperties.length() > 0) {
-			standardExpandItemWhere.append(indent).append(selectExpandProperties);
+			standardExpandItemWhere.append(selectExpandProperties);
 			if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 				standardExpandItemWhere.append(indent).append("\tUNION\n");
 			}
@@ -2456,14 +2461,14 @@ public class SparqlQueryBuilder {
 			standardExpandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem,
 					navProperty, nextTargetKey, nextTargetEntityType));
 		}
+		//Nested within expand
 		//[UNION?
 		//ExpandItemWhere]?
-		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
-			//standardExpandItemWhere.append(indent).append("\tUNION\n");
-			standardExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t",withinService));
-			//standardExpandItemWhere.append(indent).append("}\n");
-		}
+//		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
+//
+//			standardExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
+//					expandItem.getExpandOption().getExpandItems(), indent + "\t",withinService));
+//		}
 		standardExpandItemWhere.append(indent).append("}\n");
 		return standardExpandItemWhere;
 	}
@@ -2486,21 +2491,25 @@ public class SparqlQueryBuilder {
 	}
 	private StringBuilder selectExpandProperties(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService) {
+			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService) throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder selectExpandProperties = new StringBuilder();
-		selectExpandProperties.append(indent).append("#selectExpandProperties\n");
+		selectExpandProperties.append(indent).append("\t#selectExpandProperties\n");
 		selectExpandProperties.append(indent).append("\t{\n");
 		if (navProperty.getDomainCardinality().equals(Cardinality.ONE)
 				|| navProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
-			selectExpandProperties.append(indent).append("\t{\n");
+			selectExpandProperties.append(indent).append("\t\t{\n");
 		} else {
 			selectExpandProperties.append(indent).append("\t\tOPTIONAL{\n");
 		}
-		selectExpandProperties.append(indent)
-				.append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey,withinService));
+		selectExpandProperties.append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey,withinService));
 		selectExpandProperties.append(indent).append("\t\t}\n");
-		selectExpandProperties.append(indent)
-				.append(selectObjectPropertyValues(targetKey, indent, expandItem, navProperty, nextTargetKey));
+		selectExpandProperties.append(selectObjectPropertyValues(targetKey, indent, expandItem, navProperty, nextTargetKey));
+		//Nest the expand items within query to improve query execution performance ... deepest first
+		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
+			selectExpandProperties.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
+				expandItem.getExpandOption().getExpandItems(), indent + "\t\t",withinService));
+		}	
+
 		selectExpandProperties.append(indent).append("\t}\n");
 		return selectExpandProperties;
 	}
@@ -2513,7 +2522,7 @@ public class SparqlQueryBuilder {
 		if (withinService) {
 			selectObjectProperties.append(indent).append("{\n");
 		}else {
-			selectObjectProperties.append(indent).append("\t\t").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+			selectObjectProperties.append(indent).append("\t\t\t").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
 		}
 		String matchingTargetKey = "?" + nextTargetKey + "_s";
 		if (this.rdfModel.getRdfRepository().isWithMatching()) {
@@ -2576,6 +2585,7 @@ public class SparqlQueryBuilder {
 		return clausesSelect;
 	}
 
+	@SuppressWarnings("unused")
 	private StringBuilder expandItemWhere_old(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
@@ -2964,7 +2974,7 @@ public class SparqlQueryBuilder {
 		//Fixes #178
 		//clausesSelect.append(indent).append("{\n");
 		if (selectPropertyMap != null && !selectPropertyMap.isEmpty()) {
-			clausesSelect.append(indent).append("VALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			selectPropertyMap.add(RdfConstants.RDF_TYPE);
 			for (String selectProperty : selectPropertyMap) {
 				hasProperties = true;
@@ -2972,14 +2982,14 @@ public class SparqlQueryBuilder {
 			}
 			clausesSelect.append("}\n");
 		} else if (this.uriType.equals(UriType.URI3) || this.uriType.equals(UriType.URI4)) {
-			clausesSelect.append(indent).append("VALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			StringBuilder complexPropertyString = complexProperties(this.rdfComplexProperty);
 			if (complexPropertyString.length() > 0)
 				hasProperties = true;
 			clausesSelect.append(complexPropertyString);
 			clausesSelect.append("}\n");
 		} else if (!this.rdfTargetEntityType.getProperties().isEmpty()) {
-			clausesSelect.append(indent).append("VALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			for (RdfModel.RdfProperty selectProperty : targetEntityType.getInheritedProperties()) {
 				hasProperties = true;
 				if (selectProperty.getIsComplex()) {
