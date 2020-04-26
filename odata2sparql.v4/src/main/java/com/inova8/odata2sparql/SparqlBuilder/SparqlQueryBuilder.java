@@ -1216,7 +1216,8 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesExpandSelect.append("\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
-			clausesExpandSelect.append("\tUNION\n").append(expandItemsWhere(rdfTargetEntityType,
+			if(!rdfTargetEntityType.isProxy()) clausesExpandSelect.append("\tUNION\n");
+			clausesExpandSelect.append(expandItemsWhere(rdfTargetEntityType,
 					rdfTargetEntityType.entityTypeName, this.expandOption.getExpandItems(), "\t", false));
 		}
 		return clausesExpandSelect;
