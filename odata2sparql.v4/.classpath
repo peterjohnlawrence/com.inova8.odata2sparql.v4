@@ -43,6 +43,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/olgap"/>
-	<classpathentry kind="lib" path="/olgap/target/olgap-0.0.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

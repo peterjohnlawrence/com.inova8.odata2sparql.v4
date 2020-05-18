@@ -26,6 +26,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
+import com.inova8.odata2sparql.SparqlExpressionVisitor.NavPropertyPropertyFilter;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.PropertyFilter;
 import com.inova8.odata2sparql.SparqlExpressionVisitor.SparqlExpressionVisitor;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
@@ -138,8 +139,15 @@ public class SparqlFilterClausesBuilder {
 	}
 
 	public StringBuilder getClausesFilter(String indent) {
-		return clausesFilter(null, rdfTargetEntityType.entityTypeName, indent, this.filterClause
-				.getNavPropertyPropertyFilters().get(rdfTargetEntityType.entityTypeName).getPropertyFilters());
+		//return clausesFilter(null, rdfTargetEntityType.entityTypeName, indent, this.filterClause.getNavPropertyPropertyFilters().get(rdfTargetEntityType.entityTypeName).getPropertyFilters());
+		StringBuilder clausesFilter = new StringBuilder();
+		clausesFilter.append(indent).append("{\n");
+		TreeMap<String, NavPropertyPropertyFilter> navPropertyPropertyFilters = this.filterClause.getNavPropertyPropertyFilters();
+		for(NavPropertyPropertyFilter navPropertyPropertyFilter:  navPropertyPropertyFilters.values()) {
+			clausesFilter.append(clausesFilter(null, rdfTargetEntityType.entityTypeName, indent, navPropertyPropertyFilter.getPropertyFilters()));			
+		}
+		clausesFilter.append(indent).append("}\n");
+		return clausesFilter;
 	}
 
 	public StringBuilder getClausesExpandFilter(String indent) {
@@ -168,18 +176,11 @@ public class SparqlFilterClausesBuilder {
 	private StringBuilder clausesFilter(Entry<String, ExpandOption> expandSelectTreeNodeLinksEntry,
 			String nextTargetKey, String indent, TreeMap<String, PropertyFilter> propertyFilters) {
 		StringBuilder clausesFilter = new StringBuilder();
-		clausesFilter.append(indent).append("{\n");
 		// Repeat for each filtered property associated with this navProperty
 		for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
 			PropertyFilter propertyFilter = propertyFilterEntry.getValue();
-			clausesFilter.append(indent).append("\t")
-					.append("?" + nextTargetKey + "_s <" + propertyFilter.getProperty().getPropertyURI() + "> ?"
-							+ nextTargetKey + propertyFilter.getProperty().getEDMPropertyName() + "_value .\n");
-			for (String filter : propertyFilter.getFilters()) {
-				clausesFilter.append(indent).append("\t").append("FILTER((?" + filter + "_value))\n");
-			}
+			clausesFilter.append(indent).append("\t").append(propertyFilter.getClauseFilter(nextTargetKey));
 		}
-		clausesFilter.append(indent).append("}\n");
 		return clausesFilter;
 	}
 

@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +32,7 @@ import org.eclipse.rdf4j.repository.config.RepositoryImplConfig;
 import org.eclipse.rdf4j.repository.http.config.HTTPRepositoryConfig;
 import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
 import org.eclipse.rdf4j.repository.manager.RemoteRepositoryManager;
+import org.eclipse.rdf4j.repository.manager.RepositoryInfo;
 import org.eclipse.rdf4j.repository.manager.RepositoryManager;
 import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
 import org.eclipse.rdf4j.repository.sparql.config.SPARQLRepositoryConfig;
@@ -178,9 +181,20 @@ public class RdfRepositories {
 				String queryString = RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY);
 
 				TupleQuery tupleQuery = modelsConnection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-				TupleQueryResult result = tupleQuery.evaluate();
-				try {
-					while (result.hasNext()) { // iterate over the result
+				TupleQueryResult queryResult = tupleQuery.evaluate();
+				ArrayList<BindingSet> results = new ArrayList<BindingSet>();
+				{
+					try {
+						while (queryResult.hasNext()) {
+							// iterate over the results and load to arraylist to avoid apparent nested query blocking
+							results.add(queryResult.next());
+						}
+					} finally {
+						queryResult.close();
+					}
+					Iterator<BindingSet> result = results.iterator();
+					while (result.hasNext()) {
+						// iterate over each dataset
 						try {
 							BindingSet bindingSet = result.next();
 							Value valueOfDataset = bindingSet.getValue("Dataset");
@@ -193,8 +207,7 @@ public class RdfRepositories {
 
 							Literal valueOfDataRepositoryID = (Literal) bindingSet.getValue("DataRepositoryID");
 							Value valueOfDataRepositoryImplType = bindingSet.getValue("DataRepositoryImplType");
-							Value valueOfDataRepositoryImplURL = bindingSet
-									.getValue("DataRepositoryImplURL");
+							Value valueOfDataRepositoryImplURL = bindingSet.getValue("DataRepositoryImplURL");
 							Value valueOfDataRepositoryImplQueryEndpoint = bindingSet
 									.getValue("DataRepositoryImplQueryEndpoint");
 							Value valueOfDataRepositoryImplUpdateEndpoint = bindingSet
@@ -203,13 +216,10 @@ public class RdfRepositories {
 							Literal valueOfDataRepositoryImplQueryLimit = (Literal) bindingSet
 									.getValue("DataRepositoryImplQueryLimit");
 
-							Value valueOfDataRepositoryInsertGraph = bindingSet
-									.getValue("DataRepositoryInsertGraph");
-							Value valueOfDataRepositoryRemoveGraph = bindingSet
-									.getValue("DataRepositoryRemoveGraph");
-							Value valueOfDataRepositoryChangeGraph = bindingSet
-									.getValue("DataRepositoryChangeGraph");
-							
+							Value valueOfDataRepositoryInsertGraph = bindingSet.getValue("DataRepositoryInsertGraph");
+							Value valueOfDataRepositoryRemoveGraph = bindingSet.getValue("DataRepositoryRemoveGraph");
+							Value valueOfDataRepositoryChangeGraph = bindingSet.getValue("DataRepositoryChangeGraph");
+
 							Literal valueOfVocabularyRepositoryID = (Literal) bindingSet
 									.getValue("VocabularyRepositoryID");
 							Value valueOfVocabularyRepositoryImplType = bindingSet
@@ -237,10 +247,13 @@ public class RdfRepositories {
 							Literal valueOfIncludeImplicitRDF = (Literal) bindingSet.getValue("includeImplicitRDF");
 							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
-							RepositoryConfig dataRepositoryConfig = repositoryManager
-									.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
-							if (dataRepositoryConfig == null) {
-								//repositoryManager.removeRepository(valueOfDataRepositoryID.stringValue());
+							RepositoryConfig dataRepositoryConfig;
+							try {
+								dataRepositoryConfig = repositoryManager
+										.getRepositoryConfig(valueOfDataRepositoryID.getLabel());
+								if (dataRepositoryConfig == null)
+									throw new RepositoryException();
+							} catch (RepositoryException e) {
 								switch (valueOfDataRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig sparqlDataRepositoryTypeSpec = new SPARQLRepositoryConfig();
@@ -260,10 +273,9 @@ public class RdfRepositories {
 									break;
 								case "http://www.openrdf.org#HTTPRepository":
 									HTTPRepositoryConfig httpDataRepositoryTypeSpec = new HTTPRepositoryConfig();
-									httpDataRepositoryTypeSpec.setURL(
-											valueOfDataRepositoryImplURL.stringValue());
-									dataRepositoryConfig = new RepositoryConfig(
-											valueOfDataRepositoryID.stringValue(), httpDataRepositoryTypeSpec);
+									httpDataRepositoryTypeSpec.setURL(valueOfDataRepositoryImplURL.stringValue());
+									dataRepositoryConfig = new RepositoryConfig(valueOfDataRepositoryID.stringValue(),
+											httpDataRepositoryTypeSpec);
 									repositoryManager.addRepositoryConfig(dataRepositoryConfig);
 									break;
 								case "http://www.openrdf.org#ProxyRepository":
@@ -281,22 +293,28 @@ public class RdfRepositories {
 									break;
 								}
 							}
-							RepositoryConfig vocabularyRepositoryConfig = repositoryManager
-									.getRepositoryConfig(valueOfVocabularyRepositoryID.getLabel());
-							if (vocabularyRepositoryConfig == null) {
+							RepositoryConfig vocabularyRepositoryConfig;
+							try {
+								vocabularyRepositoryConfig = repositoryManager
+										.getRepositoryConfig(valueOfVocabularyRepositoryID.getLabel());
+								if (vocabularyRepositoryConfig == null)
+									throw new RepositoryException();
+							} catch (RepositoryException e) {
 								//repositoryManager.removeRepository(valueOfVocabularyRepositoryID.stringValue());
 								switch (valueOfVocabularyRepositoryImplType.toString()) {
 								case "http://www.openrdf.org#SPARQLRepository":
 									SPARQLRepositoryConfig sparqlVocabularyRepositoryTypeSpec = new SPARQLRepositoryConfig();
 									sparqlVocabularyRepositoryTypeSpec.setQueryEndpointUrl(
 											valueOfVocabularyRepositoryImplQueryEndpoint.stringValue());
-									sparqlVocabularyRepositoryTypeSpec.setUpdateEndpointUrl(verifyRDF4JUpdateEndpointUrl(
-											valueOfVocabularyRepositoryImplQueryEndpoint.stringValue(),
-											valueOfVocabularyRepositoryImplUpdateEndpoint.stringValue(),
-											valueOfVocabularyRepositoryImplProfile.toString()));
+									sparqlVocabularyRepositoryTypeSpec
+											.setUpdateEndpointUrl(verifyRDF4JUpdateEndpointUrl(
+													valueOfVocabularyRepositoryImplQueryEndpoint.stringValue(),
+													valueOfVocabularyRepositoryImplUpdateEndpoint.stringValue(),
+													valueOfVocabularyRepositoryImplProfile.toString()));
 									vocabularyRepositoryConfig = new RepositoryConfig(
-											valueOfVocabularyRepositoryID.stringValue(), sparqlVocabularyRepositoryTypeSpec);
-									
+											valueOfVocabularyRepositoryID.stringValue(),
+											sparqlVocabularyRepositoryTypeSpec);
+
 									repositoryManager.addRepositoryConfig(vocabularyRepositoryConfig);
 									break;
 								case "http://www.openrdf.org#SystemRepository":
@@ -304,10 +322,11 @@ public class RdfRepositories {
 									break;
 								case "http://www.openrdf.org#HTTPRepository":
 									HTTPRepositoryConfig httpVocabularyRepositoryTypeSpec = new HTTPRepositoryConfig();
-									httpVocabularyRepositoryTypeSpec.setURL(
-											valueOfVocabularyRepositoryImplURL.stringValue());
+									httpVocabularyRepositoryTypeSpec
+											.setURL(valueOfVocabularyRepositoryImplURL.stringValue());
 									vocabularyRepositoryConfig = new RepositoryConfig(
-											valueOfVocabularyRepositoryID.stringValue(), httpVocabularyRepositoryTypeSpec);
+											valueOfVocabularyRepositoryID.stringValue(),
+											httpVocabularyRepositoryTypeSpec);
 									repositoryManager.addRepositoryConfig(vocabularyRepositoryConfig);
 									break;
 								case "http://www.openrdf.org#ProxyRepository":
@@ -343,9 +362,9 @@ public class RdfRepositories {
 							} catch (NullPointerException e) {
 								log.warn("Null default prefix", e);
 							}
-							RdfRepository repository = new RdfRepository(this,((IRI) valueOfDataset).getLocalName(),
+							RdfRepository repository = new RdfRepository(this, ((IRI) valueOfDataset).getLocalName(),
 									defaultPrefix, namespaces);
-							
+
 							switch (valueOfDataRepositoryImplType.toString()) {
 							case "http://www.openrdf.org#SPARQLRepository":
 								repository.setDataRepository(new RdfRoleRepository(
@@ -367,19 +386,25 @@ public class RdfRepositories {
 							case "http://www.openrdf.org#ProxyRepository":
 								break;
 							case "http://www.openrdf.org#SailRepository":
-								repository.setDataRepository(new RdfRoleRepository(
-										repositoryManager.getRepository("ODATA2SPARQL"),
-										Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
-										SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue())));
+								repository.setDataRepository(
+										new RdfRoleRepository(repositoryManager.getRepository("ODATA2SPARQL"),
+												Integer.parseInt(valueOfDataRepositoryImplQueryLimit.stringValue()),
+												SPARQLProfile.get(valueOfDataRepositoryImplProfile.stringValue())));
 								break;
 							default:
 								log.error("Unrecognized repository implementatiomn type: ");
 								break;
 							}
-							if (valueOfDataRepositoryInsertGraph != null) repository.getDataRepository().setInsertGraphUrl(valueOfDataRepositoryInsertGraph.stringValue());
-							if (valueOfDataRepositoryRemoveGraph != null) repository.getDataRepository().setRemoveGraphUrl(valueOfDataRepositoryRemoveGraph.stringValue());
-							if (valueOfDataRepositoryChangeGraph != null) repository.getDataRepository().setChangeGraphUrl(valueOfDataRepositoryChangeGraph.stringValue());
-							
+							if (valueOfDataRepositoryInsertGraph != null)
+								repository.getDataRepository()
+										.setInsertGraphUrl(valueOfDataRepositoryInsertGraph.stringValue());
+							if (valueOfDataRepositoryRemoveGraph != null)
+								repository.getDataRepository()
+										.setRemoveGraphUrl(valueOfDataRepositoryRemoveGraph.stringValue());
+							if (valueOfDataRepositoryChangeGraph != null)
+								repository.getDataRepository()
+										.setChangeGraphUrl(valueOfDataRepositoryChangeGraph.stringValue());
+
 							switch (valueOfVocabularyRepositoryImplType.toString()) {
 							case "http://www.openrdf.org#SPARQLRepository":
 								repository.setModelRepository(new RdfRoleRepository(
@@ -401,16 +426,15 @@ public class RdfRepositories {
 							case "http://www.openrdf.org#ProxyRepository":
 								break;
 							case "http://www.openrdf.org#SailRepository":
-								repository.setModelRepository(
-										new RdfRoleRepository(repositoryManager.getRepository("ODATA2SPARQL"),
-												Integer.parseInt(
-														valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
-												SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue())));
+								repository.setModelRepository(new RdfRoleRepository(
+										repositoryManager.getRepository("ODATA2SPARQL"),
+										Integer.parseInt(valueOfVocabularyRepositoryImplQueryLimit.stringValue()),
+										SPARQLProfile.get(valueOfVocabularyRepositoryImplProfile.stringValue())));
 								break;
 							default:
 								log.error("Unrecognized repository implementatiomn type: ");
 								break;
-							}							
+							}
 							if (valueOfWithRdfAnnotations != null) {
 								repository.setWithRdfAnnotations(
 										Boolean.parseBoolean(valueOfWithRdfAnnotations.stringValue()));
@@ -451,14 +475,13 @@ public class RdfRepositories {
 								repository.setExpandOperations(true);
 							}
 							if (valueOfExpandTopDefault != null) {
-								repository.setExpandTopDefault(
-										Integer.parseInt(valueOfExpandTopDefault.stringValue()));
+								repository.setExpandTopDefault(Integer.parseInt(valueOfExpandTopDefault.stringValue()));
 							} else {
 								repository.setExpandTopDefault(null);
 							}
 							if (valueOfExpandSkipDefault != null) {
-								repository.setExpandSkipDefault(
-										Integer.parseInt(valueOfExpandSkipDefault.stringValue()));
+								repository
+										.setExpandSkipDefault(Integer.parseInt(valueOfExpandSkipDefault.stringValue()));
 							} else {
 								repository.setExpandTopDefault(null);
 							}
@@ -479,15 +502,12 @@ public class RdfRepositories {
 							} else {
 								repository.setIncludeImplicitRDF(false);
 							}
-							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);				
+							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
 						} catch (RepositoryConfigException e) {
 							log.warn("Failed to complete definition of dataset\n" + e.getLocalizedMessage());
 						}
 					}
-				} finally {	
-					result.close();
 				}
-
 			} catch (MalformedQueryException e) {
 				log.error("MalformedQuery " + RdfConstants.getMetaQueries().get(RdfConstants.URI_REPOSITORYQUERY), e);
 				throw new OData2SparqlException();
@@ -514,7 +534,12 @@ public class RdfRepositories {
 		try {
 			repositoryManager.initialize();
 			//Make sure we can find the bootstrap repository
-			repositoryManager.getRepositoryInfo(RdfConstants.systemId);
+			RepositoryInfo systemRepository = repositoryManager.getRepositoryInfo(RdfConstants.systemId);
+			//if (systemRepository==null) {
+			//No system repository so we could try and create it
+			log.warn("No populated system repository at " + repositoryUrl + ". Will attempt to preload");
+			preloadSystemRepository(repositoryManager);
+			//}
 		} catch (RepositoryException e) {
 			log.warn("Cannot initialize remote repository manager at " + repositoryUrl
 					+ ". Will use local repository instead");
@@ -550,6 +575,12 @@ public class RdfRepositories {
 			throw new OData2SparqlException("RdfRepositories loadRepositories failure", e);
 		}
 
+		preloadSystemRepository(repositoryManager);
+		return repositoryManager;
+
+	}
+
+	protected void preloadSystemRepository(RepositoryManager repositoryManager) throws OData2SparqlException {
 		//Create a configuration for the system repository implementation which is a native store
 
 		SailImplConfig systemRepositoryImplConfig = new MemoryStoreConfig();
@@ -600,7 +631,7 @@ public class RdfRepositories {
 			}
 			log.info("Loading models.ttl from " + localRepositoryManagerModel);
 			try {
-				modelsConnection.add(new File(localRepositoryManagerModel), RdfConstants.systemId, RDFFormat.TURTLE);
+				modelsConnection.add(new File(localRepositoryManagerModel), RdfConstants.systemIRI, RDFFormat.TURTLE);
 			} catch (RDFParseException e) {
 				log.error("RDFParseException: Cannot parse  " + localRepositoryManagerModel
 						+ " Check to ensure valid RDF/XML or TTL", e);
@@ -621,7 +652,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading odata4sparql from " + RdfConstants.odata4sparqlFile);
-				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.odata4sparqlFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.odata4sparqlFile, e);
 				throw new OData2SparqlException();
@@ -658,7 +689,7 @@ public class RdfRepositories {
 			//			}
 			try {
 				log.info("Loading sail from " + RdfConstants.sailFile);
-				modelsConnection.add(new File(RdfConstants.sailFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.sailFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.sailFile, e);
 				throw new OData2SparqlException();
@@ -682,7 +713,7 @@ public class RdfRepositories {
 			//			}
 			try {
 				log.info("Loading contextmenu from " + RdfConstants.contextmenuFile);
-				modelsConnection.add(new File(RdfConstants.contextmenuFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.contextmenuFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.contextmenuFile, e);
 				throw new OData2SparqlException();
@@ -694,7 +725,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading olgap from " + RdfConstants.olgapFile);
-				modelsConnection.add(new File(RdfConstants.olgapFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.olgapFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.olgapFile, e);
 				throw new OData2SparqlException();
@@ -706,7 +737,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading search from " + RdfConstants.searchFile);
-				modelsConnection.add(new File(RdfConstants.searchFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.searchFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.searchFile, e);
 				throw new OData2SparqlException();
@@ -718,7 +749,7 @@ public class RdfRepositories {
 			}
 			try {
 				log.info("Loading change from " + RdfConstants.changeFile);
-				modelsConnection.add(new File(RdfConstants.changeFile), RdfConstants.systemId, RDFFormat.RDFXML);
+				modelsConnection.add(new File(RdfConstants.changeFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
 			} catch (RDFParseException e) {
 				log.error("Cannot parse " + RdfConstants.changeFile, e);
 				throw new OData2SparqlException();
@@ -732,8 +763,6 @@ public class RdfRepositories {
 			log.error("Cannot connect to local system repository", e);
 			throw new OData2SparqlException();
 		}
-		return repositoryManager;
-
 	}
 
 	private TreeMap<String, Namespace> readPrefixes(RepositoryConnection modelsConnection, Value valueOfDataset)

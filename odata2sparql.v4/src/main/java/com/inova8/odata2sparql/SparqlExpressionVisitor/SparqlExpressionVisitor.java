@@ -16,6 +16,10 @@ import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.ODataApplicationException;
+import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceKind;
+import org.apache.olingo.server.api.uri.UriResourceLambdaAll;
+import org.apache.olingo.server.api.uri.UriResourceLambdaAny;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.queryoption.expression.BinaryOperatorKind;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
@@ -156,10 +160,20 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		PropertyFilter propertyFilter;
 		if (property != null) {
 			if (!propertyFilters.containsKey(property.propertyName)) {
-				propertyFilter = new PropertyFilter(property);
+				propertyFilter = new PropertyFilter(sPath,property);
 				propertyFilters.put(property.propertyName, propertyFilter);
 			} else {
 				propertyFilter = propertyFilters.get(property.propertyName);
+			}
+			if (filter != null && !filter.isEmpty())
+				propertyFilter.getFilters().add(filter);
+		}
+		if (navProperty != null) {
+			if (!propertyFilters.containsKey(navProperty.getNavigationPropertyName())) {
+				propertyFilter = new PropertyFilter(sPath,navProperty);
+				propertyFilters.put(navProperty.getNavigationPropertyName(), propertyFilter);
+			} else {
+				propertyFilter = propertyFilters.get(navProperty.getNavigationPropertyName());
 			}
 			if (filter != null && !filter.isEmpty())
 				propertyFilter.getFilters().add(filter);
@@ -342,77 +356,113 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 
 	@Override
 	public Object visitMember(Member member) throws ExpressionVisitException, ODataApplicationException {
-		RdfProperty rdfProperty = null;
-		String memberProperty = member.getResourcePath().getUriResourceParts().get(0).toString();
-		try {
-			rdfProperty = entityType.findProperty(memberProperty);
-			if (entityType.isOperation()) {
-				return "?" + rdfProperty.getVarName();
-			} else {
-				if (member instanceof UriResourceNavigation) {
-					if (sPath.isEmpty()) {
-						sPath = entityType.entityTypeName;
-					}
-					//Need to create path
-					//currentNavigationProperty = (EdmNavigationProperty) edmProperty;
-					sPath += member.toString();
-					putNavPropertyPropertyFilter(sPath, null, null, null);
-
-					return sPath;
-				} else if (RdfConstants.SUBJECT.equals(memberProperty)) {
-					//TODO still need to add full path to disambiguate
-					//rdfProperty = entityType.findProperty(edmProperty.getName());
-					//properties.add(rdfProperty);
-					if (!sPath.isEmpty()) {
-						//rdfProperty = entityType.findProperty(memberProperty);
-						if (navigationProperties.containsKey(sPath)) {
-							navigationProperties.get(sPath).add(rdfProperty);
-						} else {
-							HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
-							properties.add(rdfProperty);
-							navigationProperties.put(sPath, properties);
-						}
-						//putNavPropertyPropertyFilter(sPath,null,rdfProperty,null); 
-						String visitProperty = "?" + sPath + SUBJECT_POSTFIX;
-						sPath = "";
-						return visitProperty;
-					} else {
-						sPath = "";
-						return "?" + entityType.entityTypeName + SUBJECT_POSTFIX;
-					}
-				} else if (rdfProperty.isFK()) {
-					properties.add(rdfProperty);
-					putNavPropertyPropertyFilter(entityType.entityTypeName, null, rdfProperty, null);
- 					String visitProperty = null;
-					if (sPath.equals("")) {
-						visitProperty = "?" + entityType.getEDMEntityTypeName() + memberProperty
-								+ RdfConstants.PROPERTY_POSTFIX;
-					} else {
-						visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
-					}
-					return visitProperty;
-					
-				}else {
-					//rdfProperty = entityType.findProperty(memberProperty);
-					properties.add(rdfProperty);
-					putNavPropertyPropertyFilter(entityType.entityTypeName, null, rdfProperty, null);
-					String visitProperty = null;
-					if (sPath.equals("")) {
-						visitProperty = "?" + entityType.getEDMEntityTypeName() + memberProperty
-								+ RdfConstants.PROPERTY_POSTFIX;
-					} else {
-						visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
-					}
-					visitProperty = castVariable(rdfProperty, visitProperty);
-					sPath = "";
-					return visitProperty;
+		String currentPath = this.sPath;
+		RdfEntityType currentEntityType = this.entityType;
+		currentPath=currentEntityType.entityTypeName;
+		RdfNavigationProperty currentNavigationProperty;
+		for(UriResource memberPart: member.getResourcePath().getUriResourceParts()) {
+				switch( memberPart.getKind()){
+				case navigationProperty:
+					currentPath= visitMemberNavigationPropertyPart(currentPath,currentEntityType,member, memberPart);
+					currentNavigationProperty =  currentEntityType.findNavigationProperty(memberPart.toString());		
+					currentEntityType = currentNavigationProperty.getRangeClass();
+					break;
+				case primitiveProperty: 
+					return visitMemberPrimitivePropertyPart(currentPath,currentEntityType,member, memberPart);
+				case lambdaVariable: 
+					break;
+				case lambdaAll:
+					UriResourceLambdaAll lambdaAllMemberPart = (UriResourceLambdaAll)memberPart;
+				case lambdaAny: 
+					UriResourceLambdaAny lambdaAnyMemberPart = (UriResourceLambdaAny)memberPart;
+					Expression lambdaExpression = lambdaAnyMemberPart.getExpression();
+					break;
+				default:
 				}
-			}
-		} catch (EdmException e) {
-			throw new UnsupportedOperationException("Unrecognized property");//+ uriLiteral);
-		}
+		 }
+		return null;	
 	}
 
+	protected String visitMemberPrimitivePropertyPart(String currentPath,RdfEntityType currentEntityType,Member member, UriResource memberPart) {
+		RdfProperty rdfProperty;
+		String memberProperty = memberPart.toString();		
+		rdfProperty = currentEntityType.findProperty(memberProperty);
+		if (currentEntityType.isOperation()) {
+			return "?" + rdfProperty.getVarName();
+		} else {
+			if (member instanceof UriResourceNavigation) {
+				if (currentPath.isEmpty()) {
+					currentPath = currentEntityType.entityTypeName;
+				}
+				//Need to create path
+				//currentNavigationProperty = (EdmNavigationProperty) edmProperty;
+				currentPath += member.toString();
+				putNavPropertyPropertyFilter(currentPath, null, null, null);
+
+				return currentPath;
+			} else if (RdfConstants.SUBJECT.equals(memberProperty)) {
+				//TODO still need to add full path to disambiguate
+				//rdfProperty = entityType.findProperty(edmProperty.getName());
+				//properties.add(rdfProperty);
+				if (!currentPath.isEmpty()) {
+					//rdfProperty = entityType.findProperty(memberProperty);
+					if (navigationProperties.containsKey(sPath)) {
+						navigationProperties.get(sPath).add(rdfProperty);
+					} else {
+						HashSet<RdfProperty> properties = new HashSet<RdfProperty>();
+						properties.add(rdfProperty);
+						navigationProperties.put(sPath, properties);
+					}
+					//putNavPropertyPropertyFilter(sPath,null,rdfProperty,null); 
+					String visitProperty = "?" + currentPath + SUBJECT_POSTFIX;
+					currentPath = "";
+					return visitProperty;
+				} else {
+					sPath = "";
+					return "?" + entityType.entityTypeName + SUBJECT_POSTFIX;
+				}
+//			} else if (rdfProperty.isFK()) {
+//				properties.add(rdfProperty);
+//				putNavPropertyPropertyFilter(currentEntityType.entityTypeName, null, rdfProperty, null);
+//				String visitProperty = null;
+//				if (sPath.equals("")) {
+//					visitProperty = "?" + entityType.getEDMEntityTypeName() + memberProperty
+//							+ RdfConstants.PROPERTY_POSTFIX;
+//				} else {
+//					visitProperty = "?" + sPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
+//				}
+//				return visitProperty;
+//				
+			}else {
+				//rdfProperty = entityType.findProperty(memberProperty);
+				properties.add(rdfProperty);
+				putNavPropertyPropertyFilter(currentPath, null, rdfProperty, null);
+				String visitProperty = null;
+				if (currentPath.equals("")) {
+					visitProperty = "?" + entityType.getEDMEntityTypeName() + memberProperty
+							+ RdfConstants.PROPERTY_POSTFIX;
+				} else {
+					visitProperty = "?" + currentPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
+				}
+				visitProperty = castVariable(rdfProperty, visitProperty);
+				sPath = "";
+				return visitProperty;
+			}
+		}
+	}
+	protected String visitMemberNavigationPropertyPart(String currentPath,RdfEntityType currentEntityType,Member member, UriResource memberPart) {
+		RdfNavigationProperty rdfNavigationProperty;
+		String memberProperty = memberPart.toString();		
+		rdfNavigationProperty = currentEntityType.findNavigationProperty(memberProperty);
+		putNavPropertyPropertyFilter(currentPath, rdfNavigationProperty, null, null);
+		String visitProperty = null;
+//		if (currentPath.equals("")) {
+//			visitProperty = "?" + currentEntityType.getEDMEntityTypeName() + memberProperty;
+//		} else {
+			visitProperty = currentPath + memberProperty;
+//		}
+		return visitProperty;
+	}
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
 		switch (rdfProperty.getPropertyTypeName()) {
 		case RdfConstants.XSD_DATETIME:

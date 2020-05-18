@@ -57,7 +57,7 @@ public class RdfODataServlet extends HttpServlet {
 				readVersion();
 				File repositoryDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
 				rdfEdmProviders = new RdfEdmProviders(servletContext.getInitParameter("configFolder"),
-						servletContext.getInitParameter("repositoryFolder"), servletContext.getInitParameter("repositoryUrl"),
+						servletContext.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
 						repositoryDir.getAbsolutePath());
 //				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
 //						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
