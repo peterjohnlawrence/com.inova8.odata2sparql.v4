@@ -167,8 +167,12 @@ public class SparqlFilterClausesBuilder {
 			final Object visitorResult;
 			final String result;
 			visitorResult = filterExpression.accept(sparqlExpressionVisitor);
-			result = new String((String) visitorResult);
-			sparqlExpressionVisitor.setConditionString(result);
+			if(visitorResult==null  ) {
+				throw new ExpressionVisitException("No filter created");
+			}else {
+				result = new String((String) visitorResult);
+				sparqlExpressionVisitor.setConditionString(result);				
+			}
 		}
 		return sparqlExpressionVisitor;
 	}
