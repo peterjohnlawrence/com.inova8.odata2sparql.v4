@@ -16,6 +16,7 @@ import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceLambdaAll;
 import org.apache.olingo.server.api.uri.UriResourceLambdaAny;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
@@ -51,6 +52,8 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	private final Boolean allStatus = false;
 	private final RdfModelToMetadata rdfModelToMetadata;
 	private RdfNavigationProperty lambdaNavigationProperty;
+	private boolean lambdaAll = false;
+	private String primitivePropertyGraphPattern="";
 
 	public SparqlExpressionVisitor(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, RdfEntityType entityType,
 			String path) {
@@ -64,7 +67,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		this.navPropertyPropertyFilters = new TreeMap<String, NavPropertyPropertyFilter>();
 	}
 	public SparqlExpressionVisitor(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, RdfEntityType entityType,
-			String path,RdfNavigationProperty lambdaNavigationProperty ,SparqlExpressionVisitor parentExpressionVisitor ) {
+			String path,RdfNavigationProperty lambdaNavigationProperty ,SparqlExpressionVisitor parentExpressionVisitor, boolean lambdaAll ) {
 		super();
 		this.rdfModel = rdfModel;
 		this.entityType = entityType;
@@ -74,6 +77,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		this.properties = parentExpressionVisitor.getProperties() ;
 		this.navigationProperties = parentExpressionVisitor.getNavigationProperties();
 		this.navPropertyPropertyFilters =  parentExpressionVisitor.getNavPropertyPropertyFilters();
+		this.lambdaAll =lambdaAll;
 	}
 	public boolean isAllStatus() {
 		//TODO
@@ -202,6 +206,14 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 	@Override
 	public Object visitBinaryOperator(BinaryOperatorKind operator, Object left, Object right)
 			throws ExpressionVisitException, ODataApplicationException {
+		if(this.lambdaAll ) {			
+			String graphPattern = lambdaNavigationProperty.getGraphPattern(sPath);		
+			return "NOT EXISTS {" + graphPattern   + this.primitivePropertyGraphPattern + " FILTER(" + inverseBinaryOperation(operator, left, right) + ")}";
+		}else {
+			return binaryOperation(operator, left, right);
+		}
+	}
+	private Object binaryOperation(BinaryOperatorKind operator, Object left, Object right) {
 		String sparqlOperator = "";
 		switch (operator) {
 		case EQ:
@@ -235,7 +247,40 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		//return the binary statement
 		return "(" + left + " " + sparqlOperator + " " + right + ")";
 	}
-
+	private Object inverseBinaryOperation(BinaryOperatorKind operator, Object left, Object right) {
+		String sparqlOperator = "";
+		switch (operator) {
+		case EQ:
+			sparqlOperator = "!=";
+			break;
+		case NE:
+			sparqlOperator = "=";
+			break;
+		case OR:
+			sparqlOperator = "&&";
+			break;
+		case AND:
+			sparqlOperator = "||";
+			break;
+		case GE:
+			sparqlOperator = "<";
+			break;
+		case GT:
+			sparqlOperator = "<=";
+			break;
+		case LE:
+			sparqlOperator = ">";
+			break;
+		case LT:
+			sparqlOperator = ">=";
+			break;
+		default:
+			//Other operators are not supported for SQL Statements
+			throw new UnsupportedOperationException("Unsupported operator: " + operator.toString());
+		}
+		//return the binary statement
+		return "(" + left + " " + sparqlOperator + " " + right + ")";
+	}
 	@Override
 	public Object visitUnaryOperator(UnaryOperatorKind operator, Object operand)
 			throws ExpressionVisitException, ODataApplicationException {
@@ -285,7 +330,6 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			}
 			break;
 		case CONTAINS:
-			//TODO replacing with contains sparqlmethod = "contains(" + parameters.get(1) + "," + parameters.get(0) + ")";
 			if(parameters.get(0).toString().equals("\"\"") || parameters.get(1).toString().equals("\"\"") ){
 				sparqlmethod="true";
 			}else {
@@ -383,37 +427,63 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		}
 		RdfNavigationProperty currentNavigationProperty = null;
 		RdfNavigationProperty lambdaNavigationProperty = null;
-		for(UriResource memberPart: member.getResourcePath().getUriResourceParts()) {
+		List<UriResource> uriResourceParts = member.getResourcePath().getUriResourceParts();
+		UriResource lastUriResourcePart = uriResourceParts.get(uriResourceParts.size()-1);
+		UriResourceKind lastUriResourcePartKind = lastUriResourcePart.getKind();
+		for(UriResource memberPart: uriResourceParts) {
+				String visitProperty;
 				switch( memberPart.getKind()){
 				case navigationProperty:
-					currentPath= visitMemberNavigationPropertyPart(currentPath,currentEntityType,member, memberPart);
-					currentNavigationProperty =  currentEntityType.findNavigationProperty(memberPart.toString());		
-					currentEntityType = currentNavigationProperty.getRangeClass();
+					if(lastUriResourcePartKind.equals(UriResourceKind.lambdaAll) ) {
+						lambdaNavigationProperty =  currentEntityType.findNavigationProperty(memberPart.toString());		
+						RdfEntityType lambdaEntityType = lambdaNavigationProperty.getRangeClass();	
+						currentEntityType = lambdaEntityType;
+					}else {
+						currentPath= visitMemberNavigationPropertyPart(currentPath,currentEntityType,member, memberPart);
+						currentNavigationProperty =  currentEntityType.findNavigationProperty(memberPart.toString());		
+						currentEntityType = currentNavigationProperty.getRangeClass();
+					}
 					break;
 				case primitiveProperty: 
-					return visitMemberPrimitivePropertyPart(currentPath,currentEntityType,member, memberPart);
+					if(lambdaAll) {
+						String memberProperty = memberPart.toString();		
+						RdfProperty rdfProperty = currentEntityType.findProperty(memberProperty);
+						visitProperty = "?" + currentPath + memberProperty + RdfConstants.PROPERTY_POSTFIX;
+						
+						primitivePropertyGraphPattern =  rdfProperty.getGraphPattern(currentPath);// "?" + currentPath +"_s <" + rdfProperty.getPropertyURI() + "> " + visitProperty ;
+						visitProperty = castVariable(rdfProperty, visitProperty);
+						return visitProperty ;
+					}else {
+						return visitMemberPrimitivePropertyPart(currentPath,currentEntityType,member, memberPart);
+					}
 				case lambdaVariable: 
-					//currentPath= visitMemberNavigationPropertyPart(currentPath,currentEntityType,member, memberPart);
-					//currentNavigationProperty =  currentEntityType.findNavigationProperty(memberPart.toString());		
-					//currentEntityType = currentNavigationProperty.getRangeClass();
-					//putNavPropertyPropertyFilter(currentPath, this.lambdaNavigationProperty, null, null);
-					//lambdaNavigationProperty = currentNavigationProperty;
+					if(lambdaAll) {
+						currentPath =  currentPath + this.lambdaNavigationProperty.getNavigationPropertyName();
+					}
 					break;
 				case lambdaAll:
-					//UriResourceLambdaAll lambdaAllMemberPart = (UriResourceLambdaAll)memberPart;
-					throw new ExpressionVisitException("lambda All not implemented");
+					UriResourceLambdaAll lambdaAllMemberPart = (UriResourceLambdaAll)memberPart;
+					Expression lambdaAllExpression = lambdaAllMemberPart.getExpression();	
+					SparqlExpressionVisitor lambdaAllExpressionVisitor = new SparqlExpressionVisitor(rdfModel, this.rdfModelToMetadata,
+							currentEntityType, currentPath, lambdaNavigationProperty,this,true);
+					Object lambdaAllVisitorResult;
+					String allResult;
+					lambdaAllVisitorResult = lambdaAllExpression.accept(lambdaAllExpressionVisitor);
+					allResult = new String((String) lambdaAllVisitorResult);
+					lambdaAllExpressionVisitor.setConditionString(allResult);
+					return allResult;
 				case lambdaAny: 
 					UriResourceLambdaAny lambdaAnyMemberPart = (UriResourceLambdaAny)memberPart;
-					Expression lambdaExpression = lambdaAnyMemberPart.getExpression();	
+					Expression lambdaAnyExpression = lambdaAnyMemberPart.getExpression();	
 					lambdaNavigationProperty = currentNavigationProperty;
-					SparqlExpressionVisitor sparqlExpressionVisitor = new SparqlExpressionVisitor(rdfModel, this.rdfModelToMetadata,
-							currentEntityType, currentPath, lambdaNavigationProperty,this);
-					Object visitorResult;
-					String result;
-					visitorResult = lambdaExpression.accept(sparqlExpressionVisitor);
-					result = new String((String) visitorResult);
-					sparqlExpressionVisitor.setConditionString(result);
-					return result;
+					SparqlExpressionVisitor lambdaAnyExpressionVisitor = new SparqlExpressionVisitor(rdfModel, this.rdfModelToMetadata,
+							currentEntityType, currentPath, lambdaNavigationProperty,this,false);
+					Object lambdaAnyVisitorResult;
+					String anyResult;
+					lambdaAnyVisitorResult = lambdaAnyExpression.accept(lambdaAnyExpressionVisitor);
+					anyResult = new String((String) lambdaAnyVisitorResult);
+					lambdaAnyExpressionVisitor.setConditionString(anyResult);
+					return anyResult;
 				default:
 				}
 		 }
@@ -431,8 +501,6 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 				if (currentPath.isEmpty()) {
 					currentPath = currentEntityType.entityTypeName;
 				}
-				//Need to create path
-				//currentNavigationProperty = (EdmNavigationProperty) edmProperty;
 				currentPath += member.toString();
 				putNavPropertyPropertyFilter(currentPath, null, null, null);
 
@@ -492,11 +560,6 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		rdfNavigationProperty = currentEntityType.findNavigationProperty(memberProperty);
 		putNavPropertyPropertyFilter(currentPath, rdfNavigationProperty, null, null);
 		String visitProperty = null;
-//		if (currentPath.equals("")) {
-//			visitProperty = "?" + currentEntityType.getEDMEntityTypeName() + memberProperty;
-//		} else {
-			visitProperty = currentPath + memberProperty;
-//		}
 		return visitProperty;
 	}
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {

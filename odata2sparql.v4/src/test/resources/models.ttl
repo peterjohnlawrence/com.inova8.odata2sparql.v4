@@ -41,10 +41,14 @@
   odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
   odata4sparql:withFKProperties "true"^^xsd:boolean ;
   odata4sparql:withMatching "false"^^xsd:boolean ;
-  odata4sparql:match "{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }"^^xsd:string ;
+  odata4sparql:match " key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 ."^^xsd:string ;
   odata4sparql:useBaseType "false"^^xsd:boolean ;
   odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:expandTopDefault 5;
+  odata4sparql:expandSkipDefault 0;
+  odata4sparql:expandOrderbyDefault "true"^^xsd:boolean ;
   odata4sparql:textSearchType odata4sparql:RDF4J_Lucene ;
+  odata4sparql:includeImplicitRDF  "true"^^xsd:boolean ;
   rdfs:label "northwind"^^xsd:string 
 .
 :NW
@@ -75,9 +79,11 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+  odata4sparql:insert-graph-uri "http://northwind.com/insert"^^xsd:anyURI;
+  odata4sparql:change-graph-uri "http://inova8.com/odata4sparql/change"^^xsd:anyURI ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/northwind?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/northwind/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/northwind?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/northwind/statements?insert-graph-uri=http://northwind.com/odata4sparql/changes"^^xsd:anyURI ;
   rdfs:label "northwind Data Impl"^^xsd:string 
 .
 :northwind_Vocabulary
@@ -90,8 +96,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/northwind?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/northwind/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/northwind?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/northwind/statements?insert-graph-uri=http://northwind.com/odata4sparql/changes"^^xsd:anyURI ;
   rdfs:label "northwind Vocabulary Impl"^^xsd:string 
 .
 :STW
@@ -114,6 +120,7 @@
   odata4sparql:datasetPrefix :STW ;
   odata4sparql:datasetPrefix :SWTTHES;
   odata4sparql:datasetPrefix :ZBWEXT;
+  odata4sparql:datasetPrefix :ZBW;
   odata4sparql:defaultPrefix odata4sparql:SKOS  ;
   odata4sparql:namespace "http://zbw.eu/stw/descriptor/"^^xsd:anyURI ;
   odata4sparql:prefix "STW"^^xsd:string ;
@@ -137,6 +144,12 @@
    odata4sparql:prefix "ZBWEXT"^^xsd:string ;
         rdfs:label "ZBWEXT"^^xsd:string 
  .
+:ZBW
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://zbw.eu/"^^xsd:anyURI ;
+   odata4sparql:prefix "ZBW"^^xsd:string ;
+        rdfs:label "ZBW"^^xsd:string 
+ .
 :STW_Data
   rdf:type rep:Repository ; 
   rep:repositoryID "STW_Data"^^xsd:string ;
@@ -148,8 +161,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/STW?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/STW/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/stw?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/stw/statements"^^xsd:anyURI ;
   rdfs:label "STW Data Impl"^^xsd:string 
 .
 :STW_Vocabulary
@@ -162,8 +175,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/STW?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/STW/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/stw?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/stw/statements"^^xsd:anyURI ;
   rdfs:label "STW Vocabulary Impl"^^xsd:string 
 .
 
@@ -211,8 +224,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/cofid?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/cofid/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/cofid?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/cofid/statements"^^xsd:anyURI ;
   rdfs:label "COFID Data Impl"^^xsd:string 
 .
 :COFID_Vocabulary
@@ -225,8 +238,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/cofid?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/cofid/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/cofid?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/cofid/statements"^^xsd:anyURI ;
   rdfs:label "COFID Vocabulary Impl"^^xsd:string 
 .
 
@@ -296,8 +309,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/rdf2model?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/rdf2model/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/rdf2model?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/rdf2model/statements"^^xsd:anyURI ;
   rdfs:label "rdf2model Data Impl"^^xsd:string 
 .
 :rdf2model_Vocabulary
@@ -310,8 +323,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/rdf2model?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/rdf2model/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/rdf2model?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/rdf2model/statements"^^xsd:anyURI ;
   rdfs:label "rdf2model Vocabulary Impl"^^xsd:string 
 .
 
@@ -341,6 +354,8 @@
   odata4sparql:withFKProperties "false"^^xsd:boolean ;
   odata4sparql:useBaseType "false"^^xsd:boolean ;
   odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:expandOrderbyDefault "true"^^xsd:boolean ;
+  odata4sparql:withMatching "false"^^xsd:boolean ;
   odata4sparql:textSearchType odata4sparql:RDF4J_Lucene 
 .
 :londontube
@@ -358,11 +373,11 @@
 :tfl_Data_Impl
  # rdf:type openrdf:SPARQLRepository ;
  # rep:repositoryType openrdf:SPARQLRepository ;
- # sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/tfl?distinct=true"^^xsd:anyURI;
- # sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/tfl/statements"^^xsd:anyURI ;
+ # sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/tfl?distinct=true"^^xsd:anyURI;
+ # sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/tfl/statements"^^xsd:anyURI ;
 	rdf:type openrdf:HTTPRepository ;
 	rep:repositoryType openrdf:HTTPRepository ;
-	http:repositoryURL "http://localhost:8082/rdf4j-server/repositories/tfl"^^xsd:anyURI;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/tfl"^^xsd:anyURI;
 	odata4sparql:defaultQueryLimit 100000 ;
 	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
 	rdfs:label "tfl Data Impl"^^xsd:string 
@@ -377,11 +392,11 @@
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
  # rdf:type openrdf:SPARQLRepository ;
  # rep:repositoryType openrdf:SPARQLRepository ;
- # sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/tfl?infer=false"^^xsd:anyURI ;
- # sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/tfl/statements"^^xsd:anyURI ;
+ # sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/tfl?infer=false"^^xsd:anyURI ;
+ # sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/tfl/statements"^^xsd:anyURI ;
 	rdf:type openrdf:HTTPRepository ;
 	rep:repositoryType openrdf:HTTPRepository ;
-	http:repositoryURL "http://localhost:8082/rdf4j-server/repositories/tfl"^^xsd:anyURI;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/tfl"^^xsd:anyURI;
 	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
 	rdfs:label "tfl Vocabulary Impl"^^xsd:string 
 .
@@ -430,8 +445,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/NHS?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/NHS/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/nhs?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/nhs/statements"^^xsd:anyURI ;
   rdfs:label "NHS Data Impl"^^xsd:string 
 .
 :NHS_Vocabulary
@@ -444,8 +459,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/NHS?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/NHS/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/nhs?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/nhs/statements"^^xsd:anyURI ;
   rdfs:label "NHS Vocabulary Impl"^^xsd:string 
 .
 
@@ -635,8 +650,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/CDISC?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/CDISC/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/cdisc?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/cdisc/statements"^^xsd:anyURI ;
   rdfs:label "CDISC Data Impl"^^xsd:string 
 .
 :CDISC_Vocabulary
@@ -649,8 +664,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/CDISC?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/CDISC/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/cdisc?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/cdisc/statements"^^xsd:anyURI ;
   rdfs:label "CDISC Vocabulary Impl"^^xsd:string 
 .
 :FDA
@@ -699,8 +714,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/FDA?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/FDA/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/fda?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/fda/statements"^^xsd:anyURI ;
   rdfs:label "FDA Data Impl"^^xsd:string 
 .
 :FDA_Vocabulary
@@ -713,8 +728,8 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/FDA?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/FDA/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/fda?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/fda/statements"^^xsd:anyURI ;
   rdfs:label "FDA Vocabulary Impl"^^xsd:string 
 .
 :Kennedys
@@ -755,8 +770,8 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/Kennedys?distinct=true"^^xsd:anyURI;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/Kennedys/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/kennedys?distinct=true"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/kennedys/statements"^^xsd:anyURI ;
   rdfs:label "Kennedys Data Impl"^^xsd:string 
 .
 :Kennedys_Vocabulary
@@ -769,9 +784,80 @@
   rdf:type openrdf:SPARQLRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:SPARQLRepository ;
-  sparql:query-endpoint "http://localhost:8082/rdf4j-server/repositories/Kennedys?infer=false"^^xsd:anyURI ;
-  sparql:update-endpoint "http://localhost:8082/rdf4j-server/repositories/Kennedys/statements"^^xsd:anyURI ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/kennedys?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/kennedys/statements"^^xsd:anyURI ;
   rdfs:label "Kennedys Vocabulary Impl"^^xsd:string 
+.
+:DUL
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#"^^xsd:anyURI ;
+   odata4sparql:prefix "DUL"^^xsd:string ;
+ 	rdfs:label "DUL"^^xsd:string 
+.
+:dbp
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://dbpedia.org/"^^xsd:anyURI ;
+   odata4sparql:prefix "dbp"^^xsd:string ;
+ 	rdfs:label "dbp"^^xsd:string 
+.
+:dbpedia
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:dataRepository :dbpedia_Data ;
+  odata4sparql:vocabularyRepository :dbpedia_Vocabulary ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:GEO ;
+  odata4sparql:datasetPrefix odata4sparql:SEARCH ;
+  odata4sparql:datasetPrefix odata4sparql:QB ;
+  odata4sparql:datasetPrefix odata4sparql:DATACUBE ; 
+  odata4sparql:datasetPrefix odata4sparql:SKOS ; 
+  odata4sparql:datasetPrefix odata4sparql:SCHEMA ; 
+    odata4sparql:datasetPrefix odata4sparql:DCT ; 
+  odata4sparql:datasetPrefix :DUL ;  
+  odata4sparql:datasetPrefix :dbp ;
+  odata4sparql:defaultPrefix :dbpedia ;
+  odata4sparql:namespace "http://dbpedia.org/ontology/"^^xsd:anyURI ;
+  odata4sparql:prefix "dbpedia"^^xsd:string ;
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withFKProperties "true"^^xsd:boolean ;
+  odata4sparql:withMatching "true"^^xsd:boolean ;
+  odata4sparql:match "OPTIONAL{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }"^^xsd:string ;
+  odata4sparql:useBaseType "false"^^xsd:boolean ;
+  odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:textSearchType odata4sparql:RDF4J_Lucene ;
+  rdfs:label "dbpedia"^^xsd:string 
+.
+:dbpedia_Data
+  rdf:type rep:Repository ;
+  rep:repositoryID "dbpedia_Data"^^xsd:string ;
+  rep:repositoryImpl :dbpedia_Data_Impl ;
+  rdfs:label "dbpedia Data"^^xsd:string 
+.
+:dbpedia_Data_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:defaultQueryLimit 100000 ;
+  odata4sparql:sparqlProfile odata4sparql:VIRTUOSO ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/dbpedia_data"^^xsd:anyURI;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/dbpedia/statements"^^xsd:anyURI ;
+  rdfs:label "dbpedia Data Impl"^^xsd:string 
+.
+:dbpedia_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "dbpedia_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :dbpedia_Vocabulary_Impl ;
+  rdfs:label "dbpedia Vocabulary"^^xsd:string 
+.
+:dbpedia_Vocabulary_Impl
+  rdf:type openrdf:SPARQLRepository ;
+  odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+  rep:repositoryType openrdf:SPARQLRepository ;
+  sparql:query-endpoint "http://localhost:8080/rdf4j-server/repositories/dbpedia?infer=false"^^xsd:anyURI ;
+  sparql:update-endpoint "http://localhost:8080/rdf4j-server/repositories/dbpedia/statements"^^xsd:anyURI ;
+  rdfs:label "dbpedia Vocabulary Impl"^^xsd:string 
 .
 :nwr
   rdf:type odata4sparql:Dataset ;
@@ -814,7 +900,7 @@
   odata4sparql:defaultQueryLimit 100000 ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:HTTPRepository ;
-  http:repositoryURL "http://localhost:8082/rdf4j-server/repositories/northwind"^^xsd:anyURI;
+  http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/northwind"^^xsd:anyURI;
   rdfs:label "nwr Data Impl"^^xsd:string 
 .
 :nwr_Vocabulary
@@ -827,6 +913,276 @@
   rdf:type openrdf:HTTPRepository ;
   odata4sparql:sparqlProfile odata4sparql:RDF4J ;
   rep:repositoryType openrdf:HTTPRepository ;
-  http:repositoryURL "http://localhost:8082/rdf4j-server/repositories/northwind"^^xsd:anyURI;
+  http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/northwind"^^xsd:anyURI;
   rdfs:label "nwr Vocabulary Impl"^^xsd:string 
+.
+:ecopharm
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix :ecopharm  ;
+  odata4sparql:defaultPrefix :ecopharm  ;
+  odata4sparql:namespace "http://ecopharm.com/ref/"^^xsd:anyURI ;
+  odata4sparql:prefix "ecopharm"^^xsd:string ;
+  rdfs:label "ecopharm"^^xsd:string ;
+  odata4sparql:dataRepository :ecopharm_Data ;
+  odata4sparql:vocabularyRepository :ecopharm_Vocabulary ;
+  odata4sparql:datasetPrefix :eco ;
+  odata4sparql:datasetPrefix :ecoroot ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;   
+  odata4sparql:datasetPrefix odata4sparql:SEARCH ;  
+  odata4sparql:datasetPrefix odata4sparql:GEO ;
+  odata4sparql:datasetPrefix odata4sparql:QB ;
+  odata4sparql:datasetPrefix odata4sparql:PROV ;
+  odata4sparql:datasetPrefix odata4sparql:DATACUBE ;
+  odata4sparql:datasetPrefix odata4sparql:CONTEXTMENU ; 
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "true"^^xsd:boolean ;
+  odata4sparql:withFKProperties "false"^^xsd:boolean ;
+  odata4sparql:useBaseType "false"^^xsd:boolean ;
+  odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:textSearchType odata4sparql:RDF4J_Lucene 
+.
+:eco
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://ecopharm.com/"^^xsd:anyURI ;
+   odata4sparql:prefix "eco"^^xsd:string ;
+ 	rdfs:label "eco"^^xsd:string 
+.
+:ecoroot
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://ecopharm.com"^^xsd:anyURI ;
+   odata4sparql:prefix "ecoroot"^^xsd:string ;
+ 	rdfs:label "ecoroot"^^xsd:string 
+.
+:ecopharm_Data
+  rdf:type rep:Repository ; 
+  rep:repositoryID "ecopharm_Data"^^xsd:string ; 
+  rep:repositoryImpl :ecopharm_Data_Impl ;
+  rdfs:label "ecopharm Data"^^xsd:string 
+.
+:ecopharm_Data_Impl
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/ecopharm"^^xsd:anyURI;
+	odata4sparql:defaultQueryLimit 100000 ;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "ecopharm Data Impl"^^xsd:string 
+.
+:ecopharm_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "ecopharm_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :ecopharm_Vocabulary_Impl ;
+  rdfs:label "ecopharm Vocabulary"^^xsd:string 
+.
+:ecopharm_Vocabulary_Impl
+  odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/ecopharm"^^xsd:anyURI;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "ecopharm Vocabulary Impl"^^xsd:string 
+.
+:pronom6
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix :pronom6  ;
+  odata4sparql:defaultPrefix :schema  ;
+  odata4sparql:namespace "	http://reference.data.gov.uk/technical-registry/data/mssql#"^^xsd:anyURI ;
+  odata4sparql:prefix "pronom6"^^xsd:string ;
+  rdfs:label "pronom6"^^xsd:string ;
+  odata4sparql:dataRepository :pronom6_Data ;
+  odata4sparql:vocabularyRepository :pronom6_Vocabulary ;
+  odata4sparql:datasetPrefix :schema ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;   
+  odata4sparql:datasetPrefix odata4sparql:SEARCH ;  
+  odata4sparql:datasetPrefix odata4sparql:GEO ;
+  odata4sparql:datasetPrefix odata4sparql:QB ;
+  odata4sparql:datasetPrefix odata4sparql:PROV ;
+  odata4sparql:datasetPrefix odata4sparql:DATACUBE ;
+  odata4sparql:datasetPrefix odata4sparql:CONTEXTMENU ; 
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "true"^^xsd:boolean ;
+  odata4sparql:withFKProperties "false"^^xsd:boolean ;
+  odata4sparql:useBaseType "false"^^xsd:boolean ;
+  odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:expandTopDefault 5;
+  odata4sparql:expandSkipDefault 0;
+  odata4sparql:expandOrderbyDefault "true"^^xsd:boolean ;
+  odata4sparql:textSearchType odata4sparql:RDF4J_Lucene 
+.
+:schema
+  rdf:type odata4sparql:Prefix ; 
+   odata4sparql:namespace "http://reference.data.gov.uk/technical-registry/schema/mssql#"^^xsd:anyURI ;
+   odata4sparql:prefix "schema"^^xsd:string ;
+ 	rdfs:label "schema"^^xsd:string 
+.
+:pronom6_Data
+  rdf:type rep:Repository ; 
+  rep:repositoryID "pronom6_Data"^^xsd:string ; 
+  rep:repositoryImpl :pronom6_Data_Impl ;
+  rdfs:label "pronom6 Data"^^xsd:string 
+.
+:pronom6_Data_Impl
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/pronom6"^^xsd:anyURI;
+	odata4sparql:defaultQueryLimit 100000 ;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "pronom6 Data Impl"^^xsd:string 
+.
+:pronom6_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "pronom6_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :pronom6_Vocabulary_Impl ;
+  rdfs:label "pronom6 Vocabulary"^^xsd:string 
+.
+:pronom6_Vocabulary_Impl
+  odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/pronom6"^^xsd:anyURI;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "pronom6 Vocabulary Impl"^^xsd:string 
+.
+:chr   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/chr/"^^xsd:anyURI ;   odata4sparql:prefix "chr"^^xsd:string ;   rdfs:label "chr"^^xsd:string .
+:cmp   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/cmp/"^^xsd:anyURI ;   odata4sparql:prefix "cmp"^^xsd:string ;   rdfs:label "cmp"^^xsd:string .
+:fmt   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/fmt/"^^xsd:anyURI ;   odata4sparql:prefix "fmt"^^xsd:string ;   rdfs:label "fmt"^^xsd:string .
+:pronom2020   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/def/"^^xsd:anyURI ;   odata4sparql:prefix "pronom2020"^^xsd:string ;   rdfs:label "pronom2020"^^xsd:string .
+:pronom   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/"^^xsd:anyURI ;   odata4sparql:prefix "pronom"^^xsd:string ;   rdfs:label "pronom"^^xsd:string .
+:pronom.Activity   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Activity/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Activity"^^xsd:string ;   rdfs:label "pronom.Activity"^^xsd:string .
+:pronom.Actor   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Actor/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Actor"^^xsd:string ;   rdfs:label "pronom.Actor"^^xsd:string .
+:pronom.ActorType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ActorType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ActorType"^^xsd:string ;   rdfs:label "pronom.ActorType"^^xsd:string .
+:pronom.Alias   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Alias/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Alias"^^xsd:string ;   rdfs:label "pronom.Alias"^^xsd:string .
+:pronom.ByteOrder   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ByteOrder/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ByteOrder"^^xsd:string ;   rdfs:label "pronom.ByteOrder"^^xsd:string .
+:pronom.ByteSequence   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ByteSequence/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ByteSequence"^^xsd:string ;   rdfs:label "pronom.ByteSequence"^^xsd:string .
+:pronom.ByteSequencePosition   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ByteSequencePosition/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ByteSequencePosition"^^xsd:string ;   rdfs:label "pronom.ByteSequencePosition"^^xsd:string .
+:pronom.Classification   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Classification/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Classification"^^xsd:string ;   rdfs:label "pronom.Classification"^^xsd:string .
+:pronom.Container   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Container/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Container"^^xsd:string ;   rdfs:label "pronom.Container"^^xsd:string .
+:pronom.ContainerFile   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ContainerFile/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ContainerFile"^^xsd:string ;   rdfs:label "pronom.ContainerFile"^^xsd:string .
+:pronom.ContainerSignature   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ContainerSignature/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ContainerSignature"^^xsd:string ;   rdfs:label "pronom.ContainerSignature"^^xsd:string .
+:pronom.ContainerType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ContainerType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ContainerType"^^xsd:string ;   rdfs:label "pronom.ContainerType"^^xsd:string .
+:pronom.Country   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Country/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Country"^^xsd:string ;   rdfs:label "pronom.Country"^^xsd:string .
+:pronom.Document   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Document/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Document"^^xsd:string ;   rdfs:label "pronom.Document"^^xsd:string .
+:pronom.DocumentType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/DocumentType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.DocumentType"^^xsd:string ;   rdfs:label "pronom.DocumentType"^^xsd:string .
+:pronom.ExternalSignature   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ExternalSignature/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ExternalSignature"^^xsd:string ;   rdfs:label "pronom.ExternalSignature"^^xsd:string .
+:pronom.FileFormatFamily   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/FileFormatFamily/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.FileFormatFamily"^^xsd:string ;   rdfs:label "pronom.FileFormatFamily"^^xsd:string .
+:pronom.FormatIdentifier   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/FormatIdentifier/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.FormatIdentifier"^^xsd:string ;   rdfs:label "pronom.FormatIdentifier"^^xsd:string .
+:pronom.FormatRegistry   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/FormatRegistry/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.FormatRegistry"^^xsd:string ;   rdfs:label "pronom.FormatRegistry"^^xsd:string .
+:pronom.InternalSignature   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/InternalSignature/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.InternalSignature"^^xsd:string ;   rdfs:label "pronom.InternalSignature"^^xsd:string .
+:pronom.Lossiness   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Lossiness/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Lossiness"^^xsd:string ;   rdfs:label "pronom.Lossiness"^^xsd:string .
+:pronom.Process   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Process/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Process"^^xsd:string ;   rdfs:label "pronom.Process"^^xsd:string .
+:pronom.ProcessType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ProcessType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ProcessType"^^xsd:string ;   rdfs:label "pronom.ProcessType"^^xsd:string .
+:pronom.Relationship   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/Relationship/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.Relationship"^^xsd:string ;   rdfs:label "pronom.Relationship"^^xsd:string .
+:pronom.SoftwareType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/SoftwareType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.SoftwareType"^^xsd:string ;   rdfs:label "pronom.SoftwareType"^^xsd:string .
+:x-chr   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/x-chr/"^^xsd:anyURI ;   odata4sparql:prefix "x-chr"^^xsd:string ;   rdfs:label "x-chr"^^xsd:string .
+:x-cmp   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/x-cmp/"^^xsd:anyURI ;   odata4sparql:prefix "x-cmp"^^xsd:string ;   rdfs:label "x-cmp"^^xsd:string .
+:x-fmt   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/x-fmt/"^^xsd:anyURI ;   odata4sparql:prefix "x-fmt"^^xsd:string ;   rdfs:label "x-fmt"^^xsd:string .
+:x-sfw   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/x-sfw/"^^xsd:anyURI ;   odata4sparql:prefix "x-sfw"^^xsd:string ;   rdfs:label "x-sfw"^^xsd:string .
+:sfw   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.nationalarchives.gov.uk/PRONOM/sfw/"^^xsd:anyURI ;   odata4sparql:prefix "sfw"^^xsd:string ;   rdfs:label "sfw"^^xsd:string .
+:xsd   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI ;   odata4sparql:prefix "xsd"^^xsd:string ;   rdfs:label "xsd"^^xsd:string .
+:pronom.ActivityType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ActivityType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.ActivityType"^^xsd:string ;   rdfs:label "pronom.ActivityType"^^xsd:string .
+:pronom.ProcessType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/ProcessType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.processType"^^xsd:string ;   rdfs:label "pronom.ProcessType"^^xsd:string .
+:pronom.RelationshipType   rdf:type odata4sparql:Prefix ;    odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/id/RelationshipType/"^^xsd:anyURI ;   odata4sparql:prefix "pronom.RelationshipType"^^xsd:string ;   rdfs:label "pronom.RelationshipType"^^xsd:string .
+
+:pronom2020
+  rdf:type odata4sparql:Dataset ;
+  rdf:type odata4sparql:Prefix ;
+  odata4sparql:datasetPrefix :pronom2020  ;
+  odata4sparql:defaultPrefix :pronom2020  ;
+  odata4sparql:namespace "http://data.nationalarchives.gov.uk/formatregistry/def/"^^xsd:anyURI ;
+  odata4sparql:prefix "pronom2020"^^xsd:string ;
+  rdfs:label "pronom2020"^^xsd:string ;
+  odata4sparql:dataRepository :pronom2020_Data ;
+  odata4sparql:vocabularyRepository :pronom2020_Vocabulary ;
+ odata4sparql:datasetPrefix :chr ;
+ odata4sparql:datasetPrefix :cmp ;
+ odata4sparql:datasetPrefix :fmt ;
+ odata4sparql:datasetPrefix :pronom2020 ;
+ odata4sparql:datasetPrefix :pronom ;
+ odata4sparql:datasetPrefix :pronom.Activity ;
+ odata4sparql:datasetPrefix :pronom.Actor ;
+ odata4sparql:datasetPrefix :pronom.ActorType ;
+ odata4sparql:datasetPrefix :pronom.Alias ;
+ odata4sparql:datasetPrefix :pronom.ByteOrder ;
+ odata4sparql:datasetPrefix :pronom.ByteSequence ;
+ odata4sparql:datasetPrefix :pronom.ByteSequencePosition ;
+ odata4sparql:datasetPrefix :pronom.Classification ;
+ odata4sparql:datasetPrefix :pronom.Container ;
+ odata4sparql:datasetPrefix :pronom.ContainerFile ;
+ odata4sparql:datasetPrefix :pronom.ContainerSignature ;
+ odata4sparql:datasetPrefix :pronom.ContainerType ;
+ odata4sparql:datasetPrefix :pronom.Country ;
+ odata4sparql:datasetPrefix :pronom.Document ;
+ odata4sparql:datasetPrefix :pronom.DocumentType ;
+ odata4sparql:datasetPrefix :pronom.ExternalSignature ;
+ odata4sparql:datasetPrefix :pronom.FileFormatFamily ;
+ odata4sparql:datasetPrefix :pronom.FormatIdentifier ;
+ odata4sparql:datasetPrefix :pronom.FormatRegistry ;
+ odata4sparql:datasetPrefix :pronom.InternalSignature ;
+ odata4sparql:datasetPrefix :pronom.Lossiness ;
+ odata4sparql:datasetPrefix :pronom.Process ;
+ odata4sparql:datasetPrefix :pronom.ProcessType ;
+ odata4sparql:datasetPrefix :pronom.ProcessType ;
+ odata4sparql:datasetPrefix :pronom.SoftwareType ;
+ odata4sparql:datasetPrefix :x-chr ;
+ odata4sparql:datasetPrefix :x-cmp ;
+ odata4sparql:datasetPrefix :x-fmt ;
+ odata4sparql:datasetPrefix :x-sfw ;
+ odata4sparql:datasetPrefix :sfw ;
+ odata4sparql:datasetPrefix :xsd ;
+odata4sparql:datasetPrefix :pronom.ActivityType ;
+odata4sparql:datasetPrefix :pronom.Activity ;
+odata4sparql:datasetPrefix :pronom.RelationshipType ;
+odata4sparql:datasetPrefix :pronom.Relationship ;
+  odata4sparql:datasetPrefix odata4sparql:FOAF ;
+  odata4sparql:datasetPrefix odata4sparql:OWL ;
+  odata4sparql:datasetPrefix odata4sparql:RDFS ;
+  odata4sparql:datasetPrefix odata4sparql:SKOS ;   
+  odata4sparql:withRdfAnnotations "false"^^xsd:boolean ;
+  odata4sparql:withSapAnnotations "true"^^xsd:boolean ;
+  odata4sparql:withFKProperties "false"^^xsd:boolean ;
+  odata4sparql:useBaseType "false"^^xsd:boolean ;
+  odata4sparql:expandOperations "false"^^xsd:boolean ;
+  odata4sparql:expandTopDefault 5;
+  odata4sparql:expandSkipDefault 0;
+  odata4sparql:expandOrderbyDefault "true"^^xsd:boolean ;
+    odata4sparql:includeImplicitRDF  "false"^^xsd:boolean ;
+  odata4sparql:textSearchType odata4sparql:RDF4J_Lucene 
+.
+
+:pronom2020_Data
+  rdf:type rep:Repository ; 
+  rep:repositoryID "pronom2020_Data"^^xsd:string ; 
+  rep:repositoryImpl :pronom2020_Data_Impl ;
+  rdfs:label "pronom2020 Data"^^xsd:string 
+.
+:pronom2020_Data_Impl
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/pronom2020?distinct=true"^^xsd:anyURI;
+	odata4sparql:insert-graph-uri "http://data.nationalarchives.gov.uk/formatregistry/data/additions"^^xsd:anyURI;
+    odata4sparql:change-graph-uri "http://inova8.com/odata4sparql/change"^^xsd:anyURI ;
+	odata4sparql:defaultQueryLimit 10000000 ;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "pronom2020 Data Impl"^^xsd:string 
+.
+:pronom2020_Vocabulary
+  rdf:type rep:Repository ;
+  rep:repositoryID "pronom2020_Vocabulary"^^xsd:string ;
+  rep:repositoryImpl :pronom2020_Vocabulary_Impl ;
+  rdfs:label "pronom2020 Vocabulary"^^xsd:string 
+.
+:pronom2020_Vocabulary_Impl
+  odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdf:type openrdf:HTTPRepository ;
+	rep:repositoryType openrdf:HTTPRepository ;
+	http:repositoryURL "http://localhost:8080/rdf4j-server/repositories/pronom2020"^^xsd:anyURI;
+	odata4sparql:sparqlProfile odata4sparql:RDF4J ;
+	rdfs:label "pronom2020 Vocabulary Impl"^^xsd:string 
 .

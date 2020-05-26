@@ -1106,6 +1106,17 @@ public class RdfModel {
 		public int compareTo(RdfProperty rdfProperty) {
 			return propertyName.compareTo(rdfProperty.propertyName);
 		}
+		public String getGraphPatternVariable(String path) {
+			return "?" + path + getEDMPropertyName() + "_s";
+		}
+		public String getGraphPatternValue(String path) {
+			return "?" + path + getEDMPropertyName() +  RdfConstants.PROPERTY_POSTFIX;
+		}
+		public String getGraphPattern(String path) {
+			String graphPattern= new String("");
+			graphPattern= "?".concat(path).concat("_s <").concat(getPropertyURI()).concat("> ").concat(getGraphPatternValue(path)).concat(" .");
+			return graphPattern;
+		}
 	}
 
 	public static class RdfComplexTypePropertyPair {
@@ -1591,9 +1602,19 @@ public class RdfModel {
 				return true;
 			}
 		}
-
-
-
+		public String getGraphPatternVariable(String path) {
+			return "?" + path + getNavigationPropertyName() + "_s";
+		}
+		public String getGraphPattern(String path) {
+			String graphPattern= new String();
+			if(IsInverse()) {
+				graphPattern= "{?".concat(path).concat("_s <").concat(getNavigationPropertyIRI()).concat("> ").concat(getGraphPatternVariable(path)).concat(" .} UNION {");
+				graphPattern= graphPattern.concat(getGraphPatternVariable(path)).concat(" <").concat(getInversePropertyOfURI()).concat("> ?").concat(path).concat("_s .}");
+			}else {
+				graphPattern= "?".concat(path).concat("_s <").concat(getNavigationPropertyIRI()).concat("> ").concat(getGraphPatternVariable(path)).concat(" .");
+			}
+			return graphPattern;
+		}
 	}
 
 	private class RdfURI {

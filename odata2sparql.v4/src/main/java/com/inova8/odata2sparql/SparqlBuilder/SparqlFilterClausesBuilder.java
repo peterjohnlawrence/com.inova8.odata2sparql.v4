@@ -270,7 +270,7 @@ public class SparqlFilterClausesBuilder {
 			//If this is an implicit entityType (rdf core) then no need to add any clauses to the query to find the triples
 			if(!SparqlQueryBuilder.isImplicitEntityType(nextTargetEntityType)) {
 				TreeMap<String, PropertyFilter> propertyFilters = filterClause.getNavPropertyPropertyFilters()
-						.get(nextTargetEntityType.entityTypeName).getPropertyFilters();
+						.get(nextTargetKey).getPropertyFilters();
 				clausesExpandFilter.append(indent).append("\t").append("{\n");
 				// Repeat for each filtered property associated with this navProperty
 				for (Entry<String, PropertyFilter> propertyFilterEntry : propertyFilters.entrySet()) {
