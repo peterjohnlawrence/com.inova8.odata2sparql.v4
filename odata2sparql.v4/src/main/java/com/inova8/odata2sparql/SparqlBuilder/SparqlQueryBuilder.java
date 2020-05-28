@@ -1716,7 +1716,7 @@ public class SparqlQueryBuilder {
 			List<UriParameter> entityKeys) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPathNavigation = new StringBuilder();
 
-		String path = "";//edmEntitySet.getEntityType().getName();//edmTargetEntitySet.getEntityType().getName();
+		String path = "";//"";//edmEntitySet.getEntityType().getName();//edmTargetEntitySet.getEntityType().getName();
 		boolean isFirstSegment = true;
 		Integer index = 0;
 		String keyVariable = "";
@@ -1759,12 +1759,16 @@ public class SparqlQueryBuilder {
 						String expandedKey = rdfModel.getRdfPrefixes()
 								.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
 						pathVariable = expandKey(expandedKey);
-						keyBindString = keyBindString + indent + "BIND(" +expandKey(expandedKey) +" AS ?" + path + "_s)\n";
+						if(this.rdfModel.getRdfRepository().isWithMatching()) {
+							keyBindString = keyBindString + indent + "BIND(" +expandKey(expandedKey) +" AS ?" + path + "_key_s)\n";}
+						else {
+							keyBindString = keyBindString + indent + "BIND(" +expandKey(expandedKey) +" AS ?" + path + "_s)\n";
+						}
 						pathVariable = "?" + path + "_s";
 					}
 				}
 				if (this.rdfModel.getRdfRepository().isWithMatching()) {
-					keyVariable = "?key_s";
+					keyVariable = "?"+path+"_key_s";
 					clausesPathNavigation.append(clausesMatch(keyVariable, pathVariable, indent));
 					pathVariable = keyVariable;
 				}
@@ -1795,7 +1799,7 @@ public class SparqlQueryBuilder {
 									.append(target).append("_s)\n");
 							break;
 						case RdfConstants.RDF_HASVALUES_LABEL:
-							clausesPathNavigation.append(indent).append(entityKeyVariable).append(" ?").append(target)
+							clausesPathNavigation.append(indent).append("?_s"/*entityKeyVariable*/).append(" ?").append(target)
 									.append("_ap ?").append(target).append("_ao .\n");
 							clausesPathNavigation.append(indent).append("BIND(?").append(target).append("_ao as ?")
 									.append(target).append("_s)\n");
@@ -1862,6 +1866,7 @@ public class SparqlQueryBuilder {
 					}
 					if (this.rdfModel.getRdfRepository().isWithMatching()) {
 						clausesPathNavigation.append(clausesMatch(matchTargetVariable, targetVariable, indent));
+						if (index.equals(lastIndex - 1)) {clausesPathNavigation.append(indent).append("BIND(").append(matchTargetVariable).append(" as ").append(targetVariable).append("m)\n");}
 						if (uriResourceNavigation.getKeyPredicates().size() > 0) {
 							String navigationKey = "";
 							for (UriParameter entityKey : uriResourceNavigation.getKeyPredicates()) {

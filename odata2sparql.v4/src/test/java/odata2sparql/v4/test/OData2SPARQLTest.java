@@ -140,7 +140,7 @@ public class OData2SPARQLTest {
 		servletContext = new MockServletContext();
 		servletContext.addInitParameter(ServletContext.TEMPDIR, "C:\\");
 		servletContext.addInitParameter("configFolder", "/var/opt/inova8/odata2sparql");
-		servletContext.addInitParameter("repositoryFolder", "V4");
+		servletContext.addInitParameter("repositoryFolder", ".default");
 		servletContext.addInitParameter("repositoryUrl", "");
 		servletConfig = new MockServletConfig(servletContext);
 		servlet.init(servletConfig);

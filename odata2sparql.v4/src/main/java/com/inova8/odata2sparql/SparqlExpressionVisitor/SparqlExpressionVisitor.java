@@ -559,7 +559,7 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		String memberProperty = memberPart.toString();		
 		rdfNavigationProperty = currentEntityType.findNavigationProperty(memberProperty);
 		putNavPropertyPropertyFilter(currentPath, rdfNavigationProperty, null, null);
-		String visitProperty = null;
+		String visitProperty =  currentPath + memberProperty;
 		return visitProperty;
 	}
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
