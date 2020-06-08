@@ -245,6 +245,7 @@ public class RdfRepositories {
 							Literal valueOfExpandSkipDefault = (Literal) bindingSet.getValue("expandSkipDefault");
 							Literal valueOfExpandOrderbyDefault = (Literal) bindingSet.getValue("expandOrderbyDefault");
 							Literal valueOfIncludeImplicitRDF = (Literal) bindingSet.getValue("includeImplicitRDF");
+							Literal valueOfBottomUpSPARQLOptimization = (Literal) bindingSet.getValue("bottomUpSPARQLOptimization");
 							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
 							RepositoryConfig dataRepositoryConfig;
@@ -501,6 +502,12 @@ public class RdfRepositories {
 										Boolean.parseBoolean(valueOfIncludeImplicitRDF.stringValue()));
 							} else {
 								repository.setIncludeImplicitRDF(false);
+							}
+							if (valueOfBottomUpSPARQLOptimization != null) {
+								repository.setBottomUpSPARQLOptimization(
+										Boolean.parseBoolean(valueOfBottomUpSPARQLOptimization.stringValue()));
+							} else {
+								repository.setBottomUpSPARQLOptimization(true);
 							}
 							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
 						} catch (RepositoryConfigException e) {

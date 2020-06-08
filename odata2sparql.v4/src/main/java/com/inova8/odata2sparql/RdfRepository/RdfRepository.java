@@ -40,6 +40,7 @@ public class RdfRepository {
 	private boolean withFKProperties = false;
 	private boolean withMatching = true;
 	private boolean includeImplicitRDF = false;
+	private boolean bottomUpSPARQLOptimization = true;
 	private String match = RdfConstants.DEFAULTMATCH;
 
 	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix,
@@ -227,5 +228,13 @@ public class RdfRepository {
 
 	public void setIncludeImplicitRDF(boolean includeImplicitRDF) {
 		this.includeImplicitRDF = includeImplicitRDF;
+	}
+
+	public boolean isBottomUpSPARQLOptimization() {
+		return bottomUpSPARQLOptimization;
+	}
+
+	public void setBottomUpSPARQLOptimization(boolean bottomUpSPARQLOptimization) {
+		this.bottomUpSPARQLOptimization = bottomUpSPARQLOptimization;
 	}
 }

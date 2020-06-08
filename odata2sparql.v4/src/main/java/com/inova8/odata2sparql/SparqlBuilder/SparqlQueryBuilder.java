@@ -908,6 +908,7 @@ public class SparqlQueryBuilder {
 			where.append(clausesPathProperties());
 		}
 		where.append(clausesComplex());
+		StringBuilder insideOutOptimizationSelect = selectExpandWhere("\t\t");
 		where.append(clausesExpandSelect());
 		if ((this.uriInfo.getCountOption() != null) && (this.uriInfo.getCountOption().getValue())) {
 			where.append(selectPathCount());
@@ -2401,9 +2402,13 @@ public class SparqlQueryBuilder {
 			RdfEntityType nextTargetEntityType, Boolean firstExpandItem ,Boolean withinService) throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		StringBuilder operationExpandItemWhere = new StringBuilder();
 		operationExpandItemWhere.append(indent).append("#operationExpandItemWhere\n");
+		if(firstExpandItem) {
+			operationExpandItemWhere.append(indent).append("{\n");
+		}else {
+			operationExpandItemWhere.append(indent).append("UNION{\n");
+		}	
 		
-		
-		operationExpandItemWhere.append(indent).append("{\n");
+		//operationExpandItemWhere.append(indent).append("{\n");
 		operationExpandItemWhere.append(indent).append("\tBIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
 		if (this.rdfModel.getRdfRepository().isWithMatching()) {
 			operationExpandItemWhere.append("m");
@@ -2540,7 +2545,7 @@ public class SparqlQueryBuilder {
 	}
 
 	private StringBuilder selectObjectProperties(String targetKey, String indent, ExpandItem expandItem,
-			RdfNavigationProperty navProperty, String nextTargetKey, Boolean withinService) {
+			RdfNavigationProperty navProperty, String nextTargetKey, Boolean withinService) throws EdmException, OData2SparqlException {
 
 		StringBuilder selectObjectProperties = new StringBuilder();		
 		//Should not use a subselect within a service call
@@ -2549,6 +2554,10 @@ public class SparqlQueryBuilder {
 		}else {
 			selectObjectProperties.append(indent).append("\t\t\t").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
 		}
+		//Added to optimize for insideOut optimization
+		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization())
+			selectObjectProperties.append(selectExpandWhere(indent+"\t\t\t\t"));
+
 		String matchingTargetKey = "?" + nextTargetKey + "_s";
 		if (this.rdfModel.getRdfRepository().isWithMatching()) {
 			matchingTargetKey = matchingTargetKey + "m";
@@ -2571,6 +2580,10 @@ public class SparqlQueryBuilder {
 		}
 		if (this.rdfModel.getRdfRepository().isWithMatching())
 			selectObjectProperties.append(clausesMatch("?" + nextTargetKey + "_s", indent + "\t\t\t\t"));
+		if (expandItem.getFilterOption() != null) {
+		//	SparqlFilterClausesBuilder filter = new SparqlFilterClausesBuilder(rdfModel, rdfModelToMetadata, uriInfo, uriType,	this.rdfResourceParts);
+			selectObjectProperties.append(indent).append("\t\t\t\t").append(filterClauses.getFilter());
+		}
 		selectObjectProperties.append(indent).append("\t\t\t}");
 
 		if ((expandItem.getTopOption() != null)) {
@@ -2935,6 +2948,11 @@ public class SparqlQueryBuilder {
 		expandItemWhereCount.append(indent).append("\t{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n")
 				.append(indent).append("\t\t{\n");
+		
+		//Added to optimize for insideOut optimization
+		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization())
+			expandItemWhereCount.append(selectExpandWhere(indent+"\t\t\t"));
+		
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
 
@@ -3024,11 +3042,12 @@ public class SparqlQueryBuilder {
 				}
 			}
 			clausesSelect.append("}\n");
-		} else {
+		} else if( selectPropertyMap == null){
+			hasProperties = false;
+		}else {
 			// Assume select=*, and fetch all non object property values
 			hasProperties = true;
-			clausesSelect.append(indent)
-					.append("FILTER(!isIRI(?" + nextTargetKey + "_o) && !isBLANK(?" + nextTargetKey + "_o))\n");
+			clausesSelect.append(indent).append("FILTER(!isIRI(?" + nextTargetKey + "_o) && !isBLANK(?" + nextTargetKey + "_o))\n");
 		}
 		clausesSelect.append(indent)
 				.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
