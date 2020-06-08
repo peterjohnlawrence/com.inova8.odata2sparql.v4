@@ -2454,7 +2454,7 @@ public class SparqlQueryBuilder {
 		
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			implicitExpandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem,
-					navProperty, nextTargetKey, nextTargetEntityType));
+					navProperty, nextTargetKey, nextTargetEntityType, withinService));
 		}
 		//[UNION?
 		//ExpandItemWhere]?
@@ -2489,7 +2489,7 @@ public class SparqlQueryBuilder {
 		}
 		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
 			standardExpandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem,
-					navProperty, nextTargetKey, nextTargetEntityType));
+					navProperty, nextTargetKey, nextTargetEntityType,withinService));
 		}
 		//Nested within expand
 		//[UNION?
@@ -2555,7 +2555,7 @@ public class SparqlQueryBuilder {
 			selectObjectProperties.append(indent).append("\t\t\t").append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
 		}
 		//Added to optimize for insideOut optimization
-		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization())
+		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization() && !withinService)
 			selectObjectProperties.append(selectExpandWhere(indent+"\t\t\t\t"));
 
 		String matchingTargetKey = "?" + nextTargetKey + "_s";
@@ -2624,161 +2624,161 @@ public class SparqlQueryBuilder {
 	}
 
 	@SuppressWarnings("unused")
-	private StringBuilder expandItemWhere_old(RdfEntityType targetEntityType, String targetKey, String indent,
-			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
-			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
-
-		StringBuilder expandItemWhere = new StringBuilder();
-
-		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
-		//SparqlExpressionVisitor expandFilterClause;
-
-		expandItemWhere.append(indent).append("#expandItemWhere\n");
-		boolean isImplicitNavigationProperty = isImplicitNavigationProperty(navProperty);
-		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
-			expandItemWhere.append(indent)
-					.append("{BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
-			if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
-				expandItemWhere.append("m");
-			}
-			expandItemWhere.append(")\n");
-			if (navProperty.getDomainClass().isProxy()
-					&& this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {
-				expandItemWhere.append(indent)
-						.append("{SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl()
-								+ "?distinct=true&infer=false>{\n"); //timeout=5&
-				//No optional with service call because of performance 
-				//expandItemWhere.append(indent).append("OPTIONAL");
-				expandItemWhere.append("\t{\n");
-			} else {
-				expandItemWhere.append(indent).append("UNION");
-				if (expandItem.getSelectOption() != null)
-					expandItemWhere.append("\t{OPTIONAL\n");
-			}
-		} else if (isImplicitNavigationProperty) {
-			if (!firstExpandItem) {
-				expandItemWhere.append(indent).append("UNION{");//.append("OPTIONAL");
-				if (expandItem.getSelectOption() != null)
-					expandItemWhere.append("\t{OPTIONAL\n");
-			} else {
-				expandItemWhere.append(indent).append("UNION{");//.append("OPTIONAL");
-				if (expandItem.getSelectOption() != null)
-					expandItemWhere.append("\t{OPTIONAL\n");
-			}
-		} else {//if( !firstExpandItem){
-			expandItemWhere.append(indent).append("UNION{");
-			if (navProperty.getDomainCardinality().equals(Cardinality.ONE)
-					|| navProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
-				expandItemWhere.append("\t{\n");
-			} else {
-				if (expandItem.getSelectOption() != null)
-					expandItemWhere.append("\t{OPTIONAL\n");
-			}
-		}
-		//expandItemWhere.append("\t{\n");
-		//expandItemWhere.append(indent);
-
-		if (navProperty.getRangeClass().isOperation()) {
-			expandItemWhere.append(indent).append("\t{\n");
-			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
-			expandItemWhere.append(indent).append("\t}\n");
-		} else {
-			if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
-					&& (expandItem.getCountOption().getValue())) {
-
-			} else {
-				TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
-						expandItem.getSelectOption());
-				StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
-						navProperty.getRangeClass(), indent + "\t\t",
-						!isImplicitNavigationProperty && !navProperty.getDomainClass().isProxy());
-				expandItemWhere.append(indent).append("\t{\n");
-				if (isImplicitNavigationProperty) {
-					expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
-				} else {
-					if (selectedProperties != null && selectedProperties.isEmpty())
-						return new StringBuilder();
-					if (navProperty.getDomainClass().isOperation()) {
-						expandItemWhere.append(indent).append("\t\t{").append(" {\n");
-					} else {
-						expandItemWhere.append(indent).append("\t\t{")
-								.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
-					}
-					//expandItemWhere.append(selectExpandWhere("\t\t\t\t"));
-					String matchingTargetKey = "?" + nextTargetKey + "_s";
-					if (this.rdfModel.getRdfRepository().isWithMatching()) {
-						matchingTargetKey = matchingTargetKey + "m";
-					}
-					if (navProperty.getDomainClass().isOperation()) {
-						// Nothing to add as BIND assumed to be created
-					} else if (navProperty.IsInverse()) {
-
-						expandItemWhere.append(indent).append("\t\t\t\t{\n");
-						expandItemWhere.append(indent).append("\t\t\t\t\t").append(matchingTargetKey + " <"
-								+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
-						expandItemWhere.append(indent).append("\t\t\t\t").append("}UNION{\n");
-						expandItemWhere.append(indent).append("\t\t\t\t\t").append("?" + targetKey + "_s <"
-								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
-						expandItemWhere.append(indent).append("\t\t\t\t").append("}\n");
-
-					} else {
-						expandItemWhere.append(indent).append("\t\t\t\t").append("?" + targetKey + "_s <"
-								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
-					}
-					if (this.rdfModel.getRdfRepository().isWithMatching())
-						expandItemWhere.append(clausesMatch("?" + nextTargetKey + "_s", indent + "\t\t\t\t"));
-					expandItemWhere.append(indent).append("\t\t\t}");
-
-					if ((expandItem.getTopOption() != null)) {
-						expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
-					} else if ((expandItem.getSelectOption() != null) && (expandItem.getTopOption() == null)) {
-						// Fixes #176 
-						//						if(this.rdfModel.getRdfRepository().getExpandOrderbyDefault()) {
-						//							expandItemWhere.append(" ORDER BY ?"+  nextTargetKey + "_s" );
-						//						}
-						//						if(this.rdfModel.getRdfRepository().getExpandTopDefault()!= null) {
-						//							expandItemWhere.append(" LIMIT "+ this.rdfModel.getRdfRepository().getExpandTopDefault());
-						//						}
-						//						if(this.rdfModel.getRdfRepository().getExpandSkipDefault()!= null) {
-						//							expandItemWhere.append(" OFFSET "+ this.rdfModel.getRdfRepository().getExpandSkipDefault());
-						//						}
-
-					} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
-							&& (expandItem.getCountOption().getValue())) {
-						// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
-						expandItemWhere.append(" LIMIT 0");
-					}
-					if ((expandItem.getSkipOption() != null)) {
-						expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
-					}
-					expandItemWhere.append("\n" + indent).append("\t\t}\n");
-					expandItemWhere.append(clausesSelect);
-				}
-				expandItemWhere.append(indent).append("\t}\n");
-			}
-		}
-
-		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
-			if (expandItem.getSelectOption() != null)
-				expandItemWhere.append(indent).append("\tUNION\n");
-			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
-					nextTargetKey, nextTargetEntityType));
-			expandItemWhere.append(indent).append("}\n");
-		} else {
-			expandItemWhere.append(indent).append("}\n");
-		}
-		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
-			expandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
-					expandItem.getExpandOption().getExpandItems(), indent + "\t",false));
-			expandItemWhere.append(indent).append("}\n");
-		}
-		if (navProperty.getDomainClass().isProxy()) {
-			expandItemWhere.append(indent).append("}}\n");
-		}
-			expandItemWhere.append(indent).append("}\n");
-		return expandItemWhere;
-	}
+//	private StringBuilder expandItemWhere_old(RdfEntityType targetEntityType, String targetKey, String indent,
+//			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
+//			RdfEntityType nextTargetEntityType, boolean firstExpandItem)
+//			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
+//
+//		StringBuilder expandItemWhere = new StringBuilder();
+//
+//		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
+//		//SparqlExpressionVisitor expandFilterClause;
+//
+//		expandItemWhere.append(indent).append("#expandItemWhere\n");
+//		boolean isImplicitNavigationProperty = isImplicitNavigationProperty(navProperty);
+//		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
+//			expandItemWhere.append(indent)
+//					.append("{BIND(?" + navProperty.getRelatedKey() + " AS ?" + nextTargetKey + "_s");
+//			if (this.rdfModel.getRdfRepository().isWithMatching()) { //Fix #117
+//				expandItemWhere.append("m");
+//			}
+//			expandItemWhere.append(")\n");
+//			if (navProperty.getDomainClass().isProxy()
+//					&& this.proxyDatasetRepository != this.rdfModel.getRdfRepository()) {
+//				expandItemWhere.append(indent)
+//						.append("{SERVICE<" + this.proxyDatasetRepository.getDataRepository().getServiceUrl()
+//								+ "?distinct=true&infer=false>{\n"); //timeout=5&
+//				//No optional with service call because of performance 
+//				//expandItemWhere.append(indent).append("OPTIONAL");
+//				expandItemWhere.append("\t{\n");
+//			} else {
+//				expandItemWhere.append(indent).append("UNION");
+//				if (expandItem.getSelectOption() != null)
+//					expandItemWhere.append("\t{OPTIONAL\n");
+//			}
+//		} else if (isImplicitNavigationProperty) {
+//			if (!firstExpandItem) {
+//				expandItemWhere.append(indent).append("UNION{");//.append("OPTIONAL");
+//				if (expandItem.getSelectOption() != null)
+//					expandItemWhere.append("\t{OPTIONAL\n");
+//			} else {
+//				expandItemWhere.append(indent).append("UNION{");//.append("OPTIONAL");
+//				if (expandItem.getSelectOption() != null)
+//					expandItemWhere.append("\t{OPTIONAL\n");
+//			}
+//		} else {//if( !firstExpandItem){
+//			expandItemWhere.append(indent).append("UNION{");
+//			if (navProperty.getDomainCardinality().equals(Cardinality.ONE)
+//					|| navProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
+//				expandItemWhere.append("\t{\n");
+//			} else {
+//				if (expandItem.getSelectOption() != null)
+//					expandItemWhere.append("\t{OPTIONAL\n");
+//			}
+//		}
+//		//expandItemWhere.append("\t{\n");
+//		//expandItemWhere.append(indent);
+//
+//		if (navProperty.getRangeClass().isOperation()) {
+//			expandItemWhere.append(indent).append("\t{\n");
+//			expandItemWhere.append(clausesOperationProperties(nextTargetKey, navProperty.getRangeClass()));
+//			expandItemWhere.append(indent).append("\t}\n");
+//		} else {
+//			if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
+//					&& (expandItem.getCountOption().getValue())) {
+//
+//			} else {
+//				TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
+//						expandItem.getSelectOption());
+//				StringBuilder clausesSelect = clausesSelect(selectedProperties, nextTargetKey, nextTargetKey,
+//						navProperty.getRangeClass(), indent + "\t\t",
+//						!isImplicitNavigationProperty && !navProperty.getDomainClass().isProxy());
+//				expandItemWhere.append(indent).append("\t{\n");
+//				if (isImplicitNavigationProperty) {
+//					expandItemWhere.append(expandImplicit(targetKey, navProperty, indent + "\t\t", clausesSelect));
+//				} else {
+//					if (selectedProperties != null && selectedProperties.isEmpty())
+//						return new StringBuilder();
+//					if (navProperty.getDomainClass().isOperation()) {
+//						expandItemWhere.append(indent).append("\t\t{").append(" {\n");
+//					} else {
+//						expandItemWhere.append(indent).append("\t\t{")
+//								.append("SELECT ?" + targetKey + "_s ?" + nextTargetKey + "_s {\n");
+//					}
+//					//expandItemWhere.append(selectExpandWhere("\t\t\t\t"));
+//					String matchingTargetKey = "?" + nextTargetKey + "_s";
+//					if (this.rdfModel.getRdfRepository().isWithMatching()) {
+//						matchingTargetKey = matchingTargetKey + "m";
+//					}
+//					if (navProperty.getDomainClass().isOperation()) {
+//						// Nothing to add as BIND assumed to be created
+//					} else if (navProperty.IsInverse()) {
+//
+//						expandItemWhere.append(indent).append("\t\t\t\t{\n");
+//						expandItemWhere.append(indent).append("\t\t\t\t\t").append(matchingTargetKey + " <"
+//								+ navProperty.getInversePropertyOf().getIRI() + "> ?" + targetKey + "_s .\n");
+//						expandItemWhere.append(indent).append("\t\t\t\t").append("}UNION{\n");
+//						expandItemWhere.append(indent).append("\t\t\t\t\t").append("?" + targetKey + "_s <"
+//								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
+//						expandItemWhere.append(indent).append("\t\t\t\t").append("}\n");
+//
+//					} else {
+//						expandItemWhere.append(indent).append("\t\t\t\t").append("?" + targetKey + "_s <"
+//								+ navProperty.getNavigationPropertyIRI() + "> " + matchingTargetKey + " .\n");
+//					}
+//					if (this.rdfModel.getRdfRepository().isWithMatching())
+//						expandItemWhere.append(clausesMatch("?" + nextTargetKey + "_s", indent + "\t\t\t\t"));
+//					expandItemWhere.append(indent).append("\t\t\t}");
+//
+//					if ((expandItem.getTopOption() != null)) {
+//						expandItemWhere.append(" LIMIT " + expandItem.getTopOption().getValue());
+//					} else if ((expandItem.getSelectOption() != null) && (expandItem.getTopOption() == null)) {
+//						// Fixes #176 
+//						//						if(this.rdfModel.getRdfRepository().getExpandOrderbyDefault()) {
+//						//							expandItemWhere.append(" ORDER BY ?"+  nextTargetKey + "_s" );
+//						//						}
+//						//						if(this.rdfModel.getRdfRepository().getExpandTopDefault()!= null) {
+//						//							expandItemWhere.append(" LIMIT "+ this.rdfModel.getRdfRepository().getExpandTopDefault());
+//						//						}
+//						//						if(this.rdfModel.getRdfRepository().getExpandSkipDefault()!= null) {
+//						//							expandItemWhere.append(" OFFSET "+ this.rdfModel.getRdfRepository().getExpandSkipDefault());
+//						//						}
+//
+//					} else if ((expandItem.getSelectOption() == null) && (expandItem.getCountOption() != null)
+//							&& (expandItem.getCountOption().getValue())) {
+//						// Fixes #78 by setting limit even if $top not specified, as it cannot be in OpenUI5.
+//						expandItemWhere.append(" LIMIT 0");
+//					}
+//					if ((expandItem.getSkipOption() != null)) {
+//						expandItemWhere.append(" OFFSET " + expandItem.getSkipOption().getValue());
+//					}
+//					expandItemWhere.append("\n" + indent).append("\t\t}\n");
+//					expandItemWhere.append(clausesSelect);
+//				}
+//				expandItemWhere.append(indent).append("\t}\n");
+//			}
+//		}
+//
+//		if ((expandItem.getCountOption() != null) && expandItem.getCountOption().getValue()) {
+//			if (expandItem.getSelectOption() != null)
+//				expandItemWhere.append(indent).append("\tUNION\n");
+//			expandItemWhere.append(expandItemWhereCount(targetEntityType, targetKey, indent, expandItem, navProperty,
+//					nextTargetKey, nextTargetEntityType));
+//			expandItemWhere.append(indent).append("}\n");
+//		} else {
+//			expandItemWhere.append(indent).append("}\n");
+//		}
+//		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
+//			expandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
+//					expandItem.getExpandOption().getExpandItems(), indent + "\t",false));
+//			expandItemWhere.append(indent).append("}\n");
+//		}
+//		if (navProperty.getDomainClass().isProxy()) {
+//			expandItemWhere.append(indent).append("}}\n");
+//		}
+//			expandItemWhere.append(indent).append("}\n");
+//		return expandItemWhere;
+//	}
 
 	public static boolean isImplicitNavigationProperty(RdfNavigationProperty navProperty) {
 		String[] implicitNavigationProperties = new String[] { RdfConstants.RDF_HASFACTS_LABEL,
@@ -2938,7 +2938,7 @@ public class SparqlQueryBuilder {
 
 	private StringBuilder expandItemWhereCount(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
-			RdfEntityType nextTargetEntityType)
+			RdfEntityType nextTargetEntityType,Boolean withinService)
 			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 
 		StringBuilder expandItemWhereCount = new StringBuilder();
@@ -2950,7 +2950,7 @@ public class SparqlQueryBuilder {
 				.append(indent).append("\t\t{\n");
 		
 		//Added to optimize for insideOut optimization
-		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization())
+		if(rdfModel.getRdfRepository().isBottomUpSPARQLOptimization() && !withinService)
 			expandItemWhereCount.append(selectExpandWhere(indent+"\t\t\t"));
 		
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
