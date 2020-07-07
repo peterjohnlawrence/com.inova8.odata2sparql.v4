@@ -3031,7 +3031,7 @@ public class SparqlQueryBuilder {
 				hasProperties = true;
 			clausesSelect.append(complexPropertyString);
 			clausesSelect.append("}\n");
-		} else if (!this.rdfTargetEntityType.getProperties().isEmpty()) {
+		} else if (!this.rdfTargetEntityType.getInheritedProperties().isEmpty()) {
 			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
 			for (RdfModel.RdfProperty selectProperty : targetEntityType.getInheritedProperties()) {
 				hasProperties = true;
