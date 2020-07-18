@@ -2420,7 +2420,7 @@ public class SparqlQueryBuilder {
 			withinService=true;
 		}
 		operationExpandItemWhere.append(indent).append("\t\t{\n");		
-		operationExpandItemWhere.append(indent)	.append(selectObjectPropertyValues(targetKey, indent+"\t", expandItem, navProperty, nextTargetKey));
+		operationExpandItemWhere.append(indent)	.append(selectObjectPropertyValues(targetKey, indent, expandItem, navProperty, nextTargetKey));
 		operationExpandItemWhere.append(indent).append("\t\t}\n");
 		if ((expandItem.getExpandOption() != null) && (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 			operationExpandItemWhere.append(expandItemsWhere(nextTargetEntityType, nextTargetKey,
@@ -2529,9 +2529,10 @@ public class SparqlQueryBuilder {
 				|| navProperty.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
 			selectExpandProperties.append(indent).append("\t\t{\n");
 		} else {
-			selectExpandProperties.append(indent).append("\t\tOPTIONAL{\n");
+			selectExpandProperties.append(indent).append("\t\t{\n");
+			//selectExpandProperties.append(indent).append("\t\tOPTIONAL{\n");
 		}
-		selectExpandProperties.append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey,withinService));
+		selectExpandProperties.append(indent).append(selectObjectProperties(targetKey, indent, expandItem, navProperty, nextTargetKey,withinService));
 		selectExpandProperties.append(indent).append("\t\t}\n");
 		selectExpandProperties.append(selectObjectPropertyValues(targetKey, indent, expandItem, navProperty, nextTargetKey));
 		//Nest the expand items within query to improve query execution performance ... deepest first
@@ -3017,7 +3018,7 @@ public class SparqlQueryBuilder {
 		//Fixes #178
 		//clausesSelect.append(indent).append("{\n");
 		if (selectPropertyMap != null && !selectPropertyMap.isEmpty()) {
-			clausesSelect.append(indent).append("\tVALUES(?" + nextTargetKey + "_p){");
+			clausesSelect.append(indent).append("VALUES(?" + nextTargetKey + "_p){");
 			selectPropertyMap.add(RdfConstants.RDF_TYPE);
 			for (String selectProperty : selectPropertyMap) {
 				hasProperties = true;

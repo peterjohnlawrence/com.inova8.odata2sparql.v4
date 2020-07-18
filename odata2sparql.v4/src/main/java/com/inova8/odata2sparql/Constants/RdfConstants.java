@@ -417,7 +417,7 @@ public class RdfConstants {
 			repositoryManagerDir = new File(workingDirectory);
 			repositoryWorkingDirectory = workingDirectory;
 
-			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.5.rdf";
+			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.6.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
