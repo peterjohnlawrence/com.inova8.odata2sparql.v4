@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.olingo.commons.api.data.Annotation;
 import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
@@ -22,6 +23,8 @@ import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
+import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
+import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
@@ -611,7 +614,6 @@ class SparqlEntityCollection extends EntityCollection {
 		while (entitySetResultsMapIterator.hasNext()) {
 			Entry<String, SparqlEntity> entitySetResultsMapEntry = entitySetResultsMapIterator.next();
 			SparqlEntity rdfEntity = entitySetResultsMapEntry.getValue();
-
 			// only leave target entities in collection, the rest will be
 			// accessed via links
 			if (rdfEntity.isTargetEntity()) {
@@ -663,14 +665,25 @@ class SparqlEntityCollection extends EntityCollection {
 							rdfProperty = rdfSubjectEntityType.findProperty(rdfPropertyLocalName);
 							RdfComplexTypePropertyPair rdfComplexTypeProperty;
 							if (rdfProperty != null) {
+								Property property = new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
+										Cast(value, rdfProperty.propertyTypeName));
+//								Annotation scriptAnnotation = new Annotation();
+//								scriptAnnotation.setValue(ValueType.PRIMITIVE, "this is an annotation");
+//								scriptAnnotation.setTerm(RdfConstants.ODATA_SCRIPT_FQN);
+//								scriptAnnotation.setType("PRIMITIVE");
+//								property.getAnnotations().add(scriptAnnotation);
+//								rdfEntity.getAnnotations().add(scriptAnnotation);
+//								Property annotatedProperty = new Property(null, rdfProperty.propertyName +"@" + RdfConstants.ODATA_SCRIPT_FQN, ValueType.PRIMITIVE,
+//										"this is an annotation");
+//								rdfEntity.addProperty(annotatedProperty);
+								rdfEntity.addProperty(property);
 
-								rdfEntity.addProperty(new Property(null, rdfProperty.propertyName, ValueType.PRIMITIVE,
-										Cast(value, rdfProperty.propertyTypeName)));
 							} else if ((rdfComplexTypeProperty = rdfSubjectEntityType
 									.findComplexProperty(rdfPropertyLocalName)) != null) {
 								//It could be part of a complex property
 								Property complexProperty = rdfEntity
 										.getProperty(rdfComplexTypeProperty.getEquivalentComplexPropertyName());
+							
 								ComplexValue complexValue = null;
 								if (complexProperty == null) {
 									complexValue = new ComplexValue();
@@ -830,7 +843,7 @@ class SparqlEntityCollection extends EntityCollection {
 			}
 		} catch (Exception e) {
 			log.error(value + " cannot be cast to " + propertyTypeName.toString());
+			return null;
 		}
-		return null;
 	}
 }

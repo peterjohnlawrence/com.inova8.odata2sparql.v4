@@ -32,7 +32,6 @@ import org.eclipse.rdf4j.repository.config.RepositoryImplConfig;
 import org.eclipse.rdf4j.repository.http.config.HTTPRepositoryConfig;
 import org.eclipse.rdf4j.repository.manager.LocalRepositoryManager;
 import org.eclipse.rdf4j.repository.manager.RemoteRepositoryManager;
-import org.eclipse.rdf4j.repository.manager.RepositoryInfo;
 import org.eclipse.rdf4j.repository.manager.RepositoryManager;
 import org.eclipse.rdf4j.repository.sail.config.SailRepositoryConfig;
 import org.eclipse.rdf4j.repository.sparql.config.SPARQLRepositoryConfig;
@@ -245,6 +244,7 @@ public class RdfRepositories {
 							Literal valueOfExpandSkipDefault = (Literal) bindingSet.getValue("expandSkipDefault");
 							Literal valueOfExpandOrderbyDefault = (Literal) bindingSet.getValue("expandOrderbyDefault");
 							Literal valueOfIncludeImplicitRDF = (Literal) bindingSet.getValue("includeImplicitRDF");
+							Literal valueOfSupportScripting = (Literal) bindingSet.getValue("supportScripting");
 							Literal valueOfBottomUpSPARQLOptimization = (Literal) bindingSet.getValue("bottomUpSPARQLOptimization");
 							Value valueOfTextSearchType = bindingSet.getValue("textSearchType");
 							//Create and add the corresponding repositories
@@ -509,6 +509,12 @@ public class RdfRepositories {
 							} else {
 								repository.setBottomUpSPARQLOptimization(true);
 							}
+							if (valueOfSupportScripting != null) {
+								repository.setSupportScripting(
+										Boolean.parseBoolean(valueOfSupportScripting.stringValue()));
+							} else {
+								repository.setSupportScripting(false);
+							}
 							rdfRepositoryList.put(((IRI) valueOfDataset).getLocalName(), repository);
 						} catch (RepositoryConfigException e) {
 							log.warn("Failed to complete definition of dataset\n" + e.getLocalizedMessage());
@@ -540,13 +546,9 @@ public class RdfRepositories {
 		log.info("Trying remote Repository at " + repositoryUrl);
 		try {
 			repositoryManager.initialize();
-			//Make sure we can find the bootstrap repository
-			RepositoryInfo systemRepository = repositoryManager.getRepositoryInfo(RdfConstants.systemId);
-			//if (systemRepository==null) {
-			//No system repository so we could try and create it
+			repositoryManager.getRepositoryInfo(RdfConstants.systemId);
 			log.warn("No populated system repository at " + repositoryUrl + ". Will attempt to preload");
 			preloadSystemRepository(repositoryManager);
-			//}
 		} catch (RepositoryException e) {
 			log.warn("Cannot initialize remote repository manager at " + repositoryUrl
 					+ ". Will use local repository instead");
@@ -762,6 +764,18 @@ public class RdfRepositories {
 				throw new OData2SparqlException();
 			} catch (IOException e) {
 				log.error("Cannot access " + RdfConstants.changeFile, e);
+				throw new OData2SparqlException();
+			} finally {
+
+			}
+			try {
+				log.info("Loading script from " + RdfConstants.scriptFile);
+				modelsConnection.add(new File(RdfConstants.scriptFile), RdfConstants.systemIRI, RDFFormat.RDFXML);
+			} catch (RDFParseException e) {
+				log.error("Cannot parse " + RdfConstants.scriptFile, e);
+				throw new OData2SparqlException();
+			} catch (IOException e) {
+				log.error("Cannot access " + RdfConstants.scriptFile, e);
 				throw new OData2SparqlException();
 			} finally {
 

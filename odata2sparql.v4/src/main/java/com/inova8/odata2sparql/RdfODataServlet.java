@@ -52,20 +52,7 @@ public class RdfODataServlet extends HttpServlet {
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
-			rdfEdmProviders=getRdfEdmProviders();
-//			if (rdfEdmProviders == null) {
-//				ServletContext servletContext = getServletContext();
-//				readVersion();
-//				File repositoryDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
-//				rdfEdmProviders = new RdfEdmProviders(servletContext.getInitParameter("configFolder"),
-//						servletContext.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
-//						repositoryDir.getAbsolutePath());
-////				rdfEdmProviders = new RdfEdmProviders(this.getInitParameter("configFolder"),
-////						this.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
-////						repositoryDir.getAbsolutePath());
-//				//Set to UTC so string date objects without assigned timnezone are assumed to be UTC.
-//				//TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-//			}
+			if(rdfEdmProviders==null)rdfEdmProviders=getRdfEdmProviders();
 			if (req.getPathInfo() != null && (!req.getPathInfo().equals("/"))) {
 				String service = req.getPathInfo().split("/")[1];
 				if (service.equalsIgnoreCase(RdfConstants.RESET)) {
@@ -134,6 +121,8 @@ public class RdfODataServlet extends HttpServlet {
 			rdfEdmProviders=  new RdfEdmProviders(servletContext.getInitParameter("configFolder"),
 					servletContext.getInitParameter("repositoryFolder"), this.getInitParameter("repositoryUrl"),
 					repositoryDir.getAbsolutePath());
+			//Set to UTC so string date objects without assigned timnezone are assumed to be UTC.
+			//TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		}
 		return rdfEdmProviders;
 	}

@@ -41,7 +41,9 @@ public class RdfRepository {
 	private boolean withMatching = true;
 	private boolean includeImplicitRDF = false;
 	private boolean bottomUpSPARQLOptimization = true;
+	private boolean supportScripting=false;
 	private String match = RdfConstants.DEFAULTMATCH;
+
 
 	RdfRepository(RdfRepositories repositories, String modelName, Namespace defaultPrefix,
 			TreeMap<String, Namespace> namespaces) {
@@ -229,7 +231,12 @@ public class RdfRepository {
 	public void setIncludeImplicitRDF(boolean includeImplicitRDF) {
 		this.includeImplicitRDF = includeImplicitRDF;
 	}
-
+	public boolean isSupportScripting() {
+		return supportScripting;
+	}
+	public void setSupportScripting(boolean supportScripting) {
+		this.supportScripting = supportScripting;
+	}
 	public boolean isBottomUpSPARQLOptimization() {
 		return bottomUpSPARQLOptimization;
 	}

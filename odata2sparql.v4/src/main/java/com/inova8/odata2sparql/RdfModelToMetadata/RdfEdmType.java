@@ -57,11 +57,13 @@ public class RdfEdmType {
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#unsignedShort", EdmPrimitiveTypeKind.Int16);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#unsignedByte", EdmPrimitiveTypeKind.Byte);
 		SIMPLE_TYPE_MAPPING.put("http://www.w3.org/2001/XMLSchema#positiveInteger", EdmPrimitiveTypeKind.Int32);
+		SIMPLE_TYPE_MAPPING.put("http://inova8.com/calc2graph/def/groovyScript", EdmPrimitiveTypeKind.String);
+		SIMPLE_TYPE_MAPPING.put("http://inova8.com/calc2graph/def/script", EdmPrimitiveTypeKind.String);
 
 	};
 	public static EdmPrimitiveTypeKind getEdmType(String propertyTypeName) {
 		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
-		return EdmPrimitiveTypeKind.String;
+			return EdmPrimitiveTypeKind.String;
 		return SIMPLE_TYPE_MAPPING.get(propertyTypeName);
 	}
 	public static boolean isAnyUri(String propertyTypeName) {

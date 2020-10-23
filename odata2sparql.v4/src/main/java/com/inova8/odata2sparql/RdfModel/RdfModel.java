@@ -18,6 +18,7 @@ import org.eclipse.rdf4j.model.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.xerces.util.XMLChar;
 
@@ -25,6 +26,7 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfConnector.openrdf.RdfNode;
+import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 import com.inova8.odata2sparql.uri.UriUtils;
@@ -53,6 +55,7 @@ public class RdfModel {
 		private final Map<String, String> URItoPrefix = new TreeMap<String, String>();
 
 		private void setStandardNsPrefixes() {
+			set(RdfConstants.INOVA8, RdfConstants.INOVA8_NS);
 			set(RdfConstants.RDF, RdfConstants.RDF_NS);
 			set(RdfConstants.RDFS, RdfConstants.RDFS_NS);
 			set(RdfConstants.DC, RdfConstants.DC_NS);
@@ -100,7 +103,7 @@ public class RdfModel {
 			String encodeEntityKey = UriUtils.encodeQName(decodedEntityKey);
 			int colon = encodeEntityKey.indexOf(RdfConstants.QNAME_SEPARATOR);
 			if (colon < 0)
-				return encodeEntityKey;
+				return decodedEntityKey;//encodeEntityKey;
 			else {
 				String uri = get(encodeEntityKey.substring(0, colon));
 				if(uri == null ) {
@@ -188,7 +191,7 @@ public class RdfModel {
 
 			String[] parts = uri.split("/");
 			if (parts.length > 3) {						
-				for(int j=1;j < parts.length - 3;j++) {
+				for(int j=1;j < parts.length - 2;j++) {
 					String rootUri = "";
 					for (int i = 0; i < parts.length - j; i++) {
 						rootUri += parts[i] + "/";
@@ -274,6 +277,8 @@ public class RdfModel {
 		private final List<RdfModel.RdfEntityType> classes = new ArrayList<RdfModel.RdfEntityType>();
 		private final List<RdfModel.RdfNavigationProperty> navigationProperties = new ArrayList<RdfModel.RdfNavigationProperty>();
 		private final List<RdfModel.RdfDatatype> datatypes = new ArrayList<RdfModel.RdfDatatype>();
+
+
 		private final TreeSet<RdfModel.RdfComplexType> complexTypes = new TreeSet<RdfModel.RdfComplexType>();
 		private final TreeSet<RdfModel.RdfNodeShape> nodeShapes = new TreeSet<RdfModel.RdfNodeShape>();
 
@@ -283,11 +288,13 @@ public class RdfModel {
 		}
 
 		private void initialiseDatatypes() {
-			for (String datatype : RdfConstants.RDF_DATATYPES) {
-				datatypes.add(new RdfDatatype(datatype));
-			}
+//			for (String datatype : RdfConstants.RDF_DATATYPES) {
+//				datatypes.add(new RdfDatatype(datatype));
+//			}
 		}
-
+		public List<RdfModel.RdfDatatype> getDatatypes() {
+			return datatypes;
+		}
 		public String getSchemaName() {
 			return schemaName;
 		}
@@ -846,13 +853,27 @@ public class RdfModel {
 		}
 	}
 
-	static class RdfDatatype {
-		private RdfDatatype(String datatypeName) {
+	public static class RdfDatatype {
+		private RdfDatatype(String datatypeName,String basetypeName) {
 			super();
 			this.datatypeName = datatypeName;
+			this.basetypeName = basetypeName;
 		}
 
 		private final String datatypeName;
+		private final String basetypeName;
+
+		public String getDatatypeName() {
+			return datatypeName;
+		}
+
+		public String getBasetypeName() {
+			return basetypeName;
+		}
+		public EdmPrimitiveTypeKind getEDMBasetypeName() {
+			return RdfEdmType.getEdmType(basetypeName);
+		}
+		
 	}
 
 	/**
@@ -2055,12 +2076,14 @@ public class RdfModel {
 		return clazz;
 	}
 
-	RdfDatatype getOrCreateDatatype(RdfNode datatypeNode) throws OData2SparqlException {
+	RdfDatatype getOrCreateDatatype(RdfNode datatypeNode, RdfNode basetypeNode) throws OData2SparqlException {
 		RdfURI datatypeURI = new RdfURI(datatypeNode);
+		RdfURI basetypeURI = new RdfURI(basetypeNode);
 		RdfDatatype datatype = Enumerable.create(datatypeURI.graph.datatypes)
 				.firstOrNull(datatypeNameEquals(datatypeURI.localName));
 		if (datatype == null) {
-			datatype = new RdfDatatype(rdfToOdata(datatypeURI.localName));
+			datatype = new RdfDatatype(rdfToOdata(datatypeURI.localName), rdfToOdata(basetypeURI.localName));
+			datatypeURI.graph.datatypes.add(datatype);
 		}
 		return datatype;
 	}

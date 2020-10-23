@@ -11,19 +11,277 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://inova8.com/olgap/">
   <owl:Ontology rdf:about="">
-    <owl:imports rdf:resource="http://spinrdf.org/spin"/>
-    <owl:imports rdf:resource="http://inova8.com/odata4sparql"/>
     <owl:versionInfo>Created with TopBraid Composer</owl:versionInfo>
+    <owl:imports rdf:resource="http://inova8.com/odata4sparql"/>
+    <owl:imports rdf:resource="http://spinrdf.org/spin"/>
   </owl:Ontology>
   <owl:ObjectProperty rdf:about="http://inova8.com/olgap/end">
-    <rdfs:label>end</rdfs:label>
+    <rdfs:comment>The target end of the path</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
     <rdfs:domain>
       <odata4sparql:Operation rdf:about="http://inova8.com/olgap/ShortestPath">
-        <rdfs:label>ShortestPath</rdfs:label>
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+            <spl:predicate rdf:resource="http://inova8.com/olgap/end"/>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate>
+              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/start"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+            <spl:predicate>
+              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/service"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/maxPath"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:constraint>
+          <spl:Argument>
+            <odata4sparql:isPropertyPath rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isPropertyPath>
+            <spl:predicate>
+              <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/propertyPath"/>
+            </spl:predicate>
+            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+          </spl:Argument>
+        </spin:constraint>
         <spin:body>
           <sp:Select>
+            <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:varName>edge</sp:varName>
+                <spl:predicate>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/edge"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>subject</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>property</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/property"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:varName>direct</sp:varName>
+                <spl:predicate>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/direct"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/object"/>
+                </spl:predicate>
+                <sp:varName>object</sp:varName>
+              </rdf:Description>
+            </sp:resultVariables>
+            <sp:where rdf:parseType="Collection">
+              <sp:Bind>
+                <sp:expression>http://localhost:8080/rdf4j-server/repositories/tfl</sp:expression>
+                <sp:variable rdf:parseType="Resource">
+                  <sp:varName>service</sp:varName>
+                </sp:variable>
+              </sp:Bind>
+              <rdf:Description>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>edge</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?1</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>subject</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?1</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?2</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?1</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>property</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?2</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?3</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?2</sp:varName>
+                </sp:subject>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>direct</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?3</sp:varName>
+                </sp:subject>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?4</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?3</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?4</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>object</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?4</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://inova8.com/olgap#ShortestPathProperty"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?0</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?5</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>service</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?5</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?5</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?6</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?6</sp:varName>
+                </sp:subject>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:object rdf:resource="http://in4mium.com/londontube/id/Mornington_Crescent"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?7</sp:varName>
+                </sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?6</sp:varName>
+                </sp:subject>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?7</sp:varName>
+                </sp:subject>
+                <sp:object rdf:resource="http://in4mium.com/londontube/id/Baker_Street"/>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?7</sp:varName>
+                </sp:subject>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?8</sp:varName>
+                </sp:object>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:object> (&lt;http://in4mium.com/londontube/ref/connectsToxx&gt;|&lt;http://in4mium.com/londontube/ref/onLinexx&gt;)!(rdf:type)^(&lt;http://in4mium.com/londontube/ref/connectsFrom&gt;|  &lt;http://in4mium.com/londontube/ref/hasStationOnLinexx&gt;)^!(rdf:type)</sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?8</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?9</sp:varName>
+                </sp:object>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?8</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
+                <sp:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+                >8</sp:object>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?9</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+              <rdf:Description>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?9</sp:varName>
+                </sp:subject>
+              </rdf:Description>
+            </sp:where>
             <sp:text>SELECT ?subject ?property ?object ?direct  ?edge 
 WHERE {
      #BIND( "http://localhost:8082/rdf4j-server/repositories/tfl" as ?service)
@@ -32,327 +290,158 @@ WHERE {
 	 #BIND( "(&lt;http://in4mium.com/londontube/ref/connectsToxx&gt;|&lt;http://in4mium.com/londontube/ref/onLinexx&gt;)!(rdf:type)^(&lt;http://in4mium.com/londontube/ref/connectsFrom&gt;|  &lt;http://in4mium.com/londontube/ref/hasStationOnLinexx&gt;)^!(rdf:type)" as ?propertyPath)
 	 #BIND( 8 as ?maxPath)
 	(?edge ?subject ?property ?direct ?object )  &lt;http://inova8.com/olgap/shortestPath&gt;   (?service  ?start  ?end ?propertyPath ?maxPath )  .
-}</sp:text> <sp:where rdf:parseType="Collection">
+}</sp:text>
+          </sp:Select>
+        </spin:body>
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
+        <rdfs:label>ShortestPath</rdfs:label>
+      </odata4sparql:Operation>
+    </rdfs:domain>
+    <rdfs:label>end</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/start">
+    <rdfs:comment>The target start of the path</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>start</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/property">
+    <rdfs:comment>The predicate of the edge connecting the subject to object or vice-versa according to property direct</rdfs:comment>
+    <rdfs:label>property</rdfs:label>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/object">
+    <rdfs:comment>The object of the edge within the path</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>object</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/service">
+    <rdfs:domain>
+      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/DegreeDistribution">
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >false</odata4sparql:isProxy>
+        <spin:private rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</spin:private>
+        <rdfs:label>DegreeDistribution</rdfs:label>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
+          </spl:Argument>
+        </spin:constraint>
+        <spin:body>
+          <sp:Select>
+            <sp:where rdf:parseType="Collection">
               <sp:Bind>
                 <sp:variable rdf:parseType="Resource">
-                  <sp:varName>service</sp:varName>
+                  <sp:varName>eccentricityService</sp:varName>
                 </sp:variable>
-                <sp:expression>http://localhost:8080/rdf4j-server/repositories/tfl</sp:expression>
+                <sp:expression rdf:parseType="Resource">
+                  <sp:varName>service</sp:varName>
+                </sp:expression>
               </sp:Bind>
               <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
                 <sp:object rdf:parseType="Resource">
-                  <sp:varName>edge</sp:varName>
+                  <sp:varName>degree</sp:varName>
                 </sp:object>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?0</sp:varName>
                 </sp:subject>
+                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
               </rdf:Description>
               <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?1</sp:varName>
-                </sp:object>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?0</sp:varName>
                 </sp:subject>
                 <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>?1</sp:varName>
+                </sp:object>
               </rdf:Description>
               <rdf:Description>
+                <sp:object rdf:parseType="Resource">
+                  <sp:varName>count</sp:varName>
+                </sp:object>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?1</sp:varName>
                 </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>subject</sp:varName>
-                </sp:object>
                 <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
               </rdf:Description>
               <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?1</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?2</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?2</sp:varName>
-                </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>property</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?2</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?3</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?3</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>direct</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?3</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?4</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>object</sp:varName>
-                </sp:object>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?4</sp:varName>
-                </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?4</sp:varName>
-                </sp:subject>
                 <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
                 <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                <sp:subject rdf:parseType="Resource">
+                  <sp:varName>?1</sp:varName>
+                </sp:subject>
               </rdf:Description>
               <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?5</sp:varName>
-                </sp:object>
                 <sp:subject rdf:parseType="Resource">
                   <sp:varName>?0</sp:varName>
                 </sp:subject>
-                <sp:predicate rdf:resource="http://inova8.com/olgap#ShortestPathProperty"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?5</sp:varName>
-                </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
                 <sp:object rdf:parseType="Resource">
                   <sp:varName>service</sp:varName>
                 </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?6</sp:varName>
-                </sp:object>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?5</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:resource="http://in4mium.com/londontube/id/Mornington_Crescent"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?6</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?6</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?7</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:object rdf:resource="http://in4mium.com/londontube/id/Baker_Street"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?7</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?8</sp:varName>
-                </sp:object>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?7</sp:varName>
-                </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?8</sp:varName>
-                </sp:subject>
-                <sp:object> (&lt;http://in4mium.com/londontube/ref/connectsToxx&gt;|&lt;http://in4mium.com/londontube/ref/onLinexx&gt;)!(rdf:type)^(&lt;http://in4mium.com/londontube/ref/connectsFrom&gt;|  &lt;http://in4mium.com/londontube/ref/hasStationOnLinexx&gt;)^!(rdf:type)</sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?8</sp:varName>
-                </sp:subject>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?9</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?9</sp:varName>
-                </sp:subject>
-                <sp:object rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
-                >8</sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?9</sp:varName>
-                </sp:subject>
-                <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
+                <sp:predicate rdf:resource="http://inova8.com/olgap/degreeDistribution"/>
               </rdf:Description>
             </sp:where>
+            <sp:text>SELECT ?degreeDistributionService ?degree ?count
+WHERE {
+	(?degree  ?count )  &lt;http://inova8.com/olgap/degreeDistribution&gt;   ?service  . 
+BIND(CONCAT(STR(?service),?degree )  as ?degreeDistributionService)
+} </sp:text>
             <sp:resultVariables rdf:parseType="Collection">
               <rdf:Description>
-                <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/edge"/>
-                </spl:predicate>
-                <sp:varName>edge</sp:varName>
+                <sp:varName>degreeDistributionService</sp:varName>
+                <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
               </rdf:Description>
               <rdf:Description>
+                <sp:varName>degree</sp:varName>
                 <spl:predicate>
-                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/degree"/>
                 </spl:predicate>
-                <sp:varName>subject</sp:varName>
               </rdf:Description>
               <rdf:Description>
+                <sp:varName>count</sp:varName>
                 <spl:predicate>
-                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/property"/>
-                </spl:predicate>
-                <sp:varName>property</sp:varName>
-              </rdf:Description>
-              <rdf:Description>
-                <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/direct"/>
-                </spl:predicate>
-                <sp:varName>direct</sp:varName>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:varName>object</sp:varName>
-                <spl:predicate>
-                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/object"/>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/count"/>
                 </spl:predicate>
               </rdf:Description>
             </sp:resultVariables>
           </sp:Select>
         </spin:body>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/propertyPath"/>
-            </spl:predicate>
-            <odata4sparql:isPropertyPath rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isPropertyPath>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-            <spl:predicate>
-              <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/maxPath"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:predicate>
-              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/service"/>
-            </spl:predicate>
-            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
-            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isDataset>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-            <spl:predicate>
-              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/start"/>
-            </spl:predicate>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:predicate rdf:resource="http://inova8.com/olgap/end"/>
-            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-          </spl:Argument>
-        </spin:constraint>
+        <spin:abstract rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</spin:abstract>
       </odata4sparql:Operation>
     </rdfs:domain>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-    <rdfs:comment>The target end of the path</rdfs:comment>
-  </owl:ObjectProperty>
-  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/start">
-    <rdfs:label>start</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-    <rdfs:comment>The target start of the path</rdfs:comment>
-  </owl:ObjectProperty>
-  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/property">
-    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:label>property</rdfs:label>
-    <rdfs:comment>The predicate of the edge connecting the subject to object or vice-versa according to property direct</rdfs:comment>
-  </owl:ObjectProperty>
-  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/object">
-    <rdfs:label>object</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-    <rdfs:comment>The object of the edge within the path</rdfs:comment>
-  </owl:ObjectProperty>
-  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/service">
-    <rdfs:label>service</rdfs:label>
-    <rdfs:comment>The service to be accessed to provide the subquery results</rdfs:comment>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
     <rdfs:domain>
-      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/Eccentricity">
-        <rdfs:label>Eccentricity</rdfs:label>
+      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/Triangles">
         <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
+        >false</odata4sparql:isProxy>
         <spin:constraint>
           <spl:Argument>
-            <spl:predicate>
-              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
-            </spl:predicate>
-            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+            <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
           </spl:Argument>
         </spin:constraint>
         <spin:body>
           <sp:Select>
-            <sp:text>SELECT ?eccentricitySubject  ?eccentricity
-WHERE {
-BIND( ?subject  as ?eccentricitySubject)
-    BIND( &lt;http://inova8.com/olgap/eccentricity&gt; ( ?service, ?subject)  as ?eccentricity)
-}</sp:text> <sp:resultVariables rdf:parseType="Collection">
+            <sp:resultVariables rdf:parseType="Collection">
               <rdf:Description>
-                <spl:predicate>
-                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
-                </spl:predicate>
-                <sp:varName>eccentricitySubject</sp:varName>
+                <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
+                <sp:varName>trianglesService</sp:varName>
               </rdf:Description>
               <rdf:Description>
-                <sp:varName>eccentricity</sp:varName>
                 <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/eccentricity"/>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/triangles"/>
                 </spl:predicate>
+                <sp:varName>triangles</sp:varName>
               </rdf:Description>
             </sp:resultVariables>
             <sp:where rdf:parseType="Collection">
@@ -361,69 +450,10 @@ BIND( ?subject  as ?eccentricitySubject)
                   <sp:varName>service</sp:varName>
                 </sp:expression>
                 <sp:variable rdf:parseType="Resource">
-                  <sp:varName>service</sp:varName>
-                </sp:variable>
-              </sp:Bind>
-              <sp:Bind>
-                <sp:variable rdf:parseType="Resource">
-                  <sp:varName>subject</sp:varName>
-                </sp:variable>
-                <sp:expression rdf:parseType="Resource">
-                  <sp:varName>subject</sp:varName>
-                </sp:expression>
-              </sp:Bind>
-              <sp:Bind>
-                <sp:variable rdf:parseType="Resource">
-                  <sp:varName>eccentricity</sp:varName>
-                </sp:variable>
-                <sp:expression rdf:parseType="Resource">
-                </sp:expression>
-              </sp:Bind>
-            </sp:where>
-          </sp:Select>
-        </spin:body>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
-            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
-            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isDataset>
-          </spl:Argument>
-        </spin:constraint>
-      </odata4sparql:Operation>
-    </rdfs:domain>
-    <rdfs:domain>
-      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/Triangles">
-        <rdfs:label>Triangles</rdfs:label>
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
-        <spin:constraint>
-          <spl:Argument>
-            <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
-            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
-            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-            >true</odata4sparql:isDataset>
-          </spl:Argument>
-        </spin:constraint>
-        <spin:body>
-          <sp:Select>
-            <sp:text>SELECT ?trianglesService ?triangles
-WHERE {
-	 BIND( ?service as ?trianglesService)
-    BIND( &lt;http://inova8.com/olgap/triangles&gt; ( ?service)  as ?triangles)
-}</sp:text> <sp:where rdf:parseType="Collection">
-              <sp:Bind>
-                <sp:variable rdf:parseType="Resource">
                   <sp:varName>trianglesService</sp:varName>
                 </sp:variable>
-                <sp:expression rdf:parseType="Resource">
-                  <sp:varName>service</sp:varName>
-                </sp:expression>
               </sp:Bind>
               <sp:Bind>
-                <sp:variable rdf:parseType="Resource">
-                  <sp:varName>triangles</sp:varName>
-                </sp:variable>
                 <sp:expression>
                   <olgap:triangles>
                     <sp:arg1 rdf:parseType="Resource">
@@ -431,108 +461,146 @@ WHERE {
                     </sp:arg1>
                   </olgap:triangles>
                 </sp:expression>
+                <sp:variable rdf:parseType="Resource">
+                  <sp:varName>triangles</sp:varName>
+                </sp:variable>
               </sp:Bind>
             </sp:where>
-            <sp:resultVariables rdf:parseType="Collection">
-              <rdf:Description>
-                <sp:varName>trianglesService</sp:varName>
-                <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:varName>triangles</sp:varName>
-                <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/triangles"/>
-                </spl:predicate>
-              </rdf:Description>
-            </sp:resultVariables>
+            <sp:text>SELECT ?trianglesService ?triangles
+WHERE {
+	 BIND( ?service as ?trianglesService)
+    BIND( &lt;http://inova8.com/olgap/triangles&gt; ( ?service)  as ?triangles)
+}</sp:text>
           </sp:Select>
         </spin:body>
+        <rdfs:label>Triangles</rdfs:label>
       </odata4sparql:Operation>
     </rdfs:domain>
     <rdfs:domain>
-      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/DegreeDistribution">
-        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-        >true</odata4sparql:isProxy>
+      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/Eccentricity">
+        <spin:constraint>
+          <spl:Argument>
+            <odata4sparql:isDataset rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</odata4sparql:isDataset>
+            <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+            <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
+          </spl:Argument>
+        </spin:constraint>
         <spin:body>
           <sp:Select>
-            <sp:resultVariables rdf:parseType="Collection">
-              <rdf:Description>
-                <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
-                <sp:varName>degreeDistributionService</sp:varName>
-              </rdf:Description>
-              <rdf:Description>
-                <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/degree"/>
-                </spl:predicate>
-                <sp:varName>degree</sp:varName>
-              </rdf:Description>
-              <rdf:Description>
-                <spl:predicate>
-                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/count"/>
-                </spl:predicate>
-                <sp:varName>count</sp:varName>
-              </rdf:Description>
-            </sp:resultVariables>
-            <sp:text>SELECT ?degreeDistributionService ?degree ?count
-WHERE {
-	(?degree  ?count )  &lt;http://inova8.com/olgap/degreeDistribution&gt;   ?service  . 
-BIND(CONCAT(STR(?service),?degree )  as ?degreeDistributionService)
-} </sp:text>
             <sp:where rdf:parseType="Collection">
               <sp:Bind>
+                <sp:variable rdf:parseType="Resource">
+                  <sp:varName>service</sp:varName>
+                </sp:variable>
                 <sp:expression rdf:parseType="Resource">
                   <sp:varName>service</sp:varName>
                 </sp:expression>
+              </sp:Bind>
+              <sp:Bind>
+                <sp:expression rdf:parseType="Resource">
+                  <sp:varName>subject</sp:varName>
+                </sp:expression>
                 <sp:variable rdf:parseType="Resource">
-                  <sp:varName>eccentricityService</sp:varName>
+                  <sp:varName>subject</sp:varName>
                 </sp:variable>
               </sp:Bind>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>degree</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>?1</sp:varName>
-                </sp:object>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:subject>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#first"/>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?1</sp:varName>
-                </sp:subject>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>count</sp:varName>
-                </sp:object>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?1</sp:varName>
-                </sp:subject>
-                <sp:object rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-                <sp:predicate rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"/>
-              </rdf:Description>
-              <rdf:Description>
-                <sp:predicate rdf:resource="http://inova8.com/olgap/degreeDistribution"/>
-                <sp:object rdf:parseType="Resource">
-                  <sp:varName>service</sp:varName>
-                </sp:object>
-                <sp:subject rdf:parseType="Resource">
-                  <sp:varName>?0</sp:varName>
-                </sp:subject>
-              </rdf:Description>
+              <sp:Bind>
+                <sp:expression rdf:parseType="Resource">
+                </sp:expression>
+                <sp:variable rdf:parseType="Resource">
+                  <sp:varName>eccentricity</sp:varName>
+                </sp:variable>
+              </sp:Bind>
             </sp:where>
+            <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <sp:varName>eccentricitySubject</sp:varName>
+                <spl:predicate>
+                  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
+                </spl:predicate>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate>
+                  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/eccentricity"/>
+                </spl:predicate>
+                <sp:varName>eccentricity</sp:varName>
+              </rdf:Description>
+            </sp:resultVariables>
+            <sp:text>SELECT ?eccentricitySubject  ?eccentricity
+WHERE {
+BIND( ?subject  as ?eccentricitySubject)
+    BIND( &lt;http://inova8.com/olgap/eccentricity&gt; ( ?service, ?subject)  as ?eccentricity)
+}</sp:text>
           </sp:Select>
         </spin:body>
+        <spin:constraint>
+          <spl:Argument>
+            <spl:valueType rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+            <spl:predicate>
+              <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject"/>
+            </spl:predicate>
+          </spl:Argument>
+        </spin:constraint>
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
+        <rdfs:label>Eccentricity</rdfs:label>
+      </odata4sparql:Operation>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:comment>The service to be accessed to provide the subquery results</rdfs:comment>
+    <rdfs:label>service</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject">
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/Eccentricity"/>
+    <rdfs:comment>The subject of the edge within the path</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>subject</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/edge">
+    <rdfs:comment>The edge number or index of the discovered path</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>edge</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/maxPath">
+    <rdfs:comment>The maximum path length searched</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>maxPath</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/triangles">
+    <rdfs:label>triangles</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/Triangles"/>
+    <rdfs:comment>The number of triangles in the graph</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/degree">
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/DegreeDistribution"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:label>degree</rdfs:label>
+    <rdfs:comment>The degree of a graph distribution</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/eccentricity">
+    <rdfs:comment>The eccentricity of a node with respect to the remainder of the graph</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:label>eccentricity</rdfs:label>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/Eccentricity"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/direct">
+    <rdfs:comment>Indicates direction of edge: true: subject to object, false: object to subject</rdfs:comment>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:label>direct</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/cacheResult">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain>
+      <odata4sparql:Operation rdf:about="http://inova8.com/olgap/ClearCache">
+        <odata4sparql:isProxy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</odata4sparql:isProxy>
         <spin:constraint>
           <spl:Argument>
             <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
@@ -541,64 +609,44 @@ BIND(CONCAT(STR(?service),?degree )  as ?degreeDistributionService)
             <spl:valueType rdf:resource="http://inova8.com/odata4sparql#Dataset"/>
           </spl:Argument>
         </spin:constraint>
-        <rdfs:label>DegreeDistribution</rdfs:label>
+        <spin:body>
+          <sp:Select>
+            <sp:text>SELECT ?cacheService ?cacheResult
+WHERE { BIND( ?service as ?cacheService)
+    BIND ( olgap:clearCache('service', ?service ) as ?cacheResult)
+}</sp:text> <sp:resultVariables rdf:parseType="Collection">
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/olgap/service"/>
+                <sp:varName>cacheService</sp:varName>
+              </rdf:Description>
+              <rdf:Description>
+                <spl:predicate rdf:resource="http://inova8.com/olgap/cacheResult"/>
+                <sp:varName>cacheResult</sp:varName>
+              </rdf:Description>
+            </sp:resultVariables>
+          </sp:Select>
+        </spin:body>
+        <spin:abstract rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</spin:abstract>
+        <spin:private rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</spin:private>
+        <rdfs:label>ClearCache</rdfs:label>
       </odata4sparql:Operation>
     </rdfs:domain>
-  </owl:ObjectProperty>
-  <owl:ObjectProperty rdf:about="http://inova8.com/olgap/subject">
-    <rdfs:label>subject</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
-    <rdfs:comment>The subject of the edge within the path</rdfs:comment>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/Eccentricity"/>
-  </owl:ObjectProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/edge">
-    <rdfs:label>edge</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <rdfs:comment>The edge number or index of the discovered path</rdfs:comment>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/maxPath">
-    <rdfs:label>maxPath</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <rdfs:comment>The maximum path length searched</rdfs:comment>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/triangles">
-    <rdfs:comment>The number of triangles in the graph</rdfs:comment>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/Triangles"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <rdfs:label>triangles</rdfs:label>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/degree">
-    <rdfs:comment>The degree of a graph distribution</rdfs:comment>
-    <rdfs:label>degree</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/DegreeDistribution"/>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/eccentricity">
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/Eccentricity"/>
-    <rdfs:label>eccentricity</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    <rdfs:comment>The eccentricity of a node with respect to the remainder of the graph</rdfs:comment>
-  </owl:DatatypeProperty>
-  <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/direct">
-    <rdfs:label>direct</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:comment>Indicates direction of edge: true: subject to object, false: object to subject</rdfs:comment>
+    <rdfs:label>cacheResult</rdfs:label>
+    <rdfs:comment>cacheResult</rdfs:comment>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/propertyPath">
-    <rdfs:label>propertyPath</rdfs:label>
-    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:comment>The propertyPath using (almost) SPARQL1.1 propertypath syntax.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://inova8.com/olgap/ShortestPath"/>
+    <rdfs:label>propertyPath</rdfs:label>
   </owl:DatatypeProperty>
   <owl:DatatypeProperty rdf:about="http://inova8.com/olgap/count">
-    <rdfs:comment>The count of a degree of a graph distribution</rdfs:comment>
-    <rdfs:label>count</rdfs:label>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
     <rdfs:domain rdf:resource="http://inova8.com/olgap/DegreeDistribution"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:label>count</rdfs:label>
+    <rdfs:comment>The count of a degree of a graph distribution</rdfs:comment>
   </owl:DatatypeProperty>
 </rdf:RDF>
 

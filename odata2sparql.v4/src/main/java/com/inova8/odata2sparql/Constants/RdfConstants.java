@@ -35,7 +35,7 @@ public class RdfConstants {
 	}
 
 	public static final String DEFAULTINSERTGRAPH = "http://insertGraph";
-	
+	public static final String SERVICE = "service";	
 	public static final int DATE_PRECISION = 3;
 	public static final int DECIMAL_SCALE = 27;//10; Fixes #119
 	public static final String DEFAULTCONFIG = "/var/opt/inova8/odata2sparql/";
@@ -48,7 +48,6 @@ public class RdfConstants {
 	public static final String WILDCARD = "*";
 	public static final String UNDEFVALUE = "UNDEF";
 	public static final String PREFIXSEPARATOR = ".";
-	
 	
 	private final static ValueFactory valueFactoryImpl = SimpleValueFactory.getInstance();
 	static private Hashtable<Value, String> metaQueries;// = new Hashtable<Value, String>();
@@ -72,7 +71,8 @@ public class RdfConstants {
 	public static String searchFile;
 	public static String olgapFile;
 	public static String changeFile;
-
+	public static String scriptFile;
+	
 	public final static Value RDFSModel = valueFactoryImpl.createIRI("http://inova8.com/odata4sparql#RDFSModel");
 
 	public static final String TARGETENTITY = "http://targetEntity";
@@ -85,9 +85,7 @@ public class RdfConstants {
 	public static final String PLURAL = "s";
 	public static final String SHAPE_POSTFIX = "_shape";//"";//
 
-	
 	public static final String DEFAULTMATCH = "{ key1 (<http://www.w3.org/2004/02/skos/core#exactMatch> | ^ <http://www.w3.org/2004/02/skos/core#exactMatch>)* key2 }";
-
 
 	public static final String SAP_ANNOTATION_SCHEMA = "http://www.sap.com/Protocols/SAPData";
 	private static final String SAP_ANNOTATION_NS = "sap";
@@ -97,6 +95,7 @@ public class RdfConstants {
 	
 	private static final String  ODATA_NS ="odata";
 	private static final String  ODATA_DEFAULTNAMESPACE ="defaultNamespace";
+	private static final String  ODATA_SUPPORTSCRIPTING="supportScripting";
 	private static final String  ODATA_NAMESPACES ="namespaces";
 	private static final String  ODATA_BASETYPE ="baseType";
 	private static final String  ODATA_FK ="FK";
@@ -110,7 +109,10 @@ public class RdfConstants {
 	private static final String  ODATA_ISREIFIEDSUBJECTPREDICATE ="isReifiedSubject";
 	private static final String  ODATA_ISREIFIEDOBJECTPREDICATE ="isReifiedObject";
 	private static final String  ODATA_INVERSEOF ="inverseOf";
-		
+	
+	public static final String INOVA8_SCHEMA = "http://inova8.com/";
+	public static final String INOVA8_NS = "http://inova8.com/";
+	public static final String INOVA8 = "inova8";
 	public static final String RDF_SCHEMA = "http://www.w3.org/1999/02/22-rdf-syntax-ns";
 	public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 	public static final String RDF = "rdf";
@@ -179,12 +181,10 @@ public class RdfConstants {
 	public static final String RDFS_COMMENT = "http://www.w3.org/2000/01/rdf-schema#comment";
 	public static final String RDFS_COMMENT_LABEL = "comment";
 
-	
 	private static final String OWL_EQUIVALENTPROPERTY_LABEL = "equivalentProperty";
 	public static final String OWL_IMPORTS = "http://www.w3.org/2002/07/owl#imports";
 	public static final String OWL_IMPORTS_LABEL = "imports";
-	
-	
+		
 	public static final String RDF_SUBJECTPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#SubjectPredicate";
 	public static final String RDF_OBJECTPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Fact";	
 	public static final String RDF_VALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Term";	
@@ -197,7 +197,12 @@ public class RdfConstants {
 	public static final String RDF_HASVALUES = "http://www.w3.org/1999/02/22-rdf-syntax-ns#terms";
 	public static final String RDF_HASPREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#property";
 	public static final String RDF_HASFACTS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#facts";
-
+	
+	public static final String RDF_FACTVALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#factValue";	
+	public static final String RDF_FACTVALUE_VALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#value";	
+	public static final String RDF_FACTVALUE_SCRIPT = "http://www.w3.org/1999/02/22-rdf-syntax-ns#script";	
+	public static final String RDF_FACTVALUE_TRACE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#trace";	
+	
 	public static final String RDF_SUBJECTPREDICATE_LABEL = "SubjectPredicate";
 	public static final String RDF_OBJECTPREDICATE_LABEL = "Fact";	
 	public static final String RDF_VALUE_LABEL = "Term";	
@@ -211,6 +216,13 @@ public class RdfConstants {
 	public static final String RDF_HASPREDICATE_LABEL = "rdf_property";
 	public static final String RDF_HASFACTS_LABEL = "rdf_facts";
 
+	public static final String RDF_FACTVALUE_LABEL = "FactValue";	
+	public static final String RDF_FACTVALUE_VALUE_LABEL = "value";	
+//	public static final String RDF_FACTVALUE_LABEL = "FactValue";	
+//	public static final String RDF_FACTVALUE_VALUE_LABEL = "value";	
+	public static final String RDF_FACTVALUE_SCRIPT_LABEL = "script";	
+	public static final String RDF_FACTVALUE_TRACE_LABEL = "trace";	
+	
 	public static final String SPARQL_UNDEF = "UNDEF";
 
 	private static final String ONTOLOGY = "Ontology";
@@ -329,6 +341,7 @@ public class RdfConstants {
 	public final static String SAP_HEADING_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_HEADING;
 	public final static String SAP_QUICKINFO_FQN = RdfConstants.SAP_ANNOTATION_NS + "." + RdfConstants.SAP_QUICKINFO;
 	public final static String ODATA_DEFAULTNAMESPACE_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_DEFAULTNAMESPACE;
+	public final static String ODATA_SUPPORTSCRIPTING_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_SUPPORTSCRIPTING;
 	public final static String ODATA_NAMESPACES_FQN= RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_NAMESPACES;
 	public static final String ODATA_BASETYPE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_BASETYPE;
 	public static final String ODATA_FK_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_FK;
@@ -342,9 +355,10 @@ public class RdfConstants {
 	public static final String ODATA_ISREIFIEDSUBJECTPREDICATE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE;
 	public static final String ODATA_ISREIFIEDOBJECTPREDICATE_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE;
 	public static final String ODATA_INVERSEOF_FQN = RdfConstants.ODATA_NS + "." + RdfConstants.ODATA_INVERSEOF;
+	//public static final String ODATA_SCRIPT_FQN = RdfConstants.RDF + "." + RdfConstants.ODATA_SCRIPT;
 	public final static String RDFS_CLASS_FQN = RdfConstants.RDFS + "." + RdfConstants.RDFS_CLASS_TERM;
 	public final static String PROPERTY_FQN = RdfConstants.RDF + "." + RdfConstants.RDF_PROPERTY_TERM;
-	public final static String DATATYPE_FQN = RdfConstants.RDF + "." + RdfConstants.DATATYPE;
+	public final static String DATATYPE_FQN = RdfConstants.RDFS + "." + RdfConstants.DATATYPE;
 	public final static String INVERSEOF_FQN = RdfConstants.OWL + "." + RdfConstants.INVERSEOF;
 	
 	public final static String OWL_EQUIVALENTPROPERTY_FQN = RdfConstants.OWL + "."
@@ -355,6 +369,7 @@ public class RdfConstants {
 	private final static CsdlTerm sapheadingTerm = new CsdlTerm().setName(RdfConstants.SAP_HEADING).setType("Edm.String");
 	private final static CsdlTerm sapquickinfoTerm = new CsdlTerm().setName(RdfConstants.SAP_QUICKINFO).setType("Edm.String");
 	private final static CsdlTerm odataDefaultNamespace = new CsdlTerm().setName(RdfConstants.ODATA_DEFAULTNAMESPACE).setType("Edm.String");
+	private final static CsdlTerm odataSupportScripting = new CsdlTerm().setName(RdfConstants.ODATA_SUPPORTSCRIPTING).setType("Edm.Boolean");
 	private final static CsdlTerm odataNamespaces = new CsdlTerm().setName(RdfConstants.ODATA_NAMESPACES).setType("Edm.String");
 	private final static CsdlTerm odatabaseType = new CsdlTerm().setName(RdfConstants.ODATA_BASETYPE).setType("Edm.String");
 	private final static CsdlTerm odataFK = new CsdlTerm().setName(RdfConstants.ODATA_FK).setType("Edm.String");
@@ -368,6 +383,7 @@ public class RdfConstants {
 	private final static CsdlTerm odataIsReifiedSubjectPredicate = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDSUBJECTPREDICATE).setType("Edm.String");
 	private final static CsdlTerm odataIsReifiedObjectPredicate = new CsdlTerm().setName(RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE).setType("Edm.String");
 	private final static CsdlTerm odataInverseOf = new CsdlTerm().setName(RdfConstants.ODATA_INVERSEOF).setType("Edm.String");
+	//private final static CsdlTerm odataScript = new CsdlTerm().setName(RdfConstants.ODATA_SCRIPT).setType("Edm.String");
 	private final static CsdlTerm rdfsClassTerm = new CsdlTerm().setName(RdfConstants.RDFS_CLASS_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfPropertyTerm = new CsdlTerm().setName(RdfConstants.RDF_PROPERTY_TERM).setType("Edm.String");
 	private final static CsdlTerm rdfsDatatypeTerm = new CsdlTerm().setName(RdfConstants.DATATYPE).setType("Edm.String");
@@ -417,7 +433,7 @@ public class RdfConstants {
 			repositoryManagerDir = new File(workingDirectory);
 			repositoryWorkingDirectory = workingDirectory;
 
-			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.6.rdf";
+			odata4sparqlFile = repositoryManagerDirPath + "ontologies/odata4sparql.v2.7.7.rdf";
 			rdfFile = repositoryManagerDirPath + "ontologies/22-rdf-syntax-ns.ttl";
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
@@ -426,6 +442,8 @@ public class RdfConstants {
 			olgapFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.olgap.v2.0.0.rdf";
 			searchFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.lucenesearch.v3.0.0.rdf";
 			changeFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.change.v1.0.0.rdf";
+			scriptFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.script.v1.0.0.rdf";
+
 
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode file directory to be used for repository: " + e.getMessage());
@@ -485,6 +503,7 @@ public class RdfConstants {
 		TERMS.put(RdfConstants.SAP_HEADING, sapheadingTerm);
 		TERMS.put(RdfConstants.SAP_QUICKINFO, sapquickinfoTerm);
 		TERMS.put(RdfConstants.ODATA_DEFAULTNAMESPACE, odataDefaultNamespace);
+		TERMS.put(RdfConstants.ODATA_SUPPORTSCRIPTING, odataSupportScripting);
 		TERMS.put(RdfConstants.ODATA_NAMESPACES, odataNamespaces);
 		TERMS.put(RdfConstants.ODATA_BASETYPE, odatabaseType);
 		TERMS.put(RdfConstants.ODATA_FK, odataFK);
@@ -508,6 +527,7 @@ public class RdfConstants {
 		SAPTERMS.add(sapheadingTerm);
 		SAPTERMS.add(sapquickinfoTerm);
 		ODATATERMS.add(odataDefaultNamespace);
+		ODATATERMS.add(odataSupportScripting);
 		ODATATERMS.add(odataNamespaces);
 		ODATATERMS.add(odatabaseType);
 		ODATATERMS.add(odataFK);

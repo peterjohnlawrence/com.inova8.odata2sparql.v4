@@ -1,5 +1,6 @@
 package com.inova8.odata2sparql.SparqlBuilder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -908,7 +910,7 @@ public class SparqlQueryBuilder {
 			where.append(clausesPathProperties());
 		}
 		where.append(clausesComplex());
-		StringBuilder insideOutOptimizationSelect = selectExpandWhere("\t\t");
+	//	StringBuilder insideOutOptimizationSelect = selectExpandWhere("\t\t");
 		where.append(clausesExpandSelect());
 		if ((this.uriInfo.getCountOption() != null) && (this.uriInfo.getCountOption().getValue())) {
 			where.append(selectPathCount());
@@ -1060,8 +1062,9 @@ public class SparqlQueryBuilder {
 			if (queryOption.getName().equals(functionImportParameter.getName()))
 				switch (functionImportParameter.getType()) {
 				//Fixes #86
-				case "http://www.w3.org/2000/01/rdf-schema#Class":
-				case "http://www.w3.org/2000/01/rdf-schema#Resource":
+				case RdfConstants.RDFS_CLASS ://"http://www.w3.org/2000/01/rdf-schema#Class":
+				case RdfConstants.RDFS_RESOURCE ://"http://www.w3.org/2000/01/rdf-schema#Resource":
+				case RdfConstants.RDF_PROPERTY ://"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property":
 					return encodeIRI(datasetRepository, queryOption);
 				default:
 					return queryOption.getText();
@@ -1106,6 +1109,17 @@ public class SparqlQueryBuilder {
 		if (rdfOperationType.isFunctionImport()) {
 			queryOptions = uriInfo.getCustomQueryOptions();
 		}
+		String queryText = preprocessOperationDataset(rdfOperationType, queryOptions);
+		queryText = preprocessOperationValues(rdfOperationType, queryOptions, queryText);
+		queryText = preprocessOperationCustomQueryOptions(rdfOperationType, queryOptions, queryText);
+		if ((uriType != UriType.URI15) && (uriType != UriType.URI6B)) {
+			queryText += limitClause();
+		}
+		return queryText;
+	}
+
+	private String preprocessOperationDataset(RdfEntityType rdfOperationType, List<CustomQueryOption> queryOptions)
+			throws OData2SparqlException {
 		String queryText = rdfOperationType.queryText;
 		String dataset = "";
 		//RdfRepository proxyDatasetRepository =null;
@@ -1138,6 +1152,15 @@ public class SparqlQueryBuilder {
 			//Find the repository details of this service: endpoint and prefixes
 
 		}
+		return queryText;
+	}
+
+	private String preprocessOperationValues(RdfEntityType rdfOperationType, List<CustomQueryOption> queryOptions,
+			String queryText) throws OData2SparqlException {
+		StringBuilder parameterValues = new StringBuilder();
+		StringBuilder parameterValueNames = new StringBuilder();
+		parameterValues.append("{(");
+		parameterValueNames.append("VALUES(");
 		for (Entry<String, com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter> functionImportParameterEntry : rdfOperationType
 				.getFunctionImportParameters().entrySet()) {
 			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = functionImportParameterEntry
@@ -1156,19 +1179,57 @@ public class SparqlQueryBuilder {
 			if (functionImportParameter.isDataset())
 				parameterValue = preprocessDataset(proxyDatasetRepository, parameterValue);
 			if (parameterValue != null) {
-				queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
+				//queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
+				parameterValueNames.append("?" + functionImportParameter.getName() + " ");
+				parameterValues.append(parameterValue +" ");
 			} else {
 				if (!functionImportParameter.isNullable())
 					throw new OData2SparqlException("FunctionImport (" + rdfOperationType.getEntityTypeName()
 							+ ") cannot be called without values for non-nullable parameters");
 			}
 		}
-		if ((uriType != UriType.URI15) && (uriType != UriType.URI6B)) {
-			queryText += limitClause();
-		}
+		parameterValueNames.append(")");
+		parameterValues.append(")}");
+		int location = queryText.indexOf("{")+1;
+		String preQueryText = queryText.substring(0,location);
+		String postQueryText = queryText.substring(location);
+		queryText = preQueryText +parameterValueNames.toString()+parameterValues.toString() +  postQueryText;//queryText.replaceFirst("\\{" , "{" + parameterValueNames.toString()+parameterValues.toString());
 		return queryText;
 	}
+	private String preprocessOperationCustomQueryOptions(RdfEntityType rdfOperationType, List<CustomQueryOption> queryOptions,
+			String queryText) throws OData2SparqlException {
+		StringBuilder customQueryOptions = new StringBuilder("");
+		StringBuilder parameterValueNames = new StringBuilder();
 
+		for (CustomQueryOption queryOption : queryOptions) {
+			com.inova8.odata2sparql.RdfModel.RdfModel.FunctionImportParameter functionImportParameter = rdfOperationType.getFunctionImportParameters().get(queryOption.getName());
+			if(functionImportParameter!=null) {
+				String parameterValue = "";
+	
+				switch (rdfResourceParts.getUriType()) {
+				case URI11:
+					parameterValue = getParameterValues(rdfResourceParts.getEntitySet().getKeyPredicates(),
+							functionImportParameter);
+					break;
+				default:
+					parameterValue = getQueryOptionText(proxyDatasetRepository, queryOptions, functionImportParameter);
+				}
+				if (functionImportParameter.isPropertyPath())
+					parameterValue = preprocessPropertyPath(proxyDatasetRepository, parameterValue);
+				if (functionImportParameter.isDataset())
+					parameterValue = preprocessDataset(proxyDatasetRepository, parameterValue);
+				if (parameterValue != null) {
+					//queryText = queryText.replaceAll("\\?" + functionImportParameter.getName(), parameterValue);
+					customQueryOptions.append(",'").append( functionImportParameter.getName()).append("',").append(parameterValue +" ");
+				} 
+			}else {
+				customQueryOptions.append(",'").append(queryOption.getName()).append("',").append( queryOption.getText());	
+			}
+		}
+		String transformedQueryText = queryText.replaceAll("##customQueryOptions##", customQueryOptions.toString());
+		
+		return transformedQueryText;
+	}
 	private String preprocessPropertyPath(RdfRepository datasetRepository, String propertyPath) {
 		String translatedPropertyPath = propertyPath.replaceAll("\\s", "");
 		final Matcher propertyPathMatcher = propertyPathPattern.matcher(translatedPropertyPath);
@@ -3050,8 +3111,15 @@ public class SparqlQueryBuilder {
 			hasProperties = true;
 			clausesSelect.append(indent).append("FILTER(!isIRI(?" + nextTargetKey + "_o) && !isBLANK(?" + nextTargetKey + "_o))\n");
 		}
-		clausesSelect.append(indent)
-				.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
+		if(rdfModel.getRdfRepository().isSupportScripting()) {
+			clausesSelect.append(indent)
+				.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_or .   BIND(<http://inova8.com/olgap/objectValue>(?" + nextTargetKey + "_s , ?"+ nextTargetKey + "_p, ?" + nextTargetKey + "_or"+ rdfResourceParts.getCustomQueryOptionsArgs() +") as ?" + nextTargetKey + "_o )\n");
+		}else {
+			clausesSelect.append(indent)
+			.append("\t?" + nextTargetKey + "_s ?" + nextTargetKey + "_p ?" + nextTargetKey + "_o .\n");
+		}
+		
+		
 		if (targetEntityType.getEntityTypeName().equals(RdfConstants.RDF_VALUE_LABEL)) {
 			clausesSelect.append(indent).append("\tBIND( if(IsLiteral(?").append(nextTargetKey).append("_o), ?")
 					.append(nextTargetKey).append("_o,\"\") as ?").append(nextTargetKey).append("_literal)\n");

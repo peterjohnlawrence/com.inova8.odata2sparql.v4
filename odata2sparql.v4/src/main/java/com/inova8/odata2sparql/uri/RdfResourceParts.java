@@ -3,8 +3,11 @@ package com.inova8.odata2sparql.uri;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.data.ContextURL;
@@ -30,6 +33,7 @@ import org.apache.olingo.server.api.uri.UriResourceFunction;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
+import org.apache.olingo.server.api.uri.queryoption.CustomQueryOption;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.slf4j.Logger;
@@ -44,6 +48,7 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 
 public class RdfResourceParts {
+
 	private final Logger log = LoggerFactory.getLogger(RdfResourceParts.class);
 	final ArrayList<RdfResourcePart> rdfResourceParts = new ArrayList<RdfResourcePart>();
 	final RdfEdmProvider rdfEdmProvider;
@@ -64,6 +69,7 @@ public class RdfResourceParts {
 	private String entityString;
 	private String navPathString;
 	private int size;
+	private Map<String,Object> customQueryOptions;
 	private EdmEntitySet responseEntitySet;
 	private UriInfo uriInfo;
 	private UriType uriType;
@@ -256,7 +262,10 @@ public class RdfResourceParts {
 		navPathString = _getNavPathString();
 		lastNavProperty = _getLastNavProperty();
 		size = _size();
+		customQueryOptions = _getCustomQueryOption();
 	}
+
+
 
 	public UriInfo getUriInfo() {
 		return uriInfo;
@@ -343,6 +352,19 @@ public class RdfResourceParts {
 
 	public int size() {
 		return size;
+	}
+	
+	private Map<String, Object> _getCustomQueryOption() {
+		HashMap<String, Object> customQueryOptions = new HashMap<String,Object>();
+		customQueryOptions.put(RdfConstants.SERVICE, "<"+ this.rdfEdmProvider.getRdfRepository().getDataRepository().getServiceUrl()+">");
+		if (this.uriInfo.getCustomQueryOptions().size() == 0) {
+			return customQueryOptions;
+		} else {		
+			for (CustomQueryOption customQueryOption:this.uriInfo.getCustomQueryOptions()) {
+				customQueryOptions.put(customQueryOption.getName(), customQueryOption.getText());
+			}
+			return customQueryOptions;
+		}
 	}
 
 	private RdfResourcePart _getLastResourcePart() {
@@ -716,6 +738,21 @@ public class RdfResourceParts {
 
 	public RdfNavigationProperty getLastNavProperty() {
 		return lastNavProperty;
+	}
+
+	public Map<String,Object> getCustomQueryOptions() {
+		return customQueryOptions;
+	}
+	public String getCustomQueryOptionsArgs() {
+		if(getCustomQueryOptions()!=null) {
+			String customQueryOptionsArgs ="";
+			for( Entry<String, Object> customQueryOptionEntry:getCustomQueryOptions().entrySet()) {
+				customQueryOptionsArgs +=",'"+ customQueryOptionEntry.getKey() + "'," + customQueryOptionEntry.getValue();
+			}
+			return customQueryOptionsArgs;
+		}else {
+			return "";
+		}
 	}
 
 }
