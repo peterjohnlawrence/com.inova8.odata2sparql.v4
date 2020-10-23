@@ -1280,7 +1280,7 @@ public class SparqlQueryBuilder {
 		if (DEBUG)
 			clausesExpandSelect.append("\t#clausesExpandSelect\n");
 		if (this.expandOption != null) {
-			if(!rdfTargetEntityType.isProxy() && !isImplicitEntityType(edmTargetEntitySet.getEntityType())) clausesExpandSelect.append("\tUNION\n");
+			if(!rdfTargetEntityType.isProxy() && !isImplicitEntityType(edmTargetEntitySet.getEntityType()))clausesExpandSelect.append("");//clausesExpandSelect.append("\tUNION\n");
 			clausesExpandSelect.append(expandItemsWhere(rdfTargetEntityType,
 					rdfTargetEntityType.entityTypeName, this.expandOption.getExpandItems(), "\t", false));
 		}
