@@ -36,6 +36,7 @@ public class SparqlFilterClausesBuilder {
 
 	private StringBuilder expandItemVariables = new StringBuilder("");
 	private StringBuilder clausesExpandFilter = new StringBuilder("");
+	private Boolean clausesExpandFilterNecessary = false;
 	private StringBuilder filter = new StringBuilder("");
 	private SparqlExpressionVisitor filterClause;
 
@@ -61,7 +62,8 @@ public class SparqlFilterClausesBuilder {
 		this.rdfTargetEntityType = rdfEntityType;
 		
 		UriResource lastSegment;
-		if(uriInfo.getFilterOption()!=null) {
+		if(uriInfo.getFilterOption()!=null) 
+		{
 		switch (this.uriType) {
 		case URI1: {
 			filterClause = filterClause(uriInfo.getFilterOption(), rdfEntityType, "");
@@ -124,7 +126,7 @@ public class SparqlFilterClausesBuilder {
 		default:
 		}
 		}
-		filter = filterClause != null ? new StringBuilder(filterClause.getFilterClause()) : filter;
+		filter = uriInfo.getFilterOption() != null ? new StringBuilder(filterClause.getFilterClause()) : filter;
 		if (uriInfo.getExpandOption() != null)
 			expandItems(rdfTargetEntityType, rdfTargetEntityType.entityTypeName,
 					uriInfo.getExpandOption().getExpandItems(), "#indent");
@@ -151,7 +153,11 @@ public class SparqlFilterClausesBuilder {
 	}
 
 	public StringBuilder getClausesExpandFilter(String indent) {
+		if(clausesExpandFilterNecessary) {
 		return new StringBuilder(clausesExpandFilter.toString().replaceAll("#indent", indent));
+		}else {
+			return new StringBuilder("");
+		}
 	}
 
 	public SparqlExpressionVisitor getFilterClause() {
@@ -218,9 +224,10 @@ public class SparqlFilterClausesBuilder {
 				String nextTargetKey = targetKey + resourceNavigation.getProperty().getName();
 				RdfEntityType nextTargetEntityType = navProperty.getRangeClass();
 				//Now do the work
-				if (expandItem.getFilterOption() != null) {
+				 if (expandItem.getFilterOption() != null) {
+					clausesExpandFilterNecessary = true;
 					expandItem(targetKey, indent, expandItem, navProperty, nextTargetKey, nextTargetEntityType);
-				}
+				 }
 				if ((expandItem.getExpandOption() != null)
 						&& (expandItem.getExpandOption().getExpandItems().size() > 0)) {
 					expandItems(nextTargetEntityType, nextTargetKey, expandItem.getExpandOption().getExpandItems(),
