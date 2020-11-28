@@ -617,6 +617,10 @@ public class RdfModelToMetadata {
 				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_RDFTYPE_FQN,
 						RdfEdmType.anyUri());
 			}
+			if (rdfProperty.isReifiedObjectPredicate()) {
+				addToAnnotations(propertyAnnotations, RdfConstants.ODATA_ISREIFIEDOBJECTPREDICATE_FQN,
+						rdfProperty.isReifiedObjectPredicate().toString());
+			}
 			if(supportScripting) {
 				addToAnnotations(propertyAnnotations, RdfConstants.PROPERTY_FQN,
 						rdfProperty.getPropertyURI().toString());

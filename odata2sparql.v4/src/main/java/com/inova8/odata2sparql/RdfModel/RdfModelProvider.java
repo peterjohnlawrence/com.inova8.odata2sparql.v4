@@ -723,35 +723,42 @@ public class RdfModelProvider {
 							statementCount++;
 							statementDebug.append(reifiedStatementNode.getIRI().toString()).append(";");
 							RdfNode reifiedObjectPredicateNode = soln.getRdfNode("reifiedObjectPredicate");
-							RdfNavigationProperty reifiedObjectPredicate = rdfEntityType
-									.findNavigationProperty(reifiedObjectPredicateNode);
-							if (reifiedObjectPredicate != null) {
-								reifiedObjectPredicate.setReifiedObjectPredicate(true);
-								//reifiedObjectPredicate.setDomainCardinality(Cardinality.ONE);
-								//if(reifiedObjectPredicate.getInverseNavigationProperty()!=null)reifiedObjectPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
-								objectCount++;
-								objectDebug.append(reifiedObjectPredicateNode.getIRI().toString()).append(";");
+							if(reifiedObjectPredicateNode!=null) {
+								RdfNavigationProperty reifiedObjectPredicate = rdfEntityType
+										.findNavigationProperty(reifiedObjectPredicateNode);
+								if (reifiedObjectPredicate != null) {
+									reifiedObjectPredicate.setReifiedObjectPredicate(true);
+									objectCount++;
+									objectDebug.append(reifiedObjectPredicateNode.getIRI().toString()).append(";");
+								}else {
+									//In the case of the object it can be a datatypeProperty
+									 RdfProperty reifiedObjectProperty = rdfEntityType.findProperty(reifiedObjectPredicateNode);
+									 reifiedObjectProperty.setReifiedObjectPredicate(true);
+									 objectCount++;
+									 objectDebug.append(reifiedObjectProperty.toString()).append(";");							
+								}
 							}
+
 							RdfNode reifiedSubjectPredicateNode = soln.getRdfNode("reifiedSubjectPredicate");
-							RdfNavigationProperty reifiedSubjectPredicate = rdfEntityType
-									.findNavigationProperty(reifiedSubjectPredicateNode);
-							if (reifiedSubjectPredicate != null) {
-								reifiedSubjectPredicate.setReifiedSubjectPredicate(true);
-								//reifiedSubjectPredicate.setDomainCardinality(Cardinality.ONE);
-								//if(reifiedSubjectPredicate.getInverseNavigationProperty()!=null)reifiedSubjectPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
-								subjectCount++;
-								subjectDebug.append(reifiedSubjectPredicateNode.getIRI().toString()).append(";");
+							if(reifiedSubjectPredicateNode!=null) {
+								RdfNavigationProperty reifiedSubjectPredicate = rdfEntityType
+										.findNavigationProperty(reifiedSubjectPredicateNode);
+								if (reifiedSubjectPredicate != null) {
+									reifiedSubjectPredicate.setReifiedSubjectPredicate(true);
+									subjectCount++;
+									subjectDebug.append(reifiedSubjectPredicateNode.getIRI().toString()).append(";");
+								}
 							}
 							RdfNode reifiedPredicateNode = soln.getRdfNode("reifiedPredicate");
-							RdfNavigationProperty reifiedPredicate = rdfEntityType
-									.findNavigationProperty(reifiedPredicateNode);
-							if (reifiedPredicate != null) {
-								reifiedPredicate.setReifiedPredicate(true);
-								//reifiedPredicate.setDomainCardinality(Cardinality.ONE);
-								//if(reifiedPredicate.getInverseNavigationProperty()!=null)reifiedPredicate.getInverseNavigationProperty().setRangeCardinality(Cardinality.ONE);
-								predicateCount++;
-								predicateDebug.append(reifiedPredicateNode.getIRI().toString()).append(";");
-
+							if(reifiedPredicateNode!=null) {
+								RdfNavigationProperty reifiedPredicate = rdfEntityType
+										.findNavigationProperty(reifiedPredicateNode);
+								if (reifiedPredicate != null) {
+									reifiedPredicate.setReifiedPredicate(true);
+									predicateCount++;
+									predicateDebug.append(reifiedPredicateNode.getIRI().toString()).append(";");
+	
+								}
 							}
 						} else {
 							log.info("Failed to create reifiedStatements:" + reifiedStatementNode.getIRI().toString()
@@ -828,9 +835,10 @@ public class RdfModelProvider {
 				if (entityType.isReified()) {
 
 					RdfNavigationProperty reifiedObjectPredicate = null;
+					RdfProperty reifiedObjectProperty = null;
 					RdfNavigationProperty reifiedSubjectPredicate = null;
 					RdfNavigationProperty reifiedPredicate = null;
-					HashSet<RdfNavigationProperty> navigationProperties = entityType.getNavigationProperties();//.getInheritedNavigationProperties();
+					HashSet<RdfNavigationProperty> navigationProperties = entityType.getNavigationProperties();
 					for (RdfNavigationProperty navigationProperty : navigationProperties) {
 						if (navigationProperty.isReifiedObjectPredicate()) {
 							reifiedObjectPredicate = navigationProperty;
@@ -845,15 +853,23 @@ public class RdfModelProvider {
 								&& reifiedPredicate != null)
 							break;
 					}
-					if (reifiedObjectPredicate != null && reifiedSubjectPredicate != null) {
-						if (reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MANY)
-								|| reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
-							reifiedObjectPredicate.setDomainCardinality(Cardinality.ONE);
-							if (reifiedObjectPredicate.getInverseNavigationProperty() != null)
-								reifiedObjectPredicate.getInverseNavigationProperty()
-										.setRangeCardinality(Cardinality.ONE);
-							log.warn(reifiedObjectPredicate.getNavigationPropertyIRI().toString()
-									+ " declared reifiedSubject but cardinality MANY, set to ONE");
+					for (RdfProperty property : entityType.getProperties()) {
+						if (property.isReifiedObjectPredicate()) {
+							reifiedObjectProperty = property;
+							break;
+						}
+					}
+					if (( reifiedObjectProperty!= null   || reifiedObjectPredicate != null) && reifiedSubjectPredicate != null) {
+						if( reifiedObjectPredicate != null) {
+							if (reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MANY)						
+									|| reifiedObjectPredicate.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
+								reifiedObjectPredicate.setDomainCardinality(Cardinality.ONE);
+								if (reifiedObjectPredicate.getInverseNavigationProperty() != null)
+									reifiedObjectPredicate.getInverseNavigationProperty()
+											.setRangeCardinality(Cardinality.ONE);
+								log.warn(reifiedObjectPredicate.getNavigationPropertyIRI().toString()
+										+ " declared reifiedSubject but cardinality MANY, set to ONE");
+							}
 						}
 						if (reifiedSubjectPredicate.getDomainCardinality().equals(Cardinality.MANY)
 								|| reifiedSubjectPredicate.getDomainCardinality().equals(Cardinality.MULTIPLE)) {
