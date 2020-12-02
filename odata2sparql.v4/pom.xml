@@ -275,7 +275,7 @@
 		<javax.version>2.5</javax.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<rdf4j.version>3.4.3</rdf4j.version>
-		<jetty.version>9.4.24.v20191120</jetty.version>
+		<jetty.version>9.4.35.v20201120</jetty.version>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<junit.version>4.11</junit.version>
