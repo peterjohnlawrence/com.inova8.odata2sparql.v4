@@ -68,120 +68,124 @@ public class RdfNode {
 	}
 
 	public Object getLiteralObject() throws OData2SparqlException {
-		if (this.getLiteralDatatype() != null) {
-			switch (this.getLiteralDatatype().toString()) {
-			case "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#string":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#boolean":
-				return this.getLiteralValue().booleanValue();
-			case "http://www.w3.org/2001/XMLSchema#float":
-				return this.getLiteralValue().floatValue();
-			case "http://www.w3.org/2001/XMLSchema#double":
-				return this.getLiteralValue().doubleValue();
-			case "http://www.w3.org/2001/XMLSchema#decimal":
-				if(this.getLiteralValue().getLabel().isEmpty()) {
-					return null;
-				}else{
-					return this.getLiteralValue().decimalValue();
-				}
-			case "http://www.w3.org/2001/XMLSchema#duration":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#dateTime":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#time":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#date":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#gYearMonth":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#gYear":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#gMonthDay":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#gDay":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#gMonth":
-				return this.getLiteralValue().calendarValue();
-			case "http://www.w3.org/2001/XMLSchema#hexBinary":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#base64Binary":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#anyURI":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#QName":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#NOTATION":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#normalizedString":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#token":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#language":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#IDREFS":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#ENTITIES":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#NMTOKEN":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#NMTOKENS":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#Name":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#NCName":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#ID":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#IDREF":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#ENTITY":
-				return this.getLiteralValue().stringValue();
-			case "http://www.w3.org/2001/XMLSchema#integer":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#nonPositiveInteger":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#negativeInteger":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#long":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#int":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#short":
-				return this.getLiteralValue().shortValue();
-			case "http://www.w3.org/2001/XMLSchema#byte":
-				return this.getLiteralValue().byteValue();
-			case "http://www.w3.org/2001/XMLSchema#nonNegativeInteger":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#unsignedLong":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#unsignedInt":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#unsignedShort":
-				return this.getLiteralValue().shortValue();
-			case "http://www.w3.org/2001/XMLSchema#unsignedByte":
-				return this.getLiteralValue().byteValue();
-			case "http://www.w3.org/2001/XMLSchema#positiveInteger":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#yearMonthDuration":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#dayTimeDuration":
-				return this.getLiteralValue().intValue();
-			case "http://www.w3.org/2001/XMLSchema#dateTimeStamp":
-				return this.getLiteralValue().intValue();
-			case "http://www.openlinksw.com/schemas/virtrdf#Geometry":
-				return this.getLiteralValue().stringValue();
+		try {
+			if (this.getLiteralDatatype() != null) {
+				switch (this.getLiteralDatatype().toString()) {
+				case "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#string":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#boolean":
+					return this.getLiteralValue().booleanValue();
+				case "http://www.w3.org/2001/XMLSchema#float":
+					return this.getLiteralValue().floatValue();
+				case "http://www.w3.org/2001/XMLSchema#double":
+					return this.getLiteralValue().doubleValue();
+				case "http://www.w3.org/2001/XMLSchema#decimal":
+					if(this.getLiteralValue().getLabel().isEmpty()) {
+						return null;
+					}else{
+						return this.getLiteralValue().decimalValue();
+					}
+				case "http://www.w3.org/2001/XMLSchema#duration":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#dateTime":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#time":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#date":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#gYearMonth":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#gYear":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#gMonthDay":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#gDay":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#gMonth":
+					return this.getLiteralValue().calendarValue();
+				case "http://www.w3.org/2001/XMLSchema#hexBinary":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#base64Binary":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#anyURI":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#QName":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#NOTATION":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#normalizedString":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#token":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#language":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#IDREFS":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#ENTITIES":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#NMTOKEN":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#NMTOKENS":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#Name":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#NCName":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#ID":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#IDREF":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#ENTITY":
+					return this.getLiteralValue().stringValue();
+				case "http://www.w3.org/2001/XMLSchema#integer":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#nonPositiveInteger":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#negativeInteger":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#long":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#int":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#short":
+					return this.getLiteralValue().shortValue();
+				case "http://www.w3.org/2001/XMLSchema#byte":
+					return this.getLiteralValue().byteValue();
+				case "http://www.w3.org/2001/XMLSchema#nonNegativeInteger":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#unsignedLong":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#unsignedInt":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#unsignedShort":
+					return this.getLiteralValue().shortValue();
+				case "http://www.w3.org/2001/XMLSchema#unsignedByte":
+					return this.getLiteralValue().byteValue();
+				case "http://www.w3.org/2001/XMLSchema#positiveInteger":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#yearMonthDuration":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#dayTimeDuration":
+					return this.getLiteralValue().intValue();
+				case "http://www.w3.org/2001/XMLSchema#dateTimeStamp":
+					return this.getLiteralValue().intValue();
+				case "http://www.openlinksw.com/schemas/virtrdf#Geometry":
+					return this.getLiteralValue().stringValue();
 
-			default:
-				log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().toString()
-						+ ". Value: " + this.getLiteralValue().stringValue());
-				//throw new Olingo2SparqlException("RdfNode getLiteralObject failure");
-				return this.getLiteralValue().stringValue();
+				default:
+					log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().toString()
+							+ ". Value: " + this.getLiteralValue().stringValue());
+					//throw new Olingo2SparqlException("RdfNode getLiteralObject failure");
+					return this.getLiteralValue().stringValue();
+				}
+			} else {
+				return this.getLiteralValue();
 			}
-		} else {
+		} catch (Exception e) {
 			return this.getLiteralValue();
-		}
+		}		
 	}
 
 	public String getLocalName() {

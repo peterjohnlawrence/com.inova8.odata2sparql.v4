@@ -733,9 +733,14 @@ public class RdfModelProvider {
 								}else {
 									//In the case of the object it can be a datatypeProperty
 									 RdfProperty reifiedObjectProperty = rdfEntityType.findProperty(reifiedObjectPredicateNode);
-									 reifiedObjectProperty.setReifiedObjectPredicate(true);
-									 objectCount++;
-									 objectDebug.append(reifiedObjectProperty.toString()).append(";");							
+									 if(reifiedObjectProperty!=null) {
+										 reifiedObjectProperty.setReifiedObjectPredicate(true);
+										 objectCount++;
+										 objectDebug.append(reifiedObjectProperty.toString()).append(";");	
+									 }else {
+										 log.error("Failed to find objectproperty: " + reifiedObjectPredicateNode.getIRI().toString() + " of ReifiedStatement class: " + reifiedStatementNode.getIRI().toString()
+													+ ". Check that property declared correctly: rdf:Property if literal, owl:ObjectProperty otherwise");
+									 }
 								}
 							}
 

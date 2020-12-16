@@ -3,6 +3,7 @@
   <head>
     <meta name="generator"
     content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+
     <style>
 @import
         url(https://db.onlinewebfonts.com/c/89d11a443c316da80dcb8f5e1f63c86e?family=Bauhaus+93)
@@ -85,7 +86,6 @@ Usage: ./{repositoryId}/{resourcepath} where {resourcepath} described here:
       <th>Clear $changes</th> 
       <th>Rollback $changes</th> 
       <th>Archive $changes</th> 
-<!--       <th>Edit</th> -->
       <th>Show/Hide Configuration</th>
     </tr>
   #foreach ($repository in $repositories)
