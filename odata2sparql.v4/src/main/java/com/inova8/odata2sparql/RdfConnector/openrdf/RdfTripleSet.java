@@ -52,6 +52,7 @@ public class RdfTripleSet {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void finalize() throws Throwable {
 		super.finalize();
 		this.close();

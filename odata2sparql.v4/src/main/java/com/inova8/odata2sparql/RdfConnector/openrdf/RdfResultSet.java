@@ -97,6 +97,7 @@ public class RdfResultSet {
 		return !connection.isOpen();
 		
 	}
+	@SuppressWarnings("deprecation")
 	protected void finalize() throws Throwable {
 		super.finalize();
 		this.close();

@@ -1,2 +1,8 @@
 olgap.TrianglesFunction
 olgap.EccentricityFunction
+olgap.FactValue
+olgap.FactProvenance
+olgap.FactDebug
+olgap.ObjectValue
+olgap.ObjectProvenance
+olgap.ClearCache

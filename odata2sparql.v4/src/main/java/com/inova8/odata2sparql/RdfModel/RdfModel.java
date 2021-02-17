@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.core4j.Enumerable;
 import org.core4j.Predicate1;
@@ -20,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
-import org.apache.xerces.util.XMLChar;
-
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -152,7 +151,7 @@ public class RdfModel {
 		}
 
 		private void checkLegal(String prefix) throws OData2SparqlException {
-			if (prefix.length() > 0 && !XMLChar.isValidNCName(prefix))
+			if (prefix.length() > 0 && !(Pattern.matches("[a-zA-Z_][a-zA-Z0-9_.]*",prefix)))
 				throw new OData2SparqlException("RdfPrefixes checkLegal failure");
 		}
 
@@ -366,7 +365,14 @@ public class RdfModel {
 		final TreeMap<String, RdfModel.RdfPrimaryKey> primaryKeys = new TreeMap<String, RdfModel.RdfPrimaryKey>();
 		private boolean isProxy = false;
 		private Boolean isReified = false;
+        public RdfModel.RdfNavigationProperty getReifiedSubjectNavigationProperty(){
 
+			for(RdfModel.RdfNavigationProperty rdfNavigationProperty : navigationProperties.values()) {
+        		if(rdfNavigationProperty.reifiedSubjectPredicate)
+        			return rdfNavigationProperty;
+        	}
+        	return null;
+        }
 		public String getDeleteText() {
 			return deleteText;
 		}
@@ -662,7 +668,9 @@ public class RdfModel {
 		public RdfProperty findProperty(RdfNode propertyNode) {
 			return findProperty(rdfToOdata(propertyNode.getLocalName()));
 		}
-
+		public RdfProperty findPropertyURI(String propertyURI) {
+			return findProperty(rdfToOdata(propertyURI));
+		}
 		public RdfProperty findProperty(String propertyName) {
 			if (properties.containsKey(propertyName))
 				return properties.get(propertyName);
@@ -1503,7 +1511,10 @@ public class RdfModel {
 		}
 
 		public String getInversePropertyOfURI() {
-			return inversePropertyOf.getIRI().toString();
+			if(inversePropertyOf!=null)
+				return inversePropertyOf.getIRI().toString();
+			else
+				return null;
 		}
 
 		public RdfNode getDomainNode() {
@@ -2856,18 +2867,21 @@ public class RdfModel {
 					}
 				}
 			}
-			//RdfEntityType nodeShapeEntityComplexType = getOrCreateNodeShapeEntityComplexType(nodeShape);
-			nodeShape.setEntityType(getOrCreateNodeShapeEntityComplexType(nodeShape));
-			for (RdfDataPropertyShape dataPropertyShape : nodeShape.getDataPropertyShapes().values()) {
-				nodeShape.getComplexType().addProperty(dataPropertyShape.path);
+			if(nodeShape.getSchema()==null) {
+				log.error("Cannot identify schema of nodeshape: "+ nodeShape.getNodeShapeName()+" Nodeshape will be ignored, assuming an orphan");
+			}else {
+				//RdfEntityType nodeShapeEntityComplexType = getOrCreateNodeShapeEntityComplexType(nodeShape);
+				nodeShape.setEntityType(getOrCreateNodeShapeEntityComplexType(nodeShape));
+				for (RdfDataPropertyShape dataPropertyShape : nodeShape.getDataPropertyShapes().values()) {
+					nodeShape.getComplexType().addProperty(dataPropertyShape.path);
+				}
+				for (RdfObjectPropertyShape objectPropertyShape : nodeShape.getObjectPropertyShapes().values()) {
+					allocateObjectPropertyShape(nodeShape, objectPropertyShape);
+				}
 			}
-			for (RdfObjectPropertyShape objectPropertyShape : nodeShape.getObjectPropertyShapes().values()) {
-				allocateObjectPropertyShape(nodeShape, objectPropertyShape);
-			}
+			//second pass to add 'inherited' properties from baseNodeShape
+			inheritBaseNodeProperties();
 		}
-		//second pass to add 'inherited' properties from baseNodeShape
-		inheritBaseNodeProperties();
-
 	}
 
 	private void allocateObjectPropertyShape(RdfNodeShape nodeShape, RdfObjectPropertyShape objectPropertyShape)
@@ -2891,7 +2905,11 @@ public class RdfModel {
 						objectPropertyShape.getPropertyShapeName(), objectPropertyShape.getPropertyShapeDescription(),
 						cardinality);
 			}
-			nodeShape.getComplexType().addShapedNavigationProperty(shapedNavigationProperty);
+			if(nodeShape.getComplexType()!=null) {
+				nodeShape.getComplexType().addShapedNavigationProperty(shapedNavigationProperty);
+			}else {
+				log.error("Nodeshape without allocated complexType:" +nodeShape.getNodeShapeName() );
+			}
 		}
 	}
 

@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
+
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.olingo.commons.api.data.Annotation;
 import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
@@ -23,8 +23,6 @@ import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
-import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
-import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
@@ -709,7 +707,7 @@ class SparqlEntityCollection extends EntityCollection {
 								}
 							} else {
 								log.info("Ignoring property statement that is not part of EDM: "
-										+ propertyNode.getLocalName());
+										+ propertyNode.getLocalName() +" with value " + value.toString() +" of " + rdfEntity.getId().toString() );
 							}
 						}
 					}
@@ -825,7 +823,7 @@ class SparqlEntityCollection extends EntityCollection {
 					return ((BigInteger) value).toString();
 				} else if (value instanceof Integer) {
 					return ((Integer) value).toString();
-				} else if (value instanceof javax.xml.datatype.XMLGregorianCalendar) {
+				} else if (value instanceof XMLGregorianCalendar) {
 					return ((XMLGregorianCalendar) value).toString();
 				} else {
 					return (String) value;

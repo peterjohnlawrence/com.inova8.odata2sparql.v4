@@ -744,14 +744,15 @@ public class RdfResourceParts {
 		return customQueryOptions;
 	}
 	public String getCustomQueryOptionsArgs() {
+		String customQueryOptionsArgs =",'cacheHash','" + rdfEdmProvider.hashCode() +"'";
 		if(getCustomQueryOptions()!=null) {
-			String customQueryOptionsArgs ="";
+			
 			for( Entry<String, Object> customQueryOptionEntry:getCustomQueryOptions().entrySet()) {
 				customQueryOptionsArgs +=",'"+ customQueryOptionEntry.getKey() + "'," + customQueryOptionEntry.getValue();
 			}
 			return customQueryOptionsArgs;
 		}else {
-			return "";
+			return customQueryOptionsArgs;
 		}
 	}
 

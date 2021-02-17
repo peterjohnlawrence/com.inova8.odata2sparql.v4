@@ -149,6 +149,7 @@ public class RdfODataServlet extends HttpServlet {
 			simpleResponse(req, resp, "odata2sparql.v4");
 		}
 	}
+	@SuppressWarnings("unused")
 	private void readVersion()
 			throws IOException {
 		try {
