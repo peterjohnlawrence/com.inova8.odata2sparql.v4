@@ -644,7 +644,7 @@ public class SparqlQueryBuilder {
 			throw new ODataApplicationException("Unhandled request type " + this.uriType.toString(),
 					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
-		//TODO testing only
+		//
 		//only for expanditems where first part is a complexType
 		//However olingo has blocked changing the selectItems collection:-(
 		/*		UriInfoResource resourcePath = this.uriInfo.getExpandOption().getExpandItems().get(0).getResourcePath(); 
@@ -652,7 +652,7 @@ public class SparqlQueryBuilder {
 				selectItem.setResourcePath(resourcePath);	
 				List<SelectItem> selectItems = this.uriInfo.getSelectOption().getSelectItems();
 				selectItems.add(selectItem);*/
-		//TODO Workaround to select everything  when complexType in expand
+		// Workaround to select everything  when complexType in expand
 		//Fixes #97
 		//		if (this.uriInfo.getExpandOption() != null) {
 		//			for (ExpandItem expandItem : this.uriInfo.getExpandOption().getExpandItems()) {
@@ -682,7 +682,6 @@ public class SparqlQueryBuilder {
 		prepareConstruct.append(where());
 		prepareConstruct.append("}");
 		prepareConstruct.append(defaultLimitClause());
-		//TODO return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareConstruct).toString());
 		return new SparqlStatement(sparqlPrefixes().append(prepareConstruct).toString());
 	}
 
@@ -1738,18 +1737,17 @@ public class SparqlQueryBuilder {
 						clausesPath_KeyPredicateValues.append(")");
 					}
 
-					// TODO to get key predicates for function import
 					String keyPredicate = navProperty.getVarName();
-					// if (uriInfo.getKeyPredicates() != null &&
-					// !uriInfo.getKeyPredicates().isEmpty()) {
 					if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
 						for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 								.getKeyPredicates()) {
 							if (entityKey.getName().equals(keyPredicate)) {
-								String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
+								String keyValue =RdfResourceParts.getParameter(entityKey);
+								String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(keyValue);
 								String expandedKey = rdfModel.getRdfPrefixes()
 										.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 								clausesPath_KeyPredicateValues.append("{(<" + expandedKey + ">)}");
+								
 							}
 						}
 					}
@@ -1760,7 +1758,6 @@ public class SparqlQueryBuilder {
 				}
 			}
 		} else if (rdfTargetEntityType.isOperation()) {
-			// TODO make sure not a complex or value resourceParts
 			if (segmentSize > 2) {
 				log.error("Too many navigation properties for operation:" + uriInfo.getUriResourceParts().toString());
 			} else {
@@ -1795,8 +1792,9 @@ public class SparqlQueryBuilder {
 				//	for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 				//			.getKeyPredicates()) {
 				// Strip leading and trailing single quote from key
+				String keyValue = RdfResourceParts.getParameter(entityKey);
 				String expandedKey = rdfModel.getRdfPrefixes()
-						.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+						.expandPrefix(keyValue.substring(1, keyValue.length() - 1));
 
 				keyValues.put(entityKey.getName(), expandKey(expandedKey));
 			}
@@ -2379,7 +2377,6 @@ public class SparqlQueryBuilder {
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
 
-		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandComplexNavigationProperty.append(indent).append("#expandComplexNavigationProperty\n").append(indent);
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
 			expandComplexNavigationProperty.append("OPTIONAL");
@@ -2949,7 +2946,7 @@ public class SparqlQueryBuilder {
 
 		StringBuilder expandItemWhereCount = new StringBuilder();
 		expandItemWhereCount.append(indent).append("\t#expandItemWhereCount\n");
-		//TODO UNION or OPTIONAL, currently OPTIONAL improves performance #174 suggest neither!!
+		// UNION or OPTIONAL, currently OPTIONAL improves performance #174 suggest neither!!
 		//		expandItemWhereCount.append(indent).append("\tUNION");
 		expandItemWhereCount.append(indent).append("\t{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n")
@@ -3300,7 +3297,7 @@ public class SparqlQueryBuilder {
 										throw new EdmException("Failed to locate property:" + property.getResourcePath()
 												.getUriResourceParts().get(0).getSegmentValue());
 									} else {
-										// TODO specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be included other than link, unless included in subsequent $expand
+										//  specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be included other than link, unless included in subsequent $expand
 										// See http://docs.oasis-open.org/odata/odata/v4.0/os/part2-url-conventions/odata-v4.0-os-part2-url-conventions.html#_Toc372793861 5.1.3 System Query Option $select
 										valueProperties.add(RdfConstants.RDF_TYPE);
 									}

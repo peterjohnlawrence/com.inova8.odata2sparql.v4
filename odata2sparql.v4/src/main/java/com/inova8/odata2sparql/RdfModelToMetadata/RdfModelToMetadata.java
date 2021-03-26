@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import com.inova8.odata2sparql.Constants.PathQLConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Constants.RdfConstants.Cardinality;
 
@@ -34,6 +36,7 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlCollection;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
 
+import com.inova8.odata2sparql.RdfModel.PathQLProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfComplexProperty;
@@ -92,7 +95,7 @@ public class RdfModelToMetadata {
 							StringEscapeUtils.escapeXml11(text.replaceAll("\"", "\\\"")))));
 		}
 	}
-	private void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, Boolean text) {
+	public void addToAnnotations(List<CsdlAnnotation> annotations, String fqn, Boolean text) {
 
 			annotations.add(new CsdlAnnotation().setTerm(fqn)
 					.setExpression(new CsdlConstantExpression(CsdlConstantExpression.ConstantExpressionType.Bool, text.toString())));
@@ -145,8 +148,7 @@ public class RdfModelToMetadata {
 			locateNavigationProperties(withRdfAnnotations, withSapAnnotations, supportScripting, globalEntityTypes,
 					navigationPropertyLookup, rdfGraph);
 			locateComplexTypes(rdfGraph, complexTypes);
-			//			locateNodeShapes(withRdfAnnotations, withSapAnnotations, useBaseType, withFKProperties, globalEntityTypes,
-			//					entitySetsMapping, entitySets, rdfGraph, entityTypes, entityTypeMapping, complexTypes);
+
 			//Only add if  schema is not empty of entityTypes or complexTypes
 			if (!entityTypes.isEmpty() || !complexTypes.isEmpty()) {
 				List<CsdlAnnotation> schemaAnnotations = new ArrayList<CsdlAnnotation>();
@@ -158,10 +160,10 @@ public class RdfModelToMetadata {
 				//TODO MS does not support annotations to the schema
 				if (modelNamespace.equals(RdfConstants.RDF)) {
 					modelSchema.getComplexTypes().add(langLiteralType);
-			//		modelSchema.getComplexTypes().add(factType);
+
 				}
 				if (modelNamespace.equals(RdfConstants.RDFS)) {					
-				//	entityTypes.get(RdfConstants.RDFS_RESOURCE_LABEL).getProperties().add(createFactsProperty());
+
 				}
 				rdfEdm.put(modelNamespace, modelSchema);
 			}
@@ -184,6 +186,11 @@ public class RdfModelToMetadata {
 			}
 		}
 		locateFunctionImports(rdfModel, entityContainer);
+
+		CsdlSchema modelSchema = this.getSchema(PathQLConstants.PATHQL);
+		modelSchema.getFunctions().addAll(	PathQLProvider.locateFunctionImports(rdfModel, entityContainer));
+//		CsdlSchema instancesSchema = this.getSchema(RdfConstants.ENTITYCONTAINERNAMESPACE);
+//		instancesSchema.getFunctions().addAll(	PathQLProvider.locateFunctionImports(rdfModel, entityContainer));
 		entityContainer.setEntitySets(new ArrayList<CsdlEntitySet>(entitySets.values()));
 
 		//Finally, add terms and schemas to which they belong if they do not exist that have been used	
@@ -228,6 +235,7 @@ public class RdfModelToMetadata {
 		addNamespacesAnnotation(rdfModel, instanceSchemaAnnotations);
 
 		instanceSchema.setAnnotations(instanceSchemaAnnotations);
+		
 		return entityContainer;
 	}
 

@@ -3,6 +3,7 @@ package com.inova8.odata2sparql;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -30,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
+import com.inova8.odata2sparql.Processor.EntityCollectionProcessor;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlComplexProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
@@ -83,7 +84,7 @@ public class RdfODataServlet extends HttpServlet {
 						ODataHttpHandler handler = odata.createHandler(edm);
 						//Reserve first parameter for either the service name or a$RESET. $RELOAD
 						handler.setSplit(1);
-						handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
+						handler.register(new EntityCollectionProcessor(rdfEdmProvider));
 						handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 						handler.register(new SparqlPrimitiveValueProcessor(rdfEdmProvider));
 						handler.register(new SparqlComplexProcessor(rdfEdmProvider));
@@ -209,6 +210,8 @@ public class RdfODataServlet extends HttpServlet {
 	}
 	private void simpleResponse(final HttpServletRequest req, final HttpServletResponse resp, String textResponse)
 			throws IOException {
-		resp.getOutputStream().println(textResponse);
+		PrintWriter out = resp.getWriter();
+		out.println(textResponse);
+		//resp.getOutputStream().println(textResponse);
 	}
 }

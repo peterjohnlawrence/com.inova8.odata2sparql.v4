@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.apache.olingo.commons.api.edm.EdmBindingTarget;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
+import org.apache.olingo.commons.api.edm.EdmEntityContainer;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
@@ -23,13 +24,7 @@ public class Util {
 		String navPropName = edmNavigationProperty.getName();
 		
 		EdmEntityType bindingTargetEntityType = startEdmEntitySet.getEntityType().getNavigationProperty(navPropName).getType();
-		EdmBindingTarget edmBindingTarget=null;
-		for(EdmEntitySet entitySet : startEdmEntitySet.getEntityContainer().getEntitySets()){		
-			if(entitySet.getEntityType().equals(bindingTargetEntityType) ){
-				edmBindingTarget = entitySet;
-				break;
-			}
-		}	
+		EdmBindingTarget edmBindingTarget = locateEntitySet(startEdmEntitySet.getEntityContainer(), bindingTargetEntityType);	
 		//edmBindingTarget = startEdmEntitySet.getRelatedBindingTarget(navPropName);
 		if (edmBindingTarget == null) {
 			throw new ODataApplicationException("Not supported.", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),
@@ -45,6 +40,21 @@ public class Util {
 
 		return navigationTargetEntitySet;
 	}
+
+
+	public static EdmEntitySet locateEntitySet(EdmEntityContainer edmEntityContainer,
+			EdmEntityType entityType) {
+		EdmEntitySet edmBindingTarget=null;
+		for(EdmEntitySet entitySet : edmEntityContainer.getEntitySets()){		
+			if(entitySet.getEntityType().equals(entityType) ){
+				edmBindingTarget = entitySet;
+				break;
+			}
+		}
+		return edmBindingTarget;
+	}
+
+	
 	public static EdmEntitySet getNavigationTargetEntitySet(List<EdmEntitySet> edmEntitySets, EdmEntityType startEdmEntityType,
 			EdmNavigationProperty edmNavigationProperty) throws ODataApplicationException {
 
@@ -93,13 +103,7 @@ public class Util {
 		String navPropName = edmNavigationProperty.getName();
 		
 		EdmEntityType bindingTargetEntityType = complexType.getNavigationProperty(navPropName).getType();
-		EdmBindingTarget edmBindingTarget=null;
-		for(EdmEntitySet entitySet : startEdmEntitySet.getEntityContainer().getEntitySets()){		
-			if(entitySet.getEntityType().equals(bindingTargetEntityType) ){
-				edmBindingTarget = entitySet;
-				break;
-			}
-		}	
+		EdmBindingTarget edmBindingTarget = locateEntitySet(startEdmEntitySet.getEntityContainer(), bindingTargetEntityType);	
 		//edmBindingTarget = startEdmEntitySet.getRelatedBindingTarget(navPropName);
 		if (edmBindingTarget == null) {
 			throw new ODataApplicationException("Not supported.", HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(),

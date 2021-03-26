@@ -4,10 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
-
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
@@ -34,6 +34,10 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		rdfEntityType = rdfEdmProvider.getRdfEntityTypefromEdmEntitySet(edmEntitySet);
 		this.edmEntitySet = edmEntitySet;
 	}
+	public RdfResourceEntitySet(RdfEdmProvider rdfEdmProvider, List<UriParameter> keyPredicates) {
+		this.rdfEdmProvider = rdfEdmProvider;
+		this.keyPredicates = keyPredicates;
+	}
 	public EdmEntitySet getEdmEntitySet() {
 		return edmEntitySet;
 	}
@@ -46,7 +50,7 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		return keyPredicates;
 	}
 
-	public String getDecodedKey() throws OData2SparqlException {
+	public String getDecodedKey(UriInfo uriInfo) throws OData2SparqlException {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
 			for (UriParameter entityKey : keyPredicates) {
@@ -57,7 +61,15 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 			}
 			return pathVariable.substring(0, pathVariable.length() - 1);
 		} else if (!keyPredicates.isEmpty()) {
-			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(keyPredicates.get(0).getText());
+			String key =RdfResourceParts.getParameter(keyPredicates.get(0));
+//			String key ;
+//			if(keyPredicates.get(0).getAlias()!=null ) {
+//				key= uriInfo.getValueForAlias(keyPredicates.get(0).getAlias());
+//			//	key = key.substring(1,key.length()-1);
+//			}else {
+//				 key = keyPredicates.get(0).getText();
+//			}
+			String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(key);
 			String expandedKey = rdfEdmProvider.getRdfModel().getRdfPrefixes()
 					.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 			return "<" + expandedKey + ">";
@@ -66,12 +78,12 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		}
 	}
 
-	public String getLocalKey() {
+	public String getLocalKey(UriInfo uriInfo) {
 		if (keyPredicates.size() > 1) {
 			return null;
 		} else if (!keyPredicates.isEmpty()) {
 			try {
-				String key = keyPredicates.get(0).getText();
+				String key =RdfResourceParts.getParameter(keyPredicates.get(0));
 				key = key.substring(1, key.length() - 1);
 				return  "'" +  UriUtils.encodeUri( key) + "'";
 			} catch (UnsupportedEncodingException e) {
@@ -82,11 +94,11 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		}
 	}
 
-	public String getSubjectId() {
+	public String getSubjectId(UriInfo uriInfo) {
 		if (keyPredicates.size() > 1) {
 			return null;
 		} else if (!keyPredicates.isEmpty()) {
-			String key = keyPredicates.get(0).getText();
+			String key =RdfResourceParts.getParameter(keyPredicates.get(0));
 			key = key.substring(1, key.length() - 1);
 			try {
 				return key =UriUtils.encodeUri(key);
@@ -100,9 +112,9 @@ public class RdfResourceEntitySet extends RdfResourcePart {
 		}
 	}
 
-	public String geEntityString() {
+	public String getEntityString(UriInfo uriInfo) {
 
-		return getRdfEntityType().getEntityTypeName() + "(" + getLocalKey() + ")";
+		return getRdfEntityType().getEntityTypeName() + "(" + getLocalKey(uriInfo) + ")";
 	}
 
 	public boolean hasKey() {

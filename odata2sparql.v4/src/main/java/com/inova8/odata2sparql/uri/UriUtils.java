@@ -1,8 +1,11 @@
 package com.inova8.odata2sparql.uri;
 
 import java.io.UnsupportedEncodingException;
+import static org.eclipse.rdf4j.model.util.Values.iri;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import org.eclipse.rdf4j.model.IRI;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
@@ -25,5 +28,11 @@ public static String objectToSubjectId(String objectId ) {
 }
 public static String objectToSubjectUri(String objectId, RdfPrefixes rdfPrefixes  ) throws OData2SparqlException {
 	return rdfPrefixes.expandPredicate(objectToSubjectId(objectId));
+}
+public static IRI subjectToIri(String subjectId, RdfPrefixes rdfPrefixes  ) throws OData2SparqlException {
+	return iri(rdfPrefixes.expandPredicate(subjectId));
+}
+public static IRI keyToIri(String subjectId, RdfPrefixes rdfPrefixes  ) throws OData2SparqlException {
+	return iri(rdfPrefixes.expandPredicateKey(subjectId));
 }
 }

@@ -122,7 +122,7 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 	public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, final String name) throws ODataException {
 
 		try {
-			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {			
 				CsdlEntityContainer schemaEntityContainer = this.rdfEdmModelProvider.getEdmMetadata().getSchema(entityContainer.getNamespace()).getEntityContainer();
 				//if (entityContainer.equals(schemaEntityContainer.getName())) {
 					for (CsdlEntitySet entitySet : schemaEntityContainer.getEntitySets()) {

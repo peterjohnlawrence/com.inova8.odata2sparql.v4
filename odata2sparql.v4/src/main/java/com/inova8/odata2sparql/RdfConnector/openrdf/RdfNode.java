@@ -53,7 +53,7 @@ public class RdfNode {
 		if (this.isBlank()) {
 			return ((BNode) node).toString();
 		} else {
-			return ((IRI) node).toString();
+			return ((IRI) node).stringValue();
 		}
 	}
 	public String getIRIString() {
@@ -70,7 +70,7 @@ public class RdfNode {
 	public Object getLiteralObject() throws OData2SparqlException {
 		try {
 			if (this.getLiteralDatatype() != null) {
-				switch (this.getLiteralDatatype().toString()) {
+				switch (this.getLiteralDatatype().stringValue()) {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString":
 					return this.getLiteralValue().stringValue();
 				case "http://www.w3.org/2001/XMLSchema#string":
@@ -175,7 +175,7 @@ public class RdfNode {
 					return this.getLiteralValue().stringValue();
 
 				default:
-					log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().toString()
+					log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().stringValue()
 							+ ". Value: " + this.getLiteralValue().stringValue());
 					//throw new Olingo2SparqlException("RdfNode getLiteralObject failure");
 					return this.getLiteralValue().stringValue();

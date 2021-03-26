@@ -15,10 +15,10 @@ import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmException;
+import org.apache.olingo.commons.api.edm.EdmFunction;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
-import org.apache.olingo.commons.api.edm.provider.CsdlFunction;
-import org.apache.olingo.commons.api.edm.provider.CsdlFunctionImport;
-import org.apache.olingo.commons.api.edm.provider.CsdlReturnType;
+import org.apache.olingo.commons.api.edm.EdmReturnType;
+import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.OData;
@@ -26,6 +26,7 @@ import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
@@ -69,13 +70,23 @@ public class RdfResourceParts {
 	private String entityString;
 	private String navPathString;
 	private int size;
-	private Map<String,Object> customQueryOptions;
+	private Map<String, Object> customQueryOptions;
 	private EdmEntitySet responseEntitySet;
-	private UriInfo uriInfo;
+	private static UriInfo uriInfo;
 	private UriType uriType;
 	private RdfResourceEntitySet entitySet;
 	private static UrlValidator urlValidator = new UrlValidator();
-	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo) throws EdmException, ODataException, OData2SparqlException {
+	public static String getParameter(UriParameter uriParameter) {
+		String keyValue ;
+		if(uriParameter.getAlias()!=null ) {
+			keyValue= uriInfo.getValueForAlias(uriParameter.getAlias());
+		}else {
+			keyValue = uriParameter.getText();
+		}
+		return keyValue;
+ }
+	public RdfResourceParts(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo)
+			throws EdmException, ODataException, OData2SparqlException {
 		this.rdfEdmProvider = rdfEdmProvider;
 		this.uriInfo = uriInfo;
 		for (UriResource resourcePart : uriInfo.getUriResourceParts()) {
@@ -102,11 +113,17 @@ public class RdfResourceParts {
 				break;
 			case function:
 				UriResourceFunction function = (UriResourceFunction) resourcePart;
-				EdmEntitySet edmEntitySet = function.getFunctionImport().getReturnedEntitySet();
-				rdfResourceParts
-						.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet, function.getParameters()));
+				rdfResourceParts.add(new RdfResourceFunction(this.rdfEdmProvider, function, function.getParameters()));
 				isFunction = true;
 				break;
+			//
+			//				
+			//				EdmEntitySet edmEntitySet = function.getFunctionImport().getReturnedEntitySet();
+			//				
+			//				rdfResourceParts
+			//						.add(new RdfResourceEntitySet(this.rdfEdmProvider, edmEntitySet, function.getParameters()));
+			//				isFunction = true;
+			//				break;
 			default:
 				log.error(resourcePart.getKind().toString() + " not handled in resourceParts constructor");
 				break;
@@ -206,8 +223,8 @@ public class RdfResourceParts {
 				 * instances
 				 */
 				contextUrl = ContextURL.with()
-						.entitySetOrSingletonOrType(this.getEntitySet().getEdmEntitySet().getEntityType().getName())
-						.suffix(ContextURL.Suffix.ENTITY).selectList(selectList).oDataPath(request.getRawBaseUri())
+						.entitySetOrSingletonOrType(this.getResponseEntitySet().getName())
+						.selectList(selectList).oDataPath(request.getRawBaseUri())
 						.serviceRoot(new URI(request.getRawBaseUri() + "/")).build();
 				break;
 			case URI12:
@@ -254,18 +271,16 @@ public class RdfResourceParts {
 		responseRdfEntityType = _getResponseRdfEntityType();
 		penultimateResourcePart = _getPenultimateResourcePart();
 		decodedKey = _getDecodedKey();
-		localKey = _getLocalKey();
-		subjectId = _getSubjectId();
-		targetSubjectId = _getTargetSubjectId();
+		localKey = _getLocalKey(uriInfo);
+		subjectId = _getSubjectId(uriInfo);
+		targetSubjectId = _getTargetSubjectId(uriInfo);
 		entitySet = _getEntitySet();
-		entityString = _getEntityString();
+		entityString = _getEntityString(uriInfo);
 		navPathString = _getNavPathString();
 		lastNavProperty = _getLastNavProperty();
 		size = _size();
 		customQueryOptions = _getCustomQueryOption();
 	}
-
-
 
 	public UriInfo getUriInfo() {
 		return uriInfo;
@@ -282,9 +297,11 @@ public class RdfResourceParts {
 	public String getLastPropertyName() {
 		return lastPropertyName;
 	}
+
 	public String getLastNavPropertyName() {
 		return lastNavPropertyName;
 	}
+
 	public EdmComplexType getLastComplexType() {
 		return lastComplexType;
 	}
@@ -312,9 +329,11 @@ public class RdfResourceParts {
 	public String getSubjectId() {
 		return subjectId;
 	}
+
 	public String getValidatedSubjectIdUrl() throws OData2SparqlException {
 		return validatedId(subjectId);
 	}
+
 	public String getLocalKey() {
 		return localKey;
 	}
@@ -322,6 +341,7 @@ public class RdfResourceParts {
 	public String getTargetSubjectId() {
 		return targetSubjectId;
 	}
+
 	public String getValidatedTargetSubjectIdUrl() throws OData2SparqlException {
 		return validatedId(targetSubjectId);
 	}
@@ -338,6 +358,7 @@ public class RdfResourceParts {
 			return null;
 		}
 	}
+
 	public RdfResourceEntitySet getEntitySet() {
 		return entitySet;
 	}
@@ -353,14 +374,15 @@ public class RdfResourceParts {
 	public int size() {
 		return size;
 	}
-	
+
 	private Map<String, Object> _getCustomQueryOption() {
-		HashMap<String, Object> customQueryOptions = new HashMap<String,Object>();
-		customQueryOptions.put(RdfConstants.SERVICE, "<"+ this.rdfEdmProvider.getRdfRepository().getDataRepository().getServiceUrl()+">");
+		HashMap<String, Object> customQueryOptions = new HashMap<String, Object>();
+		customQueryOptions.put(RdfConstants.SERVICE,
+				"<" + this.rdfEdmProvider.getRdfRepository().getDataRepository().getServiceUrl() + ">");
 		if (this.uriInfo.getCustomQueryOptions().size() == 0) {
 			return customQueryOptions;
-		} else {		
-			for (CustomQueryOption customQueryOption:this.uriInfo.getCustomQueryOptions()) {
+		} else {
+			for (CustomQueryOption customQueryOption : this.uriInfo.getCustomQueryOptions()) {
 				customQueryOptions.put(customQueryOption.getName(), customQueryOption.getText());
 			}
 			return customQueryOptions;
@@ -387,12 +409,15 @@ public class RdfResourceParts {
 		}
 		return null;
 	}
+
 	private RdfNavigationProperty _getLastNavProperty() {
 		RdfResourcePart lastResourcePart = _getLastResourcePart();
 		if (lastResourcePart != null) {
 			if (lastResourcePart.uriResourceKind.equals(UriResourceKind.navigationProperty)) {
-				EdmNavigationProperty edmNavigationProperty =  ((RdfResourceNavigationProperty) lastResourcePart).getEdmNavigationProperty();
-				RdfNavigationProperty navProperty = this.getEntitySet().getRdfEntityType().findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
+				EdmNavigationProperty edmNavigationProperty = ((RdfResourceNavigationProperty) lastResourcePart)
+						.getEdmNavigationProperty();
+				RdfNavigationProperty navProperty = this.getEntitySet().getRdfEntityType()
+						.findNavigationPropertyByEDMNavigationPropertyName(edmNavigationProperty.getName());
 				return navProperty;
 			} else if (lastResourcePart.uriResourceKind.equals(UriResourceKind.complexProperty)) {
 				return null;//TODO
@@ -401,6 +426,7 @@ public class RdfResourceParts {
 		return null;
 
 	}
+
 	private String _getLastNavPropertyName() {
 		RdfResourcePart lastResourcePart = _getLastResourcePart();
 		if (lastResourcePart != null) {
@@ -412,6 +438,7 @@ public class RdfResourceParts {
 		}
 		return null;
 	}
+
 	private EdmComplexType _getLastComplexType() {
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
@@ -443,7 +470,7 @@ public class RdfResourceParts {
 		}
 	}
 
-	private RdfEntityType _getResponseRdfEntityType() throws EdmException, ODataApplicationException {
+	private RdfEntityType _getResponseRdfEntityType() throws EdmException, ODataException {
 		if (isFunction) {
 			return responseRdfEntityType;
 		} else {
@@ -461,23 +488,24 @@ public class RdfResourceParts {
 
 	private String _getDecodedKey() throws OData2SparqlException {
 		if (getAsEntitySet(0) != null)
-			return getAsEntitySet(0).getDecodedKey();
+
+			return getAsEntitySet(0).getDecodedKey(uriInfo);
 		return null;
 	}
 
-	private String _getLocalKey() {
+	private String _getLocalKey(UriInfo uriInfo) {
 		if (getAsEntitySet(0) != null)
-			return getAsEntitySet(0).getLocalKey();
+			return getAsEntitySet(0).getLocalKey(uriInfo);
 		return null;
 	}
 
-	private String _getSubjectId() {
+	private String _getSubjectId(UriInfo uriInfo) {
 		if (getAsEntitySet(0) != null)
-			return getAsEntitySet(0).getSubjectId();
+			return getAsEntitySet(0).getSubjectId(uriInfo);
 		return null;
 	}
 
-	private String _getTargetSubjectId() {
+	private String _getTargetSubjectId(UriInfo uriInfo) {
 
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
@@ -490,7 +518,7 @@ public class RdfResourceParts {
 				break;
 			case entitySet:
 				if (getAsEntitySet(j).hasKey()) {
-					return getAsEntitySet(j).getSubjectId();
+					return getAsEntitySet(j).getSubjectId(uriInfo);
 				}
 				break;
 			default:
@@ -500,9 +528,9 @@ public class RdfResourceParts {
 		return null;
 	}
 
-	private String _getEntityString() {
+	private String _getEntityString(UriInfo uriInfo) {
 		if (getAsEntitySet(0) != null)
-			return getAsEntitySet(0).geEntityString();
+			return getAsEntitySet(0).getEntityString(uriInfo);
 		return null;
 	}
 
@@ -510,7 +538,7 @@ public class RdfResourceParts {
 		if (getAsEntitySet(0) != null)
 			return getAsEntitySet(0);
 		return null;
-	
+
 	}
 
 	private String _getNavPathString() {
@@ -528,6 +556,7 @@ public class RdfResourceParts {
 			}
 		}
 	}
+
 	public ArrayList<RdfResourcePart> getNavPath() {
 		ArrayList<RdfResourcePart> navParts = new ArrayList<RdfResourcePart>();
 		if (rdfResourceParts.size() == 0) {
@@ -543,11 +572,12 @@ public class RdfResourceParts {
 			}
 		}
 	}
+
 	private int _size() {
 		return rdfResourceParts.size();
 	}
 
-	private EdmEntitySet _getResponseEntitySet() throws ODataApplicationException {
+	private EdmEntitySet _getResponseEntitySet() throws ODataException {
 
 		for (int j = rdfResourceParts.size() - 1; j >= 0; j--) {
 			switch (rdfResourceParts.get(j).getUriResourceKind()) {
@@ -563,6 +593,37 @@ public class RdfResourceParts {
 				}
 			case entitySet:
 				return getAsEntitySet(j).getEdmEntitySet();
+			case function:
+				RdfResourceEntitySet bindingEntitySet = null;
+				if (j > 0) {
+					//Find the bound entity set if set
+
+					EdmFunction function = ((RdfResourceFunction) rdfResourceParts.get(j)).getFunction().getFunction();
+					EdmType returnType = function.getReturnType().getType();
+					RdfResourcePart penultimatePart = rdfResourceParts.get(j - 1);
+					switch (penultimatePart.uriResourceKind){
+						case function:
+							RdfResourceFunction bindingFunction = (RdfResourceFunction) penultimatePart;
+							return bindingFunction.getFunction().getFunctionImport().getReturnedEntitySet();
+
+						case entitySet:
+							bindingEntitySet = (RdfResourceEntitySet) penultimatePart;
+							EdmEntitySet functionResponseEntitySet = Util.locateEntitySet(
+									bindingEntitySet.edmEntitySet.getEntityContainer(), (EdmEntityType) returnType);
+							return functionResponseEntitySet;						
+	
+						default:
+						
+					}
+					
+
+				} else {
+					//If unbound then Edm contains return entityset (doen't otherwise for some reason)
+					UriResourceFunction hfunction = ((RdfResourceFunction) rdfResourceParts.get(j)).getFunction();
+					EdmEntitySet functionResponseEntitySet = hfunction.getFunctionImport().getReturnedEntitySet();
+					return functionResponseEntitySet;
+				}
+
 			default:
 				break;
 			}
@@ -577,13 +638,21 @@ public class RdfResourceParts {
 
 	private UriType _getUriType() throws ODataException {
 		if (isFunction()) {
-			UriResource functionResource = uriInfo.asUriInfoResource().getUriResourceParts().get(0);
-			CsdlFunctionImport functionImport = rdfEdmProvider.getEntityContainer()
-					.getFunctionImport(functionResource.getSegmentValue());
-			List<CsdlFunction> function = rdfEdmProvider.getFunctions(functionImport.getFunctionFQN());
-			CsdlReturnType functionReturnType = function.get(0).getReturnType();
+//			CsdlReturnType functionReturnType;
+			//If a function then it must be the last of the resourceParts.
+			UriResourceFunction functionResource = (UriResourceFunction)uriInfo.asUriInfoResource().getUriResourceParts()
+					.get(rdfResourceParts.size() - 1);
+			EdmFunction function = functionResource.getFunction();
+			EdmReturnType functionReturnType = function.getReturnType();
+			responseRdfEntityType = rdfEdmProvider.getMappedEntityType(functionReturnType.getType().getFullQualifiedName());
+			
+//			CsdlFunctionImport functionImport = rdfEdmProvider.getEntityContainer()
+//					.getFunctionImport(functionResource.getSegmentValue());
+//			List<CsdlFunction> function = rdfEdmProvider.getFunctions(functionImport.getFunctionFQN());
+//			functionReturnType = function.get(0).getReturnType();
 
-			responseRdfEntityType = rdfEdmProvider.getMappedEntityType(functionReturnType.getTypeFQN());
+
+
 			if (functionReturnType.isCollection()) {
 				//URI11/13
 				return UriType.URI11;
@@ -644,8 +713,16 @@ public class RdfResourceParts {
 		if (rdfResourceParts.size() == 0) {
 			return null;
 		} else {
+			switch (rdfResourceParts.get(index).getUriResourceKind()) {
+			case entitySet:
+				return (RdfResourceEntitySet) (rdfResourceParts.get(index));
+			case function:
+			default:
+				return null;
+
+			}
 		}
-		return (RdfResourceEntitySet) (rdfResourceParts.get(index));
+		//	return (RdfResourceEntitySet) (rdfResourceParts.get(index));
 
 	}
 
@@ -669,7 +746,7 @@ public class RdfResourceParts {
 			}
 			return null;
 		case complexProperty:
-			return getEntitySet(index-1);
+			return getEntitySet(index - 1);
 		default:
 			log.error(getResourceKind(index).toString() + " not handled for getEntitySet");
 			return null;
@@ -740,18 +817,20 @@ public class RdfResourceParts {
 		return lastNavProperty;
 	}
 
-	public Map<String,Object> getCustomQueryOptions() {
+	public Map<String, Object> getCustomQueryOptions() {
 		return customQueryOptions;
 	}
+
 	public String getCustomQueryOptionsArgs() {
-		String customQueryOptionsArgs =",'cacheHash','" + rdfEdmProvider.hashCode() +"'";
-		if(getCustomQueryOptions()!=null) {
-			
-			for( Entry<String, Object> customQueryOptionEntry:getCustomQueryOptions().entrySet()) {
-				customQueryOptionsArgs +=",'"+ customQueryOptionEntry.getKey() + "'," + customQueryOptionEntry.getValue();
+		String customQueryOptionsArgs = ",'cacheHash','" + rdfEdmProvider.hashCode() + "'";
+		if (getCustomQueryOptions() != null) {
+
+			for (Entry<String, Object> customQueryOptionEntry : getCustomQueryOptions().entrySet()) {
+				customQueryOptionsArgs += ",'" + customQueryOptionEntry.getKey() + "',"
+						+ customQueryOptionEntry.getValue();
 			}
 			return customQueryOptionsArgs;
-		}else {
+		} else {
 			return customQueryOptionsArgs;
 		}
 	}

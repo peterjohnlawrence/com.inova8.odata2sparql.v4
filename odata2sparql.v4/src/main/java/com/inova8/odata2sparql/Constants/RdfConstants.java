@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.SystemUtils;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -139,12 +140,19 @@ public class RdfConstants {
 	public static final String RDF_LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
 
 	public static final String RDFS_RESOURCE = "http://www.w3.org/2000/01/rdf-schema#Resource";
+	public static final String RDFS_RESOURCE_NAME = "Resource";
+	public static final FullQualifiedName  RDFS_RESOURCE_FQN= new FullQualifiedName(RDFS, RDFS_RESOURCE_NAME);	
 	public static final String RDFS_RESOURCE_LABEL = "Resource";
+	
 	public static final String RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
 	public static final String RDFS_CLASS_LABEL = "Class";
 	public static final String RDFS_CLASS_TERM = "class";
+	
 	public static final String OWL_THING = "http://www.w3.org/2002/07/owl#Thing";
+	public static final String OWL_THING_NAME = "Thing";
+	public static final FullQualifiedName  OWL_THING_FQN= new FullQualifiedName(OWL, OWL_THING_NAME);
 	public static final String OWL_THING_LABEL = "Thing";
+	
 	public static final String OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
 	public static final String OWL_CLASS_LABEL = "Class";
 	public static final String RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";

@@ -148,7 +148,7 @@ public class SparqlBaseCommand {
 
 		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider, rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
-
+	//	rdfResourceParts.getDecodedKey()
 		return knownKey ? rdfResults.findEntity(key) : rdfResults.getFirstEntity();
 
 	}
