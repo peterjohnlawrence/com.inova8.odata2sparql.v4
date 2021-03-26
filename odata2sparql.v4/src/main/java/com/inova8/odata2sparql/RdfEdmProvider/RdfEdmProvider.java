@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfEdmProvider;
 
 import java.util.ArrayList;
@@ -29,51 +32,121 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
+/**
+ * The Class RdfEdmProvider.
+ */
 public class RdfEdmProvider extends CsdlAbstractEdmProvider {
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfEdmProvider.class);
+	
+	/** The rdf edm model provider. */
 	private final RdfEdmModelProvider rdfEdmModelProvider;
+	
+	/** The rdf edm providers. */
 	private final RdfEdmProviders rdfEdmProviders;
 	
 
+	/**
+	 * Instantiates a new rdf edm provider.
+	 *
+	 * @param rdfEdmProviders the rdf edm providers
+	 * @param rdfRepository the rdf repository
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	RdfEdmProvider( RdfEdmProviders rdfEdmProviders, RdfRepository rdfRepository) throws OData2SparqlException {
 		this.rdfEdmModelProvider = new RdfEdmModelProvider(rdfRepository);
 		this.rdfEdmProviders =rdfEdmProviders;
 		rdfEdmProviders.getRdfEdmProviders().put(rdfRepository.getModelName(), this);
 	}
 
+	/**
+	 * Gets the mapped entity type.
+	 *
+	 * @param fullQualifiedName the full qualified name
+	 * @return the mapped entity type
+	 */
 	public RdfEntityType getMappedEntityType(FullQualifiedName fullQualifiedName) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedEntityType(fullQualifiedName);
 	} 
 
+	/**
+	 * Gets the rdf entity typefrom edm entity set.
+	 *
+	 * @param edmEntitySet the edm entity set
+	 * @return the rdf entity typefrom edm entity set
+	 * @throws EdmException the edm exception
+	 */
 	public RdfEntityType getRdfEntityTypefromEdmEntitySet(EdmEntitySet edmEntitySet) throws EdmException {
 		return this.getMappedEntityType(new FullQualifiedName(edmEntitySet.getEntityType().getNamespace(), edmEntitySet
 				.getEntityType().getName()));  
 	}
+	
+	/**
+	 * Gets the mapped property.
+	 *
+	 * @param fqnProperty the fqn property
+	 * @return the mapped property
+	 */
 	public RdfProperty getMappedProperty(FullQualifiedName fqnProperty) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedProperty(fqnProperty);
 	}
 
+	/**
+	 * Gets the mapped navigation property.
+	 *
+	 * @param edmNavigationProperty the edm navigation property
+	 * @return the mapped navigation property
+	 */
 	public RdfNavigationProperty getMappedNavigationProperty(FullQualifiedName edmNavigationProperty) {
 		return this.rdfEdmModelProvider.getEdmMetadata().getMappedNavigationProperty(edmNavigationProperty);
 	}
 
+	/**
+	 * Gets the edm metadata.
+	 *
+	 * @return the edm metadata
+	 */
 	public RdfModelToMetadata getEdmMetadata() {
 		return this.rdfEdmModelProvider.getEdmMetadata();
 	}
 
+	/**
+	 * Gets the rdf repository.
+	 *
+	 * @return the rdf repository
+	 */
 	public RdfRepository getRdfRepository() {
 		return this.rdfEdmModelProvider.getRdfRepository();
 	}
 
+	/**
+	 * Gets the rdf model.
+	 *
+	 * @return the rdf model
+	 */
 	public RdfModel getRdfModel() {
 		return this.rdfEdmModelProvider.getRdfModel();
 	}
  
+	/**
+	 * Gets the schemas.
+	 *
+	 * @return the schemas
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public List<CsdlSchema> getSchemas() throws ODataException {
 		return this.rdfEdmModelProvider.getEdmMetadata().getSchemas();
 	}
 
+	/**
+	 * Gets the entity type.
+	 *
+	 * @param edmFQName the edm FQ name
+	 * @return the entity type
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlEntityType getEntityType(final FullQualifiedName edmFQName) throws ODataException {
 
@@ -96,6 +169,13 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the complex type.
+	 *
+	 * @param edmFQName the edm FQ name
+	 * @return the complex type
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlComplexType getComplexType(final FullQualifiedName edmFQName) throws ODataException {
 
@@ -118,11 +198,19 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the entity set.
+	 *
+	 * @param entityContainer the entity container
+	 * @param name the name
+	 * @return the entity set
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, final String name) throws ODataException {
 
 		try {
-			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
+			//for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {			
 				CsdlEntityContainer schemaEntityContainer = this.rdfEdmModelProvider.getEdmMetadata().getSchema(entityContainer.getNamespace()).getEntityContainer();
 				//if (entityContainer.equals(schemaEntityContainer.getName())) {
 					for (CsdlEntitySet entitySet : schemaEntityContainer.getEntitySets()) {
@@ -140,6 +228,14 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the function import.
+	 *
+	 * @param entityContainer the entity container
+	 * @param name the name
+	 * @return the function import
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlFunctionImport getFunctionImport(FullQualifiedName entityContainer, final String name)
 			throws ODataException {
@@ -165,6 +261,13 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the entity container info.
+	 *
+	 * @param entityContainer the entity container
+	 * @return the entity container info
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlEntityContainerInfo getEntityContainerInfo(FullQualifiedName entityContainer) throws ODataException {
 		if (entityContainer == null) {
@@ -186,6 +289,13 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the functions.
+	 *
+	 * @param functionName the function name
+	 * @return the functions
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public List<CsdlFunction> getFunctions(FullQualifiedName functionName) throws ODataException {
 	//	return super.getFunctions(functionName);
@@ -210,11 +320,24 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the term.
+	 *
+	 * @param termName the term name
+	 * @return the term
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlTerm getTerm(FullQualifiedName termName) throws ODataException {
 		return RdfConstants.TERMS.get(termName.getName());
 	}
 
+	/**
+	 * Gets the entity container.
+	 *
+	 * @return the entity container
+	 * @throws ODataException the o data exception
+	 */
 	@Override
 	public CsdlEntityContainer getEntityContainer() throws ODataException {
 		for (CsdlSchema schema : this.rdfEdmModelProvider.getEdmMetadata().getSchemas()) {
@@ -227,6 +350,11 @@ public class RdfEdmProvider extends CsdlAbstractEdmProvider {
 		return null;
 	}
 
+	/**
+	 * Gets the rdf edm providers.
+	 *
+	 * @return the rdf edm providers
+	 */
 	public RdfEdmProviders getRdfEdmProviders() {
 		return rdfEdmProviders;
 	}

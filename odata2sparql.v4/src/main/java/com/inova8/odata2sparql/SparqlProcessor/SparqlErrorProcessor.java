@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
@@ -17,14 +20,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * The Class SparqlErrorProcessor.
+ */
 public class SparqlErrorProcessor implements ErrorProcessor {
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(SparqlErrorProcessor.class);
+	
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 	}
 
+	/**
+	 * Process error.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param serverError the server error
+	 * @param responseFormat the response format
+	 */
 	@Override
 	public void processError(ODataRequest request, ODataResponse response, ODataServerError serverError,
 			ContentType responseFormat) {

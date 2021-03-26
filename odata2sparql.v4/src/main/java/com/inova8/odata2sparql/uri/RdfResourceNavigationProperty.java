@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.uri;
 
 import java.util.List;
@@ -11,11 +14,26 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
+/**
+ * The Class RdfResourceNavigationProperty.
+ */
 public class RdfResourceNavigationProperty extends RdfResourcePart {
+	
+	/** The rdf edm provider. */
 	RdfEdmProvider rdfEdmProvider;
+	
+	/** The edm navigation property. */
 	EdmNavigationProperty edmNavigationProperty;
+	
+	/** The key predicates. */
 	List<UriParameter> keyPredicates;
 
+	/**
+	 * Instantiates a new rdf resource navigation property.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriResourceNavigation the uri resource navigation
+	 */
 	public RdfResourceNavigationProperty(RdfEdmProvider rdfEdmProvider, UriResourceNavigation uriResourceNavigation) {
 		super.setUriResourceKind(UriResourceKind.navigationProperty);
 		this.rdfEdmProvider = rdfEdmProvider;
@@ -24,10 +42,20 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 		this.edmNavigationProperty = edmNavigationProperty;
 	}
 
+	/**
+	 * Gets the edm navigation property.
+	 *
+	 * @return the edm navigation property
+	 */
 	public EdmNavigationProperty getEdmNavigationProperty() {
 		return edmNavigationProperty;
 	}
 
+	/**
+	 * Gets the nav path.
+	 *
+	 * @return the nav path
+	 */
 	public String getNavPath() {
 		if (!keyPredicates.isEmpty()) {
 			return edmNavigationProperty.getName() + "(" + getLocalKey() + ")";
@@ -36,6 +64,12 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 		}
 	}
 
+	/**
+	 * Gets the decoded key.
+	 *
+	 * @return the decoded key
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public String getDecodedKey() throws OData2SparqlException {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
@@ -56,6 +90,11 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 		}
 	}
 
+	/**
+	 * Gets the local key.
+	 *
+	 * @return the local key
+	 */
 	public String getLocalKey() {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
@@ -69,6 +108,12 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 			return "";
 		}
 	}
+	
+	/**
+	 * Gets the subject id.
+	 *
+	 * @return the subject id
+	 */
 	public String getSubjectId() {
 		if (keyPredicates.size() > 1) {
 			String pathVariable = "";
@@ -85,6 +130,11 @@ public class RdfResourceNavigationProperty extends RdfResourcePart {
 		}
 	}
 
+	/**
+	 * Checks for key.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean hasKey() {
 		return !keyPredicates.isEmpty();
 	}

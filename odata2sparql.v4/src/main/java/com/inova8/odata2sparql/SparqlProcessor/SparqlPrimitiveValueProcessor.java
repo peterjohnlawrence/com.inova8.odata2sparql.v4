@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
@@ -41,22 +44,52 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlPrimitiveValueProcessor.
+ */
 public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
 
+	/**
+	 * Instantiates a new sparql primitive value processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlPrimitiveValueProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
 
+	/**
+	 * Read primitive value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readPrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -74,6 +107,16 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
+	/**
+	 * Read primitive.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readPrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
@@ -91,6 +134,18 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
+	/**
+	 * Read primitive or value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @param isValue the is value
+	 * @throws EdmException the edm exception
+	 * @throws ODataException the o data exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void readPrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException, OData2SparqlException {
 		// 1. Retrieve info from URI
@@ -156,6 +211,14 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 
 	}
 
+	/**
+	 * Write property value.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param response the response
+	 * @param property the property
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void writePropertyValue(RdfResourceParts rdfResourceParts, ODataResponse response, Property property) throws ODataApplicationException {
 		if (property == null) {
 			//ByteArrayInputStream serializerContent = new ByteArrayInputStream(null);//Charset.forName("UTF-8")));
@@ -176,6 +239,19 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
+	/**
+	 * Write property.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param request the request
+	 * @param response the response
+	 * @param responseFormat the response format
+	 * @param edmPropertyName the edm property name
+	 * @param edmPropertyType the edm property type
+	 * @param property the property
+	 * @throws SerializerException the serializer exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void writeProperty(RdfResourceParts rdfResourceParts, ODataRequest request, ODataResponse response, ContentType responseFormat,
 			String edmPropertyName, EdmPrimitiveType edmPropertyType, Property property)
 			throws SerializerException, ODataApplicationException {
@@ -201,6 +277,17 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		}
 	}
 
+	/**
+	 * Update primitive.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updatePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
@@ -217,6 +304,17 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		this.updatePrimitiveOrValue(request, response, uriInfo, result.getProperty().getValue().toString(), false);
 	}
 
+	/**
+	 * Update primitive value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updatePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
@@ -233,6 +331,16 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		this.updatePrimitiveOrValue(request, response, uriInfo, result, true);
 	}
 
+	/**
+	 * Update primitive or value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param entry the entry
+	 * @param isValue the is value
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void updatePrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo, Object entry,
 			Boolean isValue) throws ODataApplicationException {
 		try {
@@ -244,18 +352,43 @@ public class SparqlPrimitiveValueProcessor implements PrimitiveValueProcessor {
 		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
+	/**
+	 * Delete primitive value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public void deletePrimitiveValue(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException {
 		this.deletePrimitiveOrValue(request, response, uriInfo, false);
 	}
 
+	/**
+	 * Delete primitive.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public void deletePrimitive(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException{
 		this.deletePrimitiveOrValue(request, response, uriInfo, true);
 	}
 
+	/**
+	 * Delete primitive or value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param isValue the is value
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void deletePrimitiveOrValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			Boolean isValue) throws ODataApplicationException {
 		try {

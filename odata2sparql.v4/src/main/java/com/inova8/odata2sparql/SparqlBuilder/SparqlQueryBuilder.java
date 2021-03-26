@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlBuilder;
 
 import java.util.Arrays;
@@ -420,42 +423,84 @@ ExpandItemWhereCount :=
 	}
 */
 
+/**
+ * The Class SparqlQueryBuilder.
+ */
 public class SparqlQueryBuilder {
 
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(SparqlQueryBuilder.class);
+	
+	/** The rdf model. */
 	//private final RdfEdmProvider rdfEdmProvider;
 	private final RdfModel rdfModel;
+	
+	/** The rdf model to metadata. */
 	private final RdfModelToMetadata rdfModelToMetadata;
 
+	/** The uri type. */
 	private final UriType uriType;
+	
+	/** The uri info. */
 	private UriInfo uriInfo;
+	
+	/** The rdf resource parts. */
 	private RdfResourceParts rdfResourceParts;
 
+	/** The rdf entity type. */
 	private RdfEntityType rdfEntityType = null;
+	
+	/** The rdf target entity type. */
 	private RdfEntityType rdfTargetEntityType = null;
+	
+	/** The rdf complex property. */
 	private RdfProperty rdfComplexProperty = null;
+	
+	/** The edm entity set. */
 	private EdmEntitySet edmEntitySet = null;
+	
+	/** The edm target entity set. */
 	private EdmEntitySet edmTargetEntitySet = null;
+	
+	/** The edm path complex type. */
 	private EdmComplexType edmPathComplexType = null;
+	
+	/** The expand option. */
 	private ExpandOption expandOption;
 	//private SelectOption selectOption;
 
+	/** The is primitive value. */
 	private Boolean isPrimitiveValue = false;
+	
+	/** The filter clause. */
 	private SparqlExpressionVisitor filterClause;
+	
+	/** The filter clauses. */
 	private SparqlFilterClausesBuilder filterClauses;
+	
+	/** The select property map. */
 	//	private HashSet<SparqlFilterClausesBuilder> lambdaAllfilterClauses = new HashSet<SparqlFilterClausesBuilder>();
 	private TreeSet<String> selectPropertyMap;
 
+	/** The Constant DEBUG. */
 	private static final boolean DEBUG = true;
 
+	/** The property path regex. */
 	final String propertyPathRegex = "([!^]*)?\\(([^)]*)\\)";
+	
+	/** The property path pattern. */
 	final Pattern propertyPathPattern = Pattern.compile(propertyPathRegex, Pattern.MULTILINE);
 
+	/** The property regex. */
 	final String propertyRegex = "([^|~]*)~([^|]*)|(<[^|>]*>)";
+	
+	/** The property pattern. */
 	final Pattern propertyPattern = Pattern.compile(propertyRegex, Pattern.MULTILINE);
 
+	/** The proxy dataset repository. */
 	RdfRepository proxyDatasetRepository;
 
+	/** The proxied rdf edm providers. */
 	private TreeMap<String, RdfEdmProvider> proxiedRdfEdmProviders = new TreeMap<String, RdfEdmProvider>();
 
 	//	public SparqlQueryBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
@@ -471,6 +516,18 @@ public class SparqlQueryBuilder {
 	//		// Prepare what is required to create the SPARQL
 	//		prepareBuilder();
 	//		log.info("Builder for URIType: " + uriType.toString());
+	/**
+	 * Instantiates a new sparql query builder.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	//	}
 	public SparqlQueryBuilder(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType,
 			RdfResourceParts rdfResourceParts)
@@ -487,6 +544,14 @@ public class SparqlQueryBuilder {
 		log.info("Builder for URIType: " + uriType.toString());
 	}
 
+	/**
+	 * Prepare builder.
+	 *
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void prepareBuilder()
 			throws EdmException, ODataApplicationException, ExpressionVisitException, OData2SparqlException {
 		// Prepare what is required to create the SPARQL
@@ -644,7 +709,7 @@ public class SparqlQueryBuilder {
 			throw new ODataApplicationException("Unhandled request type " + this.uriType.toString(),
 					HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
 		}
-		//TODO testing only
+		//
 		//only for expanditems where first part is a complexType
 		//However olingo has blocked changing the selectItems collection:-(
 		/*		UriInfoResource resourcePath = this.uriInfo.getExpandOption().getExpandItems().get(0).getResourcePath(); 
@@ -652,7 +717,7 @@ public class SparqlQueryBuilder {
 				selectItem.setResourcePath(resourcePath);	
 				List<SelectItem> selectItems = this.uriInfo.getSelectOption().getSelectItems();
 				selectItems.add(selectItem);*/
-		//TODO Workaround to select everything  when complexType in expand
+		// Workaround to select everything  when complexType in expand
 		//Fixes #97
 		//		if (this.uriInfo.getExpandOption() != null) {
 		//			for (ExpandItem expandItem : this.uriInfo.getExpandOption().getExpandItems()) {
@@ -672,6 +737,15 @@ public class SparqlQueryBuilder {
 
 	}
 
+	/**
+	 * Prepare construct sparql.
+	 *
+	 * @return the sparql statement
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	public SparqlStatement prepareConstructSparql()
 			throws EdmException, ODataApplicationException, OData2SparqlException, ExpressionVisitException {
 
@@ -682,10 +756,17 @@ public class SparqlQueryBuilder {
 		prepareConstruct.append(where());
 		prepareConstruct.append("}");
 		prepareConstruct.append(defaultLimitClause());
-		//TODO return new SparqlStatement(this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareConstruct).toString());
 		return new SparqlStatement(sparqlPrefixes().append(prepareConstruct).toString());
 	}
 
+	/**
+	 * Prepare count entity set sparql.
+	 *
+	 * @return the sparql statement
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement prepareCountEntitySetSparql()
 			throws ODataApplicationException, EdmException, OData2SparqlException {
 
@@ -697,6 +778,13 @@ public class SparqlQueryBuilder {
 				this.rdfModel.getRdfPrefixes().sparqlPrefixes().append(prepareCountEntitySet).toString());
 	}
 
+	/**
+	 * Construct.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder construct() throws EdmException, OData2SparqlException {
 		StringBuilder construct = new StringBuilder("CONSTRUCT {\n");
 		String key = edmTargetEntitySet.getEntityType().getName();
@@ -724,6 +812,15 @@ public class SparqlQueryBuilder {
 		return construct;
 	}
 
+	/**
+	 * Target entity identifier.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @param key the key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder targetEntityIdentifier(RdfEntityType rdfEntityType, String key, String indent)
 			throws EdmException {
 		StringBuilder targetEntityIdentifier = new StringBuilder();
@@ -738,6 +835,15 @@ public class SparqlQueryBuilder {
 		return targetEntityIdentifier;
 	}
 
+	/**
+	 * Construct type.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @param key the key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder constructType(RdfEntityType rdfEntityType, String key, String indent) throws EdmException {
 		StringBuilder constructType = new StringBuilder();
 		if (DEBUG)
@@ -748,6 +854,14 @@ public class SparqlQueryBuilder {
 		return constructType;
 	}
 
+	/**
+	 * Matching.
+	 *
+	 * @param key the key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder matching(String key, String indent) throws EdmException {
 		StringBuilder matching = new StringBuilder();
 		if (DEBUG)
@@ -756,6 +870,16 @@ public class SparqlQueryBuilder {
 		return matching;
 	}
 
+	/**
+	 * Construct operation.
+	 *
+	 * @param nextTargetKey the next target key
+	 * @param rdfOperationType the rdf operation type
+	 * @param indent the indent
+	 * @param isExpand the is expand
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder constructOperation(String nextTargetKey, RdfEntityType rdfOperationType, String indent,
 			Boolean isExpand) throws EdmException {
 		StringBuilder constructOperation = new StringBuilder();
@@ -777,6 +901,12 @@ public class SparqlQueryBuilder {
 		return constructOperation;
 	}
 
+	/**
+	 * Construct node shape path.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder constructNodeShapePath() throws EdmException {
 		StringBuilder constructNodeShapePath = new StringBuilder();
 		if (DEBUG)
@@ -794,6 +924,13 @@ public class SparqlQueryBuilder {
 		return constructNodeShapePath;
 	}
 
+	/**
+	 * Construct complex type.
+	 *
+	 * @param entityTypeName the entity type name
+	 * @param complexType the complex type
+	 * @return the string builder
+	 */
 	private StringBuilder constructComplexType(String entityTypeName, RdfComplexType complexType) {
 		StringBuilder constructNodeShapePath = new StringBuilder();
 		for (RdfProperty complexProperty : complexType.getProperties().values()) {
@@ -829,6 +966,13 @@ public class SparqlQueryBuilder {
 		return constructNodeShapePath;
 	}
 
+	/**
+	 * Construct node shape type.
+	 *
+	 * @param entityTypeName the entity type name
+	 * @param complexProperty the complex property
+	 * @return the string builder
+	 */
 	private StringBuilder constructNodeShapeType(String entityTypeName, RdfComplexProperty complexProperty) {
 		StringBuilder constructNodeShapeType = new StringBuilder();
 		if (DEBUG)
@@ -838,6 +982,12 @@ public class SparqlQueryBuilder {
 		return constructNodeShapeType;
 	}
 
+	/**
+	 * Construct path.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder constructPath() throws EdmException {
 		StringBuilder constructPath = new StringBuilder();
 		if (DEBUG)
@@ -855,6 +1005,12 @@ public class SparqlQueryBuilder {
 		return constructPath;
 	}
 
+	/**
+	 * Construct complex.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder constructComplex() throws EdmException {
 		StringBuilder constructComplex = new StringBuilder();
 		if (DEBUG)
@@ -864,6 +1020,15 @@ public class SparqlQueryBuilder {
 		return constructComplex;
 	}
 
+	/**
+	 * Complex construct.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder complexConstruct(RdfEntityType targetEntityType, String targetKey, String indent)
 			throws EdmException {
 		StringBuilder complexConstruct = new StringBuilder();
@@ -873,6 +1038,13 @@ public class SparqlQueryBuilder {
 		return complexConstruct;
 	}
 
+	/**
+	 * Construct expand select.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder constructExpandSelect() throws EdmException, OData2SparqlException {
 		StringBuilder constructExpandSelect = new StringBuilder();
 		if (DEBUG)
@@ -883,6 +1055,15 @@ public class SparqlQueryBuilder {
 		return constructExpandSelect;
 	}
 
+	/**
+	 * Where.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder where()
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder where = new StringBuilder();
@@ -916,6 +1097,13 @@ public class SparqlQueryBuilder {
 		return where;
 	}
 
+	/**
+	 * Clauses node shape properties.
+	 *
+	 * @param entityTypeName the entity type name
+	 * @param rdfTargetEntityType the rdf target entity type
+	 * @return the object
+	 */
 	private Object clausesNodeShapeProperties(String entityTypeName, RdfEntityType rdfTargetEntityType) {
 		StringBuilder clausesNodeShapeProperties = new StringBuilder();
 		if (DEBUG)
@@ -939,6 +1127,13 @@ public class SparqlQueryBuilder {
 		return clausesNodeShapeProperties;
 	}
 
+	/**
+	 * Clauses complex type.
+	 *
+	 * @param entityTypeName the entity type name
+	 * @param clausesNodeShapeProperties the clauses node shape properties
+	 * @param complexType the complex type
+	 */
 	private void clausesComplexType(String entityTypeName, StringBuilder clausesNodeShapeProperties,
 			RdfComplexType complexType) {
 		for (RdfProperty complexProperty : complexType.getProperties().values()) {
@@ -1000,6 +1195,12 @@ public class SparqlQueryBuilder {
 		}
 	}
 
+	/**
+	 * Clauses path properties.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	private StringBuilder clausesPathProperties() throws EdmException {
 		StringBuilder clausesPathProperties = new StringBuilder();
 		if (DEBUG)
@@ -1031,6 +1232,15 @@ public class SparqlQueryBuilder {
 		return clausesPathProperties;
 	}
 
+	/**
+	 * Clauses reified path properties.
+	 *
+	 * @param rdfTargetEntityType the rdf target entity type
+	 * @param reifiedProperty the reified property
+	 * @param variableName the variable name
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesReifiedPathProperties(RdfEntityType rdfTargetEntityType ,RdfProperty reifiedProperty, String variableName, String indent) {
 		//		 #Special case of extended reification attribute value
 		//         VALUES(?Attribute_p){(<http://inova8.com/plant/def/attribute.Value>)}
@@ -1052,6 +1262,13 @@ public class SparqlQueryBuilder {
 
 		return clausesReifiedPathProperties;
 	}
+ 
+ /**
+  * Builds the reified subject property path.
+  *
+  * @param reifiedSubjectNavigationProperty the reified subject navigation property
+  * @return the string builder
+  */
  private StringBuilder buildReifiedSubjectPropertyPath( RdfNavigationProperty reifiedSubjectNavigationProperty ) {
 	 StringBuilder reifiedSubjectPropertyPath = new StringBuilder("(") ;
 	 if(reifiedSubjectNavigationProperty.getNavigationPropertyIRI()!=null ) {
@@ -1063,6 +1280,16 @@ public class SparqlQueryBuilder {
 	 reifiedSubjectPropertyPath.append(")");
 	 return reifiedSubjectPropertyPath;
  }
+	
+	/**
+	 * Clauses operation properties.
+	 *
+	 * @param nextTargetKey the next target key
+	 * @param rdfOperationType the rdf operation type
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesOperationProperties(String nextTargetKey, RdfEntityType rdfOperationType)
 			throws EdmException, OData2SparqlException {
 		StringBuilder clausesOperationProperties = new StringBuilder();
@@ -1078,6 +1305,12 @@ public class SparqlQueryBuilder {
 		return clausesOperationProperties;
 	}
 
+	/**
+	 * Operation UUID.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @return the string builder
+	 */
 	private StringBuilder operationUUID(RdfEntityType rdfOperationType) {
 		StringBuilder operationUUID = new StringBuilder();
 		operationUUID.append("IRI(CONCAT(\"" + RdfConstants.URN_NS + "\",MD5(CONCAT(");
@@ -1088,6 +1321,14 @@ public class SparqlQueryBuilder {
 		return operationUUID.append("))))");
 	}
 
+	/**
+	 * Filter operation query.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder filterOperationQuery(RdfEntityType rdfOperationType)
 			throws EdmException, OData2SparqlException {
 		StringBuilder filter = new StringBuilder();
@@ -1100,6 +1341,15 @@ public class SparqlQueryBuilder {
 		return filter;
 	}
 
+	/**
+	 * Gets the query option text.
+	 *
+	 * @param datasetRepository the dataset repository
+	 * @param queryOptions the query options
+	 * @param functionImportParameter the function import parameter
+	 * @return the query option text
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String getQueryOptionText(RdfRepository datasetRepository, List<CustomQueryOption> queryOptions,
 			FunctionImportParameter functionImportParameter) throws OData2SparqlException {
 
@@ -1118,6 +1368,14 @@ public class SparqlQueryBuilder {
 		return null;
 	}
 
+	/**
+	 * Encode IRI.
+	 *
+	 * @param datasetRepository the dataset repository
+	 * @param queryOption the query option
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String encodeIRI(RdfRepository datasetRepository, CustomQueryOption queryOption)
 			throws OData2SparqlException {
 		String resource = queryOption.getText().substring(1, queryOption.getText().length() - 1);
@@ -1132,6 +1390,13 @@ public class SparqlQueryBuilder {
 		}
 	}
 
+	/**
+	 * Gets the parameter values.
+	 *
+	 * @param keyPredicates the key predicates
+	 * @param functionImportParameter the function import parameter
+	 * @return the parameter values
+	 */
 	private String getParameterValues(List<UriParameter> keyPredicates,
 			FunctionImportParameter functionImportParameter) {
 		for (UriParameter queryOption : keyPredicates) {
@@ -1149,6 +1414,14 @@ public class SparqlQueryBuilder {
 		return null;
 	}
 
+	/**
+	 * Preprocess operation query.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @return the string
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String preprocessOperationQuery(RdfEntityType rdfOperationType) throws EdmException, OData2SparqlException {
 		List<CustomQueryOption> queryOptions = null;
 		if (rdfOperationType.isFunctionImport()) {
@@ -1163,6 +1436,14 @@ public class SparqlQueryBuilder {
 		return queryText;
 	}
 
+	/**
+	 * Preprocess operation dataset.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @param queryOptions the query options
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String preprocessOperationDataset(RdfEntityType rdfOperationType, List<CustomQueryOption> queryOptions)
 			throws OData2SparqlException {
 		String queryText = rdfOperationType.queryText;
@@ -1200,6 +1481,15 @@ public class SparqlQueryBuilder {
 		return queryText;
 	}
 
+	/**
+	 * Preprocess operation values.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @param queryOptions the query options
+	 * @param queryText the query text
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String preprocessOperationValues(RdfEntityType rdfOperationType, List<CustomQueryOption> queryOptions,
 			String queryText) throws OData2SparqlException {
 		StringBuilder parameterValues = new StringBuilder();
@@ -1242,6 +1532,15 @@ public class SparqlQueryBuilder {
 		return queryText;
 	}
 
+	/**
+	 * Preprocess operation custom query options.
+	 *
+	 * @param rdfOperationType the rdf operation type
+	 * @param queryOptions the query options
+	 * @param queryText the query text
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String preprocessOperationCustomQueryOptions(RdfEntityType rdfOperationType,
 			List<CustomQueryOption> queryOptions, String queryText) throws OData2SparqlException {
 		StringBuilder customQueryOptions = new StringBuilder("");
@@ -1280,6 +1579,13 @@ public class SparqlQueryBuilder {
 		return transformedQueryText;
 	}
 
+	/**
+	 * Preprocess property path.
+	 *
+	 * @param datasetRepository the dataset repository
+	 * @param propertyPath the property path
+	 * @return the string
+	 */
 	private String preprocessPropertyPath(RdfRepository datasetRepository, String propertyPath) {
 		String translatedPropertyPath = propertyPath.replaceAll("\\s", "");
 		final Matcher propertyPathMatcher = propertyPathPattern.matcher(translatedPropertyPath);
@@ -1303,6 +1609,13 @@ public class SparqlQueryBuilder {
 		return translatedPropertyPath;
 	}
 
+	/**
+	 * Preprocess dataset.
+	 *
+	 * @param datasetRepository the dataset repository
+	 * @param parameterValue the parameter value
+	 * @return the string
+	 */
 	private String preprocessDataset(RdfRepository datasetRepository, String parameterValue) {
 		//return "\"" + datasetRepository.getDataRepository().getServiceUrl() + "\"";
 		if (datasetRepository != null && datasetRepository.getDataRepository().getServiceUrl() != null) {
@@ -1313,6 +1626,15 @@ public class SparqlQueryBuilder {
 		}
 	}
 
+	/**
+	 * Clauses complex.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder clausesComplex()
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder clausesComplex = new StringBuilder();
@@ -1324,6 +1646,15 @@ public class SparqlQueryBuilder {
 		return clausesComplex;
 	}
 
+	/**
+	 * Clauses expand select.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder clausesExpandSelect()
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder clausesExpandSelect = new StringBuilder();
@@ -1338,6 +1669,13 @@ public class SparqlQueryBuilder {
 		return clausesExpandSelect;
 	}
 
+	/**
+	 * Select operation.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectOperation() throws EdmException, OData2SparqlException {
 		StringBuilder selectOperation = new StringBuilder();
 		if (DEBUG)
@@ -1346,6 +1684,13 @@ public class SparqlQueryBuilder {
 		return selectOperation;
 	}
 
+	/**
+	 * Select expand.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectExpand() throws EdmException, OData2SparqlException {
 		StringBuilder selectExpand = new StringBuilder();
 		if (DEBUG)
@@ -1373,6 +1718,14 @@ public class SparqlQueryBuilder {
 		return selectExpand;
 	}
 
+	/**
+	 * Select expand where.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectExpandWhere(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder selectExpandWhere = new StringBuilder();
 		if (DEBUG)
@@ -1430,6 +1783,14 @@ public class SparqlQueryBuilder {
 		return selectExpandWhere;
 	}
 
+	/**
+	 * Select expand where limit.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectExpandWhereLimit(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder selectExpandWhereLimit = new StringBuilder();
 
@@ -1453,6 +1814,12 @@ public class SparqlQueryBuilder {
 		return selectExpandWhereLimit;
 	}
 
+	/**
+	 * Filter.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder filter(String indent) {
 		StringBuilder filter = new StringBuilder().append(indent);
 		if (DEBUG)
@@ -1463,6 +1830,12 @@ public class SparqlQueryBuilder {
 		return filter;
 	}
 
+	/**
+	 * Exists.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder exists(String indent) {
 		StringBuilder exists = new StringBuilder();
 		if (DEBUG)
@@ -1473,6 +1846,14 @@ public class SparqlQueryBuilder {
 		return exists;
 	}
 
+	/**
+	 * Clauses path.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder().append(indent);
 		switch (this.uriType) {
@@ -1513,6 +1894,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses match.
+	 *
+	 * @param key1 the key 1
+	 * @param key2 the key 2
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesMatch(String key1, String key2, String indent) {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
@@ -1521,6 +1910,13 @@ public class SparqlQueryBuilder {
 		return clausesMatch;
 	}
 
+	/**
+	 * Clauses match.
+	 *
+	 * @param key the key
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesMatch(String key, String indent) {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
@@ -1529,6 +1925,14 @@ public class SparqlQueryBuilder {
 		return clausesMatch;
 	}
 
+	/**
+	 * Clauses match navigation key.
+	 *
+	 * @param key1 the key 1
+	 * @param key2 the key 2
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesMatchNavigationKey(String key1, String key2, String indent) {
 		StringBuilder clausesMatch = new StringBuilder();
 		if (DEBUG)
@@ -1537,11 +1941,24 @@ public class SparqlQueryBuilder {
 		return clausesMatch;
 	}
 
+	/**
+	 * Creates the match from template.
+	 *
+	 * @param key1 the key 1
+	 * @param key2 the key 2
+	 * @return the string
+	 */
 	private String createMatchFromTemplate(String key1, String key2) {
 		String template = this.rdfModel.getRdfRepository().getMatch();
 		return template.replace("key1", key1).replaceAll("key2", key2);
 	}
 
+	/**
+	 * Values sub class of.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @return the string builder
+	 */
 	private StringBuilder valuesSubClassOf(RdfEntityType rdfEntityType) {
 		StringBuilder valuesSubClassOf = new StringBuilder();
 		valuesSubClassOf.append("VALUES(?class){");
@@ -1556,6 +1973,14 @@ public class SparqlQueryBuilder {
 		return valuesSubClassOf;
 	}
 
+	/**
+	 * Clauses path URI 1.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI1(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1578,6 +2003,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 2.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI2(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1591,6 +2024,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 3.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI3(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1605,6 +2046,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 4.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI4(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1619,6 +2068,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 5.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI5(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1632,6 +2089,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 6 A.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI6A(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1645,6 +2110,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 6 B.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI6B(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1667,6 +2140,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 15.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI15(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1686,6 +2167,14 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Clauses path URI 16.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_URI16(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath = new StringBuilder();
 		if (DEBUG)
@@ -1699,6 +2188,12 @@ public class SparqlQueryBuilder {
 		return clausesPath;
 	}
 
+	/**
+	 * Primary key variables.
+	 *
+	 * @param rdfentityType the rdfentity type
+	 * @return the string builder
+	 */
 	private StringBuilder primaryKey_Variables(RdfEntityType rdfentityType) {
 		StringBuilder primaryKey_Variables = new StringBuilder();
 		if (rdfEntityType.isOperation()) {
@@ -1711,6 +2206,14 @@ public class SparqlQueryBuilder {
 		return primaryKey_Variables;
 	}
 
+	/**
+	 * Clauses path key predicate values.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPath_KeyPredicateValues(String indent) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPath_KeyPredicateValues = new StringBuilder();
 		String key = "";
@@ -1738,18 +2241,17 @@ public class SparqlQueryBuilder {
 						clausesPath_KeyPredicateValues.append(")");
 					}
 
-					// TODO to get key predicates for function import
 					String keyPredicate = navProperty.getVarName();
-					// if (uriInfo.getKeyPredicates() != null &&
-					// !uriInfo.getKeyPredicates().isEmpty()) {
 					if (((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0)).getKeyPredicates().size() != 0) {
 						for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 								.getKeyPredicates()) {
 							if (entityKey.getName().equals(keyPredicate)) {
-								String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(entityKey.getText());
+								String keyValue =RdfResourceParts.getParameter(entityKey);
+								String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(keyValue);
 								String expandedKey = rdfModel.getRdfPrefixes()
 										.expandPrefix(decodedEntityKey.substring(1, decodedEntityKey.length() - 1));
 								clausesPath_KeyPredicateValues.append("{(<" + expandedKey + ">)}");
+								
 							}
 						}
 					}
@@ -1760,7 +2262,6 @@ public class SparqlQueryBuilder {
 				}
 			}
 		} else if (rdfTargetEntityType.isOperation()) {
-			// TODO make sure not a complex or value resourceParts
 			if (segmentSize > 2) {
 				log.error("Too many navigation properties for operation:" + uriInfo.getUriResourceParts().toString());
 			} else {
@@ -1795,8 +2296,9 @@ public class SparqlQueryBuilder {
 				//	for (UriParameter entityKey : ((UriResourceEntitySet) uriInfo.getUriResourceParts().get(0))
 				//			.getKeyPredicates()) {
 				// Strip leading and trailing single quote from key
+				String keyValue = RdfResourceParts.getParameter(entityKey);
 				String expandedKey = rdfModel.getRdfPrefixes()
-						.expandPrefix(entityKey.getText().substring(1, entityKey.getText().length() - 1));
+						.expandPrefix(keyValue.substring(1, keyValue.length() - 1));
 
 				keyValues.put(entityKey.getName(), expandKey(expandedKey));
 			}
@@ -1812,6 +2314,12 @@ public class SparqlQueryBuilder {
 		return clausesPath_KeyPredicateValues;
 	}
 
+	/**
+	 * Expand key.
+	 *
+	 * @param expandedKey the expanded key
+	 * @return the string
+	 */
 	private String expandKey(String expandedKey) {
 		String pathVariable = "";
 		expandedKey = SparqlEntity.URLDecodeEntityKey(expandedKey);
@@ -1825,6 +2333,16 @@ public class SparqlQueryBuilder {
 		return pathVariable;
 	}
 
+	/**
+	 * Clauses path navigation.
+	 *
+	 * @param indent the indent
+	 * @param navigationSegments the navigation segments
+	 * @param entityKeys the entity keys
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder clausesPathNavigation(String indent, List<UriResource> navigationSegments,
 			List<UriParameter> entityKeys) throws EdmException, OData2SparqlException {
 		StringBuilder clausesPathNavigation = new StringBuilder();
@@ -2029,6 +2547,12 @@ public class SparqlQueryBuilder {
 		return clausesPathNavigation.insert(0, keyBindString);
 	}
 
+	/**
+	 * Clauses expand filter.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesExpandFilter(String indent) {
 		StringBuilder clausesExpandFilter = new StringBuilder().append(indent);
 		if (DEBUG)
@@ -2039,6 +2563,12 @@ public class SparqlQueryBuilder {
 		return clausesExpandFilter;
 	}
 
+	/**
+	 * Search.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder search(String indent) {
 		StringBuilder search = new StringBuilder().append(indent);
 		if (DEBUG)
@@ -2095,6 +2625,14 @@ public class SparqlQueryBuilder {
 		return search;
 	}
 
+	/**
+	 * Select path.
+	 *
+	 * @param searchAndFilter the search and filter
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectPath(StringBuilder searchAndFilter) throws EdmException, OData2SparqlException {
 		StringBuilder selectPath = new StringBuilder();
 		String indent;
@@ -2124,6 +2662,13 @@ public class SparqlQueryBuilder {
 		return selectPath;
 	}
 
+	/**
+	 * Select path count.
+	 *
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectPathCount() throws EdmException, OData2SparqlException {
 		StringBuilder selectPath = new StringBuilder();
 
@@ -2144,6 +2689,12 @@ public class SparqlQueryBuilder {
 		return selectPath;
 	}
 
+	/**
+	 * Clauses filter.
+	 *
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder clausesFilter(String indent) {
 		StringBuilder clausesFilter = new StringBuilder().append(indent);
 		if (DEBUG)
@@ -2175,6 +2726,15 @@ public class SparqlQueryBuilder {
 	//			// rdfEntityType.entityTypeName, indent,null));
 	//		}
 	//		return lambdaAllFilter;
+	/**
+	 * Expand complex construct.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 */
 	//	}
 	private StringBuilder expandComplexConstruct(RdfEntityType targetEntityType, String targetKey, String indent)
 			throws EdmException {
@@ -2191,6 +2751,17 @@ public class SparqlQueryBuilder {
 		return expandItemsConstruct;
 	}
 
+	/**
+	 * Expand items construct.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param expandItems the expand items
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder expandItemsConstruct(RdfEntityType targetEntityType, String targetKey,
 			List<ExpandItem> expandItems, String indent) throws EdmException, OData2SparqlException {
 		StringBuilder expandItemsConstruct = new StringBuilder();
@@ -2248,6 +2819,13 @@ public class SparqlQueryBuilder {
 		return expandItemsConstruct;
 	}
 
+	/**
+	 * Validate operation callable.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @return the boolean
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private Boolean validateOperationCallable(RdfEntityType rdfEntityType) throws OData2SparqlException {
 		if (rdfEntityType.isOperation()) {
 			if (!this.rdfModel.getRdfRepository().getExpandOperations()) {
@@ -2280,6 +2858,17 @@ public class SparqlQueryBuilder {
 		}
 	}
 
+	/**
+	 * Expand complex property construct.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @return the string builder
+	 */
 	private StringBuilder expandComplexPropertyConstruct(RdfEntityType targetEntityType, String targetKey,
 			String indent, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType) {
@@ -2312,6 +2901,20 @@ public class SparqlQueryBuilder {
 		return expandComplexPropertyConstruct;
 	}
 
+	/**
+	 * Expand item construct.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder expandItemConstruct(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType) throws EdmException, OData2SparqlException {
@@ -2351,6 +2954,18 @@ public class SparqlQueryBuilder {
 		return expandItemConstruct;
 	}
 
+	/**
+	 * Expand complex.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder expandComplex(RdfEntityType targetEntityType, String targetKey, String indent)
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
 		StringBuilder expandComplex = new StringBuilder();
@@ -2370,6 +2985,20 @@ public class SparqlQueryBuilder {
 		return expandComplex;
 	}
 
+	/**
+	 * Expand complex navigation property.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder expandComplexNavigationProperty(RdfEntityType targetEntityType, String targetKey,
 			String indent, RdfNavigationProperty navProperty, String nextTargetKey, RdfEntityType nextTargetEntityType)
 			throws OData2SparqlException, ODataApplicationException, ExpressionVisitException {
@@ -2379,7 +3008,6 @@ public class SparqlQueryBuilder {
 		// Not optional if filter imposed on path but should really be equality like filters, not negated filters
 		//SparqlExpressionVisitor expandFilterClause;
 
-		//TODO performance fix and to avoid OPTIONAL when no subselect but use otherwise
 		expandComplexNavigationProperty.append(indent).append("#expandComplexNavigationProperty\n").append(indent);
 		if (navProperty.getDomainClass().isOperation()) {//Fixes #103 || limitSet()) {
 			expandComplexNavigationProperty.append("OPTIONAL");
@@ -2440,6 +3068,20 @@ public class SparqlQueryBuilder {
 		return expandComplexNavigationProperty;
 	}
 
+	/**
+	 * Expand items where.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param expandItems the expand items
+	 * @param indent the indent
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder expandItemsWhere(RdfEntityType targetEntityType, String targetKey,
 			List<ExpandItem> expandItems, String indent, Boolean withinService)
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
@@ -2502,6 +3144,23 @@ public class SparqlQueryBuilder {
 		return expandItemsWhere;
 	}
 
+	/**
+	 * Expand item where.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder expandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, Boolean firstExpandItem, Boolean withinService)
@@ -2522,6 +3181,24 @@ public class SparqlQueryBuilder {
 		return expandItemWhere;
 	}
 
+	/**
+	 * Operation expand item where.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder operationExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, Boolean firstExpandItem, Boolean withinService)
@@ -2563,6 +3240,23 @@ public class SparqlQueryBuilder {
 		return operationExpandItemWhere;
 	}
 
+	/**
+	 * Implicit expand item where.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder implicitExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService)
@@ -2596,6 +3290,23 @@ public class SparqlQueryBuilder {
 		return implicitExpandItemWhere;
 	}
 
+	/**
+	 * Standard expand item where.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder standardExpandItemWhere(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService)
@@ -2632,6 +3343,19 @@ public class SparqlQueryBuilder {
 		return standardExpandItemWhere;
 	}
 
+	/**
+	 * Select implicit expand properties.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @return the string builder
+	 */
 	private StringBuilder selectImplicitExpandProperties(RdfEntityType targetEntityType, String targetKey,
 			String indent, ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem) {
@@ -2651,6 +3375,24 @@ public class SparqlQueryBuilder {
 		return selectImplicitExpandProperties;
 	}
 
+	/**
+	 * Select expand properties.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param firstExpandItem the first expand item
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectExpandProperties(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, boolean firstExpandItem, Boolean withinService)
@@ -2682,6 +3424,19 @@ public class SparqlQueryBuilder {
 		return selectExpandProperties;
 	}
 
+	/**
+	 * Select object properties.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder selectObjectProperties(String targetKey, String indent, ExpandItem expandItem,
 			RdfNavigationProperty navProperty, String nextTargetKey, Boolean withinService)
 			throws EdmException, OData2SparqlException {
@@ -2755,6 +3510,16 @@ public class SparqlQueryBuilder {
 		return selectObjectProperties;
 	}
 
+	/**
+	 * Select object property values.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @return the string builder
+	 */
 	private StringBuilder selectObjectPropertyValues(String targetKey, String indent, ExpandItem expandItem,
 			RdfNavigationProperty navProperty, String nextTargetKey) {
 		TreeSet<String> selectedProperties = createSelectPropertyMap(navProperty.getRangeClass(),
@@ -2784,6 +3549,12 @@ public class SparqlQueryBuilder {
 		return clausesSelect;
 	}
 
+	/**
+	 * Checks if is implicit navigation property.
+	 *
+	 * @param navProperty the nav property
+	 * @return true, if is implicit navigation property
+	 */
 	public static boolean isImplicitNavigationProperty(RdfNavigationProperty navProperty) {
 		String[] implicitNavigationProperties = new String[] { RdfConstants.RDF_HASFACTS_LABEL,
 				RdfConstants.RDF_HASPREDICATE_LABEL, RdfConstants.RDF_HASVALUES_LABEL,
@@ -2792,6 +3563,12 @@ public class SparqlQueryBuilder {
 		return Arrays.asList(implicitNavigationProperties).contains(navProperty.getEDMNavigationPropertyName());
 	}
 
+	/**
+	 * Checks if is implicit entity type.
+	 *
+	 * @param edmEntityType the edm entity type
+	 * @return true, if is implicit entity type
+	 */
 	private static boolean isImplicitEntityType(EdmEntityType edmEntityType) {
 		String[] implicitEntityTypes = new String[] { RdfConstants.RDF_OBJECTPREDICATE_LABEL,
 				RdfConstants.RDF_SUBJECTPREDICATE_LABEL, RdfConstants.RDF_VALUE_LABEL,
@@ -2799,6 +3576,12 @@ public class SparqlQueryBuilder {
 		return Arrays.asList(implicitEntityTypes).contains(edmEntityType.getName());
 	}
 
+	/**
+	 * Checks if is implicit entity type.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @return true, if is implicit entity type
+	 */
 	public static boolean isImplicitEntityType(RdfEntityType rdfEntityType) {
 		String[] implicitEntityTypes = new String[] { RdfConstants.RDF_OBJECTPREDICATE_LABEL,
 				RdfConstants.RDF_SUBJECTPREDICATE_LABEL, RdfConstants.RDF_VALUE_LABEL,
@@ -2806,6 +3589,15 @@ public class SparqlQueryBuilder {
 		return Arrays.asList(implicitEntityTypes).contains(rdfEntityType.getEntityTypeName());
 	}
 
+	/**
+	 * Expand implicit.
+	 *
+	 * @param targetKey the target key
+	 * @param navProperty the nav property
+	 * @param indent the indent
+	 * @param clausesSelect the clauses select
+	 * @return the string builder
+	 */
 	private StringBuilder expandImplicit(String targetKey, RdfNavigationProperty navProperty, String indent,
 			StringBuilder clausesSelect) {
 		StringBuilder expandImplicit = null;
@@ -2830,6 +3622,13 @@ public class SparqlQueryBuilder {
 		return expandImplicit;
 	}
 
+	/**
+	 * Expand item where has facts.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereHasFacts(String targetKey, String indent) {
 		StringBuilder expandItemWhereHasFacts = new StringBuilder();
 		//  	?Customer_s ?Customerrdf_hasFacts_ap ?Customerrdf_hasFacts_ao . 
@@ -2848,6 +3647,14 @@ public class SparqlQueryBuilder {
 		return expandItemWhereHasFacts;
 	}
 
+	/**
+	 * Expand item where has predicate.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param clausesSelect the clauses select
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereHasPredicate(String targetKey, String indent, StringBuilder clausesSelect) {
 		StringBuilder expandItemWhereHasPredicate = new StringBuilder();
 		//		BIND( ?Customerrdf_hasFacts_ap    as ?Customerrdf_hasFactsrdf_hasPredicate_s  )
@@ -2875,6 +3682,13 @@ public class SparqlQueryBuilder {
 		return expandItemWhereHasPredicate;
 	}
 
+	/**
+	 * Expand item where has values.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereHasValues(String targetKey, String indent) {
 		StringBuilder expandItemWhereHasValues = new StringBuilder();
 		//      BIND( IRI(CONCAT(STR(?Customerrdf_hasFacts_s),"-", MD5(STR(?Customerrdf_hasFacts_ao) ))) as ?Customerrdf_hasFactsrdf_hasValues_s)  
@@ -2896,6 +3710,14 @@ public class SparqlQueryBuilder {
 		return expandItemWhereHasValues;
 	}
 
+	/**
+	 * Expand item where has object value.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param clausesSelect the clauses select
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereHasObjectValue(String targetKey, String indent, StringBuilder clausesSelect) {
 		StringBuilder expandItemWhereHasObjectValue = new StringBuilder();
 		//		BIND(?Customerrdf_hasFactsrdf_hasValues_o  as ?Customerrdf_hasFactsrdf_hasValuesrdf_hasObjectValue_s  )
@@ -2907,6 +3729,13 @@ public class SparqlQueryBuilder {
 		return expandItemWhereHasObjectValue;
 	}
 
+	/**
+	 * Expand item where is objective.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereIsObjective(String targetKey, String indent) {
 		StringBuilder expandItemWhereIsObjective = new StringBuilder();
 		//		?Customerrdf_isObjective_as ?Customerrdf_isObjective_ap  ?Customer_s   .
@@ -2920,6 +3749,14 @@ public class SparqlQueryBuilder {
 		return expandItemWhereIsObjective;
 	}
 
+	/**
+	 * Expand item where is predicate of.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param clausesSelect the clauses select
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereIsPredicateOf(String targetKey, String indent, StringBuilder clausesSelect) {
 		StringBuilder expandItemWhereIsPredicateOf = new StringBuilder();
 		//		BIND(?Customerrdf_isObjective_ap  as    ?Customerrdf_isObjectiverdf_isPredicateOf_s)    
@@ -2931,6 +3768,14 @@ public class SparqlQueryBuilder {
 		return expandItemWhereIsPredicateOf;
 	}
 
+	/**
+	 * Expand item where has subjects.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param clausesSelect the clauses select
+	 * @return the string builder
+	 */
 	private StringBuilder expandItemWhereHasSubjects(String targetKey, String indent, StringBuilder clausesSelect) {
 		StringBuilder expandItemWhereHasSubjects = new StringBuilder();
 		//  	BIND(?Customerrdf_isObjective_as  as   ?Customerrdf_isObjectiverdf_hasSubjects_s )
@@ -2942,6 +3787,22 @@ public class SparqlQueryBuilder {
 		return expandItemWhereHasSubjects;
 	}
 
+	/**
+	 * Expand item where count.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @param withinService the within service
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private StringBuilder expandItemWhereCount(RdfEntityType targetEntityType, String targetKey, String indent,
 			ExpandItem expandItem, RdfNavigationProperty navProperty, String nextTargetKey,
 			RdfEntityType nextTargetEntityType, Boolean withinService)
@@ -2949,7 +3810,7 @@ public class SparqlQueryBuilder {
 
 		StringBuilder expandItemWhereCount = new StringBuilder();
 		expandItemWhereCount.append(indent).append("\t#expandItemWhereCount\n");
-		//TODO UNION or OPTIONAL, currently OPTIONAL improves performance #174 suggest neither!!
+		// UNION or OPTIONAL, currently OPTIONAL improves performance #174 suggest neither!!
 		//		expandItemWhereCount.append(indent).append("\tUNION");
 		expandItemWhereCount.append(indent).append("\t{ SELECT ?").append(targetKey)
 				.append("_s (COUNT(DISTINCT ?" + nextTargetKey + "_s) as ?" + nextTargetKey + "_count)\n")
@@ -3014,6 +3875,17 @@ public class SparqlQueryBuilder {
 		return expandItemWhereCount;
 	}
 
+	/**
+	 * Clauses select.
+	 *
+	 * @param selectPropertyMap the select property map
+	 * @param nextTargetKey the next target key
+	 * @param navPath the nav path
+	 * @param targetEntityType the target entity type
+	 * @param indent the indent
+	 * @param includeSubjectid the include subjectid
+	 * @return the string builder
+	 */
 	private StringBuilder clausesSelect(TreeSet<String> selectPropertyMap, String nextTargetKey, String navPath,
 			RdfEntityType targetEntityType, String indent, boolean includeSubjectid) {
 		StringBuilder clausesSelect = new StringBuilder();
@@ -3089,6 +3961,12 @@ public class SparqlQueryBuilder {
 			return new StringBuilder();
 	}
 
+	/**
+	 * Complex properties.
+	 *
+	 * @param selectProperty the select property
+	 * @return the string builder
+	 */
 	private StringBuilder complexProperties(RdfModel.RdfProperty selectProperty) {
 		StringBuilder complexProperties = new StringBuilder();
 		if (selectProperty != null) {
@@ -3112,6 +3990,12 @@ public class SparqlQueryBuilder {
 		return complexProperties;
 	}
 
+	/**
+	 * Complex properties set.
+	 *
+	 * @param selectProperty the select property
+	 * @return the tree set
+	 */
 	private TreeSet<String> complexPropertiesSet(RdfModel.RdfProperty selectProperty) {
 		TreeSet<String> complexProperties = new TreeSet<String>();
 		for (RdfProperty complexProperty : selectProperty.getComplexType().getProperties().values()) {
@@ -3138,6 +4022,11 @@ public class SparqlQueryBuilder {
 	//		return complexProperties;
 	//	}
 
+	/**
+	 * Limit clause.
+	 *
+	 * @return the string builder
+	 */
 	private StringBuilder limitClause() {
 		StringBuilder limitClause = new StringBuilder();
 		// if
@@ -3173,10 +4062,20 @@ public class SparqlQueryBuilder {
 		return limitClause;
 	}
 
+	/**
+	 * Limit set.
+	 *
+	 * @return true, if successful
+	 */
 	private boolean limitSet() {
 		return ((uriInfo.getTopOption() != null) || (uriInfo.getSkipOption() != null));
 	}
 
+	/**
+	 * Default limit clause.
+	 *
+	 * @return the string builder
+	 */
 	private StringBuilder defaultLimitClause() {
 		StringBuilder defaultLimitClause = new StringBuilder();
 		int defaultLimit = rdfModel.getRdfRepository().getModelRepository().getDefaultQueryLimit();
@@ -3185,6 +4084,14 @@ public class SparqlQueryBuilder {
 		return defaultLimitClause;
 	}
 
+	/**
+	 * Select reified property.
+	 *
+	 * @param entityType the entity type
+	 * @param selectOption the select option
+	 * @return the rdf property
+	 * @throws EdmException the edm exception
+	 */
 	private RdfProperty selectReifiedProperty(RdfEntityType entityType, SelectOption selectOption)
 			throws EdmException {
 		if (entityType.isReified() && rdfModel.getRdfRepository().isSupportScripting()) {
@@ -3246,6 +4153,14 @@ public class SparqlQueryBuilder {
 		}
 	}
 
+	/**
+	 * Creates the select property map.
+	 *
+	 * @param entityType the entity type
+	 * @param selectOption the select option
+	 * @return the tree set
+	 * @throws EdmException the edm exception
+	 */
 	private TreeSet<String> createSelectPropertyMap(RdfEntityType entityType, SelectOption selectOption)
 			throws EdmException {
 		// Align variables
@@ -3300,7 +4215,7 @@ public class SparqlQueryBuilder {
 										throw new EdmException("Failed to locate property:" + property.getResourcePath()
 												.getUriResourceParts().get(0).getSegmentValue());
 									} else {
-										// TODO specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be included other than link, unless included in subsequent $expand
+										//  specifically asked for key so should be added to VALUES even though no details of a selected navigationproperty need be included other than link, unless included in subsequent $expand
 										// See http://docs.oasis-open.org/odata/odata/v4.0/os/part2-url-conventions/odata-v4.0-os-part2-url-conventions.html#_Toc372793861 5.1.3 System Query Option $select
 										valueProperties.add(RdfConstants.RDF_TYPE);
 									}
@@ -3335,14 +4250,32 @@ public class SparqlQueryBuilder {
 		//return null;
 	}
 
+	/**
+	 * Checks if is primitive value.
+	 *
+	 * @return the boolean
+	 */
 	public Boolean isPrimitiveValue() {
 		return isPrimitiveValue;
 	}
 
+	/**
+	 * Sets the checks if is primitive value.
+	 *
+	 * @param isPrimitiveValue the new checks if is primitive value
+	 */
 	public void setIsPrimitiveValue(Boolean isPrimitiveValue) {
 		this.isPrimitiveValue = isPrimitiveValue;
 	}
 
+	/**
+	 * Prepare entity links sparql.
+	 *
+	 * @return the sparql statement
+	 * @throws EdmException the edm exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement prepareEntityLinksSparql()
 			throws EdmException, ODataApplicationException, OData2SparqlException {
 		String expandedKey = rdfResourceParts.getValidatedSubjectIdUrl();
@@ -3384,12 +4317,23 @@ public class SparqlQueryBuilder {
 		return new SparqlStatement(sparql.toString());
 	}
 
+	/**
+	 * Adds the proxied rdf edm provider.
+	 *
+	 * @param proxyDataset the proxy dataset
+	 * @param proxiedRdfEdmProvider the proxied rdf edm provider
+	 */
 	public void addProxiedRdfEdmProvider(String proxyDataset, RdfEdmProvider proxiedRdfEdmProvider) {
 		if (!this.proxiedRdfEdmProviders.containsKey(proxyDataset)) {
 			this.proxiedRdfEdmProviders.put(proxyDataset, proxiedRdfEdmProvider);
 		}
 	}
 
+	/**
+	 * Sparql prefixes.
+	 *
+	 * @return the string builder
+	 */
 	public StringBuilder sparqlPrefixes() {
 		StringBuilder sparqlPrefixes = new StringBuilder();
 

@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
@@ -27,15 +30,36 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlReferenceCollectionProcessor.
+ */
 public class SparqlReferenceCollectionProcessor implements ReferenceCollectionProcessor{
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
+	
+	/**
+	 * Instantiates a new sparql reference collection processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlReferenceCollectionProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
@@ -43,6 +67,16 @@ public class SparqlReferenceCollectionProcessor implements ReferenceCollectionPr
 	}
 	
 	
+	/**
+	 * Read reference collection.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override 
 	public void readReferenceCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {

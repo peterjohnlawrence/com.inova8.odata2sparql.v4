@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
 //import org.openrdf.model.Value;
@@ -13,10 +16,23 @@ import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
 
+/**
+ * The Class RdfNode.
+ */
 public class RdfNode {
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfNode.class);
+	
+	/** The node. */
 	private final Value node;
 
+	/**
+	 * Equals.
+	 *
+	 * @param obj the obj
+	 * @return true, if successful
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof String) {
@@ -28,49 +44,102 @@ public class RdfNode {
 		}
 	}
 
+	/**
+	 * Hash code.
+	 *
+	 * @return the int
+	 */
 	@Override
 	public int hashCode() {
 		return this.node.stringValue().hashCode();
 	}
 
+	/**
+	 * Instantiates a new rdf node.
+	 *
+	 * @param node the node
+	 */
 	public RdfNode(Value node) {
 		this.node = node;
 	}
 
+	/**
+	 * Gets the node.
+	 *
+	 * @return the node
+	 */
 	public Value getNode() {
 		return node;
 	}
 
+	/**
+	 * Checks if is iri.
+	 *
+	 * @return true, if is iri
+	 */
 	public boolean isIRI() {
 		return node instanceof IRI;
 	}
 
+	/**
+	 * Checks if is blank.
+	 *
+	 * @return true, if is blank
+	 */
 	public boolean isBlank() {
 		return node instanceof BNode;
 	}
 
+	/**
+	 * Gets the iri.
+	 *
+	 * @return the iri
+	 */
 	public Object getIRI() {
 		if (this.isBlank()) {
 			return ((BNode) node).toString();
 		} else {
-			return ((IRI) node).toString();
+			return ((IRI) node).stringValue();
 		}
 	}
+	
+	/**
+	 * Gets the IRI string.
+	 *
+	 * @return the IRI string
+	 */
 	public String getIRIString() {
 		return this.getIRI().toString();
 	}
+	
+	/**
+	 * Gets the literal datatype.
+	 *
+	 * @return the literal datatype
+	 */
 	public IRI getLiteralDatatype() {
 		return ((Literal) node).getDatatype();
 	}
 
+	/**
+	 * Gets the literal value.
+	 *
+	 * @return the literal value
+	 */
 	public Literal getLiteralValue() {
 		return ((Literal) node);
 	}
 
+	/**
+	 * Gets the literal object.
+	 *
+	 * @return the literal object
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public Object getLiteralObject() throws OData2SparqlException {
 		try {
 			if (this.getLiteralDatatype() != null) {
-				switch (this.getLiteralDatatype().toString()) {
+				switch (this.getLiteralDatatype().stringValue()) {
 				case "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString":
 					return this.getLiteralValue().stringValue();
 				case "http://www.w3.org/2001/XMLSchema#string":
@@ -175,7 +244,7 @@ public class RdfNode {
 					return this.getLiteralValue().stringValue();
 
 				default:
-					log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().toString()
+					log.debug("RdfNode getLiteralObject failure. Datatype:" + this.getLiteralDatatype().stringValue()
 							+ ". Value: " + this.getLiteralValue().stringValue());
 					//throw new Olingo2SparqlException("RdfNode getLiteralObject failure");
 					return this.getLiteralValue().stringValue();
@@ -188,6 +257,11 @@ public class RdfNode {
 		}		
 	}
 
+	/**
+	 * Gets the local name.
+	 *
+	 * @return the local name
+	 */
 	public String getLocalName() {
 		if(this.isBlank()) {
 			return ((BNode) node).toString();
@@ -196,6 +270,11 @@ public class RdfNode {
 		}
 	}
 
+	/**
+	 * Gets the namespace.
+	 *
+	 * @return the namespace
+	 */
 	public String getNamespace() {
 		String nameSpace = ((IRI) node).getNamespace();
 		if(this.isIRI()) return ((IRI) node).getNamespace();
@@ -207,6 +286,11 @@ public class RdfNode {
 			return nameSpace;
 	}
 
+	/**
+	 * Gets the literal.
+	 *
+	 * @return the literal
+	 */
 	public RdfLiteral getLiteral() {
 		RdfLiteral rdfLiteral = new RdfLiteral((Literal) node);
 		return rdfLiteral;

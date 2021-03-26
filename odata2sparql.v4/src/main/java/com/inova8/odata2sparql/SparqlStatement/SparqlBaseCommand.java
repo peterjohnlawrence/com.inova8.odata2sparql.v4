@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlStatement;
 
 import java.net.URI;
@@ -36,9 +39,25 @@ import com.inova8.odata2sparql.SparqlBuilder.SparqlQueryBuilder;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlBaseCommand.
+ */
 public class SparqlBaseCommand {
+	
+	/** The Constant log. */
 	private final static Logger log = LoggerFactory.getLogger(SparqlBaseCommand.class);
 
+	/**
+	 * Read entity set.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @param rdfResourceParts the rdf resource parts
+	 * @return the entity collection
+	 * @throws ODataException the o data exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	static public EntityCollection readEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType,
 			RdfResourceParts rdfResourceParts) throws ODataException, OData2SparqlException {
 		SparqlQueryBuilder sparqlBuilder = new SparqlQueryBuilder(rdfEdmProvider, uriInfo, uriType, rdfResourceParts);
@@ -70,6 +89,18 @@ public class SparqlBaseCommand {
 		return rdfResults.getEntityCollection();
 	}
 
+	/**
+	 * Read entity.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @param rdfResourceParts the rdf resource parts
+	 * @return the entity
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	static public Entity readEntity(RdfEdmProvider rdfEdmProvider, final UriInfo uriInfo, UriType uriType,
 			RdfResourceParts rdfResourceParts) throws EdmException, OData2SparqlException, ODataException {
 		List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
@@ -148,11 +179,22 @@ public class SparqlBaseCommand {
 
 		SparqlEntityCollection rdfResults = sparqlStatement.executeConstruct(rdfEdmProvider, rdfEntityType,
 				uriInfo.getExpandOption(), uriInfo.getSelectOption());
-
+	//	rdfResourceParts.getDecodedKey()
 		return knownKey ? rdfResults.findEntity(key) : rdfResults.getFirstEntity();
 
 	}
 
+	/**
+	 * Count entity set.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @return the rdf literal
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws EdmException the edm exception
+	 * @throws ODataException the o data exception
+	 */
 	static public RdfLiteral countEntitySet(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo, UriType uriType)
 			throws OData2SparqlException, EdmException, ODataException {
 		RdfResourceParts rdfResourceParts = new RdfResourceParts(rdfEdmProvider, uriInfo);
@@ -177,6 +219,17 @@ public class SparqlBaseCommand {
 		}
 	}
 
+	/**
+	 * Read reference collection.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @return the entity collection
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws EdmException the edm exception
+	 * @throws ODataException the o data exception
+	 */
 	static public EntityCollection readReferenceCollection(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo,
 			UriType uriType)
 			throws OData2SparqlException, EdmException, ODataException {
@@ -202,6 +255,17 @@ public class SparqlBaseCommand {
 		}
 	}
 
+	/**
+	 * Write entity.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param requestEntity the request entity
+	 * @return the entity
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws EdmException the edm exception
+	 * @throws ODataException the o data exception
+	 */
 	public static Entity writeEntity(RdfEdmProvider rdfEdmProvider,RdfResourceParts rdfResourceParts,   Entity requestEntity)
 			throws OData2SparqlException, EdmException, ODataException {
 		SparqlStatement sparqlStatement = null;
@@ -224,6 +288,14 @@ public class SparqlBaseCommand {
 		return requestEntity;
 	}
 
+	/**
+	 * Delete entity.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param uriInfo the uri info
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void deleteEntity(RdfEdmProvider rdfEdmProvider, RdfResourceParts rdfResourceParts,  UriInfo uriInfo) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		// 1. Retrieve the entity set which belongs to the requested entity
@@ -246,6 +318,16 @@ public class SparqlBaseCommand {
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
+	/**
+	 * Update entity.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param uriInfo the uri info
+	 * @param requestEntity the request entity
+	 * @param httpMethod the http method
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void updateEntity(RdfEdmProvider rdfEdmProvider, RdfResourceParts rdfResourceParts,   UriInfo uriInfo, Entity requestEntity,
 			HttpMethod httpMethod) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
@@ -272,6 +354,14 @@ public class SparqlBaseCommand {
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
+	/**
+	 * Update primitive value.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @param entry the entry
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void updatePrimitiveValue(RdfEdmProvider rdfEdmProvider,  UriInfo uriInfo, Object entry)
 			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
@@ -305,6 +395,14 @@ public class SparqlBaseCommand {
 		sparqlStatement.executeUpdate(rdfEdmProvider);
 	}
 
+	/**
+	 * Delete primitive value.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param uriInfo the uri info
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	public static void deletePrimitiveValue(RdfEdmProvider rdfEdmProvider, UriInfo uriInfo)
 			throws OData2SparqlException, ODataException {
 		SparqlStatement sparqlStatement = null;
@@ -341,6 +439,16 @@ public class SparqlBaseCommand {
 
 	}
 
+	/**
+	 * Write entity reference.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param uriInfo the uri info
+	 * @param requestEntityReferences the request entity references
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	public static void writeEntityReference(RdfEdmProvider rdfEdmProvider, RdfResourceParts rdfResourceParts , UriInfo uriInfo,
 			List<URI> requestEntityReferences) throws OData2SparqlException, ODataException {
 		SparqlStatement sparqlStatement = null;
@@ -368,6 +476,16 @@ public class SparqlBaseCommand {
 
 	}
 
+	/**
+	 * Update entity reference.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param uriInfo the uri info
+	 * @param requestEntityReferences the request entity references
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	public static void updateEntityReference(RdfEdmProvider rdfEdmProvider,RdfResourceParts rdfResourceParts , UriInfo uriInfo,
 			List<URI> requestEntityReferences) throws OData2SparqlException, ODataException {
 		SparqlStatement sparqlStatement = null;
@@ -393,6 +511,14 @@ public class SparqlBaseCommand {
 		sparqlStatement.executeInsert(rdfEdmProvider);
 	}
 
+	/**
+	 * Delete entity reference.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param uriInfo the uri info
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void deleteEntityReference(RdfEdmProvider rdfEdmProvider,RdfResourceParts rdfResourceParts , UriInfo uriInfo)
 			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;

@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
@@ -33,22 +36,52 @@ import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 
+/**
+ * The Class SparqlEntityProcessor.
+ */
 public class SparqlEntityProcessor implements EntityProcessor {
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/** The odata. */
 	private OData odata; 
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
 
+	/**
+	 * Instantiates a new sparql entity processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlEntityProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
 
+	/**
+	 * Read entity.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
@@ -89,6 +122,17 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 	}
 
+	/**
+	 * Update entity.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updateEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -121,6 +165,17 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
+	/**
+	 * Creates the entity.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void createEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -170,6 +225,15 @@ public class SparqlEntityProcessor implements EntityProcessor {
 		response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
 	}
 
+	/**
+	 * Delete entity.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void deleteEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {

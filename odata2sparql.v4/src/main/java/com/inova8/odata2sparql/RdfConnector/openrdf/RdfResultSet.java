@@ -1,9 +1,5 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2015 inova8.com and/or its affiliates. All rights reserved.
- *
- * 
+ * inova8 2020
  */
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
@@ -24,16 +20,20 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
  * The Class RdfResultSet. Acts as a wrapper class for the results of a SPARQL query
  */
 public class RdfResultSet {
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfTripleSet.class);
     /** The result set. */
     private final TupleQueryResult resultSet;
+    
+    /** The connection. */
     private final RepositoryConnection connection;
     
     /**
      * Instantiates a new rdf result set.
-     * @param connection 
      *
-     * @param resultSet the result set
+     * @param repository the repository
+     * @param query the query
      */
 	 RdfResultSet(Repository repository, String query) {
 		 this.connection =  repository.getConnection();
@@ -56,7 +56,7 @@ public class RdfResultSet {
 	 * Next solution.
 	 *
 	 * @return the rdf query solution
-	 * @throws OData2SparqlException 
+	 * @throws OData2SparqlException the o data 2 sparql exception
 	 */
 	public RdfQuerySolution nextSolution() throws OData2SparqlException {
 		BindingSet querySolution;
@@ -72,7 +72,7 @@ public class RdfResultSet {
 	 * Next.
 	 *
 	 * @return the rdf query solution
-	 * @throws OData2SparqlException 
+	 * @throws OData2SparqlException the o data 2 sparql exception
 	 */
 	public RdfQuerySolution next() throws OData2SparqlException {
 		BindingSet querySolution;
@@ -84,6 +84,9 @@ public class RdfResultSet {
 		return new RdfQuerySolution(querySolution);
 	}
 
+	/**
+	 * Close.
+	 */
 	public void close()  {
 		try {
 			if (connection.isOpen() ){
@@ -93,10 +96,22 @@ public class RdfResultSet {
 			log.warn("Failed to close RdfResultSet");
 		}
 	}
+	
+	/**
+	 * Checks if is closed.
+	 *
+	 * @return true, if is closed
+	 */
 	public boolean isClosed(){
 		return !connection.isOpen();
 		
 	}
+	
+	/**
+	 * Finalize.
+	 *
+	 * @throws Throwable the throwable
+	 */
 	@SuppressWarnings("deprecation")
 	protected void finalize() throws Throwable {
 		super.finalize();

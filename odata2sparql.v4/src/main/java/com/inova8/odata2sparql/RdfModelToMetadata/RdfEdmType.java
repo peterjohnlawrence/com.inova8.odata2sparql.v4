@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfModelToMetadata;
 
 import java.util.Map;
@@ -7,7 +10,12 @@ import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 
+/**
+ * The Class RdfEdmType.
+ */
 public class RdfEdmType {
+	
+	/** The Constant SIMPLE_TYPE_MAPPING. */
 	private static final Map<String, EdmPrimitiveTypeKind> SIMPLE_TYPE_MAPPING = new TreeMap<String, EdmPrimitiveTypeKind>();
 
 	static {
@@ -61,16 +69,36 @@ public class RdfEdmType {
 		SIMPLE_TYPE_MAPPING.put("http://inova8.com/calc2graph/def/script", EdmPrimitiveTypeKind.String);
 
 	};
+	
+	/**
+	 * Gets the edm type.
+	 *
+	 * @param propertyTypeName the property type name
+	 * @return the edm type
+	 */
 	public static EdmPrimitiveTypeKind getEdmType(String propertyTypeName) {
 		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
 			return EdmPrimitiveTypeKind.String;
 		return SIMPLE_TYPE_MAPPING.get(propertyTypeName);
 	}
+	
+	/**
+	 * Checks if is any uri.
+	 *
+	 * @param propertyTypeName the property type name
+	 * @return true, if is any uri
+	 */
 	public static boolean isAnyUri(String propertyTypeName) {
 		if (propertyTypeName== null || !SIMPLE_TYPE_MAPPING.containsKey(propertyTypeName))
 		return false;
 		return  propertyTypeName.equals("http://www.w3.org/2001/XMLSchema#anyURI");
 	};
+	
+	/**
+	 * Any uri.
+	 *
+	 * @return the string
+	 */
 	public static String anyUri() {
 		return "Edm.anyURI";
 	};

@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlBuilder;
 
 import java.util.List;
@@ -32,22 +35,60 @@ import com.inova8.odata2sparql.SparqlExpressionVisitor.SparqlExpressionVisitor;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlFilterClausesBuilder.
+ */
 public class SparqlFilterClausesBuilder {
 
+	/** The expand item variables. */
 	private StringBuilder expandItemVariables = new StringBuilder("");
+	
+	/** The clauses expand filter. */
 	private StringBuilder clausesExpandFilter = new StringBuilder("");
+	
+	/** The clauses expand filter necessary. */
 	private Boolean clausesExpandFilterNecessary = false;
+	
+	/** The filter. */
 	private StringBuilder filter = new StringBuilder("");
+	
+	/** The filter clause. */
 	private SparqlExpressionVisitor filterClause;
 
+	/** The uri type. */
 	private final UriType uriType;
+	
+	/** The rdf model to metadata. */
 	private final RdfModelToMetadata rdfModelToMetadata;
+	
+	/** The rdf model. */
 	private final RdfModel rdfModel;
+	
+	/** The edm entity set. */
 	private EdmEntitySet edmEntitySet;
+	
+	/** The rdf entity type. */
 	private RdfEntityType rdfEntityType;
+	
+	/** The edm target entity set. */
 	private EdmEntitySet edmTargetEntitySet;
+	
+	/** The rdf target entity type. */
 	private RdfEntityType rdfTargetEntityType;
 
+	/**
+	 * Instantiates a new sparql filter clauses builder.
+	 *
+	 * @param rdfModel the rdf model
+	 * @param rdfModelToMetadata the rdf model to metadata
+	 * @param uriInfo the uri info
+	 * @param uriType the uri type
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlFilterClausesBuilder(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, UriInfo uriInfo,
 			UriType uriType,RdfResourceParts  rdfResourceParts)
 			throws ODataApplicationException, ExpressionVisitException, EdmException, OData2SparqlException {
@@ -132,14 +173,30 @@ public class SparqlFilterClausesBuilder {
 					uriInfo.getExpandOption().getExpandItems(), "#indent");
 	}
 
+	/**
+	 * Gets the expand item variables.
+	 *
+	 * @return the expand item variables
+	 */
 	public StringBuilder getExpandItemVariables() {
 		return expandItemVariables;
 	}
 
+	/**
+	 * Gets the filter.
+	 *
+	 * @return the filter
+	 */
 	public StringBuilder getFilter() {
 		return filter;
 	}
 
+	/**
+	 * Gets the clauses filter.
+	 *
+	 * @param indent the indent
+	 * @return the clauses filter
+	 */
 	public StringBuilder getClausesFilter(String indent) {
 		//return clausesFilter(null, rdfTargetEntityType.entityTypeName, indent, this.filterClause.getNavPropertyPropertyFilters().get(rdfTargetEntityType.entityTypeName).getPropertyFilters());
 		StringBuilder clausesFilter = new StringBuilder();
@@ -152,6 +209,12 @@ public class SparqlFilterClausesBuilder {
 		return clausesFilter;
 	}
 
+	/**
+	 * Gets the clauses expand filter.
+	 *
+	 * @param indent the indent
+	 * @return the clauses expand filter
+	 */
 	public StringBuilder getClausesExpandFilter(String indent) {
 		if(clausesExpandFilterNecessary) {
 		return new StringBuilder(clausesExpandFilter.toString().replaceAll("#indent", indent));
@@ -160,10 +223,25 @@ public class SparqlFilterClausesBuilder {
 		}
 	}
 
+	/**
+	 * Gets the filter clause.
+	 *
+	 * @return the filter clause
+	 */
 	public SparqlExpressionVisitor getFilterClause() {
 		return filterClause;
 	}
 
+	/**
+	 * Filter clause.
+	 *
+	 * @param filter the filter
+	 * @param entityType the entity type
+	 * @param nextTargetKey the next target key
+	 * @return the sparql expression visitor
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private SparqlExpressionVisitor filterClause(FilterOption filter, RdfEntityType entityType, String nextTargetKey)
 			throws ODataApplicationException, ExpressionVisitException {
 		SparqlExpressionVisitor sparqlExpressionVisitor = new SparqlExpressionVisitor(rdfModel, rdfModelToMetadata,
@@ -183,6 +261,15 @@ public class SparqlFilterClausesBuilder {
 		return sparqlExpressionVisitor;
 	}
 
+	/**
+	 * Clauses filter.
+	 *
+	 * @param expandSelectTreeNodeLinksEntry the expand select tree node links entry
+	 * @param nextTargetKey the next target key
+	 * @param indent the indent
+	 * @param propertyFilters the property filters
+	 * @return the string builder
+	 */
 	private StringBuilder clausesFilter(Entry<String, ExpandOption> expandSelectTreeNodeLinksEntry,
 			String nextTargetKey, String indent, TreeMap<String, PropertyFilter> propertyFilters) {
 		StringBuilder clausesFilter = new StringBuilder();
@@ -194,6 +281,18 @@ public class SparqlFilterClausesBuilder {
 		return clausesFilter;
 	}
 
+	/**
+	 * Expand items.
+	 *
+	 * @param targetEntityType the target entity type
+	 * @param targetKey the target key
+	 * @param expandItems the expand items
+	 * @param indent the indent
+	 * @throws EdmException the edm exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private void expandItems(RdfEntityType targetEntityType, String targetKey, List<ExpandItem> expandItems,
 			String indent)
 			throws EdmException, OData2SparqlException, ODataApplicationException, ExpressionVisitException {
@@ -237,6 +336,18 @@ public class SparqlFilterClausesBuilder {
 		}
 	}
 
+	/**
+	 * Expand item.
+	 *
+	 * @param targetKey the target key
+	 * @param indent the indent
+	 * @param expandItem the expand item
+	 * @param navProperty the nav property
+	 * @param nextTargetKey the next target key
+	 * @param nextTargetEntityType the next target entity type
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ExpressionVisitException the expression visit exception
+	 */
 	private void expandItem(String targetKey, String indent, ExpandItem expandItem, RdfNavigationProperty navProperty,
 			String nextTargetKey, RdfEntityType nextTargetEntityType)
 			throws ODataApplicationException, ExpressionVisitException {

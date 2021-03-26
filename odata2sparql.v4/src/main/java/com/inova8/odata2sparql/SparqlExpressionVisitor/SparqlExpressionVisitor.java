@@ -1,9 +1,5 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2015 inova8.com and/or its affiliates. All rights reserved.
- *
- * 
+ * inova8 2020
  */
 package com.inova8.odata2sparql.SparqlExpressionVisitor;
 
@@ -37,24 +33,59 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfModelToMetadata;
 import com.inova8.odata2sparql.SparqlStatement.SparqlEntity;
 
+/**
+ * The Class SparqlExpressionVisitor.
+ */
 public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
+	
+	/** The subject postfix. */
 	private final String SUBJECT_POSTFIX = "_s";
+	
+	/** The s path. */
 	private String sPath = "";
+	
+	/** The properties. */
 	private final HashSet<RdfProperty> properties;
+	
+	/** The navigation properties. */
 	private final TreeMap<String, HashSet<RdfProperty>> navigationProperties;
 
+	/** The nav property property filters. */
 	private final TreeMap<String, NavPropertyPropertyFilter> navPropertyPropertyFilters;
+	
+	/** The rdf model. */
 	private final RdfModel rdfModel;
 
 
+	/** The entity type. */
 	private final RdfEntityType entityType;
+	
+	/** The condition string. */
 	private String conditionString = "";
+	
+	/** The all status. */
 	private final Boolean allStatus = false;
+	
+	/** The rdf model to metadata. */
 	private final RdfModelToMetadata rdfModelToMetadata;
+	
+	/** The lambda navigation property. */
 	private RdfNavigationProperty lambdaNavigationProperty;
+	
+	/** The lambda all. */
 	private boolean lambdaAll = false;
+	
+	/** The primitive property graph pattern. */
 	private String primitivePropertyGraphPattern="";
 
+	/**
+	 * Instantiates a new sparql expression visitor.
+	 *
+	 * @param rdfModel the rdf model
+	 * @param rdfModelToMetadata the rdf model to metadata
+	 * @param entityType the entity type
+	 * @param path the path
+	 */
 	public SparqlExpressionVisitor(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, RdfEntityType entityType,
 			String path) {
 		super();
@@ -66,6 +97,18 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		this.navigationProperties = new TreeMap<String, HashSet<RdfProperty>>();
 		this.navPropertyPropertyFilters = new TreeMap<String, NavPropertyPropertyFilter>();
 	}
+	
+	/**
+	 * Instantiates a new sparql expression visitor.
+	 *
+	 * @param rdfModel the rdf model
+	 * @param rdfModelToMetadata the rdf model to metadata
+	 * @param entityType the entity type
+	 * @param path the path
+	 * @param lambdaNavigationProperty the lambda navigation property
+	 * @param parentExpressionVisitor the parent expression visitor
+	 * @param lambdaAll the lambda all
+	 */
 	public SparqlExpressionVisitor(RdfModel rdfModel, RdfModelToMetadata rdfModelToMetadata, RdfEntityType entityType,
 			String path,RdfNavigationProperty lambdaNavigationProperty ,SparqlExpressionVisitor parentExpressionVisitor, boolean lambdaAll ) {
 		super();
@@ -79,34 +122,77 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		this.navPropertyPropertyFilters =  parentExpressionVisitor.getNavPropertyPropertyFilters();
 		this.lambdaAll =lambdaAll;
 	}
+	
+	/**
+	 * Checks if is all status.
+	 *
+	 * @return true, if is all status
+	 */
 	public boolean isAllStatus() {
 		//TODO
 		return allStatus;
 	}
 
+	/**
+	 * Gets the condition string.
+	 *
+	 * @return the condition string
+	 */
 	public String getConditionString() {
 		return conditionString;
 	}
 
+	/**
+	 * Sets the condition string.
+	 *
+	 * @param conditionString the new condition string
+	 */
 	public void setConditionString(String conditionString) {
 		this.conditionString = conditionString;
 
 	}
 
+	/**
+	 * Gets the aggregate filter clause.
+	 *
+	 * @return the aggregate filter clause
+	 */
 	public String getAggregateFilterClause() {
 		return this.isAllStatus() ? conditionString : "";
 	}
 
+	/**
+	 * Gets the nav property property filters.
+	 *
+	 * @return the nav property property filters
+	 */
 	public TreeMap<String, NavPropertyPropertyFilter> getNavPropertyPropertyFilters() {
 		return navPropertyPropertyFilters;
 	}
+	
+	/**
+	 * Gets the properties.
+	 *
+	 * @return the properties
+	 */
 	public HashSet<RdfProperty> getProperties() {
 		return properties;
 	}
+	
+	/**
+	 * Gets the navigation properties.
+	 *
+	 * @return the navigation properties
+	 */
 	public TreeMap<String, HashSet<RdfProperty>> getNavigationProperties() {
 		return navigationProperties;
 	}
 
+	/**
+	 * Gets the navigation property subjects.
+	 *
+	 * @return the navigation property subjects
+	 */
 	public String getNavigationPropertySubjects() {
 		String navigationPropertySubject = "";
 		for (Entry<String, HashSet<RdfProperty>> navigationPropertyEntry : navigationProperties.entrySet()) {
@@ -119,6 +205,11 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return navigationPropertySubject;
 	}
 
+	/**
+	 * Gets the property clause.
+	 *
+	 * @return the property clause
+	 */
 	public String getPropertyClause() {
 		String propertyClause = "";
 		String key = entityType.entityTypeName;
@@ -162,6 +253,11 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 
 	}
 
+	/**
+	 * Gets the filter clause.
+	 *
+	 * @return the filter clause
+	 */
 	public String getFilterClause() {
 		if (!allStatus) {
 			if (conditionString != "")
@@ -170,6 +266,14 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return "";
 	}
 
+	/**
+	 * Put nav property property filter.
+	 *
+	 * @param sPath the s path
+	 * @param navProperty the nav property
+	 * @param property the property
+	 * @param filter the filter
+	 */
 	private void putNavPropertyPropertyFilter(String sPath, RdfNavigationProperty navProperty, RdfProperty property,
 			String filter) {
 		NavPropertyPropertyFilter navPropertyPropertyFilter;
@@ -203,6 +307,16 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		}
 	}
 
+	/**
+	 * Visit binary operator.
+	 *
+	 * @param operator the operator
+	 * @param left the left
+	 * @param right the right
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitBinaryOperator(BinaryOperatorKind operator, Object left, Object right)
 			throws ExpressionVisitException, ODataApplicationException {
@@ -213,6 +327,15 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			return binaryOperation(operator, left, right);
 		}
 	}
+	
+	/**
+	 * Binary operation.
+	 *
+	 * @param operator the operator
+	 * @param left the left
+	 * @param right the right
+	 * @return the object
+	 */
 	private Object binaryOperation(BinaryOperatorKind operator, Object left, Object right) {
 		String sparqlOperator = "";
 		switch (operator) {
@@ -247,6 +370,15 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		//return the binary statement
 		return "(" + left + " " + sparqlOperator + " " + right + ")";
 	}
+	
+	/**
+	 * Inverse binary operation.
+	 *
+	 * @param operator the operator
+	 * @param left the left
+	 * @param right the right
+	 * @return the object
+	 */
 	private Object inverseBinaryOperation(BinaryOperatorKind operator, Object left, Object right) {
 		String sparqlOperator = "";
 		switch (operator) {
@@ -281,6 +413,16 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		//return the binary statement
 		return "(" + left + " " + sparqlOperator + " " + right + ")";
 	}
+	
+	/**
+	 * Visit unary operator.
+	 *
+	 * @param operator the operator
+	 * @param operand the operand
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitUnaryOperator(UnaryOperatorKind operator, Object operand)
 			throws ExpressionVisitException, ODataApplicationException {
@@ -298,6 +440,15 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return sparqlunary;
 	}
 
+	/**
+	 * Visit method call.
+	 *
+	 * @param methodCall the method call
+	 * @param parameters the parameters
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Object visitMethodCall(MethodKind methodCall, List parameters)
@@ -380,6 +531,16 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 
 	}
 
+	/**
+	 * Visit lambda expression.
+	 *
+	 * @param lambdaFunction the lambda function
+	 * @param lambdaVariable the lambda variable
+	 * @param expression the expression
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitLambdaExpression(String lambdaFunction, String lambdaVariable, Expression expression)
 			throws ExpressionVisitException, ODataApplicationException {
@@ -387,6 +548,14 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return null;
 	}
 
+	/**
+	 * Visit literal.
+	 *
+	 * @param literal the literal
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitLiteral(Literal literal) throws ExpressionVisitException, ODataApplicationException {
 		String decodedEntityKey = SparqlEntity.URLDecodeEntityKey(literal.toString());
@@ -417,6 +586,14 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		}
 	}
 
+	/**
+	 * Visit member.
+	 *
+	 * @param member the member
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitMember(Member member) throws ExpressionVisitException, ODataApplicationException {
 		String currentPath = this.sPath;
@@ -490,6 +667,15 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return null;	
 	}
 
+	/**
+	 * Visit member primitive property part.
+	 *
+	 * @param currentPath the current path
+	 * @param currentEntityType the current entity type
+	 * @param member the member
+	 * @param memberPart the member part
+	 * @return the string
+	 */
 	protected String visitMemberPrimitivePropertyPart(String currentPath,RdfEntityType currentEntityType,Member member, UriResource memberPart) {
 		RdfProperty rdfProperty;
 		String memberProperty = memberPart.toString();		
@@ -554,6 +740,16 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 			}
 		}
 	}
+	
+	/**
+	 * Visit member navigation property part.
+	 *
+	 * @param currentPath the current path
+	 * @param currentEntityType the current entity type
+	 * @param member the member
+	 * @param memberPart the member part
+	 * @return the string
+	 */
 	protected String visitMemberNavigationPropertyPart(String currentPath,RdfEntityType currentEntityType,Member member, UriResource memberPart) {
 		RdfNavigationProperty rdfNavigationProperty;
 		String memberProperty = memberPart.toString();		
@@ -562,6 +758,14 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		String visitProperty =  currentPath + memberProperty;
 		return visitProperty;
 	}
+	
+	/**
+	 * Cast variable.
+	 *
+	 * @param rdfProperty the rdf property
+	 * @param visitProperty the visit property
+	 * @return the string
+	 */
 	private String castVariable(RdfProperty rdfProperty, String visitProperty) {
 		switch (rdfProperty.getPropertyTypeName()) {
 		case RdfConstants.XSD_DATETIME:
@@ -576,24 +780,57 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return visitProperty;
 	}
 
+	/**
+	 * Visit alias.
+	 *
+	 * @param aliasName the alias name
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitAlias(String aliasName) throws ExpressionVisitException, ODataApplicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * Visit type literal.
+	 *
+	 * @param type the type
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitTypeLiteral(EdmType type) throws ExpressionVisitException, ODataApplicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * Visit lambda reference.
+	 *
+	 * @param variableName the variable name
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitLambdaReference(String variableName) throws ExpressionVisitException, ODataApplicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * Visit enum.
+	 *
+	 * @param type the type
+	 * @param enumValues the enum values
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Object visitEnum(EdmEnumType type, List enumValues)
@@ -602,6 +839,16 @@ public class SparqlExpressionVisitor implements ExpressionVisitor<Object> {
 		return null;
 	}
 
+	/**
+	 * Visit binary operator.
+	 *
+	 * @param operator the operator
+	 * @param left the left
+	 * @param right the right
+	 * @return the object
+	 * @throws ExpressionVisitException the expression visit exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	@Override
 	public Object visitBinaryOperator(BinaryOperatorKind operator, Object left, List<Object> right)
 			throws ExpressionVisitException, ODataApplicationException {

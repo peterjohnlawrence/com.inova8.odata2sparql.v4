@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlBuilder;
 
 import java.text.SimpleDateFormat;
@@ -17,9 +20,21 @@ import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.SparqlStatement.SparqlStatement;
 
+/**
+ * The Class SparqlChangeManager.
+ */
 public class SparqlChangeManager {
+	
+	/** The Constant log. */
 	private final static Logger log = LoggerFactory.getLogger(SparqlChangeManager.class);
 
+	/**
+	 * Clear.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void clear(String rdfRepositoryID, RdfEdmProvider rdfEdmProvider) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		StringBuilder clear = new StringBuilder();
@@ -36,6 +51,13 @@ public class SparqlChangeManager {
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
+	/**
+	 * Archive.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void archive(String rdfRepositoryID, RdfEdmProvider rdfEdmProvider) throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
 		StringBuilder archive;
@@ -71,6 +93,13 @@ public class SparqlChangeManager {
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
+	/**
+	 * Rollback.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void rollback(String rdfRepositoryID, RdfEdmProvider rdfEdmProvider) throws OData2SparqlException {
 		//SparqlStatement sparqlStatement = null;
 
@@ -101,6 +130,12 @@ public class SparqlChangeManager {
 		}
 	}
 
+	/**
+	 * Changes.
+	 *
+	 * @param changeGraph the change graph
+	 * @return the string
+	 */
 	private static String changes(String changeGraph) {
 
 		StringBuilder changesQuery = new StringBuilder();
@@ -111,6 +146,13 @@ public class SparqlChangeManager {
 		return changesQuery.toString();
 	}
 
+	/**
+	 * Rollback.
+	 *
+	 * @param changeGraph the change graph
+	 * @param changeURI the change URI
+	 * @return the string
+	 */
 	private static String rollback(String changeGraph, String changeURI) {
 		StringBuilder rollback = new StringBuilder();
 		rollback.append("DELETE{ \n").append("	GRAPH ?addedGraph \n").append("	{ \n")
@@ -157,6 +199,14 @@ public class SparqlChangeManager {
 		return rollback.toString();
 	}
 
+	/**
+	 * Rollback.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param change the change
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void rollback(String rdfRepositoryID, RdfEdmProvider rdfEdmProvider, String change)
 			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;
@@ -219,6 +269,14 @@ public class SparqlChangeManager {
 		sparqlStatement.executeDelete(rdfEdmProvider);
 	}
 
+	/**
+	 * Rollback.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @param rdfEdmProvider the rdf edm provider
+	 * @param backTo the back to
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public static void rollback(String rdfRepositoryID, RdfEdmProvider rdfEdmProvider, Date backTo)
 			throws OData2SparqlException {
 		SparqlStatement sparqlStatement = null;

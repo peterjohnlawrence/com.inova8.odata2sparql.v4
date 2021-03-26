@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlStatement;
 
 import java.math.BigDecimal;
@@ -46,10 +49,21 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModelToMetadata.RdfEdmType;
 import com.inova8.odata2sparql.Utils.RdfNodeComparator;
 
+/**
+ * The Class SparqlEntityCollection.
+ */
 class SparqlEntityCollection extends EntityCollection {
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(SparqlEntityCollection.class);
+	
+	/** The entity set results map. */
 	private final Map<String, SparqlEntity> entitySetResultsMap = new TreeMap<String, SparqlEntity>();
+	
+	/** The nav property results. */
 	private final Map<String, Map<String, List<Object>>> navPropertyResults = new TreeMap<String, Map<String, List<Object>>>();
+	
+	/** The sparql edm provider. */
 	private RdfEdmProvider sparqlEdmProvider;
 
 	// Clarification of expanded structure
@@ -57,6 +71,15 @@ class SparqlEntityCollection extends EntityCollection {
 	// Expanded to first level: List<Map<Subject, Map<navProp, Map<Object, Map<Property,Value>>>>>
 	// Expanded to second level: List<Map<Subject, Map<navProp, Map<Object, Map<navProp, Map<Object, Map<Property,Value>>>>>>>
 
+	/**
+	 * Instantiates a new sparql entity collection.
+	 *
+	 * @param sparqlEdmProvider the sparql edm provider
+	 * @param entityType the entity type
+	 * @param results the results
+	 * @param expand the expand
+	 * @param select the select
+	 */
 	SparqlEntityCollection(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) {
 		super();
@@ -68,11 +91,23 @@ class SparqlEntityCollection extends EntityCollection {
 	//		return entitySetResultsMap;
 	//	}
 
+	/**
+	 * Gets the entity collection.
+	 *
+	 * @return the entity collection
+	 * @throws ODataException the o data exception
+	 */
 	public EntityCollection getEntityCollection() throws ODataException {
 
 		return this;
 	}
 
+	/**
+	 * Gets the first entity.
+	 *
+	 * @return the first entity
+	 * @throws ODataException the o data exception
+	 */
 	public Entity getFirstEntity() throws ODataException {
 		if (!this.getEntities().isEmpty()) {
 			return this.iterator().next();
@@ -81,6 +116,12 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 	}
 
+	/**
+	 * Find entity.
+	 *
+	 * @param key the key
+	 * @return the entity
+	 */
 	public Entity findEntity(String key) {
 		if (!this.getEntities().isEmpty()) {
 			for (Entity entity : this.getEntities()) {
@@ -94,10 +135,22 @@ class SparqlEntityCollection extends EntityCollection {
 		return null;
 	}
 
+	/**
+	 * Gets the nav property results.
+	 *
+	 * @return the nav property results
+	 */
 	public Map<String, Map<String, List<Object>>> getNavPropertyResults() {
 		return navPropertyResults;
 	}
 
+	/**
+	 * Gets the links.
+	 *
+	 * @param entityKey the entity key
+	 * @param navProperty the nav property
+	 * @return the links
+	 */
 	List<Map<String, Object>> getLinks(String entityKey, String navProperty) {
 		ArrayList<Map<String, Object>> links = new ArrayList<Map<String, Object>>();
 
@@ -113,6 +166,13 @@ class SparqlEntityCollection extends EntityCollection {
 		return links;
 	}
 
+	/**
+	 * Adds the nav property object values.
+	 *
+	 * @param subject the subject
+	 * @param navigationPropertyName the navigation property name
+	 * @param rdfObjectEntity the rdf object entity
+	 */
 	private void addNavPropertyObjectValues(String subject, String navigationPropertyName,
 			SparqlEntity rdfObjectEntity) {
 
@@ -139,6 +199,16 @@ class SparqlEntityCollection extends EntityCollection {
 		rdfObjectEntity.setExpandedEntity(true);
 	}
 
+	/**
+	 * To sparql entity collection.
+	 *
+	 * @param rdfEntityType the rdf entity type
+	 * @param results the results
+	 * @param expand the expand
+	 * @param select the select
+	 * @return the sparql entity collection
+	 * @throws EdmException the edm exception
+	 */
 	private SparqlEntityCollection toSparqlEntityCollection(RdfEntityType rdfEntityType, RdfTripleSet results,
 			ExpandOption expand, SelectOption select) throws EdmException {
 		
@@ -299,6 +369,13 @@ class SparqlEntityCollection extends EntityCollection {
 		return this.build();
 	}
 
+	/**
+	 * Find or create complex link.
+	 *
+	 * @param rdfSubjectEntity the rdf subject entity
+	 * @param rdfComplexTypeProperty the rdf complex type property
+	 * @param rdfObjectEntity the rdf object entity
+	 */
 	@SuppressWarnings("unchecked")
 	private void findOrCreateComplexLink(SparqlEntity rdfSubjectEntity,
 			RdfComplexTypePropertyPair rdfComplexTypeProperty, SparqlEntity rdfObjectEntity) {
@@ -415,6 +492,14 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 	}
 
+	/**
+	 * Find or create link.
+	 *
+	 * @param rdfSubjectEntity the rdf subject entity
+	 * @param rdfNavigationProperty the rdf navigation property
+	 * @param rdfObjectEntity the rdf object entity
+	 * @return the link
+	 */
 	private Link findOrCreateLink(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty,
 			SparqlEntity rdfObjectEntity) {
 		Link link = null;
@@ -455,6 +540,13 @@ class SparqlEntityCollection extends EntityCollection {
 		return link;
 	}
 
+	/**
+	 * Find or create rdf type link.
+	 *
+	 * @param rdfSubjectEntity the rdf subject entity
+	 * @param rdfObjectEntity the rdf object entity
+	 * @return the link
+	 */
 	private Link findOrCreateRdfTypeLink(SparqlEntity rdfSubjectEntity, 
 			SparqlEntity rdfObjectEntity) {
 		 String edmNavigationPropertyName = RdfConstants.RDF_TYPE_EDMNAME;
@@ -488,6 +580,15 @@ class SparqlEntityCollection extends EntityCollection {
 					+edmNavigationPropertyName);
 		return link;
 	}
+	
+	/**
+	 * Find or create link count.
+	 *
+	 * @param rdfSubjectEntity the rdf subject entity
+	 * @param rdfNavigationProperty the rdf navigation property
+	 * @param count the count
+	 * @return the link
+	 */
 	private Link findOrCreateLinkCount(SparqlEntity rdfSubjectEntity, RdfNavigationProperty rdfNavigationProperty,
 			int count) {
 		Link link = null;
@@ -526,6 +627,12 @@ class SparqlEntityCollection extends EntityCollection {
 		return link;
 	}
 
+	/**
+	 * Find or create entity.
+	 *
+	 * @param subjectNode the subject node
+	 * @return the sparql entity
+	 */
 	private SparqlEntity findOrCreateEntity(RdfNode subjectNode) {//, RdfEntityType rdfEntityType) {
 		SparqlEntity rdfEntity;
 		rdfEntity = entitySetResultsMap.get(
@@ -540,6 +647,9 @@ class SparqlEntityCollection extends EntityCollection {
 		return rdfEntity;
 	}
 
+	/**
+	 * Merge matching.
+	 */
 	private void mergeMatching() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
@@ -563,6 +673,12 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 	}
 
+	/**
+	 * Resolve complex properties.
+	 *
+	 * @param rdfEntity the rdf entity
+	 * @param properties the properties
+	 */
 	private void resolveComplexProperties(SparqlEntity rdfEntity, List<Property> properties) {
 		for (Property property : properties) {
 			ValueType propertyValueType = property.getValueType();
@@ -606,6 +722,11 @@ class SparqlEntityCollection extends EntityCollection {
 		}
 	}
 
+	/**
+	 * Builds the.
+	 *
+	 * @return the sparql entity collection
+	 */
 	private SparqlEntityCollection build() {
 		Iterator<Map.Entry<String, SparqlEntity>> entitySetResultsMapIterator = entitySetResultsMap.entrySet()
 				.iterator();
@@ -741,6 +862,13 @@ class SparqlEntityCollection extends EntityCollection {
 		return this;
 	}
 
+	/**
+	 * Cast.
+	 *
+	 * @param value the value
+	 * @param propertyTypeName the property type name
+	 * @return the object
+	 */
 	private Object Cast(Object value, String propertyTypeName) {
 		EdmPrimitiveTypeKind propertyType = RdfEdmType.getEdmType(propertyTypeName);
 		try {

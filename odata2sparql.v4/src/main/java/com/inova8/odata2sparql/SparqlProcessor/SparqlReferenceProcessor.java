@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
@@ -31,22 +34,52 @@ import com.inova8.odata2sparql.SparqlStatement.SparqlBaseCommand;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlReferenceProcessor.
+ */
 public class SparqlReferenceProcessor implements ReferenceProcessor {
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
 
+	/**
+	 * Instantiates a new sparql reference processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlReferenceProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
 
+	/**
+	 * Read reference.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readReference(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
@@ -93,6 +126,16 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 
 	}
 
+	/**
+	 * Creates the reference.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void createReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
@@ -121,6 +164,16 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
+	/**
+	 * Update reference.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updateReference(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat) throws ODataApplicationException, ODataLibraryException {
@@ -150,6 +203,15 @@ public class SparqlReferenceProcessor implements ReferenceProcessor {
 		response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 	}
 
+	/**
+	 * Delete reference.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void deleteReference(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {

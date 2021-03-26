@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfRepository;
 
 import java.io.File;
@@ -47,17 +50,43 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Constants.*;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 
+/**
+ * The Class RdfRepositories.
+ */
 public class RdfRepositories {
 
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfRepositories.class);
+	
+	/** The repository manager. */
 	private RepositoryManager repositoryManager = null;
+	
+	/** The repository folder. */
 	private final String repositoryFolder;
+	
+	/** The repository url. */
 	private final String repositoryUrl;
+	
+	/** The repository dir. */
 	private final String repositoryDir;
+	
+	/** The rdf repository list. */
 	private Map<String, RdfRepository> rdfRepositoryList = new TreeMap<String, RdfRepository>();
+	
+	/** The local repository manager model. */
 	String localRepositoryManagerModel = RdfConstants.repositoryWorkingDirectory;
+	
+	/** The local repository manager directory. */
 	String localRepositoryManagerDirectory = RdfConstants.repositoryWorkingDirectory;
 
+	/**
+	 * Instantiates a new rdf repositories.
+	 *
+	 * @param configFolder the config folder
+	 * @param repositoryFolder the repository folder
+	 * @param repositoryUrl the repository url
+	 * @param repositoryDir the repository dir
+	 */
 	public RdfRepositories(String configFolder, String repositoryFolder, String repositoryUrl, String repositoryDir) {
 		super();
 		if (configFolder == null || configFolder.isEmpty()) {
@@ -79,14 +108,27 @@ public class RdfRepositories {
 		}
 	}
 
+	/**
+	 * Gets the local repository manager model.
+	 *
+	 * @return the local repository manager model
+	 */
 	public String getLocalRepositoryManagerModel() {
 		return localRepositoryManagerModel;
 	}
 
+	/**
+	 * Gets the local repository manager directory.
+	 *
+	 * @return the local repository manager directory
+	 */
 	public String getLocalRepositoryManagerDirectory() {
 		return localRepositoryManagerDirectory;
 	}
 
+	/**
+	 * Reload.
+	 */
 	public void reload() {
 		repositoryManager.shutDown();
 		try {
@@ -98,14 +140,33 @@ public class RdfRepositories {
 		}
 	}
 
+	/**
+	 * Gets the rdf repository.
+	 *
+	 * @param rdfRepositoryID the rdf repository ID
+	 * @return the rdf repository
+	 */
 	public RdfRepository getRdfRepository(String rdfRepositoryID) {
 		return rdfRepositoryList.get(rdfRepositoryID);
 	}
 
+	/**
+	 * Gets the rdf repositories.
+	 *
+	 * @return the rdf repositories
+	 */
 	public Map<String, RdfRepository> getRdfRepositories() {
 		return rdfRepositoryList;
 	}
 
+	/**
+	 * Verify RDF 4 J update endpoint url.
+	 *
+	 * @param queryEndpointUrl the query endpoint url
+	 * @param updateEndpointUrl the update endpoint url
+	 * @param profile the profile
+	 * @return the string
+	 */
 	private String verifyRDF4JUpdateEndpointUrl(String queryEndpointUrl, String updateEndpointUrl, String profile) {
 		if (profile == "" || profile.equals(SPARQLProfile.RDF4J.getCode())) {
 			URI updateEndpointUri;
@@ -147,6 +208,12 @@ public class RdfRepositories {
 
 	}
 
+	/**
+	 * Load repositories.
+	 *
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws RepositoryConfigException the repository config exception
+	 */
 	private void loadRepositories() throws OData2SparqlException, RepositoryConfigException {
 		try {
 			if (this.repositoryUrl != null && !this.repositoryUrl.isEmpty()) {
@@ -540,6 +607,13 @@ public class RdfRepositories {
 		}
 	}
 
+	/**
+	 * Bootstrap remote repository.
+	 *
+	 * @param repositoryUrl the repository url
+	 * @return the repository manager
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	@SuppressWarnings("deprecation")
 	private RepositoryManager bootstrapRemoteRepository(String repositoryUrl) throws OData2SparqlException {
 		RemoteRepositoryManager repositoryManager = new RemoteRepositoryManager(repositoryUrl);
@@ -557,6 +631,13 @@ public class RdfRepositories {
 		return repositoryManager;
 	}
 
+	/**
+	 * Bootstrap local repository.
+	 *
+	 * @return the repository manager
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@SuppressWarnings("deprecation")
 	private RepositoryManager bootstrapLocalRepository() throws OData2SparqlException, IOException {
 		//Create a local repository manager for managing all of the endpoints including the model itself
@@ -589,6 +670,12 @@ public class RdfRepositories {
 
 	}
 
+	/**
+	 * Preload system repository.
+	 *
+	 * @param repositoryManager the repository manager
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void preloadSystemRepository(RepositoryManager repositoryManager) throws OData2SparqlException {
 		//Create a configuration for the system repository implementation which is a native store
 
@@ -786,6 +873,14 @@ public class RdfRepositories {
 		}
 	}
 
+	/**
+	 * Read prefixes.
+	 *
+	 * @param modelsConnection the models connection
+	 * @param valueOfDataset the value of dataset
+	 * @return the tree map
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private TreeMap<String, Namespace> readPrefixes(RepositoryConnection modelsConnection, Value valueOfDataset)
 			throws OData2SparqlException {
 		TreeMap<String, Namespace> namespaces = new TreeMap<String, Namespace>();
@@ -822,6 +917,13 @@ public class RdfRepositories {
 
 	}
 
+	/**
+	 * Read queries.
+	 *
+	 * @param modelsConnection the models connection
+	 * @param RDFSModel the RDFS model
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void readQueries(RepositoryConnection modelsConnection, Value RDFSModel) throws OData2SparqlException {
 		Hashtable<Value, Hashtable<Value, String>> metaModels = RdfConstants.getMetaModels();
 		//Bootstrap the standard queries

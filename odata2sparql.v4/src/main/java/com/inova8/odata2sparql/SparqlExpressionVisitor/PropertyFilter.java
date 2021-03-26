@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlExpressionVisitor;
 
 import java.util.HashSet;
@@ -5,33 +8,82 @@ import java.util.HashSet;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfNavigationProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 
+/**
+ * The Class PropertyFilter.
+ */
 public class PropertyFilter {
+	
+	/** The property. */
 	private final RdfProperty property;
+	
+	/** The navigation property. */
 	private final RdfNavigationProperty navigationProperty;
+	
+	/** The target prefix. */
 	private final String  targetPrefix;
+	
+	/** The filters. */
 	private final HashSet<String> filters;
 
+	/**
+	 * Instantiates a new property filter.
+	 *
+	 * @param targetPrefix the target prefix
+	 * @param property the property
+	 */
 	PropertyFilter(String  targetPrefix,RdfProperty property) {
 		this.navigationProperty = null;
 		this.property = property;
 		this.targetPrefix = targetPrefix;
 		filters = new HashSet<String>();
 	}
+	
+	/**
+	 * Instantiates a new property filter.
+	 *
+	 * @param targetPrefix the target prefix
+	 * @param navigationProperty the navigation property
+	 */
 	PropertyFilter(String  targetPrefix,RdfNavigationProperty navigationProperty) {
 		this.navigationProperty = navigationProperty;
 		this.property = null;
 		this.targetPrefix = targetPrefix;
 		filters = new HashSet<String>();
 	}
+	
+	/**
+	 * Gets the property.
+	 *
+	 * @return the property
+	 */
 	public RdfProperty getProperty() {
 		return property;
 	}
+	
+	/**
+	 * Gets the navigation property.
+	 *
+	 * @return the navigation property
+	 */
 	public RdfNavigationProperty getNavigationProperty() {
 		return navigationProperty;
 	}
+	
+	/**
+	 * Gets the filters.
+	 *
+	 * @return the filters
+	 */
 	public HashSet<String> getFilters() {
 		return filters;
 	}
+	
+	/**
+	 * Gets the clause filter.
+	 *
+	 * @param nextTargetKey the next target key
+	 * @return the clause filter
+	 */
 	public StringBuilder getClauseFilter(String nextTargetKey) {
 		StringBuilder clauseFilter= new StringBuilder();
 		if(this.property != null)

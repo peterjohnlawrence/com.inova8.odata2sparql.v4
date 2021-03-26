@@ -1,9 +1,5 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2015 inova8.com and/or its affiliates. All rights reserved.
- *
- * 
+ * inova8 2020
  */
 package com.inova8.odata2sparql.SparqlStatement;
 
@@ -22,18 +18,45 @@ import com.inova8.odata2sparql.RdfConnector.openrdf.RdfUpdate;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfEntityType;
 
+/**
+ * The Class SparqlStatement.
+ */
 public class SparqlStatement {
+	
+	/** The Constant log. */
 	private final static Logger log = LoggerFactory.getLogger(SparqlStatement.class);
+	
+	/** The sparql. */
 	private static String sparql;
 
+	/**
+	 * Instantiates a new sparql statement.
+	 *
+	 * @param sparql the sparql
+	 */
 	public SparqlStatement(String sparql) {
 		SparqlStatement.sparql = sparql;
 	}
 
+	/**
+	 * Gets the sparql.
+	 *
+	 * @return the sparql
+	 */
 	public String getSparql() {
 		return sparql;
 	}
 
+	/**
+	 * Execute construct.
+	 *
+	 * @param sparqlEdmProvider the sparql edm provider
+	 * @param entityType the entity type
+	 * @param expand the expand
+	 * @param select the select
+	 * @return the sparql entity collection
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	SparqlEntityCollection executeConstruct(RdfEdmProvider sparqlEdmProvider, RdfEntityType entityType,
 			ExpandOption expand, SelectOption select) throws OData2SparqlException {
 		RdfConstructQuery rdfQuery = new RdfConstructQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(),
@@ -50,6 +73,13 @@ public class SparqlStatement {
 		return new SparqlEntityCollection(sparqlEdmProvider, entityType, results, expand, select);
 	}
 
+	/**
+	 * Execute select.
+	 *
+	 * @param sparqlEdmProvider the sparql edm provider
+	 * @return the rdf result set
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	RdfResultSet executeSelect(RdfEdmProvider sparqlEdmProvider) throws OData2SparqlException {
 		RdfSelectQuery rdfQuery = new RdfSelectQuery(sparqlEdmProvider.getRdfRepository().getDataRepository(), sparql);
 		RdfResultSet results = null;
@@ -62,6 +92,12 @@ public class SparqlStatement {
 		return results;
 	}
 
+	/**
+	 * Execute insert.
+	 *
+	 * @param sparqlEdmProvider the sparql edm provider
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	void executeInsert(RdfEdmProvider sparqlEdmProvider)
 			throws OData2SparqlException {
 
@@ -77,6 +113,11 @@ public class SparqlStatement {
 		}
 	}
 
+	/**
+	 * Execute delete.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public void executeDelete(RdfEdmProvider rdfEdmProvider) {
 		
 		RdfUpdate rdfDelete = new RdfUpdate(rdfEdmProvider.getRdfRepository().getDataRepository(),
@@ -90,6 +131,12 @@ public class SparqlStatement {
 			rdfDelete.close();
 		}	
 	}
+	
+	/**
+	 * Execute update.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public void executeUpdate(RdfEdmProvider rdfEdmProvider) {
 		
 		RdfUpdate rdfUpdate = new RdfUpdate(rdfEdmProvider.getRdfRepository().getDataRepository(),

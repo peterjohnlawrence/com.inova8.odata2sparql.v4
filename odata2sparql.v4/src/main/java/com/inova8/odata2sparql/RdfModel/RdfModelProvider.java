@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfModel;
 
 import java.util.Collection;
@@ -27,18 +30,40 @@ import com.inova8.odata2sparql.RdfModel.RdfModel.RdfProperty;
 import com.inova8.odata2sparql.RdfModel.RdfModel.RdfSchema;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 
+/**
+ * The Class RdfModelProvider.
+ */
 public class RdfModelProvider {
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfModelProvider.class);
+	
+	/** The model. */
 	private final RdfModel model;
+	
+	/** The complex types. */
 	private TreeSet<RdfComplexType> complexTypes = new TreeSet<RdfComplexType>();
+	
+	/** The rdf metamodel provider. */
 	private final RdfMetamodelProvider rdfMetamodelProvider;
 
+	/**
+	 * Instantiates a new rdf model provider.
+	 *
+	 * @param rdfRepository the rdf repository
+	 */
 	public RdfModelProvider(RdfRepository rdfRepository) {
 		super();
 		this.rdfMetamodelProvider = new RdfMetamodelProvider(rdfRepository);
 		model = new RdfModel(rdfRepository);
 	}
 
+	/**
+	 * Gets the rdf model.
+	 *
+	 * @return the rdf model
+	 * @throws Exception the exception
+	 */
 	public RdfModel getRdfModel() throws Exception {
 		log.info("Loading model " + model.getRdfRepository().getModelName() + " from endpoint: "
 				+ model.getRdfRepository().getModelRepository().getRepository().toString());
@@ -63,8 +88,14 @@ public class RdfModelProvider {
 		return model;
 	}
 
+	/**
+	 * Initialize core.
+	 *
+	 * @return the rdf entity type
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private RdfEntityType initializeCore() throws OData2SparqlException {
-		RdfSchema defaultGraph = model.getOrCreateGraph(rdfMetamodelProvider.getRdfRepository().defaultNamespace(),
+		RdfSchema defaultGraph = model.getOrCreateGraph( rdfMetamodelProvider.getRdfRepository().defaultNamespace(),
 				rdfMetamodelProvider.getRdfRepository().getDefaultPrefix());
 		defaultGraph.isDefault = true;
 		model.getOrCreatePrefix(rdfMetamodelProvider.getRdfRepository().getDefaultPrefix(),
@@ -147,97 +178,18 @@ public class RdfModelProvider {
 				unityNode, unityNode, RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
 		
 		if (this.rdfMetamodelProvider.getRdfRepository().isIncludeImplicitRDF()) {
-			includeImplicitRDF(rdfStringNode, unityNode, rdfsResource);
+			ImplicitRDFProvider.includeImplicitRDF(rdfStringNode, unityNode, rdfsResource,model);
 		}
-//		if (this.rdfMetamodelProvider.getRdfRepository().isSupportScripting()) {
-//			addSupportScripting(unityNode);
-//		}
+		PathQLProvider.includePathQL(rdfStringNode, unityNode, rdfsResource,model);
 		return rdfsResource;
 	}
 
-	protected void includeImplicitRDF(RdfNode rdfStringNode, RdfNode unityNode, RdfEntityType rdfsResource)
-			throws OData2SparqlException {
-		//RDF MetaModel
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_STATEMENT_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_STATEMENT), unityNode, unityNode,
-				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.ONE);
-		RdfNode rdfSubjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE);
-		RdfNode rdfSubjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_SUBJECTPREDICATE_LABEL);
-		model.getOrCreateEntityType(rdfSubjectPredicateNode, rdfSubjectPredicateLabelNode, rdfsResource);
-		RdfNode rdfObjectPredicateNode = RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE);
-		RdfNode rdfObjectPredicateLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_OBJECTPREDICATE_LABEL);
-		model.getOrCreateEntityType(rdfObjectPredicateNode, rdfObjectPredicateLabelNode, rdfsResource);
-		RdfNode rdfValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_VALUE);
-		RdfNode rdfValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_VALUE_LABEL);
-		model.getOrCreateEntityType(rdfValueNode, rdfValueLabelNode, rdfsResource);
-
-
-
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASFACTS),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASFACTS_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE), unityNode, unityNode,
-				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASPREDICATE),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASPREDICATE_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode, RdfConstants.Cardinality.ONE,
-				RdfConstants.Cardinality.ONE);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASVALUES),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASVALUES_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTPREDICATE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_VALUE), unityNode, unityNode, RdfConstants.Cardinality.MANY,
-				RdfConstants.Cardinality.MANY);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASOBJECTVALUE),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASOBJECTVALUE_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDF_VALUE), RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-				unityNode, unityNode, RdfConstants.Cardinality.ONE, RdfConstants.Cardinality.ONE);
-		model.getOrCreateProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASDATAVALUE), null,
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASDATAVALUE_LABEL), rdfValueNode, rdfStringNode,
-				RdfConstants.Cardinality.ZERO_TO_ONE);
-		model.getOrCreateProperty(RdfNodeFactory.createURI(RdfConstants.RDF_OBJECTVALUE), null,
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_OBJECTVALUE_LABEL), rdfValueNode, rdfStringNode,
-				RdfConstants.Cardinality.ONE);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISOBJECTIVE),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_ISOBJECTIVE_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE), unityNode, unityNode,
-				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_ISPREDICATEOF),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_ISPREDICATEOF_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
-				RdfNodeFactory.createURI(RdfConstants.RDF_PROPERTY), unityNode, unityNode, RdfConstants.Cardinality.ONE,
-				RdfConstants.Cardinality.ONE);
-		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_HASSUBJECTS),
-				RdfNodeFactory.createLiteral(RdfConstants.RDF_HASSUBJECTS_LABEL),
-				RdfNodeFactory.createURI(RdfConstants.RDF_SUBJECTPREDICATE),
-				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), unityNode, unityNode,
-				RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
-	}
-
-//	private void addSupportScripting(RdfNode unityNode) throws OData2SparqlException {
-//		
-//		RdfNode rdfFactValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE);
-//		RdfNode rdfFactValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_FACTVALUE_LABEL);
-//		RdfEntityType rdfFactValueEntityType = model.getOrCreateEntityType(rdfFactValueNode, rdfFactValueLabelNode);
-//		rdfFactValueEntityType.setBaseType(null);
-//		RdfNode rdfFactValueValueNode = RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE_VALUE);
-//		RdfNode rdfFactValueValueLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_FACTVALUE_VALUE_LABEL);
-//		model.getOrCreateProperty(rdfFactValueValueNode, rdfFactValueValueLabelNode, rdfFactValueNode);
-//		RdfNode rdfFactValueScriptNode = RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE_SCRIPT);
-//		RdfNode rdfFactValueScriptLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_FACTVALUE_SCRIPT_LABEL);
-//		model.getOrCreateProperty(rdfFactValueScriptNode, rdfFactValueScriptLabelNode, rdfFactValueNode);
-//		RdfNode rdfFactValueTraceNode = RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE_TRACE);
-//		RdfNode rdfFactValueTraceLabelNode = RdfNodeFactory.createLiteral(RdfConstants.RDF_FACTVALUE_TRACE_LABEL);
-//		model.getOrCreateProperty(rdfFactValueTraceNode, rdfFactValueTraceLabelNode, rdfFactValueNode);
-//		model.getOrCreateNavigationProperty(RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE),
-//				RdfNodeFactory.createLiteral(RdfConstants.RDF_FACTVALUE_LABEL),
-//				RdfNodeFactory.createURI(RdfConstants.RDFS_RESOURCE), RdfNodeFactory.createURI(RdfConstants.RDF_FACTVALUE),
-//				unityNode, unityNode, RdfConstants.Cardinality.MANY, RdfConstants.Cardinality.MANY);
-//	}
-
+	/**
+	 * Gets the classes.
+	 *
+	 * @return the classes
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getClasses() throws OData2SparqlException {
 
 		// Classes
@@ -300,6 +252,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the datatypes.
+	 *
+	 * @return the datatypes
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getDatatypes() throws OData2SparqlException {
 		// Datatypes
 		try {
@@ -334,6 +292,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the data type properties.
+	 *
+	 * @return the data type properties
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getDataTypeProperties() throws OData2SparqlException {
 		TreeMap<String, TreeSet<RdfEntityType>> propertyClasses = new TreeMap<>();
 		getDataTypeProperties_Domains(propertyClasses);
@@ -342,6 +306,13 @@ public class RdfModelProvider {
 		removeIncompleteProperties(propertyClasses);
 	}
 
+	/**
+	 * Gets the data type properties domains.
+	 *
+	 * @param propertyClasses the property classes
+	 * @return the data type properties domains
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getDataTypeProperties_Domains(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		try {
@@ -400,6 +371,16 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the or create super property.
+	 *
+	 * @param propertyNode the property node
+	 * @param soln the soln
+	 * @param propertyLabelNode the property label node
+	 * @param domainNode the domain node
+	 * @return the or create super property
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private RdfProperty getOrCreateSuperProperty(RdfNode propertyNode, RdfQuerySolution soln, RdfNode propertyLabelNode,
 			RdfNode domainNode) throws OData2SparqlException {
 		RdfProperty datatypeProperty = null;
@@ -432,6 +413,13 @@ public class RdfModelProvider {
 		return datatypeProperty;
 	}
 
+	/**
+	 * Gets the data type properties ranges.
+	 *
+	 * @param propertyClasses the property classes
+	 * @return the data type properties ranges
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getDataTypeProperties_Ranges(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
@@ -473,6 +461,13 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the data type properties cardinality.
+	 *
+	 * @param propertyClasses the property classes
+	 * @return the data type properties cardinality
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getDataTypeProperties_Cardinality(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses)
 			throws OData2SparqlException {
 		// DataType Properties
@@ -522,6 +517,11 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Removes the incomplete properties.
+	 *
+	 * @param propertyClasses the property classes
+	 */
 	private void removeIncompleteProperties(TreeMap<String, TreeSet<RdfEntityType>> propertyClasses) {
 		for (TreeSet<RdfEntityType> classes : propertyClasses.values()) {
 			if (!classes.isEmpty()) {
@@ -545,6 +545,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the object properties.
+	 *
+	 * @return the object properties
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getObjectProperties() throws OData2SparqlException {
 		// Object Properties
 		try {
@@ -697,6 +703,12 @@ public class RdfModelProvider {
 	//		}
 	//	}
 
+	/**
+	 * Gets the reified statements.
+	 *
+	 * @return the reified statements
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getReifiedStatements() throws OData2SparqlException {
 		// Reified Classes
 		try {
@@ -789,6 +801,24 @@ public class RdfModelProvider {
 
 	}
 
+	/**
+	 * Creates the super object property.
+	 *
+	 * @param soln the soln
+	 * @param propertyNode the property node
+	 * @param propertyLabelNode the property label node
+	 * @param domainNode the domain node
+	 * @param multipleDomainNode the multiple domain node
+	 * @param rangeNode the range node
+	 * @param multipleRangeNode the multiple range node
+	 * @param maxRangeCardinalityNode the max range cardinality node
+	 * @param minRangeCardinalityNode the min range cardinality node
+	 * @param rangeCardinalityNode the range cardinality node
+	 * @param maxDomainCardinalityNode the max domain cardinality node
+	 * @param minDomainCardinalityNode the min domain cardinality node
+	 * @param domainCardinalityNode the domain cardinality node
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void createSuperObjectProperty(RdfQuerySolution soln, RdfNode propertyNode, RdfNode propertyLabelNode,
 			RdfNode domainNode, RdfNode multipleDomainNode, RdfNode rangeNode, RdfNode multipleRangeNode,
 			RdfNode maxRangeCardinalityNode, RdfNode minRangeCardinalityNode, RdfNode rangeCardinalityNode,
@@ -831,6 +861,9 @@ public class RdfModelProvider {
 
 	}
 
+	/**
+	 * Cleanup reified predicates.
+	 */
 	private void cleanupReifiedPredicates() {
 
 		for (RdfSchema graph : model.graphs) {
@@ -899,13 +932,20 @@ public class RdfModelProvider {
 					} else {
 						log.warn(entityType.getIRI().toString()
 								+ " declared reified but no subject and object predicates");
-						entityType.setReified(false);
+						//Assume it can be inherited
+					//	entityType.setReified(false);
 					}
 				}
 			}
 		}
 	}
 
+	/**
+	 * Gets the inverse properties.
+	 *
+	 * @return the inverse properties
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getInverseProperties() throws OData2SparqlException {
 		// Inverse Properties
 		try {
@@ -971,6 +1011,25 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Creates the inverse super property.
+	 *
+	 * @param soln the soln
+	 * @param inversePropertyNode the inverse property node
+	 * @param inversePropertyLabelNode the inverse property label node
+	 * @param propertyNode the property node
+	 * @param domainNode the domain node
+	 * @param multipleDomainNode the multiple domain node
+	 * @param rangeNode the range node
+	 * @param multipleRangeNode the multiple range node
+	 * @param maxRangeCardinalityNode the max range cardinality node
+	 * @param minRangeCardinalityNode the min range cardinality node
+	 * @param rangeCardinalityNode the range cardinality node
+	 * @param maxDomainCardinalityNode the max domain cardinality node
+	 * @param minDomainCardinalityNode the min domain cardinality node
+	 * @param domainCardinalityNode the domain cardinality node
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void createInverseSuperProperty(RdfQuerySolution soln, RdfNode inversePropertyNode,
 			RdfNode inversePropertyLabelNode, RdfNode propertyNode, RdfNode domainNode, RdfNode multipleDomainNode,
 			RdfNode rangeNode, RdfNode multipleRangeNode, RdfNode maxRangeCardinalityNode,
@@ -1013,6 +1072,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the operations.
+	 *
+	 * @return the operations
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getOperations() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1055,6 +1120,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the operation association results.
+	 *
+	 * @return the operation association results
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getOperationAssociationResults() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1100,6 +1171,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the operation property results.
+	 *
+	 * @return the operation property results
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getOperationPropertyResults() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1145,6 +1222,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the operation arguments.
+	 *
+	 * @return the operation arguments
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getOperationArguments() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1190,6 +1273,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the node shapes.
+	 *
+	 * @return the node shapes
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getNodeShapes() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1234,6 +1323,12 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Gets the property shapes.
+	 *
+	 * @return the property shapes
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void getPropertyShapes() throws OData2SparqlException {
 		try {
 			int count = 0;
@@ -1287,6 +1382,11 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Cleanup orphan classes.
+	 *
+	 * @param rdfsResource the rdfs resource
+	 */
 	private void cleanupOrphanClasses(RdfEntityType rdfsResource) {
 
 		// Clean up orphaned classes
@@ -1322,6 +1422,11 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Creates the FK properties.
+	 *
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void createFKProperties() throws OData2SparqlException {
 		for (RdfSchema rdfGraph : model.graphs) {
 			for (RdfEntityType rdfEntityType : rdfGraph.getClasses()) {
@@ -1337,6 +1442,15 @@ public class RdfModelProvider {
 		}
 	}
 
+	/**
+	 * Interpret cardinality.
+	 *
+	 * @param maxCardinalityNode the max cardinality node
+	 * @param minCardinalityNode the min cardinality node
+	 * @param cardinalityNode the cardinality node
+	 * @param defaultCardinality the default cardinality
+	 * @return the cardinality
+	 */
 	private Cardinality interpretCardinality(RdfNode maxCardinalityNode, RdfNode minCardinalityNode,
 			RdfNode cardinalityNode, Cardinality defaultCardinality) {
 		if (cardinalityNode != null) {

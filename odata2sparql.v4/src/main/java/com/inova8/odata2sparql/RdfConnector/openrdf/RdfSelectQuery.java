@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.RdfConnector.openrdf;
 
 import org.eclipse.rdf4j.query.MalformedQueryException;
@@ -9,15 +12,42 @@ import org.slf4j.LoggerFactory;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
 import com.inova8.odata2sparql.RdfRepository.RdfRoleRepository;
 
+/**
+ * The Class RdfSelectQuery.
+ */
 public class RdfSelectQuery extends RdfQuery{
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfConstructQuery.class);
+	
+	/**
+	 * Instantiates a new rdf select query.
+	 *
+	 * @param rdfRoleRepository the rdf role repository
+	 * @param query the query
+	 */
 	public RdfSelectQuery(RdfRoleRepository rdfRoleRepository, String query) {
 		super.rdfRoleRepository = rdfRoleRepository;
 		super.query = query;
 	}
+	
+	/**
+	 * Exec select.
+	 *
+	 * @return the rdf result set
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public RdfResultSet execSelect() throws OData2SparqlException {
 		return execSelect(true);
 	}
+	
+	/**
+	 * Exec select.
+	 *
+	 * @param logQuery the log query
+	 * @return the rdf result set
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public RdfResultSet execSelect(Boolean logQuery) throws OData2SparqlException {
 		RdfResultSet rdfResultSet = null;
 		try {

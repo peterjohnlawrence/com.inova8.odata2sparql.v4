@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlBuilder;
 
 import java.net.URI;
@@ -32,11 +35,26 @@ import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 import com.inova8.odata2sparql.uri.UriUtils;
 
+/**
+ * The Class SparqlCreateUpdateDeleteBuilder.
+ */
 public class SparqlCreateUpdateDeleteBuilder {
+	
+	/** The log. */
 	@SuppressWarnings("unused")
 	private final Logger log = LoggerFactory.getLogger(SparqlStatement.class);
+	
+	/** The rdf model. */
 	private final RdfModel rdfModel;
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/**
+	 * Instantiates a new sparql create update delete builder.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	//private final RdfEdmProvider rdfEdmProvider;
 	public SparqlCreateUpdateDeleteBuilder(RdfEdmProvider rdfEdmProvider) {
 		super();
@@ -45,6 +63,16 @@ public class SparqlCreateUpdateDeleteBuilder {
 		//	this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Generate insert entity.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entry the entry
+	 * @return the sparql statement
+	 * @throws ODataException the o data exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateInsertEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			Entity entry) throws ODataException,OData2SparqlException {
 
@@ -62,11 +90,33 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate operation from template.
+	 *
+	 * @param template the template
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder generateOperationFromTemplate(String template, RdfEntityType entityType,
 			List<UriParameter> entityKeys, Entity entry) throws OData2SparqlException {
 		return generateOperationFromTemplate(template, entityType, entityKeys, entry, null, null);
 	}
 
+	/**
+	 * Generate operation from template.
+	 *
+	 * @param template the template
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @param property the property
+	 * @param value the value
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder generateOperationFromTemplate(String template, RdfEntityType entityType,
 			List<UriParameter> entityKeys, Entity entry, String property, Object value) throws OData2SparqlException {
 		Pattern p = Pattern.compile("(##(INSERT|DELETE|UPDATE|UPDATEPROPERTY)VALUES(.*?)##).*?", Pattern.DOTALL);
@@ -98,6 +148,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return stringBuffer;
 	}
 
+	/**
+	 * Delete values replace.
+	 *
+	 * @param group the group
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String deleteValuesReplace(String group, RdfEntityType entityType, List<UriParameter> entityKeys)
 			throws OData2SparqlException {
 		String deleteReplace = group;
@@ -111,6 +170,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return deleteReplace;
 	}
 
+	/**
+	 * Update properties replace.
+	 *
+	 * @param group the group
+	 * @param entityType the entity type
+	 * @param property the property
+	 * @param value the value
+	 * @return the string
+	 */
 	private String updatePropertiesReplace(String group, RdfEntityType entityType, String property, Object value) {
 		String updatePropertiesReplace = group;
 		RdfProperty rdfProperty = entityType.findProperty(property);
@@ -123,6 +191,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return updatePropertiesReplace;
 	}
 
+	/**
+	 * Insert values replace.
+	 *
+	 * @param group the group
+	 * @param entityType the entity type
+	 * @param entry the entry
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String insertValuesReplace(String group, RdfEntityType entityType, Entity entry)
 			throws OData2SparqlException {
 		String insertReplace = group;
@@ -143,6 +220,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return insertReplace;
 	}
 
+	/**
+	 * Generate insert properties.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	private StringBuilder generateInsertProperties(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, Entity entry) throws OData2SparqlException, ODataException {
 		String entityName = rdfResourceParts.getEntitySet().getRdfEntityType().getEntityTypeName();
@@ -177,6 +265,16 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return insertProperties;
 	}
 
+	/**
+	 * Generate update properties.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @return the string builder
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private StringBuilder generateUpdateProperties(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, Entity entry) throws OData2SparqlException {
 		String entityName = rdfResourceParts.getEntitySet().getRdfEntityType().getEntityTypeName();
@@ -211,6 +309,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return updateProperties;
 	}
 
+	/**
+	 * Adds the current graph query.
+	 *
+	 * @param entityName the entity name
+	 * @param insertProperties the insert properties
+	 */
 	protected void addCurrentGraphQuery(String entityName, StringBuilder insertProperties) {
 		insertProperties.append("\tOPTIONAL{\n");
 		insertProperties.append("\t\tGRAPH ?currentGraph \n");
@@ -225,6 +329,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("\tFILTER(?revisedUpdated)\n");
 	}
 
+	/**
+	 * Adds the current graph insert query.
+	 *
+	 * @param entityName the entity name
+	 * @param insertProperties the insert properties
+	 */
 	protected void addCurrentGraphInsertQuery(String entityName, StringBuilder insertProperties) {
 		insertProperties.append("\tOPTIONAL{\n");
 		insertProperties.append("\t\tGRAPH ?currentGraph \n");
@@ -239,6 +349,18 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertProperties.append("\tFILTER(?revisedUpdated)\n");
 	}
 
+	/**
+	 * Adds the insert property values.
+	 *
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entity the entity
+	 * @param entityName the entity name
+	 * @param insertPropertyValues the insert property values
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	protected void addInsertPropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entity,
 			String entityName, StringBuilder insertPropertyValues, RdfResourceParts rdfResourceParts)
 			throws OData2SparqlException, ODataException {
@@ -283,6 +405,14 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insertPropertyValues.append("\t}\n");
 	}
 
+	/**
+	 * Find key.
+	 *
+	 * @param entityType the entity type
+	 * @param entity the entity
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected String findKey(RdfEntityType entityType, Entity entity) throws OData2SparqlException {
 		String entityKey;
 		String expandedKey = null;
@@ -304,6 +434,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return expandedKey;
 	}
 
+	/**
+	 * Builds the entity statements.
+	 *
+	 * @param entityType the entity type
+	 * @param entity the entity
+	 * @param insertPropertyValues the insert property values
+	 * @param expandedKey the expanded key
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void buildEntityStatements(RdfEntityType entityType, Entity entity, StringBuilder insertPropertyValues,
 			String expandedKey) throws OData2SparqlException {
 		//Now create VALUES statement for all dataproperties
@@ -363,6 +502,14 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Builds the dependent entity statements.
+	 *
+	 * @param insertPropertyValues the insert property values
+	 * @param navigationProperty the navigation property
+	 * @param dependentEntity the dependent entity
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void buildDependentEntityStatements(StringBuilder insertPropertyValues,
 			RdfNavigationProperty navigationProperty, Entity dependentEntity) throws OData2SparqlException {
 		String dependentKey = findKey(navigationProperty.getRangeClass(), dependentEntity);
@@ -376,6 +523,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Adds the update property values.
+	 *
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @param entityName the entity name
+	 * @param updatePropertyValues the update property values
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void addUpdatePropertyValues(RdfEntityType entityType, List<UriParameter> entityKeys, Entity entry,
 			String entityName, StringBuilder updatePropertyValues, RdfResourceParts rdfResourceParts)
 			throws OData2SparqlException {
@@ -474,6 +632,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		updatePropertyValues.append("\t}\n");
 	}
 
+	/**
+	 * Adds the delete property values.
+	 *
+	 * @param expandedKey the expanded key
+	 * @param entityName the entity name
+	 * @param deleteProperties the delete properties
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void addDeletePropertyValues(String expandedKey, String entityName, StringBuilder deleteProperties,
 			RdfResourceParts rdfResourceParts) throws OData2SparqlException {
 		deleteProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
@@ -519,6 +686,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		deleteProperties.append("\t}\n");
 	}
 
+	/**
+	 * Adds the delete entity reference.
+	 *
+	 * @param expandedKey the expanded key
+	 * @param entityName the entity name
+	 * @param deleteProperties the delete properties
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	protected void addDeleteEntityReference(String expandedKey, String entityName, StringBuilder deleteProperties,
 			RdfResourceParts rdfResourceParts) throws OData2SparqlException {
 		deleteProperties.append("\tVALUES(?").append(entityName).append("_s ?").append(entityName).append("_p ?")
@@ -553,6 +729,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		deleteProperties.append("\t}\n");
 	}
 
+	/**
+	 * Adds the change logging parameters.
+	 *
+	 * @param entityName the entity name
+	 * @param changeLoggingParameters the change logging parameters
+	 */
 	protected void addChangeLoggingParameters(String entityName, StringBuilder changeLoggingParameters) {
 		changeLoggingParameters.append("\tBIND(NOW() as ?now)\n");
 		changeLoggingParameters.append("\tBIND(IRI(CONCAT(\"")
@@ -572,6 +754,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 				.append(entityName).append("_p))),\"-\",STR(?now)))) as ?deletedChange)\n");
 	}
 
+	/**
+	 * Adds the added.
+	 *
+	 * @param entityName the entity name
+	 * @param insert the insert
+	 */
 	protected void addAdded(String entityName, StringBuilder insert) {
 		insert.append("\tGRAPH ?addedGraph\n");
 		insert.append("\t{\n");
@@ -580,6 +768,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		insert.append("\t}\n");
 	}
 
+	/**
+	 * Adds the delete.
+	 *
+	 * @param entityName the entity name
+	 * @param delete the delete
+	 */
 	protected void addDelete(String entityName, StringBuilder delete) {
 		delete.append("DELETE {\n");
 		delete.append("\tGRAPH ?deletedGraph\n");
@@ -590,6 +784,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		delete.append("}\n");
 	}
 
+	/**
+	 * Adds the change logging header.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addChangeLoggingHeader(String entityName, StringBuilder changelogging) {
 		changelogging.append("\t##Changes\n");
 		changelogging.append("\tGRAPH <").append(rdfModel.getRdfRepository().getDataRepository().getChangeGraphUrl())
@@ -598,6 +798,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		changelogging.append("\t\t<http://inova8.com/odata4sparql#created>  ?now.\n");
 	}
 
+	/**
+	 * Adds the change logging added change.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addChangeLoggingAddedChange(String entityName, StringBuilder changelogging) {
 		changelogging.append("\t?change <http://inova8.com/odata4sparql#added> ?addedChange .\n");
 		changelogging.append("\t?addedChange \n");
@@ -607,6 +813,12 @@ public class SparqlCreateUpdateDeleteBuilder {
 		changelogging.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_no .\n");
 	}
 
+	/**
+	 * Adds the change logging deleted change.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addChangeLoggingDeletedChange(String entityName, StringBuilder changelogging) {
 		changelogging.append("\t?change <http://inova8.com/odata4sparql#deleted> ?deletedChange .\n");
 		changelogging.append("\t?deletedChange \n");
@@ -616,18 +828,36 @@ public class SparqlCreateUpdateDeleteBuilder {
 		changelogging.append("\t\t<http://inova8.com/odata4sparql#object>  ?").append(entityName).append("_o .\n");
 	}
 
+	/**
+	 * Adds the deleted logging.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addDeletedLogging(String entityName, StringBuilder changelogging) {
 		addChangeLoggingHeader(entityName, changelogging);
 		addChangeLoggingDeletedChange(entityName, changelogging);
 		changelogging.append("\t}\n");
 	}
 
+	/**
+	 * Adds the added logging.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addAddedLogging(String entityName, StringBuilder changelogging) {
 		addChangeLoggingHeader(entityName, changelogging);
 		addChangeLoggingAddedChange(entityName, changelogging);
 		changelogging.append("\t}\n");
 	}
 
+	/**
+	 * Adds the change logging.
+	 *
+	 * @param entityName the entity name
+	 * @param changelogging the changelogging
+	 */
 	protected void addChangeLogging(String entityName, StringBuilder changelogging) {
 		addChangeLoggingHeader(entityName, changelogging);
 		addChangeLoggingAddedChange(entityName, changelogging);
@@ -635,6 +865,13 @@ public class SparqlCreateUpdateDeleteBuilder {
 		changelogging.append("\t}\n");
 	}
 
+	/**
+	 * Cast object to xsd.
+	 *
+	 * @param object the object
+	 * @return the string
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String castObjectToXsd(Object object) throws OData2SparqlException {
 		switch (object.getClass().getName()) {
 		case "Null":
@@ -654,6 +891,15 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate delete entity.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateDeleteEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys) throws OData2SparqlException {
 		if (entityType.isOperation()) {
@@ -694,6 +940,14 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate delete entity reference.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateDeleteEntityReference(RdfResourceParts rdfResourceParts, RdfEntityType entityType)
 			throws OData2SparqlException {
 		if (entityType.isOperation()) {
@@ -734,6 +988,16 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate update entity.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param entry the entry
+	 * @return the sparql statement
+	 * @throws Exception the exception
+	 */
 	public SparqlStatement generateUpdateEntity(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, Entity entry) throws Exception {
 		if (entityType.isOperation()) {
@@ -751,6 +1015,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate update entity simple property value.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param property the property
+	 * @param entry the entry
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateUpdateEntitySimplePropertyValue(RdfResourceParts rdfResourceParts,
 			RdfEntityType entityType, List<UriParameter> entityKeys, String property, Object entry)
 			throws OData2SparqlException {
@@ -807,6 +1082,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate operation update entity simple property value.
+	 *
+	 * @param updatePropertyText the update property text
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param property the property
+	 * @param entry the entry
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private SparqlStatement generateOperationUpdateEntitySimplePropertyValue(String updatePropertyText,
 			RdfEntityType entityType, List<UriParameter> entityKeys, String property, Object entry)
 			throws OData2SparqlException {
@@ -814,6 +1100,16 @@ public class SparqlCreateUpdateDeleteBuilder {
 				entityKeys, null, property, entry).toString());
 	}
 
+	/**
+	 * Generate delete entity simple property value.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param property the property
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateDeleteEntitySimplePropertyValue(RdfResourceParts rdfResourceParts,
 			RdfEntityType entityType, List<UriParameter> entityKeys, String property) throws OData2SparqlException {
 		if (entityType.isOperation()) {
@@ -866,6 +1162,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Generate insert entity reference.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param entityKeys the entity keys
+	 * @param navigationProperty the navigation property
+	 * @param requestEntityReferences the request entity references
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	public SparqlStatement generateInsertEntityReference(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			List<UriParameter> entityKeys, RdfNavigationProperty navigationProperty, List<URI> requestEntityReferences)
 			throws OData2SparqlException {
@@ -923,6 +1230,13 @@ public class SparqlCreateUpdateDeleteBuilder {
 		}
 	}
 
+	/**
+	 * Gets the expanded link entitykey.
+	 *
+	 * @param requestEntityReference the request entity reference
+	 * @return the expanded link entitykey
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private String getExpandedLinkEntitykey(URI requestEntityReference) throws OData2SparqlException {
 		String[] parts = requestEntityReference.getPath().split("/");
 		String linkEntityUri = parts[parts.length - 1];
@@ -931,6 +1245,17 @@ public class SparqlCreateUpdateDeleteBuilder {
 		return expandedLinkEntityKey;
 	}
 
+	/**
+	 * Generate update entity reference.
+	 *
+	 * @param rdfResourceParts the rdf resource parts
+	 * @param entityType the entity type
+	 * @param navigationProperty the navigation property
+	 * @param requestEntityReferences the request entity references
+	 * @return the sparql statement
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 * @throws ODataException the o data exception
+	 */
 	public SparqlStatement generateUpdateEntityReference(RdfResourceParts rdfResourceParts, RdfEntityType entityType,
 			RdfNavigationProperty navigationProperty, List<URI> requestEntityReferences) throws OData2SparqlException, ODataException {
 		if (entityType.isOperation()) {

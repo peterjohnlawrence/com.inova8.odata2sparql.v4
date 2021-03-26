@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
@@ -23,17 +26,42 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class SparqlDefaultProcessor.
+ */
 public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumentProcessor, ErrorProcessor {
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(SparqlDefaultProcessor.class);
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(final OData odata, final ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
 
+	/**
+	 * Read service document.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestedContentType the requested content type
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readServiceDocument(final ODataRequest request, final ODataResponse response, final UriInfo uriInfo,
 			final ContentType requestedContentType) throws ODataApplicationException, ODataLibraryException {
@@ -60,6 +88,16 @@ public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumen
 		}
 	}
 
+	/**
+	 * Read metadata.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestedContentType the requested content type
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readMetadata(final ODataRequest request, final ODataResponse response, final UriInfo uriInfo,
 			final ContentType requestedContentType) throws ODataApplicationException, ODataLibraryException {
@@ -85,6 +123,14 @@ public class SparqlDefaultProcessor implements MetadataProcessor, ServiceDocumen
 		}
 	}
 
+	/**
+	 * Process error.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param serverError the server error
+	 * @param responseFormat the response format
+	 */
 	@Override
 	public void processError(ODataRequest request, ODataResponse response, ODataServerError serverError,
 			ContentType responseFormat) {

@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.InputStream;
@@ -22,17 +25,43 @@ import org.apache.olingo.server.api.processor.BatchProcessor;
 
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 
+/**
+ * The Class SparqlBatchProcessor.
+ */
 public class SparqlBatchProcessor implements BatchProcessor {
+	
+	/** The odata. */
 	private OData odata;
+	
+	/**
+	 * Instantiates a new sparql batch processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlBatchProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 	}
 
+	/**
+	 * Process batch.
+	 *
+	 * @param facade the facade
+	 * @param request the request
+	 * @param response the response
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void processBatch(BatchFacade facade, ODataRequest request, ODataResponse response)
 			throws ODataApplicationException, ODataLibraryException {
@@ -67,6 +96,15 @@ public class SparqlBatchProcessor implements BatchProcessor {
 
 	}
 
+	/**
+	 * Process change set.
+	 *
+	 * @param facade the facade
+	 * @param requests the requests
+	 * @return the o data response part
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public ODataResponsePart processChangeSet(BatchFacade facade, List<ODataRequest> requests)
 			throws ODataApplicationException, ODataLibraryException {

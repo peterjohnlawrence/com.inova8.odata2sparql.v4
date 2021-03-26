@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package odata2sparql.v4.test;
 
 import static org.junit.Assert.*;
@@ -23,31 +26,83 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.mock.web.MockServletConfig;
 
+/**
+ * The Class OData2SPARQLTest.
+ */
 @RunWith(value = Parameterized.class)
 public class OData2SPARQLTest {
+	
+	/** The servlet. */
 	private static RdfODataServlet servlet;
+	
+	/** The servlet context. */
 	private static MockServletContext servletContext;
+	
+	/** The servlet config. */
 	private static MockServletConfig servletConfig;
+	
+	/** The request. */
 	private static MockHttpServletRequest request;
+	
+	/** The response. */
 	private static MockHttpServletResponse response;
+	
+	/** The group. */
 	@SuppressWarnings("unused")
 	private String group;
+	
+	/** The subgroup. */
 	@SuppressWarnings("unused")
 	private String subgroup;
+	
+	/** The test. */
 	@SuppressWarnings("unused")
 	private String test;
+	
+	/** The skip. */
 	private String skip;
+	
+	/** The method. */
 	private String method;
+	
+	/** The repository. */
 	private String repository;
+	
+	/** The request URI. */
 	private String requestURI;
+	
+	/** The query. */
 	private String query;
+	
+	/** The options. */
 	private String options;
+	
+	/** The expected. */
 	private String expected;
+	
+	/** The comments. */
 	@SuppressWarnings("unused")
 	private String comments;
+	
+	/** The index. */
 	@SuppressWarnings("unused")
 	private String index;
 	
+	/**
+	 * Instantiates a new o data 2 SPARQL test.
+	 *
+	 * @param group the group
+	 * @param subgroup the subgroup
+	 * @param test the test
+	 * @param skip the skip
+	 * @param method the method
+	 * @param repository the repository
+	 * @param requestURI the request URI
+	 * @param query the query
+	 * @param options the options
+	 * @param expected the expected
+	 * @param comments the comments
+	 */
 	public OData2SPARQLTest(String group, String subgroup, String test, String skip, String method, String repository,
 			String requestURI, String query, String options, String expected, String comments) {//,String index) {
 		this.group = group;
@@ -64,6 +119,13 @@ public class OData2SPARQLTest {
 		this.index = "index";
 	}
 
+	/**
+	 * Gets the test data.
+	 *
+	 * @param fileName the file name
+	 * @return the test data
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static Collection<String[]> getTestData(String fileName) throws IOException {
 		List<String[]> records = new ArrayList<String[]>();
 		String record;
@@ -107,6 +169,13 @@ public class OData2SPARQLTest {
 		return records;
 	}
 
+	/**
+	 * Copy of.
+	 *
+	 * @param array the array
+	 * @param length the length
+	 * @return the string[]
+	 */
 	private static String[] copyOf(String[] array, int length) {
 		if (array.length == length) {
 			return array;
@@ -118,15 +187,33 @@ public class OData2SPARQLTest {
 		}
 	}
 
+	/**
+	 * Removes the excess white space.
+	 *
+	 * @param input the input
+	 * @return the string
+	 */
 	String removeExcessWhiteSpace(String input) {
 		String output = input.trim().replaceAll("\\s+", " ");
 		return output;
 	}
 
+	/**
+	 * Assert string equals.
+	 *
+	 * @param expected the expected
+	 * @param actual the actual
+	 */
 	void assertStringEquals(String expected, String actual) {
 		assertEquals(removeExcessWhiteSpace(expected), removeExcessWhiteSpace(actual));
 	}
 
+	/**
+	 * Test data.
+	 *
+	 * @return the collection
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	//@Parameters(name = "{0}:{1}/{2}:URI={3}?{4}")
 	@Parameters(name = "{10}:{3}/{2}:URI={5}/{6}?{7}")
 	public static Collection<String[]> testData() throws IOException {
@@ -134,6 +221,11 @@ public class OData2SPARQLTest {
 		return getTestData("src/test/resources/GetTests.csv");
 	}
 
+	/**
+	 * Sets the up.
+	 *
+	 * @throws Exception the exception
+	 */
 	@BeforeClass
 	public static void setUp() throws Exception {
 		servlet = new RdfODataServlet();
@@ -146,6 +238,12 @@ public class OData2SPARQLTest {
 		servlet.init(servletConfig);
 	}
 
+	/**
+	 * Service request.
+	 *
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Test
 	public void serviceRequest() throws ServletException, IOException {
 		request = new MockHttpServletRequest(servletContext);

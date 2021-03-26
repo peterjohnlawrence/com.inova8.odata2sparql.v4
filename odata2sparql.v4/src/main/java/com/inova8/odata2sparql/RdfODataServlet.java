@@ -1,8 +1,12 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -30,25 +34,46 @@ import org.slf4j.LoggerFactory;
 
 import com.inova8.odata2sparql.Constants.RdfConstants;
 import com.inova8.odata2sparql.Exception.OData2SparqlException;
+import com.inova8.odata2sparql.Processor.EntityCollectionProcessor;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProvider;
 import com.inova8.odata2sparql.RdfEdmProvider.RdfEdmProviders;
 import com.inova8.odata2sparql.RdfRepository.RdfRepository;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlBatchProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlComplexProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlDefaultProcessor;
-import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlEntityProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlPrimitiveValueProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceCollectionProcessor;
 import com.inova8.odata2sparql.SparqlProcessor.SparqlReferenceProcessor;
 
+/**
+ * The Class RdfODataServlet.
+ */
 public class RdfODataServlet extends HttpServlet {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(RdfODataServlet.class);
+	
+	/** The rdf edm providers. */
 	static private RdfEdmProviders rdfEdmProviders = null;
+	
+	/** The version. */
 	static String version = null;
+	
+	/** The build date. */
 	static String buildDate = null;
 
+	/**
+	 * Service.
+	 *
+	 * @param req the req
+	 * @param resp the resp
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void service(final HttpServletRequest req, final HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
@@ -83,7 +108,7 @@ public class RdfODataServlet extends HttpServlet {
 						ODataHttpHandler handler = odata.createHandler(edm);
 						//Reserve first parameter for either the service name or a$RESET. $RELOAD
 						handler.setSplit(1);
-						handler.register(new SparqlEntityCollectionProcessor(rdfEdmProvider));
+						handler.register(new EntityCollectionProcessor(rdfEdmProvider));
 						handler.register(new SparqlEntityProcessor(rdfEdmProvider));
 						handler.register(new SparqlPrimitiveValueProcessor(rdfEdmProvider));
 						handler.register(new SparqlComplexProcessor(rdfEdmProvider));
@@ -114,6 +139,11 @@ public class RdfODataServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Gets the rdf edm providers.
+	 *
+	 * @return the rdf edm providers
+	 */
 	private synchronized RdfEdmProviders getRdfEdmProviders() {
 		if(rdfEdmProviders==null) {
 			ServletContext servletContext = getServletContext();
@@ -126,6 +156,12 @@ public class RdfODataServlet extends HttpServlet {
 		}
 		return rdfEdmProviders;
 	}
+	
+	/**
+	 * Options response.
+	 *
+	 * @param resp the resp
+	 */
 	private void optionsResponse(final HttpServletResponse resp) {
 		resp.addHeader("Access-Control-Allow-Origin", "*");
 		resp.addHeader("Access-Control-Allow-Headers",
@@ -138,6 +174,14 @@ public class RdfODataServlet extends HttpServlet {
 		resp.setStatus(200);
 	}
 
+	/**
+	 * Html response.
+	 *
+	 * @param req the req
+	 * @param resp the resp
+	 * @param textResponse the text response
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void htmlResponse(HttpServletRequest req, HttpServletResponse resp, String textResponse)
 			throws IOException {
 		try {
@@ -149,6 +193,12 @@ public class RdfODataServlet extends HttpServlet {
 			simpleResponse(req, resp, "odata2sparql.v4");
 		}
 	}
+	
+	/**
+	 * Read version.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@SuppressWarnings("unused")
 	private void readVersion()
 			throws IOException {
@@ -166,6 +216,15 @@ public class RdfODataServlet extends HttpServlet {
 			log.error("Cannot read version information", e);
 		}
 	}
+	
+	/**
+	 * Html template response.
+	 *
+	 * @param req the req
+	 * @param resp the resp
+	 * @param textTemplate the text template
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void htmlTemplateResponse(HttpServletRequest req, HttpServletResponse resp, String textTemplate)
 			throws IOException {
 		try {
@@ -193,6 +252,12 @@ public class RdfODataServlet extends HttpServlet {
 			simpleResponse(req, resp, "odata2sparql.v4");
 		}
 	}
+	
+	/**
+	 * Sets the template location.
+	 *
+	 * @return the properties
+	 */
 	private static Properties setTemplateLocation() {
 		Properties props = new Properties();
 		String sPath = getWorkingPath();
@@ -200,6 +265,12 @@ public class RdfODataServlet extends HttpServlet {
 		props.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
 		return props;
 	}
+	
+	/**
+	 * Gets the working path.
+	 *
+	 * @return the working path
+	 */
 	private static String getWorkingPath() {
 		URL main = RdfODataServlet.class.getResource("RdfODataServlet.class");
 		File file = new File(main.getPath());
@@ -207,8 +278,19 @@ public class RdfODataServlet extends HttpServlet {
 		String sPath = path.getParent().getParent().getParent().getParent().toString();
 		return sPath;
 	}
+	
+	/**
+	 * Simple response.
+	 *
+	 * @param req the req
+	 * @param resp the resp
+	 * @param textResponse the text response
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void simpleResponse(final HttpServletRequest req, final HttpServletResponse resp, String textResponse)
 			throws IOException {
-		resp.getOutputStream().println(textResponse);
+		PrintWriter out = resp.getWriter();
+		out.println(textResponse);
+		//resp.getOutputStream().println(textResponse);
 	}
 }

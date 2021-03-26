@@ -1,3 +1,6 @@
+/*
+ * inova8 2020
+ */
 package com.inova8.odata2sparql.SparqlProcessor;
 
 import java.io.ByteArrayInputStream;
@@ -39,22 +42,52 @@ import com.inova8.odata2sparql.uri.RdfResourcePart;
 import com.inova8.odata2sparql.uri.RdfResourceParts;
 import com.inova8.odata2sparql.uri.UriType;
 
+/**
+ * The Class SparqlComplexProcessor.
+ */
 public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollectionProcessor {
+	
+	/** The rdf edm provider. */
 	private final RdfEdmProvider rdfEdmProvider;
+	
+	/** The odata. */
 	private OData odata;
+	
+	/** The service metadata. */
 	private ServiceMetadata serviceMetadata;
 
+	/**
+	 * Instantiates a new sparql complex processor.
+	 *
+	 * @param rdfEdmProvider the rdf edm provider
+	 */
 	public SparqlComplexProcessor(RdfEdmProvider rdfEdmProvider) {
 		super();
 		this.rdfEdmProvider = rdfEdmProvider;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param odata the odata
+	 * @param serviceMetadata the service metadata
+	 */
 	@Override
 	public void init(OData odata, ServiceMetadata serviceMetadata) {
 		this.odata = odata;
 		this.serviceMetadata = serviceMetadata;
 	}
 
+	/**
+	 * Read complex.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
 			throws ODataApplicationException, ODataLibraryException {
@@ -73,6 +106,16 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 
 	}
 
+	/**
+	 * Read complex collection.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void readComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -119,6 +162,22 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 				uriInfo, rdfResourceParts);
 
 	}
+	
+	/**
+	 * Write collection.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param responseFormat the response format
+	 * @param edmEntitySet the edm entity set
+	 * @param edmPropertyName the edm property name
+	 * @param edmComplexType the edm complex type
+	 * @param property the property
+	 * @param uriInfo the uri info
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws SerializerException the serializer exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void writeCollection(ODataRequest request, ODataResponse response, ContentType responseFormat,
 			EdmEntitySet edmEntitySet, String edmPropertyName, EdmComplexType edmComplexType, Property property,
 			UriInfo uriInfo, RdfResourceParts rdfResourceParts) throws SerializerException, ODataApplicationException {
@@ -142,6 +201,14 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 			response.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
 		}
 	}
+	
+	/**
+	 * Navigate to complex property.
+	 *
+	 * @param entity the entity
+	 * @param rdfResourceParts the rdf resource parts
+	 * @return the property
+	 */
 	private Property navigateToComplexProperty(Entity entity, RdfResourceParts rdfResourceParts) {
 		ArrayList<RdfResourcePart> navPath = rdfResourceParts.getNavPath();
 		if (navPath == null) {
@@ -158,6 +225,18 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		}
 	}
 
+	/**
+	 * Read complex value.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param responseFormat the response format
+	 * @param isValue the is value
+	 * @throws EdmException the edm exception
+	 * @throws ODataException the o data exception
+	 * @throws OData2SparqlException the o data 2 sparql exception
+	 */
 	private void readComplexValue(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType responseFormat, Boolean isValue) throws EdmException, ODataException, OData2SparqlException {
 		// 1. Retrieve info from URI
@@ -199,6 +278,13 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		}
 	}
 
+	/**
+	 * Write complex value.
+	 *
+	 * @param response the response
+	 * @param property the property
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void writeComplexValue(ODataResponse response, Property property) throws ODataApplicationException {
 		if (property == null) {
 			throw new ODataApplicationException("No property found", HttpStatusCode.NOT_FOUND.getStatusCode(),
@@ -216,6 +302,21 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		}
 	}
 
+	/**
+	 * Write property.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param responseFormat the response format
+	 * @param edmEntitySet the edm entity set
+	 * @param edmPropertyName the edm property name
+	 * @param edmComplexType the edm complex type
+	 * @param property the property
+	 * @param uriInfo the uri info
+	 * @param rdfResourceParts the rdf resource parts
+	 * @throws SerializerException the serializer exception
+	 * @throws ODataApplicationException the o data application exception
+	 */
 	private void writeProperty(ODataRequest request, ODataResponse response, ContentType responseFormat,
 			EdmEntitySet edmEntitySet, String edmPropertyName, EdmComplexType edmComplexType, Property property,
 			UriInfo uriInfo, RdfResourceParts rdfResourceParts) throws SerializerException, ODataApplicationException {
@@ -250,6 +351,17 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 		}
 	}
 
+	/**
+	 * Update complex.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updateComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat,
 			ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
@@ -258,6 +370,15 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 
 	}
 
+	/**
+	 * Delete complex.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void deleteComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
@@ -266,6 +387,17 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 
 	}
 
+	/**
+	 * Update complex collection.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @param requestFormat the request format
+	 * @param responseFormat the response format
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void updateComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
 			ContentType requestFormat, ContentType responseFormat)
@@ -275,6 +407,15 @@ public class SparqlComplexProcessor implements ComplexProcessor, ComplexCollecti
 
 	}
 
+	/**
+	 * Delete complex collection.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @param uriInfo the uri info
+	 * @throws ODataApplicationException the o data application exception
+	 * @throws ODataLibraryException the o data library exception
+	 */
 	@Override
 	public void deleteComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
 			throws ODataApplicationException, ODataLibraryException {
