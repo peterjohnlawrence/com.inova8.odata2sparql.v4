@@ -970,7 +970,7 @@ public class RdfConstants {
 			rdfsFile = repositoryManagerDirPath + "ontologies/rdf-schema.ttl";
 			sailFile = repositoryManagerDirPath + "ontologies/sail.rdf";
 			spFile = repositoryManagerDirPath + "ontologies/sp.ttl";
-			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.1.rdf";
+			contextmenuFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.contextmenu.v2.0.2.rdf";
 			olgapFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.olgap.v2.0.0.rdf";
 			searchFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.lucenesearch.v3.0.0.rdf";
 			changeFile = repositoryManagerDirPath + "ontologies/odata4sparql.proxy.change.v1.0.0.rdf";
